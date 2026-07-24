@@ -1,26 +1,65 @@
-import { BadgeCheck, Focus, ZoomIn } from 'lucide-react';
-import { useBandsStore, useSelectionStore, useViewportStore } from '@/stores';
+import { Crosshair, Grid3X3, MousePointer2, Move, Ruler, ZoomIn } from 'lucide-react';
+import { movementLibrary } from '@/domain/movements/movementLibrary';
+import { useBandsStore, useGlobalSettingsStore, useSelectionStore, useViewportStore } from '@/stores';
 
 export const BottomStatusBar = () => {
   const zoom = useViewportStore((s) => s.zoom);
+  const showSnapping = useViewportStore((s) => s.showSnapping);
+  const mouseX = useViewportStore((s) => s.mouseX);
+  const mouseY = useViewportStore((s) => s.mouseY);
   const selectedBandId = useSelectionStore((s) => s.selectedBandId);
   const bands = useBandsStore((s) => s.bands);
+  const caseDiameterMm = useGlobalSettingsStore((s) => s.caseDiameterMm);
+  const units = useGlobalSettingsStore((s) => s.units);
 
   const selected = bands.find((b) => b.id === selectedBandId);
+  const movement = movementLibrary[0];
 
   return (
-    <footer className="grid grid-cols-1 items-center gap-2 rounded-panel border border-engineering-border bg-engineering-panel/80 p-3 text-xs text-engineering-muted shadow-panel md:grid-cols-3">
-      <div className="flex items-center gap-2">
-        <BadgeCheck className="h-4 w-4 text-engineering-teal" />
-        Parametric mode active
+    <footer className="ds-panel grid grid-cols-1 gap-2 px-3 py-2 text-xs text-engineering-muted xl:grid-cols-9">
+      <div className="flex items-center gap-1.5">
+        <MousePointer2 className="ds-icon-sm text-engineering-teal" />
+        <span className="ds-label-status">Mouse</span>
+        <span className="font-mono text-engineering-text">
+          {mouseX.toFixed(0)}, {mouseY.toFixed(0)}
+        </span>
       </div>
-      <div className="flex items-center gap-2 md:justify-center">
-        <ZoomIn className="h-4 w-4 text-engineering-amber" />
-        Zoom {Math.round(zoom * 100)}%
+      <div className="flex items-center gap-1.5">
+        <ZoomIn className="ds-icon-sm text-engineering-amber" />
+        <span className="ds-label-status">Zoom</span>
+        <span className="font-mono text-engineering-text">{Math.round(zoom * 100)}%</span>
       </div>
-      <div className="flex items-center gap-2 md:justify-end">
-        <Focus className="h-4 w-4 text-engineering-teal" />
-        {selected ? `Selected: ${selected.name}` : 'Selected: None'}
+      <div className="flex items-center gap-1.5">
+        <Grid3X3 className="ds-icon-sm text-engineering-teal" />
+        <span className="ds-label-status">Grid</span>
+        <span className="font-mono text-engineering-text">0.10mm</span>
+      </div>
+      <div className="flex items-center gap-1.5">
+        <Move className="ds-icon-sm text-engineering-amber" />
+        <span className="ds-label-status">Snap</span>
+        <span className="font-mono text-engineering-text">{showSnapping ? 'On' : 'Off'}</span>
+      </div>
+      <div className="flex items-center gap-1.5">
+        <Ruler className="ds-icon-sm text-engineering-teal" />
+        <span className="ds-label-status">Units</span>
+        <span className="font-mono text-engineering-text">{units}</span>
+      </div>
+      <div className="flex items-center gap-1.5">
+        <Crosshair className="ds-icon-sm text-engineering-amber" />
+        <span className="ds-label-status">Movement</span>
+        <span className="font-mono text-engineering-text">{movement?.name ?? 'None'}</span>
+      </div>
+      <div className="flex items-center gap-1.5">
+        <span className="ds-label-status">Band</span>
+        <span className="font-mono text-engineering-text">{selected ? selected.displayName : 'None'}</span>
+      </div>
+      <div className="flex items-center gap-1.5">
+        <span className="ds-label-status">Tool</span>
+        <span className="font-mono text-engineering-text">Select</span>
+      </div>
+      <div className="flex items-center gap-1.5 xl:justify-end">
+        <span className="ds-label-status">Case</span>
+        <span className="font-mono text-engineering-amber">{caseDiameterMm.toFixed(1)}mm</span>
       </div>
     </footer>
   );

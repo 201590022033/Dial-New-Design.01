@@ -5,3 +5,17 @@ export const getMovementTemplateById = (id: string) => {
 };
 
 export const listMovementTemplates = () => movementLibrary;
+
+export const getMovementRecommendations = (movementId: string) => {
+  const movement = getMovementTemplateById(movementId);
+  if (!movement) {
+    return null;
+  }
+
+  return {
+    recommendedChapterRingDiameterMm: movement.recommendedChapterRingDiameterMm,
+    recommendedBezelDiameterMm: movement.recommendedBezelDiameterMm,
+    dialDiameterMm: movement.dialDiameterMm,
+    centerHoleMm: movement.centerHoleMm
+  };
+};
