@@ -17,6 +17,7 @@ export const BottomStatusBar = () => {
   const selectedBandId = useSelectionStore((s) => s.selectedBandId);
   const bands = useBandsStore((s) => s.bands);
   const warnings = useBandsStore((s) => s.warnings);
+  const manufacturingWarnings = useBandsStore((s) => s.manufacturingWarnings);
   const validationResults = useBandsStore((s) => s.validationResults);
   const caseDiameterMm = useGlobalSettingsStore((s) => s.caseDiameterMm);
   const units = useGlobalSettingsStore((s) => s.units);
@@ -25,6 +26,7 @@ export const BottomStatusBar = () => {
   const activeTemplateId = useDesignEngineStore((s) => s.activeTemplateId);
   const selectedMovementId = useDesignEngineStore((s) => s.selectedMovementId);
   const lumeMode = useDesignEngineStore((s) => s.lumeResult.mode);
+  const collisionWarnings = useDesignEngineStore((s) => s.collisionWarnings);
 
   const selected = bands.find((b) => b.id === selectedBandId);
   const movement = movementLibrary.find((entry) => entry.id === selectedMovementId) ?? movementLibrary[0];
@@ -107,6 +109,14 @@ export const BottomStatusBar = () => {
       <div className="flex items-center gap-1.5">
         <span className="ds-label-status">Lume</span>
         <span className="font-mono text-engineering-text">{lumeMode}</span>
+      </div>
+      <div className="flex items-center gap-1.5">
+        <span className="ds-label-status">Manufacturing</span>
+        <span className="font-mono text-engineering-text">{manufacturingWarnings.length} warning(s)</span>
+      </div>
+      <div className="flex items-center gap-1.5">
+        <span className="ds-label-status">Collisions</span>
+        <span className="font-mono text-engineering-text">{collisionWarnings.length} warning(s)</span>
       </div>
       <div className="flex items-center gap-1.5">
         <span className="ds-label-status">Constraints</span>

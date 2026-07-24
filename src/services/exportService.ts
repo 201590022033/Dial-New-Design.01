@@ -1,4 +1,17 @@
 import type { BandEntity } from '@/domain/bands/types';
+import type { DesignOverlay, RenderContext } from '@/renderer/types';
+import {
+  estimateOutputSize,
+  generateEngineeringSvg,
+  generatePseudoDxf,
+  generatePseudoPdf,
+  type EngineeringExportInput,
+  type EngineeringExportTarget,
+  type ExportMetadata
+} from '@/services/exportGeometryService';
+import { buildExportPreviewSummary, type ExportPreviewSummary } from '@/services/exportPreviewService';
+import type { ScaleRunResult } from '@/services/scaleEngineService';
+import type { ManufacturingWarning } from '@/domain/manufacturing/validationEngine';
 
 export interface ExportPayload {
   svgMarkup: string;
@@ -24,6 +37,19 @@ export interface ManufacturingPackage {
     svgGroupId: string;
     exportEnabled: boolean;
   }>;
+}
+
+export interface EngineeringExportRequest {
+  target: EngineeringExportTarget;
+  format: ExtendedExportRequest['format'];
+  filename: string;
+  bands: BandEntity[];
+  selectedBandId: string | null;
+  context: RenderContext;
+  scalePreview: ScaleRunResult | null;
+  designOverlay: DesignOverlay | null;
+  warnings: ManufacturingWarning[];
+  metadata?: ExportMetadata;
 }
 
 export const exportSvg = ({ svgMarkup, filename }: ExportPayload): void => {
@@ -94,4 +120,64 @@ export const buildManufacturingPackage = (
       exportEnabled: band.exportEnabled
     }))
   };
+};
+
+export const buildEngineeringExport = (request: EngineeringExportRequest): {
+  content: string;
+  format: ExtendedExportRequest['format'];
+  preview: ExportPreviewSummary;
+} => {
+  const baseInput: EngineeringExportInput = {
+    target: request.target,
+    bands: request.bands,
+    selectedBandId: request.selectedBandId,
+    context: request.context,
+    scalePreview: request.scalePreview,
+    designOverlay: request.designOverlay,
+    metadata: request.metadata
+  };
+
+  const svg = generateEngineeringSvg(baseInput);
+  const content =
+    request.format === 'svg'
+      ? svg
+      : request.format === 'dxf'
+        ? generatePseudoDxf(baseInput)
+        : request.format === 'pdf'
+          ? generatePseudoPdf(svg)
+          : svg;
+
+  const preview = buildExportPreviewSummary({
+    target: request.target,
+    selectedBandId: request.selectedBandId,
+    bands: request.bands,
+    warnings: request.warnings,
+    fileSizeBytes: estimateOutputSize(content),
+    metadata: request.metadata
+  });
+
+  return {
+    content,
+    format: request.format,
+    preview
+  };
+};
+
+export const exportEngineeringByFormat = (request: EngineeringExportRequest): ExportPreviewSummary => {
+  const built = buildEngineeringExport(request);
+  const mappedMetadata = request.metadata
+    ? Object.fromEntries(
+        Object.entries(request.metadata).filter((entry): entry is [string, string | number | boolean] => {
+          const value = entry[1];
+          return typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean';
+        })
+      )
+    : undefined;
+  exportByFormat({
+    format: built.format,
+    filename: request.filename,
+    content: built.content,
+    metadata: mappedMetadata
+  });
+  return built.preview;
 };

@@ -167,5 +167,17 @@ export const helpDocPages: HelpDocPage[] = [
     title: 'Template Library',
     category: 'Guidelines',
     summary: 'Purpose: load style families while preserving full editability. Best practice: treat templates as starting points, then tune for movement and production tolerances.'
+  },
+  {
+    id: 'export-preview',
+    title: 'Export Preview Workflow',
+    category: 'Guidelines',
+    summary: 'Purpose: inspect layers, dimensions, warnings, and estimated process sizes before final export for manufacturing output.'
+  },
+  {
+    id: 'project-files',
+    title: '.dial Project Files',
+    category: 'Guidelines',
+    summary: 'Purpose: persist full project state with versioning, autosave snapshots, and workflow portability across sessions.'
   }
 ];

@@ -6,3 +6,4 @@ export * from '@/stores/viewportStore';
 export * from '@/stores/exportStore';
 export * from '@/stores/scaleStore';
 export * from '@/stores/designEngineStore';
+export * from '@/stores/projectStore';

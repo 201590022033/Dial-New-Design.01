@@ -36,5 +36,6 @@ export const engineeringHelpIndex: EngineeringHelpEntry[] = [
   { featureId: 'template-library', helpDocIds: ['template-library', 'dial-face-engine', 'movement-integration'] },
   { featureId: 'material-library', helpDocIds: ['uv-printing', 'laser-cutting', 'cnc'] },
   { featureId: 'manufacturing-engine', helpDocIds: ['manufacturing', 'laser-cutting', 'cnc'] },
-  { featureId: 'export-engine', helpDocIds: ['svg-guidelines', 'recommended-tolerances'] }
+  { featureId: 'export-engine', helpDocIds: ['svg-guidelines', 'recommended-tolerances', 'export-preview'] },
+  { featureId: 'project-files', helpDocIds: ['project-files', 'svg-guidelines'] }
 ];

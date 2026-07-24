@@ -2,18 +2,30 @@ import { create } from 'zustand';
 import { createBand } from '@/domain/bands/bandRegistry';
 import type { BandEntity, BandId, BandKind } from '@/domain/bands/types';
 import { runGeometryEngine } from '@/domain/geometry/geometryEngine';
+import type { CollisionWarning } from '@/domain/geometry/collisionEngine';
 import type { GlobalGeometryParameters, StructuredValidationResult } from '@/domain/geometry/types';
+import type { ManufacturingWarning } from '@/domain/manufacturing/validationEngine';
+import { validateManufacturing } from '@/domain/manufacturing/validationEngine';
+import type { MaterialDefinition } from '@/domain/materials/materialLibrary';
 import type { DonutGeometry } from '@/types/geometry';
 
 interface BandsState {
   bands: BandEntity[];
   warnings: string[];
+  manufacturingWarnings: ManufacturingWarning[];
   validationResults: StructuredValidationResult[];
   addBand: (kind: BandKind, geometry: DonutGeometry) => void;
+  setBandsSnapshot: (bands: BandEntity[]) => void;
   updateBand: (id: BandId, updater: (band: BandEntity) => BandEntity) => void;
   removeBand: (id: BandId) => void;
   reorderBands: (fromIndex: number, toIndex: number) => void;
-  syncWithGeometryEngine: (params: GlobalGeometryParameters) => void;
+  syncWithGeometryEngine: (
+    params: GlobalGeometryParameters,
+    options?: {
+      collisions?: CollisionWarning[];
+      selectedMaterial?: MaterialDefinition | null;
+    }
+  ) => void;
 }
 
 const initialBands: BandEntity[] = [
@@ -26,6 +38,7 @@ const initialBands: BandEntity[] = [
 export const useBandsStore = create<BandsState>((set) => ({
   bands: initialBands,
   warnings: [],
+  manufacturingWarnings: [],
   validationResults: [],
   addBand: (kind, geometry) =>
     set((state) => ({
@@ -33,6 +46,13 @@ export const useBandsStore = create<BandsState>((set) => ({
         ...state.bands,
         createBand(`band-${kind}-${crypto.randomUUID().slice(0, 8)}`, kind, geometry)
       ]
+    })),
+  setBandsSnapshot: (bands) =>
+    set(() => ({
+      bands,
+      warnings: [],
+      validationResults: [],
+      manufacturingWarnings: []
     })),
   updateBand: (id, updater) =>
     set((state) => ({
@@ -62,12 +82,19 @@ export const useBandsStore = create<BandsState>((set) => ({
         }))
       };
     }),
-  syncWithGeometryEngine: (params) =>
+  syncWithGeometryEngine: (params, options) =>
     set((state) => {
       const engine = runGeometryEngine(state.bands, params);
+      const manufacturing = validateManufacturing(engine.bands, params, {
+        selectedMaterial: options?.selectedMaterial ?? null,
+        collisions: options?.collisions ?? [],
+        printableAreaDiameterMm: params.dialDiameterMm,
+        minimumTextHeightMm: params.minimumTextHeightMm
+      });
       const warnings = [
         ...engine.warnings.map((warning) => warning.message),
-        ...engine.constraintViolations.map((violation) => violation.description)
+        ...engine.constraintViolations.map((violation) => violation.description),
+        ...manufacturing.warnings.map((warning) => warning.message)
       ];
 
       const warningsByBand = new Map<string, string[]>();
@@ -93,6 +120,7 @@ export const useBandsStore = create<BandsState>((set) => ({
           };
         }),
         warnings,
+        manufacturingWarnings: manufacturing.warnings,
         validationResults: engine.validationResults
       };
     })

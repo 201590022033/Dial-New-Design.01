@@ -1,13 +1,31 @@
-import { useEffect, useMemo } from 'react';
+import { Suspense, lazy, useEffect, useMemo } from 'react';
 import { LeftBandsPanel } from '@/components/layout/LeftBandsPanel';
 import { TopToolbar } from '@/components/layout/TopToolbar';
 import { CentreCanvas } from '@/components/layout/CentreCanvas';
 import { RightInspector } from '@/components/layout/RightInspector';
 import { BottomStatusBar } from '@/components/layout/BottomStatusBar';
-import { RightFeatureStack } from '@/components/layout/RightFeatureStack';
-import { ExtensionPointsPanel } from '@/components/layout/ExtensionPointsPanel';
-import { HelpCenter } from '@/components/layout/HelpCenter';
-import { useBandsStore, useDesignEngineStore, useGlobalSettingsStore, useScaleStore, useSelectionStore } from '@/stores';
+import { evaluateCollisions } from '@/domain/geometry/collisionEngine';
+import { materialById } from '@/domain/materials/materialLibrary';
+import {
+  useBandsStore,
+  useDesignEngineStore,
+  useGlobalSettingsStore,
+  useHistoryStore,
+  useProjectStore,
+  useScaleStore,
+  useSelectionStore,
+  useViewportStore
+} from '@/stores';
+
+const RightFeatureStack = lazy(() =>
+  import('@/components/layout/RightFeatureStack').then((mod) => ({ default: mod.RightFeatureStack }))
+);
+const ExtensionPointsPanel = lazy(() =>
+  import('@/components/layout/ExtensionPointsPanel').then((mod) => ({ default: mod.ExtensionPointsPanel }))
+);
+const HelpCenter = lazy(() =>
+  import('@/components/layout/HelpCenter').then((mod) => ({ default: mod.HelpCenter }))
+);
 
 export const App = () => {
   const syncWithGeometryEngine = useBandsStore((state) => state.syncWithGeometryEngine);
@@ -17,7 +35,29 @@ export const App = () => {
   const regenerateScalePreview = useScaleStore((state) => state.regeneratePreview);
   const setSelectedScaleKind = useScaleStore((state) => state.setSelectedScaleKind);
   const selectedScaleKind = useScaleStore((state) => state.selectedScaleKind);
+  const scalePluginConfig = useScaleStore((state) => state.pluginConfig);
+  const scaleContext = useScaleStore((state) => state.context);
+  const scalePreview = useScaleStore((state) => state.preview);
   const suggestedScaleKind = useDesignEngineStore((state) => state.suggestedScaleKind);
+  const overlay = useDesignEngineStore((state) => state.overlay);
+  const chapterRingConfig = useDesignEngineStore((state) => state.chapterRingConfig);
+  const setCollisionWarnings = useDesignEngineStore((state) => state.setCollisionWarnings);
+  const markerConfig = useDesignEngineStore((state) => state.markerConfig);
+  const typographyConfig = useDesignEngineStore((state) => state.typographyConfig);
+  const textureConfig = useDesignEngineStore((state) => state.dialFaceConfig.texture);
+
+  const setRuntimeSnapshot = useProjectStore((state) => state.setRuntimeSnapshot);
+  const autosaveNow = useProjectStore((state) => state.autosaveNow);
+  const loadAutosave = useProjectStore((state) => state.loadAutosave);
+  const projectInfo = useProjectStore((state) => state.info);
+
+  const zoom = useViewportStore((state) => state.zoom);
+  const panX = useViewportStore((state) => state.panX);
+  const panY = useViewportStore((state) => state.panY);
+  const showGuides = useViewportStore((state) => state.showGuides);
+  const showSnapping = useViewportStore((state) => state.showSnapping);
+  const pastCount = useHistoryStore((state) => state.past.length);
+  const futureCount = useHistoryStore((state) => state.future.length);
   const caseDiameterMm = useGlobalSettingsStore((state) => state.caseDiameterMm);
   const dialDiameterMm = useGlobalSettingsStore((state) => state.dialDiameterMm);
   const movementDiameterMm = useGlobalSettingsStore((state) => state.movementDiameterMm);
@@ -69,8 +109,35 @@ export const App = () => {
   );
 
   useEffect(() => {
-    syncWithGeometryEngine(geometryParams);
-  }, [geometryParams, syncWithGeometryEngine]);
+    const material = materialById(projectInfo.material);
+    const collisions = evaluateCollisions({
+      typography: overlay.typography,
+      markers: overlay.markers.map((entry) => entry.marker),
+      chapterRingMarkers: overlay.chapterRingMarkers,
+      scalePreview,
+      caseRadiusMm: geometryParams.caseDiameterMm / 2,
+      chapterOuterRadiusMm: chapterRingConfig.radiusOuterMm,
+      bezelInnerRadiusMm: geometryParams.dialDiameterMm / 2,
+      includeDateWindow: true,
+      includeSubdial: true
+    });
+
+    setCollisionWarnings(collisions);
+    syncWithGeometryEngine(geometryParams, {
+      collisions,
+      selectedMaterial: material
+    });
+  }, [
+    chapterRingConfig.radiusOuterMm,
+    geometryParams,
+    overlay.chapterRingMarkers,
+    overlay.markers,
+    overlay.typography,
+    projectInfo.material,
+    scalePreview,
+    setCollisionWarnings,
+    syncWithGeometryEngine
+  ]);
 
   useEffect(() => {
     const selectedBand = bands.find((band) => band.id === selectedBandId) ?? null;
@@ -87,6 +154,57 @@ export const App = () => {
     }
   }, [selectedScaleKind, setSelectedScaleKind, suggestedScaleKind]);
 
+  useEffect(() => {
+    loadAutosave();
+  }, [loadAutosave]);
+
+  useEffect(() => {
+    setRuntimeSnapshot({
+      geometry: geometryParams,
+      bands,
+      selectedScaleKind,
+      scalePluginConfig,
+      scaleContext,
+      markerConfig,
+      typographyConfig,
+      textureConfig,
+      viewport: {
+        zoom,
+        panX,
+        panY
+      },
+      selectedBandId,
+      preferences: {
+        showGuides,
+        showSnapping
+      },
+      historyCounts: {
+        pastCount,
+        futureCount
+      }
+    });
+    autosaveNow();
+  }, [
+    autosaveNow,
+    bands,
+    futureCount,
+    geometryParams,
+    markerConfig,
+    panX,
+    panY,
+    pastCount,
+    scaleContext,
+    scalePluginConfig,
+    selectedBandId,
+    selectedScaleKind,
+    setRuntimeSnapshot,
+    showGuides,
+    showSnapping,
+    textureConfig,
+    typographyConfig,
+    zoom
+  ]);
+
   return (
     <div className="grid min-h-screen grid-rows-[auto_1fr_auto] gap-3 p-3 md:p-4">
       <TopToolbar />
@@ -101,12 +219,18 @@ export const App = () => {
 
         <aside className="grid min-h-0 grid-rows-[auto_1fr_auto] gap-3">
           <RightInspector />
-          <RightFeatureStack />
-          <ExtensionPointsPanel />
+          <Suspense fallback={<div className="ds-panel p-3 text-xs text-engineering-muted">Loading feature stack...</div>}>
+            <RightFeatureStack />
+          </Suspense>
+          <Suspense fallback={<div className="ds-panel p-3 text-xs text-engineering-muted">Loading extension points...</div>}>
+            <ExtensionPointsPanel />
+          </Suspense>
         </aside>
       </main>
       <BottomStatusBar />
-      <HelpCenter />
+      <Suspense fallback={null}>
+        <HelpCenter />
+      </Suspense>
     </div>
   );
 };

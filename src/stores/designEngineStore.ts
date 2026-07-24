@@ -39,6 +39,7 @@ import {
 } from '@/services/movementRecommendationService';
 import type { ScaleKind } from '@/domain/scales/types';
 import type { DesignOverlay } from '@/renderer/types';
+import type { CollisionWarning } from '@/domain/geometry/collisionEngine';
 
 interface DesignEngineState {
   dialFaceConfig: DialFaceConfig;
@@ -56,6 +57,7 @@ interface DesignEngineState {
   bezelResult: BezelResult;
   lumeResult: LumeResult;
   overlay: DesignOverlay;
+  collisionWarnings: CollisionWarning[];
   warnings: string[];
   updateDialFaceConfig: (patch: Partial<DialFaceConfig>) => void;
   updateMarkerConfig: (patch: Partial<MarkerEngineConfig>) => void;
@@ -65,6 +67,19 @@ interface DesignEngineState {
   updateLumeConfig: (patch: Partial<LumeEngineConfig>) => void;
   selectMovement: (movementId: string) => void;
   applyTemplate: (templateId: TemplateId) => void;
+  setCollisionWarnings: (warnings: CollisionWarning[]) => void;
+  hydrateDesignState: (snapshot: {
+    templateId: TemplateId;
+    markerConfig: MarkerEngineConfig;
+    typographyConfig: TypographyConfig;
+    textureConfig: DialFaceConfig['texture'];
+    colors: {
+      primary: string;
+      secondary: string;
+      accent: string;
+    };
+  }) => void;
+  resetDesignState: () => void;
   regenerate: () => void;
 }
 
@@ -133,6 +148,7 @@ export const useDesignEngineStore = create<DesignEngineState>((set, get) => ({
     initialChapter,
     initialLume
   ),
+  collisionWarnings: [],
   warnings: collectWarnings(initialDialFace, initialChapter, initialBezel),
   updateDialFaceConfig: (patch) => {
     set((state) => ({
@@ -245,6 +261,37 @@ export const useDesignEngineStore = create<DesignEngineState>((set, get) => ({
       suggestedScaleKind: payload.scaleSuggestion
     }));
 
+    get().regenerate();
+  },
+  setCollisionWarnings: (collisionWarnings) => set({ collisionWarnings }),
+  hydrateDesignState: (snapshot) => {
+    set((state) => ({
+      activeTemplateId: snapshot.templateId,
+      markerConfig: snapshot.markerConfig,
+      typographyConfig: snapshot.typographyConfig,
+      dialFaceConfig: {
+        ...state.dialFaceConfig,
+        color: snapshot.colors.primary,
+        secondaryColor: snapshot.colors.secondary,
+        texture: snapshot.textureConfig
+      }
+    }));
+    get().regenerate();
+  },
+  resetDesignState: () => {
+    set({
+      dialFaceConfig: defaultDialFaceConfig,
+      markerConfig: defaultMarkerConfig,
+      typographyConfig: defaultTypographyConfig,
+      chapterRingConfig: defaultChapterRingConfig,
+      bezelConfig: defaultBezelConfig,
+      lumeConfig: defaultLumeConfig,
+      activeTemplateId: 'classic-dress',
+      selectedMovementId: defaultMovementId,
+      movementRecommendations: getMovementDesignRecommendations(defaultMovementId),
+      suggestedScaleKind: 'circular',
+      collisionWarnings: []
+    });
     get().regenerate();
   },
   regenerate: () => {

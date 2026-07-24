@@ -17,6 +17,12 @@ interface ScaleState {
   setContext: (context: Partial<ScaleMathContext>) => void;
   syncFromBand: (band: BandEntity | null, minimumLineWidthMm: number) => void;
   regeneratePreview: () => void;
+  hydrateScaleState: (snapshot: {
+    selectedScaleKind: ScaleKind;
+    pluginConfig: ScalePluginConfig;
+    context: ScaleMathContext;
+  }) => void;
+  resetScaleState: () => void;
 }
 
 const fallbackPlugin = getScalePlugin('circular');
@@ -126,5 +132,24 @@ export const useScaleStore = create<ScaleState>((set, get) => ({
       preview: result,
       validation: result?.validation ?? null
     });
+  },
+  hydrateScaleState: (snapshot) => {
+    set({
+      selectedScaleKind: snapshot.selectedScaleKind,
+      pluginConfig: snapshot.pluginConfig,
+      context: snapshot.context
+    });
+    get().regeneratePreview();
+  },
+  resetScaleState: () => {
+    set({
+      selectedScaleKind: 'circular',
+      pluginConfig: fallbackConfig,
+      context: defaultContext,
+      previewEnabled: true,
+      validation: null,
+      preview: null
+    });
+    get().regeneratePreview();
   }
 }));

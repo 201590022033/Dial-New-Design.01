@@ -95,6 +95,8 @@ export const RightInspector = () => {
   const updateLumeConfig = useDesignEngineStore((s) => s.updateLumeConfig);
   const selectMovement = useDesignEngineStore((s) => s.selectMovement);
   const applyTemplate = useDesignEngineStore((s) => s.applyTemplate);
+  const manufacturingWarnings = useBandsStore((s) => s.manufacturingWarnings);
+  const collisionWarnings = useDesignEngineStore((s) => s.collisionWarnings);
 
   const selected = useMemo(() => bands.find((b) => b.id === selectedBandId), [bands, selectedBandId]);
 
@@ -579,6 +581,40 @@ export const RightInspector = () => {
             <p>Center Hole: {movementRecommendations?.centreHoleMm.toFixed(2) ?? '--'} mm</p>
             <p>Date Position: {movementRecommendations?.datePosition ?? 'none'}</p>
           </div>
+        </CollapsibleCard>
+
+        <CollapsibleCard title="Manufacturing Validation" accent="amber" defaultOpen>
+          {manufacturingWarnings.length === 0 ? (
+            <p className="text-xs text-engineering-muted">No manufacturing warnings.</p>
+          ) : (
+            <ul className="space-y-1">
+              {manufacturingWarnings.slice(0, 12).map((warning, index) => (
+                <li
+                  key={`${warning.code}-${index}`}
+                  className="rounded-md border border-amber-500/40 bg-amber-500/10 px-2 py-1 text-xs text-amber-200"
+                >
+                  {warning.message}
+                </li>
+              ))}
+            </ul>
+          )}
+        </CollapsibleCard>
+
+        <CollapsibleCard title="Collision Detection" accent="amber" defaultOpen>
+          {collisionWarnings.length === 0 ? (
+            <p className="text-xs text-engineering-muted">No collision warnings.</p>
+          ) : (
+            <ul className="space-y-1">
+              {collisionWarnings.slice(0, 12).map((warning, index) => (
+                <li
+                  key={`${warning.code}-${index}`}
+                  className="rounded-md border border-amber-500/40 bg-amber-500/10 px-2 py-1 text-xs text-amber-200"
+                >
+                  {warning.message}
+                </li>
+              ))}
+            </ul>
+          )}
         </CollapsibleCard>
 
         {(selected ? inspectorByBand[selected.kind] : ['General']).map((sectionTitle) => (
