@@ -1,6 +1,13 @@
 import { Crosshair, Grid3X3, MousePointer2, Move, Ruler, ZoomIn } from 'lucide-react';
 import { movementLibrary } from '@/domain/movements/movementLibrary';
-import { useBandsStore, useGlobalSettingsStore, useScaleStore, useSelectionStore, useViewportStore } from '@/stores';
+import {
+  useBandsStore,
+  useDesignEngineStore,
+  useGlobalSettingsStore,
+  useScaleStore,
+  useSelectionStore,
+  useViewportStore
+} from '@/stores';
 
 export const BottomStatusBar = () => {
   const zoom = useViewportStore((s) => s.zoom);
@@ -15,9 +22,12 @@ export const BottomStatusBar = () => {
   const units = useGlobalSettingsStore((s) => s.units);
   const scalePreview = useScaleStore((s) => s.preview);
   const scaleValidation = useScaleStore((s) => s.validation);
+  const activeTemplateId = useDesignEngineStore((s) => s.activeTemplateId);
+  const selectedMovementId = useDesignEngineStore((s) => s.selectedMovementId);
+  const lumeMode = useDesignEngineStore((s) => s.lumeResult.mode);
 
   const selected = bands.find((b) => b.id === selectedBandId);
-  const movement = movementLibrary[0];
+  const movement = movementLibrary.find((entry) => entry.id === selectedMovementId) ?? movementLibrary[0];
   const validationErrors = validationResults.filter((entry) => entry.severity === 'error').length;
   const geometryStatus = validationErrors > 0 ? 'Attention' : 'Healthy';
   const currentScale = scalePreview?.pluginName ?? (selected?.kind === 'scale-generator' ? 'Custom Scale' : 'Circular');
@@ -89,6 +99,14 @@ export const BottomStatusBar = () => {
         <span className="font-mono text-engineering-text">
           {validationErrors > 0 ? `${validationErrors} error(s)` : 'OK'}
         </span>
+      </div>
+      <div className="flex items-center gap-1.5">
+        <span className="ds-label-status">Template</span>
+        <span className="font-mono text-engineering-text">{activeTemplateId}</span>
+      </div>
+      <div className="flex items-center gap-1.5">
+        <span className="ds-label-status">Lume</span>
+        <span className="font-mono text-engineering-text">{lumeMode}</span>
       </div>
       <div className="flex items-center gap-1.5">
         <span className="ds-label-status">Constraints</span>

@@ -6,8 +6,17 @@ import { Panel } from '@/components/ui/Panel';
 import { Button } from '@/components/ui/Button';
 import { CollapsibleCard } from '@/components/ui/CollapsibleCard';
 import { listScalePlugins } from '@/domain/scales/scaleRegistry';
+import { templateLibrary, type TemplateId } from '@/domain/generators/templateLibrary';
+import { listTexturePlugins } from '@/domain/generators/textureEngine';
+import { movementLibrary } from '@/domain/movements/movementLibrary';
 import { dialDimensionsSchema, type DialDimensionsInput } from '@/hooks/useDialValidation';
-import { useGlobalSettingsStore, useBandsStore, useScaleStore, useSelectionStore } from '@/stores';
+import {
+  useGlobalSettingsStore,
+  useBandsStore,
+  useScaleStore,
+  useSelectionStore,
+  useDesignEngineStore
+} from '@/stores';
 import type { BandKind } from '@/domain/bands/types';
 
 const inspectorByBand: Record<BandKind, string[]> = {
@@ -67,6 +76,25 @@ export const RightInspector = () => {
     () => scalePlugins.find((plugin) => plugin.kind === selectedScaleKind) ?? null,
     [scalePlugins, selectedScaleKind]
   );
+  const texturePlugins = useMemo(() => listTexturePlugins(), []);
+
+  const activeTemplateId = useDesignEngineStore((s) => s.activeTemplateId);
+  const dialFaceConfig = useDesignEngineStore((s) => s.dialFaceConfig);
+  const markerConfig = useDesignEngineStore((s) => s.markerConfig);
+  const typographyConfig = useDesignEngineStore((s) => s.typographyConfig);
+  const chapterRingConfig = useDesignEngineStore((s) => s.chapterRingConfig);
+  const bezelConfig = useDesignEngineStore((s) => s.bezelConfig);
+  const lumeConfig = useDesignEngineStore((s) => s.lumeConfig);
+  const selectedMovementId = useDesignEngineStore((s) => s.selectedMovementId);
+  const movementRecommendations = useDesignEngineStore((s) => s.movementRecommendations);
+  const updateDialFaceConfig = useDesignEngineStore((s) => s.updateDialFaceConfig);
+  const updateMarkerConfig = useDesignEngineStore((s) => s.updateMarkerConfig);
+  const updateTypographyConfig = useDesignEngineStore((s) => s.updateTypographyConfig);
+  const updateChapterRingConfig = useDesignEngineStore((s) => s.updateChapterRingConfig);
+  const updateBezelConfig = useDesignEngineStore((s) => s.updateBezelConfig);
+  const updateLumeConfig = useDesignEngineStore((s) => s.updateLumeConfig);
+  const selectMovement = useDesignEngineStore((s) => s.selectMovement);
+  const applyTemplate = useDesignEngineStore((s) => s.applyTemplate);
 
   const selected = useMemo(() => bands.find((b) => b.id === selectedBandId), [bands, selectedBandId]);
 
@@ -195,6 +223,361 @@ export const RightInspector = () => {
             <p className="text-xs text-engineering-muted">
               Dirty: {selected ? (selected.dirty ? 'yes' : 'no') : '--'} | Last Updated: {selected?.lastUpdatedIso ?? '--'}
             </p>
+          </div>
+        </CollapsibleCard>
+
+        <CollapsibleCard title="Template Library" accent="teal" defaultOpen>
+          <label className="block">
+            <span className="ds-label-inspector">Template</span>
+            <select
+              className="ds-input mt-1"
+              value={activeTemplateId}
+              onChange={(event) => applyTemplate(event.target.value as TemplateId)}
+            >
+              {templateLibrary.map((template) => (
+                <option key={template.id} value={template.id}>
+                  {template.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <p className="text-xs text-engineering-muted">
+            Templates configure dial, markers, typography, chapter ring, bezel, lume, and movement suggestions while keeping all values editable.
+          </p>
+        </CollapsibleCard>
+
+        <CollapsibleCard title="Dial Face" accent="teal">
+          <div className="grid grid-cols-2 gap-2">
+            <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+              <span className="ds-label-inspector">Style</span>
+              <select
+                className="ds-input mt-1"
+                value={dialFaceConfig.style}
+                onChange={(event) => updateDialFaceConfig({ style: event.target.value as typeof dialFaceConfig.style })}
+              >
+                <option value="plain">Plain</option>
+                <option value="two-tone">Two-Tone</option>
+                <option value="sector">Sector</option>
+                <option value="sandwich">Sandwich (Placeholder)</option>
+                <option value="skeleton">Skeleton (Placeholder)</option>
+                <option value="open-heart">Open Heart (Placeholder)</option>
+              </select>
+            </label>
+            <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+              <span className="ds-label-inspector">Finish</span>
+              <select
+                className="ds-input mt-1"
+                value={dialFaceConfig.finish}
+                onChange={(event) => updateDialFaceConfig({ finish: event.target.value as typeof dialFaceConfig.finish })}
+              >
+                <option value="matte">Matte</option>
+                <option value="sunburst">Sunburst</option>
+                <option value="textured">Textured</option>
+              </select>
+            </label>
+            <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+              <span className="ds-label-inspector">Colour</span>
+              <input
+                type="color"
+                className="ds-input mt-1"
+                value={dialFaceConfig.color}
+                onChange={(event) => updateDialFaceConfig({ color: event.target.value })}
+              />
+            </label>
+            <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+              <span className="ds-label-inspector">Center Hole</span>
+              <input
+                type="number"
+                step="0.05"
+                className="ds-input mt-1"
+                value={dialFaceConfig.centreHole.diameterMm}
+                onChange={(event) =>
+                  updateDialFaceConfig({
+                    centreHole: {
+                      ...dialFaceConfig.centreHole,
+                      diameterMm: Number(event.target.value)
+                    }
+                  })
+                }
+              />
+            </label>
+          </div>
+        </CollapsibleCard>
+
+        <CollapsibleCard title="Textures" accent="teal">
+          <div className="grid grid-cols-2 gap-2">
+            <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5 col-span-2">
+              <span className="ds-label-inspector">Texture</span>
+              <select
+                className="ds-input mt-1"
+                value={dialFaceConfig.texture.kind}
+                onChange={(event) =>
+                  updateDialFaceConfig({
+                    texture: {
+                      ...dialFaceConfig.texture,
+                      kind: event.target.value as typeof dialFaceConfig.texture.kind
+                    }
+                  })
+                }
+              >
+                {texturePlugins.map((plugin) => (
+                  <option key={plugin.kind} value={plugin.kind}>
+                    {plugin.displayName} {plugin.implemented ? '' : '(Placeholder)'}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+              <span className="ds-label-inspector">Intensity</span>
+              <input
+                type="number"
+                min={0}
+                max={1}
+                step="0.05"
+                className="ds-input mt-1"
+                value={dialFaceConfig.texture.intensity}
+                onChange={(event) =>
+                  updateDialFaceConfig({
+                    texture: {
+                      ...dialFaceConfig.texture,
+                      intensity: Number(event.target.value)
+                    }
+                  })
+                }
+              />
+            </label>
+            <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+              <span className="ds-label-inspector">Contrast</span>
+              <input
+                type="number"
+                min={0}
+                max={1}
+                step="0.05"
+                className="ds-input mt-1"
+                value={dialFaceConfig.texture.contrast}
+                onChange={(event) =>
+                  updateDialFaceConfig({
+                    texture: {
+                      ...dialFaceConfig.texture,
+                      contrast: Number(event.target.value)
+                    }
+                  })
+                }
+              />
+            </label>
+          </div>
+        </CollapsibleCard>
+
+        <CollapsibleCard title="Typography" accent="teal">
+          <div className="grid grid-cols-2 gap-2">
+            <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5 col-span-2">
+              <span className="ds-label-inspector">Content</span>
+              <input
+                type="text"
+                className="ds-input mt-1"
+                value={typographyConfig.content}
+                onChange={(event) => updateTypographyConfig({ content: event.target.value })}
+              />
+            </label>
+            <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+              <span className="ds-label-inspector">Layout</span>
+              <select
+                className="ds-input mt-1"
+                value={typographyConfig.layout}
+                onChange={(event) => updateTypographyConfig({ layout: event.target.value as typeof typographyConfig.layout })}
+              >
+                <option value="straight">Straight</option>
+                <option value="radial">Radial</option>
+                <option value="circular">Circular</option>
+                <option value="arc">Arc</option>
+                <option value="horizontal">Horizontal</option>
+                <option value="vertical">Vertical</option>
+                <option value="inside-circle">Inside Circle</option>
+                <option value="outside-circle">Outside Circle</option>
+                <option value="future-path">Future Path</option>
+              </select>
+            </label>
+            <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+              <span className="ds-label-inspector">Font Category</span>
+              <select
+                className="ds-input mt-1"
+                value={typographyConfig.fontCategory}
+                onChange={(event) =>
+                  updateTypographyConfig({
+                    fontCategory: event.target.value as typeof typographyConfig.fontCategory
+                  })
+                }
+              >
+                <option value="modern-sans">Modern Sans</option>
+                <option value="technical-sans">Technical Sans</option>
+                <option value="pilot">Pilot</option>
+                <option value="vintage">Vintage</option>
+                <option value="roman">Roman</option>
+                <option value="arabic">Arabic</option>
+                <option value="railroad">Railroad</option>
+                <option value="military">Military</option>
+              </select>
+            </label>
+          </div>
+        </CollapsibleCard>
+
+        <CollapsibleCard title="Markers" accent="teal">
+          <div className="grid grid-cols-2 gap-2">
+            <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+              <span className="ds-label-inspector">Type</span>
+              <select
+                className="ds-input mt-1"
+                value={markerConfig.kind}
+                onChange={(event) => updateMarkerConfig({ kind: event.target.value as typeof markerConfig.kind })}
+              >
+                <option value="baton">Baton</option>
+                <option value="round">Round</option>
+                <option value="triangle">Triangle</option>
+                <option value="rectangle">Rectangle</option>
+                <option value="arabic-numeral">Arabic Numerals</option>
+                <option value="roman-numeral">Roman Numerals</option>
+                <option value="railroad-track">Railroad Track</option>
+              </select>
+            </label>
+            <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+              <span className="ds-label-inspector">Count</span>
+              <input
+                type="number"
+                min={1}
+                max={120}
+                className="ds-input mt-1"
+                value={markerConfig.count}
+                onChange={(event) => updateMarkerConfig({ count: Number(event.target.value) })}
+              />
+            </label>
+          </div>
+        </CollapsibleCard>
+
+        <CollapsibleCard title="Chapter Ring" accent="teal">
+          <div className="grid grid-cols-2 gap-2">
+            <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+              <span className="ds-label-inspector">Style</span>
+              <select
+                className="ds-input mt-1"
+                value={chapterRingConfig.style}
+                onChange={(event) =>
+                  updateChapterRingConfig({ style: event.target.value as typeof chapterRingConfig.style })
+                }
+              >
+                <option value="plain">Plain</option>
+                <option value="minute-track">Minute Track</option>
+                <option value="railroad-track">Railroad Track</option>
+                <option value="slide-rule-ring">Slide Rule Ring</option>
+                <option value="tachymeter-ring">Tachymeter Ring</option>
+                <option value="compass-ring">Compass Ring</option>
+                <option value="countdown-ring">Countdown Ring</option>
+                <option value="custom-scale-ring">Custom Scale Ring</option>
+              </select>
+            </label>
+            <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+              <span className="ds-label-inspector">Manufacturing</span>
+              <select
+                className="ds-input mt-1"
+                value={chapterRingConfig.manufacturing}
+                onChange={(event) =>
+                  updateChapterRingConfig({
+                    manufacturing: event.target.value as typeof chapterRingConfig.manufacturing
+                  })
+                }
+              >
+                <option value="printed">Printed</option>
+                <option value="applied">Applied</option>
+                <option value="lumed">Lumed</option>
+                <option value="engraved">Engraved</option>
+                <option value="laser-cut">Laser Cut</option>
+              </select>
+            </label>
+          </div>
+        </CollapsibleCard>
+
+        <CollapsibleCard title="Bezel" accent="teal">
+          <div className="grid grid-cols-2 gap-2">
+            <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+              <span className="ds-label-inspector">Type</span>
+              <select
+                className="ds-input mt-1"
+                value={bezelConfig.type}
+                onChange={(event) => updateBezelConfig({ type: event.target.value as typeof bezelConfig.type })}
+              >
+                <option value="smooth">Smooth</option>
+                <option value="coin-edge">Coin Edge</option>
+                <option value="knurled">Knurled</option>
+                <option value="scalloped">Scalloped</option>
+                <option value="dive">Dive</option>
+                <option value="gmt">GMT</option>
+                <option value="compass">Compass</option>
+                <option value="countdown">Countdown</option>
+                <option value="slide-rule">Slide Rule</option>
+                <option value="fixed">Fixed</option>
+              </select>
+            </label>
+            <label className="flex items-center justify-between rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5 text-xs">
+              <span className="ds-label-inspector">Rotating (Metadata)</span>
+              <input
+                type="checkbox"
+                checked={bezelConfig.rotating}
+                onChange={(event) => updateBezelConfig({ rotating: event.target.checked })}
+              />
+            </label>
+          </div>
+        </CollapsibleCard>
+
+        <CollapsibleCard title="Lume" accent="teal">
+          <div className="grid grid-cols-2 gap-2">
+            <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+              <span className="ds-label-inspector">Mode</span>
+              <select
+                className="ds-input mt-1"
+                value={lumeConfig.mode}
+                onChange={(event) => updateLumeConfig({ mode: event.target.value as typeof lumeConfig.mode })}
+              >
+                <option value="no-lume">No Lume</option>
+                <option value="filled">Filled</option>
+                <option value="outline">Outline</option>
+                <option value="applied">Applied</option>
+              </select>
+            </label>
+            <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+              <span className="ds-label-inspector">Intensity</span>
+              <input
+                type="number"
+                min={0}
+                max={1}
+                step="0.05"
+                className="ds-input mt-1"
+                value={lumeConfig.intensity}
+                onChange={(event) => updateLumeConfig({ intensity: Number(event.target.value) })}
+              />
+            </label>
+          </div>
+        </CollapsibleCard>
+
+        <CollapsibleCard title="Movement" accent="teal">
+          <label className="block">
+            <span className="ds-label-inspector">Movement</span>
+            <select
+              className="ds-input mt-1"
+              value={selectedMovementId}
+              onChange={(event) => selectMovement(event.target.value)}
+            >
+              {movementLibrary.map((movement) => (
+                <option key={movement.id} value={movement.id}>
+                  {movement.name} ({movement.manufacturer})
+                </option>
+              ))}
+            </select>
+          </label>
+          <div className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5 text-xs text-engineering-muted">
+            <p>Dial: {movementRecommendations?.recommendedDialDiameterMm.toFixed(2) ?? '--'} mm</p>
+            <p>Chapter Width: {movementRecommendations?.recommendedChapterRingWidthMm.toFixed(2) ?? '--'} mm</p>
+            <p>Bezel Width: {movementRecommendations?.recommendedBezelWidthMm.toFixed(2) ?? '--'} mm</p>
+            <p>Center Hole: {movementRecommendations?.centreHoleMm.toFixed(2) ?? '--'} mm</p>
+            <p>Date Position: {movementRecommendations?.datePosition ?? 'none'}</p>
           </div>
         </CollapsibleCard>
 

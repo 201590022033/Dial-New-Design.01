@@ -113,5 +113,59 @@ export const helpDocPages: HelpDocPage[] = [
     title: 'Scale Manufacturing Constraints',
     category: 'Manufacturing',
     summary: 'Purpose/history/math background/use/watch examples/manufacturing notes placeholder for scale manufacturing checks.'
+  },
+  {
+    id: 'dial-face-engine',
+    title: 'Dial Face Engine',
+    category: 'Guidelines',
+    summary: 'Purpose: establish base dial surfaces. Guidelines: choose style then finish, keep center hole tolerance-safe, and apply border contrast for readability.'
+  },
+  {
+    id: 'texture-engine',
+    title: 'Texture Engine',
+    category: 'Guidelines',
+    summary: 'Historical examples include matte military dials and sunburst dress dials. Manufacturing advice: balance texture intensity against legibility and print accuracy.'
+  },
+  {
+    id: 'typography-engine',
+    title: 'Typography Engine',
+    category: 'Guidelines',
+    summary: 'Purpose: reusable text layout (radial/arc/horizontal/vertical). Best practices: maintain kerning discipline and enforce minimum text heights for process safety.'
+  },
+  {
+    id: 'marker-engine',
+    title: 'Marker Engine',
+    category: 'Construction',
+    summary: 'Purpose: generate index systems from batons to railroad tracks. Watchmaking reference: applied markers improve depth, printed markers reduce assembly complexity.'
+  },
+  {
+    id: 'chapter-ring-engine',
+    title: 'Chapter Ring Engine',
+    category: 'Construction',
+    summary: 'Purpose: configure minute tracks, slide rules, tachymeters, and custom ring scales. Manufacturing advice: validate curvature and marker spacing before export.'
+  },
+  {
+    id: 'bezel-engine',
+    title: 'Bezel Engine',
+    category: 'Construction',
+    summary: 'Purpose: modular bezel generation with grip profile and scale insert strategy. Historical references include dive elapsed bezels and aviation slide-rule bezels.'
+  },
+  {
+    id: 'lume-engine',
+    title: 'Lume Engine',
+    category: 'Manufacturing',
+    summary: 'Purpose: define lume mode and visual intensity placeholders. Best practice: coordinate lume geometry with marker style and print/relief constraints.'
+  },
+  {
+    id: 'movement-integration',
+    title: 'Movement Integration',
+    category: 'Guidelines',
+    summary: 'Purpose: movement-driven layout recommendations (dial, chapter, bezel widths). Manufacturing advice: respect hand-stack clearances and date-window alignment.'
+  },
+  {
+    id: 'template-library',
+    title: 'Template Library',
+    category: 'Guidelines',
+    summary: 'Purpose: load style families while preserving full editability. Best practice: treat templates as starting points, then tune for movement and production tolerances.'
   }
 ];

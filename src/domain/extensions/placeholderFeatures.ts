@@ -6,8 +6,13 @@ export type PlaceholderFeatureId =
   | 'countdown'
   | 'guilloche'
   | 'texture-engine'
+  | 'typography-engine'
+  | 'marker-engine'
+  | 'chapter-ring-engine'
+  | 'bezel-engine'
   | 'lume-engine'
-  | 'movement-templates';
+  | 'movement-templates'
+  | 'template-library';
 
 export interface PlaceholderFeature {
   id: PlaceholderFeatureId;
@@ -56,13 +61,37 @@ export const placeholderFeatures: PlaceholderFeature[] = [
   {
     id: 'texture-engine',
     title: 'Texture Engine',
-    status: 'planned',
+    status: 'in-progress',
     description: 'Extension point for material texture layering.'
+  },
+  {
+    id: 'typography-engine',
+    title: 'Typography Engine',
+    status: 'in-progress',
+    description: 'Extension point for radial/arc/straight watch typography layout systems.'
+  },
+  {
+    id: 'marker-engine',
+    title: 'Marker Engine',
+    status: 'in-progress',
+    description: 'Extension point for reusable marker families and index rendering strategies.'
+  },
+  {
+    id: 'chapter-ring-engine',
+    title: 'Chapter Ring Engine',
+    status: 'in-progress',
+    description: 'Extension point for chapter ring styles, scale plugins, and manufacturing surfaces.'
+  },
+  {
+    id: 'bezel-engine',
+    title: 'Bezel Engine',
+    status: 'in-progress',
+    description: 'Extension point for bezel style generation, inserts, and grip metadata.'
   },
   {
     id: 'lume-engine',
     title: 'Lume Engine',
-    status: 'planned',
+    status: 'in-progress',
     description: 'Extension point for lume paint simulation presets.'
   },
   {
@@ -70,5 +99,11 @@ export const placeholderFeatures: PlaceholderFeature[] = [
     title: 'Movement Templates',
     status: 'in-progress',
     description: 'Extension point for movement driven layout constraints.'
+  },
+  {
+    id: 'template-library',
+    title: 'Template Library',
+    status: 'in-progress',
+    description: 'Extension point for reusable watch-style templates with editable downstream settings.'
   }
 ];
