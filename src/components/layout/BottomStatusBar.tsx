@@ -1,6 +1,6 @@
 import { Crosshair, Grid3X3, MousePointer2, Move, Ruler, ZoomIn } from 'lucide-react';
 import { movementLibrary } from '@/domain/movements/movementLibrary';
-import { useBandsStore, useGlobalSettingsStore, useSelectionStore, useViewportStore } from '@/stores';
+import { useBandsStore, useGlobalSettingsStore, useScaleStore, useSelectionStore, useViewportStore } from '@/stores';
 
 export const BottomStatusBar = () => {
   const zoom = useViewportStore((s) => s.zoom);
@@ -13,12 +13,14 @@ export const BottomStatusBar = () => {
   const validationResults = useBandsStore((s) => s.validationResults);
   const caseDiameterMm = useGlobalSettingsStore((s) => s.caseDiameterMm);
   const units = useGlobalSettingsStore((s) => s.units);
+  const scalePreview = useScaleStore((s) => s.preview);
+  const scaleValidation = useScaleStore((s) => s.validation);
 
   const selected = bands.find((b) => b.id === selectedBandId);
   const movement = movementLibrary[0];
   const validationErrors = validationResults.filter((entry) => entry.severity === 'error').length;
   const geometryStatus = validationErrors > 0 ? 'Attention' : 'Healthy';
-  const currentScale = selected?.kind === 'scale-generator' ? 'Custom Scale' : 'Circular';
+  const currentScale = scalePreview?.pluginName ?? (selected?.kind === 'scale-generator' ? 'Custom Scale' : 'Circular');
 
   return (
     <footer className="ds-panel grid grid-cols-1 gap-2 px-3 py-2 text-xs text-engineering-muted xl:grid-cols-12">
@@ -71,6 +73,12 @@ export const BottomStatusBar = () => {
       <div className="flex items-center gap-1.5">
         <span className="ds-label-status">Scale</span>
         <span className="font-mono text-engineering-text">{currentScale}</span>
+      </div>
+      <div className="flex items-center gap-1.5">
+        <span className="ds-label-status">Scale Validation</span>
+        <span className="font-mono text-engineering-text">
+          {scaleValidation ? (scaleValidation.valid ? 'OK' : `${scaleValidation.warnings.length} warning(s)`) : 'Idle'}
+        </span>
       </div>
       <div className="flex items-center gap-1.5">
         <span className="ds-label-status">Geometry</span>

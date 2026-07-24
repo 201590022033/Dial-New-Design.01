@@ -7,10 +7,14 @@ import { BottomStatusBar } from '@/components/layout/BottomStatusBar';
 import { RightFeatureStack } from '@/components/layout/RightFeatureStack';
 import { ExtensionPointsPanel } from '@/components/layout/ExtensionPointsPanel';
 import { HelpCenter } from '@/components/layout/HelpCenter';
-import { useBandsStore, useGlobalSettingsStore } from '@/stores';
+import { useBandsStore, useGlobalSettingsStore, useScaleStore, useSelectionStore } from '@/stores';
 
 export const App = () => {
   const syncWithGeometryEngine = useBandsStore((state) => state.syncWithGeometryEngine);
+  const bands = useBandsStore((state) => state.bands);
+  const selectedBandId = useSelectionStore((state) => state.selectedBandId);
+  const syncScaleFromBand = useScaleStore((state) => state.syncFromBand);
+  const regenerateScalePreview = useScaleStore((state) => state.regeneratePreview);
   const caseDiameterMm = useGlobalSettingsStore((state) => state.caseDiameterMm);
   const dialDiameterMm = useGlobalSettingsStore((state) => state.dialDiameterMm);
   const movementDiameterMm = useGlobalSettingsStore((state) => state.movementDiameterMm);
@@ -64,6 +68,15 @@ export const App = () => {
   useEffect(() => {
     syncWithGeometryEngine(geometryParams);
   }, [geometryParams, syncWithGeometryEngine]);
+
+  useEffect(() => {
+    const selectedBand = bands.find((band) => band.id === selectedBandId) ?? null;
+    syncScaleFromBand(selectedBand, minimumLineWidthMm);
+  }, [bands, minimumLineWidthMm, selectedBandId, syncScaleFromBand]);
+
+  useEffect(() => {
+    regenerateScalePreview();
+  }, [regenerateScalePreview]);
 
   return (
     <div className="grid min-h-screen grid-rows-[auto_1fr_auto] gap-3 p-3 md:p-4">

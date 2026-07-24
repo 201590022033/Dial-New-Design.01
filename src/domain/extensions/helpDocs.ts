@@ -83,5 +83,35 @@ export const helpDocPages: HelpDocPage[] = [
     title: 'SVG Guidelines',
     category: 'Guidelines',
     summary: 'Placeholder best practices for vector layer naming, units, and export hygiene.'
+  },
+  {
+    id: 'scale-linear',
+    title: 'Linear Scale Plugin',
+    category: 'Mathematics',
+    summary: 'Purpose/history/math background/use/watch examples/manufacturing notes placeholder for linear scale plugin.'
+  },
+  {
+    id: 'scale-logarithmic',
+    title: 'Logarithmic Scale Plugin',
+    category: 'Mathematics',
+    summary: 'Purpose/history/math background/use/watch examples/manufacturing notes placeholder for logarithmic scale plugin.'
+  },
+  {
+    id: 'scale-tachymeter',
+    title: 'Tachymeter Scale Plugin',
+    category: 'Construction',
+    summary: 'Purpose/history/math background/use/watch examples/manufacturing notes placeholder for tachymeter plugin.'
+  },
+  {
+    id: 'scale-compass',
+    title: 'Compass Scale Plugin',
+    category: 'Construction',
+    summary: 'Purpose/history/math background/use/watch examples/manufacturing notes placeholder for compass plugin.'
+  },
+  {
+    id: 'scale-manufacturing',
+    title: 'Scale Manufacturing Constraints',
+    category: 'Manufacturing',
+    summary: 'Purpose/history/math background/use/watch examples/manufacturing notes placeholder for scale manufacturing checks.'
   }
 ];

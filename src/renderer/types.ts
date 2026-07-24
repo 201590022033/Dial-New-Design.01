@@ -1,4 +1,5 @@
 import type { BandEntity } from '@/domain/bands/types';
+import type { ScaleRunResult } from '@/services/scaleEngineService';
 
 export interface RenderContext {
   width: number;
@@ -13,6 +14,7 @@ export interface RenderContext {
 export interface RendererOptions {
   showGuides: boolean;
   showSnapping: boolean;
+  scalePreview: ScaleRunResult | null;
 }
 
 export interface RendererAdapter {

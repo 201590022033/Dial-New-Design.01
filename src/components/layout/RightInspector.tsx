@@ -5,8 +5,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Panel } from '@/components/ui/Panel';
 import { Button } from '@/components/ui/Button';
 import { CollapsibleCard } from '@/components/ui/CollapsibleCard';
+import { listScalePlugins } from '@/domain/scales/scaleRegistry';
 import { dialDimensionsSchema, type DialDimensionsInput } from '@/hooks/useDialValidation';
-import { useGlobalSettingsStore, useBandsStore, useSelectionStore } from '@/stores';
+import { useGlobalSettingsStore, useBandsStore, useScaleStore, useSelectionStore } from '@/stores';
 import type { BandKind } from '@/domain/bands/types';
 
 const inspectorByBand: Record<BandKind, string[]> = {
@@ -54,6 +55,18 @@ export const RightInspector = () => {
   const bandGapMm = useGlobalSettingsStore((s) => s.bandGapMm);
   const manufacturingToleranceMm = useGlobalSettingsStore((s) => s.manufacturingToleranceMm);
   const laserKerfMm = useGlobalSettingsStore((s) => s.laserKerfMm);
+  const selectedScaleKind = useScaleStore((s) => s.selectedScaleKind);
+  const scaleConfig = useScaleStore((s) => s.pluginConfig);
+  const scalePreviewEnabled = useScaleStore((s) => s.previewEnabled);
+  const scaleValidation = useScaleStore((s) => s.validation);
+  const setSelectedScaleKind = useScaleStore((s) => s.setSelectedScaleKind);
+  const updateScaleConfig = useScaleStore((s) => s.updatePluginConfig);
+  const setScalePreviewEnabled = useScaleStore((s) => s.setPreviewEnabled);
+  const scalePlugins = useMemo(() => listScalePlugins(true), []);
+  const currentScalePlugin = useMemo(
+    () => scalePlugins.find((plugin) => plugin.kind === selectedScaleKind) ?? null,
+    [scalePlugins, selectedScaleKind]
+  );
 
   const selected = useMemo(() => bands.find((b) => b.id === selectedBandId), [bands, selectedBandId]);
 
@@ -191,25 +204,155 @@ export const RightInspector = () => {
             title={sectionTitle}
             defaultOpen={sectionTitle === 'General' || sectionTitle === 'Geometry'}
           >
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-[11px] text-engineering-muted">
-                <CircleDot className="ds-icon-sm text-engineering-teal" />
-                Placeholder settings surface for {sectionTitle.toLowerCase()}.
+            {sectionTitle === 'Scale Generator' ? (
+              <div className="space-y-2">
+                <label className="block">
+                  <span className="ds-label-inspector">Scale Type</span>
+                  <select
+                    className="ds-input mt-1"
+                    value={selectedScaleKind}
+                    onChange={(event) => setSelectedScaleKind(event.target.value as typeof selectedScaleKind)}
+                  >
+                    {scalePlugins.map((plugin) => (
+                      <option key={plugin.kind} value={plugin.kind}>
+                        {plugin.metadata.name} ({plugin.metadata.category})
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+                    <span className="ds-label-inspector">Start</span>
+                    <input
+                      type="number"
+                      step="0.1"
+                      className="ds-input mt-1"
+                      value={scaleConfig.startValue}
+                      onChange={(event) =>
+                        updateScaleConfig({ startValue: Number(event.target.value) })
+                      }
+                    />
+                  </label>
+                  <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+                    <span className="ds-label-inspector">End</span>
+                    <input
+                      type="number"
+                      step="0.1"
+                      className="ds-input mt-1"
+                      value={scaleConfig.endValue}
+                      onChange={(event) =>
+                        updateScaleConfig({ endValue: Number(event.target.value) })
+                      }
+                    />
+                  </label>
+                  <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+                    <span className="ds-label-inspector">Major Step</span>
+                    <input
+                      type="number"
+                      step="0.1"
+                      className="ds-input mt-1"
+                      value={scaleConfig.majorStep}
+                      onChange={(event) =>
+                        updateScaleConfig({ majorStep: Number(event.target.value) })
+                      }
+                    />
+                  </label>
+                  <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+                    <span className="ds-label-inspector">Minor Step</span>
+                    <input
+                      type="number"
+                      step="0.1"
+                      className="ds-input mt-1"
+                      value={scaleConfig.minorStep}
+                      onChange={(event) =>
+                        updateScaleConfig({ minorStep: Number(event.target.value) })
+                      }
+                    />
+                  </label>
               </div>
-              <div className="grid grid-cols-2 gap-2">
-                <div className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
-                  <p className="ds-label-inspector">Preset</p>
-                  <p className="mt-1 text-xs text-engineering-text">Engineering Default</p>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+                    <span className="ds-label-inspector">Tick Direction</span>
+                    <select
+                      className="ds-input mt-1"
+                      value={scaleConfig.tickDirection}
+                      onChange={(event) =>
+                        updateScaleConfig({ tickDirection: event.target.value as typeof scaleConfig.tickDirection })
+                      }
+                    >
+                      <option value="outside">Outside</option>
+                      <option value="inside">Inside</option>
+                      <option value="bidirectional">Bidirectional</option>
+                    </select>
+                  </label>
+                  <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+                    <span className="ds-label-inspector">Labels</span>
+                    <select
+                      className="ds-input mt-1"
+                      value={scaleConfig.labelOrientation}
+                      onChange={(event) =>
+                        updateScaleConfig({ labelOrientation: event.target.value as typeof scaleConfig.labelOrientation })
+                      }
+                    >
+                      <option value="radial">Radial</option>
+                      <option value="horizontal">Horizontal</option>
+                      <option value="curved">Curved</option>
+                    </select>
+                  </label>
                 </div>
+
+                <div className="flex items-center justify-between rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5 text-xs">
+                  <span className="text-engineering-muted">Live Preview</span>
+                  <input
+                    type="checkbox"
+                    checked={scalePreviewEnabled}
+                    onChange={(event) => setScalePreviewEnabled(event.target.checked)}
+                  />
+                </div>
+
                 <div className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
-                  <p className="ds-label-inspector">Status</p>
-                  <p className="mt-1 text-xs text-engineering-amber">Planned</p>
+                  <p className="ds-label-inspector">Plugin Metadata</p>
+                  <p className="mt-1 text-xs text-engineering-text">
+                    {currentScalePlugin?.metadata.description ?? 'No plugin selected.'}
+                  </p>
+                  <p className="mt-1 text-xs text-engineering-muted">
+                    Model: {currentScalePlugin?.mathematicalModel ?? '--'}
+                  </p>
+                </div>
+
+                <div className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+                  <p className="ds-label-inspector">Validation</p>
+                  <p className="mt-1 text-xs text-engineering-text">
+                    {scaleValidation ? (scaleValidation.valid ? 'Valid' : 'Warnings') : 'No preview generated.'}
+                  </p>
+                  <p className="text-xs text-engineering-muted">
+                    Warning Count: {scaleValidation?.warnings.length ?? 0}
+                  </p>
                 </div>
               </div>
-              <Button variant="inspector" size="sm" className="w-full justify-center">
-                <DraftingCompass className="ds-icon-sm" /> Open {sectionTitle} Tools
-              </Button>
-            </div>
+            ) : (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-[11px] text-engineering-muted">
+                  <CircleDot className="ds-icon-sm text-engineering-teal" />
+                  Placeholder settings surface for {sectionTitle.toLowerCase()}.
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+                    <p className="ds-label-inspector">Preset</p>
+                    <p className="mt-1 text-xs text-engineering-text">Engineering Default</p>
+                  </div>
+                  <div className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+                    <p className="ds-label-inspector">Status</p>
+                    <p className="mt-1 text-xs text-engineering-amber">Planned</p>
+                  </div>
+                </div>
+                <Button variant="inspector" size="sm" className="w-full justify-center">
+                  <DraftingCompass className="ds-icon-sm" /> Open {sectionTitle} Tools
+                </Button>
+              </div>
+            )}
           </CollapsibleCard>
         ))}
       </div>

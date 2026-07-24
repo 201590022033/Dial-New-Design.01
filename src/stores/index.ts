@@ -4,3 +4,4 @@ export * from '@/stores/bandsStore';
 export * from '@/stores/historyStore';
 export * from '@/stores/viewportStore';
 export * from '@/stores/exportStore';
+export * from '@/stores/scaleStore';

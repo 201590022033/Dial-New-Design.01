@@ -6,7 +6,7 @@ import { useResizeObserver } from '@/hooks/useResizeObserver';
 import { useRenderer } from '@/renderer/useRenderer';
 import { nextZoomValue } from '@/renderer/services/zoomService';
 import { createPanState, resolvePan, type PanState } from '@/renderer/services/panService';
-import { useBandsStore, useSelectionStore, useViewportStore } from '@/stores';
+import { useBandsStore, useScaleStore, useSelectionStore, useViewportStore } from '@/stores';
 
 export const CentreCanvas = () => {
   const [container, setContainer] = useState<HTMLDivElement | null>(null);
@@ -16,6 +16,7 @@ export const CentreCanvas = () => {
   const panY = useViewportStore((s) => s.panY);
   const showGuides = useViewportStore((s) => s.showGuides);
   const showSnapping = useViewportStore((s) => s.showSnapping);
+  const scalePreview = useScaleStore((s) => s.preview);
   const setZoom = useViewportStore((s) => s.setZoom);
   const selectBand = useSelectionStore((s) => s.selectBand);
   const hoverBand = useSelectionStore((s) => s.hoverBand);
@@ -46,8 +47,8 @@ export const CentreCanvas = () => {
   );
 
   useEffect(() => {
-    renderer.renderBands(bands, renderContext, { showGuides, showSnapping });
-  }, [renderer, bands, renderContext, showGuides, showSnapping]);
+    renderer.renderBands(bands, renderContext, { showGuides, showSnapping, scalePreview });
+  }, [renderer, bands, renderContext, showGuides, showSnapping, scalePreview]);
 
   return (
     <motion.section
