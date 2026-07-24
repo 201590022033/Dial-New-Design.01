@@ -49,7 +49,11 @@ export const RightInspector = () => {
   const selectedBandId = useSelectionStore((s) => s.selectedBandId);
   const bands = useBandsStore((s) => s.bands);
   const setCaseDiameter = useGlobalSettingsStore((s) => s.setCaseDiameter);
+  const updateGeometryParams = useGlobalSettingsStore((s) => s.updateGeometryParams);
   const caseDiameterMm = useGlobalSettingsStore((s) => s.caseDiameterMm);
+  const bandGapMm = useGlobalSettingsStore((s) => s.bandGapMm);
+  const manufacturingToleranceMm = useGlobalSettingsStore((s) => s.manufacturingToleranceMm);
+  const laserKerfMm = useGlobalSettingsStore((s) => s.laserKerfMm);
 
   const selected = useMemo(() => bands.find((b) => b.id === selectedBandId), [bands, selectedBandId]);
 
@@ -98,6 +102,87 @@ export const RightInspector = () => {
               Apply Master Dimension
             </Button>
           </form>
+        </CollapsibleCard>
+
+        <CollapsibleCard title="Geometry" accent="amber" defaultOpen>
+          <div className="grid grid-cols-2 gap-2">
+            <div className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+              <p className="ds-label-inspector">Outer Diameter</p>
+              <p className="mt-1 font-mono text-xs text-engineering-text">
+                {selected ? selected.outerDiameterMm.toFixed(2) : '--'} mm
+              </p>
+            </div>
+            <div className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+              <p className="ds-label-inspector">Inner Diameter</p>
+              <p className="mt-1 font-mono text-xs text-engineering-text">
+                {selected ? selected.innerDiameterMm.toFixed(2) : '--'} mm
+              </p>
+            </div>
+            <div className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+              <p className="ds-label-inspector">Calculated Width</p>
+              <p className="mt-1 font-mono text-xs text-engineering-text">
+                {selected ? selected.calculatedWidthMm.toFixed(2) : '--'} mm
+              </p>
+            </div>
+            <div className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+              <p className="ds-label-inspector">Validation Status</p>
+              <p className="mt-1 text-xs text-engineering-text">
+                {selected ? (selected.validationState.valid ? 'Valid' : 'Warnings') : 'No Selection'}
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2">
+            <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+              <span className="ds-label-inspector">Band Gap</span>
+              <input
+                type="number"
+                step="0.01"
+                className="ds-input mt-1"
+                value={bandGapMm}
+                onChange={(event) =>
+                  updateGeometryParams({ bandGapMm: Number(event.target.value) })
+                }
+              />
+            </label>
+            <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+              <span className="ds-label-inspector">Tolerance</span>
+              <input
+                type="number"
+                step="0.01"
+                className="ds-input mt-1"
+                value={manufacturingToleranceMm}
+                onChange={(event) =>
+                  updateGeometryParams({ manufacturingToleranceMm: Number(event.target.value) })
+                }
+              />
+            </label>
+            <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+              <span className="ds-label-inspector">Kerf</span>
+              <input
+                type="number"
+                step="0.01"
+                className="ds-input mt-1"
+                value={laserKerfMm}
+                onChange={(event) =>
+                  updateGeometryParams({ laserKerfMm: Number(event.target.value) })
+                }
+              />
+            </label>
+          </div>
+
+          <div className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+            <p className="ds-label-inspector">Dependency Information</p>
+            <p className="mt-1 text-xs text-engineering-muted">
+              Parent: {selected?.parentBandId ?? 'none'}
+            </p>
+            <p className="text-xs text-engineering-muted">
+              Dependencies: {selected?.dependencyIds.length ?? 0} | Affected: {selected?.affectedObjectIds.length ?? 0}
+            </p>
+            <p className="text-xs text-engineering-muted">
+              Dirty: {selected ? (selected.dirty ? 'yes' : 'no') : '--'} | Last Updated: {selected?.lastUpdatedIso ?? '--'}
+            </p>
+          </div>
         </CollapsibleCard>
 
         {(selected ? inspectorByBand[selected.kind] : ['General']).map((sectionTitle) => (

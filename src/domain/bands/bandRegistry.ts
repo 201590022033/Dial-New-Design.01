@@ -1,4 +1,5 @@
 import type { BandEntity, BandKind } from '@/domain/bands/types';
+import { buildDefaultSnapTargets } from '@/domain/geometry/snapTargets';
 import type { DonutGeometry } from '@/types/geometry';
 
 const clampDonut = (geometry: DonutGeometry): DonutGeometry => {
@@ -7,7 +8,10 @@ const clampDonut = (geometry: DonutGeometry): DonutGeometry => {
   return { innerRadius: inner, outerRadius: outer };
 };
 
-const defaults: Record<BandKind, Omit<BandEntity, 'id' | 'geometry'>> = {
+const defaults: Record<
+  BandKind,
+  Omit<BandEntity, 'id' | 'geometry' | 'dependencyIds' | 'affectedObjectIds' | 'dirty' | 'lastUpdatedIso'>
+> = {
   'dial-face': {
     kind: 'dial-face',
     displayName: 'Dial Face',
@@ -270,25 +274,42 @@ export const createBand = (
 ): BandEntity => {
   const base = defaults[kind];
   const clamped = clampDonut(geometry);
-  return {
+  const nowIso = new Date().toISOString();
+  const band: BandEntity = {
     id,
     ...base,
     geometry: clamped,
     innerDiameterMm: clamped.innerRadius * 2,
     outerDiameterMm: clamped.outerRadius * 2,
     calculatedWidthMm: clamped.outerRadius - clamped.innerRadius,
-    color: base.style.fill
+    color: base.style.fill,
+    dependencyIds: base.relationships.map((relationship) => relationship.targetBandId),
+    affectedObjectIds: [],
+    dirty: false,
+    lastUpdatedIso: nowIso,
+    snapTargets: []
+  };
+
+  return {
+    ...band,
+    snapTargets: buildDefaultSnapTargets(band)
   };
 };
 
 export const updateBandGeometry = (band: BandEntity, geometry: DonutGeometry): BandEntity => {
   const clamped = clampDonut(geometry);
-  return {
+  const updated: BandEntity = {
     ...band,
     geometry: clamped,
     innerDiameterMm: clamped.innerRadius * 2,
     outerDiameterMm: clamped.outerRadius * 2,
-    calculatedWidthMm: clamped.outerRadius - clamped.innerRadius
+    calculatedWidthMm: clamped.outerRadius - clamped.innerRadius,
+    lastUpdatedIso: new Date().toISOString()
+  };
+
+  return {
+    ...updated,
+    snapTargets: buildDefaultSnapTargets(updated)
   };
 };
 

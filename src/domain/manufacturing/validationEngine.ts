@@ -60,11 +60,11 @@ export const validateManufacturing = (
     }
   });
 
-  if (params.minimumTextSizePt < 5) {
+  if (params.minimumTextHeightMm < 1.2) {
     warnings.push({
       level: 'warning',
       code: 'TEXT_LEGIBILITY',
-      message: 'Text legibility risk: minimum text size is below 5pt.'
+      message: 'Text legibility risk: minimum text height is below 1.2mm.'
     });
   }
 

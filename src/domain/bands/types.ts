@@ -1,4 +1,5 @@
 import type { DonutGeometry } from '@/types/geometry';
+import type { SnapTargetType } from '@/domain/geometry/types';
 
 export type BandId = string;
 
@@ -17,6 +18,7 @@ export type BandKind =
 
 export interface BandSnapTarget {
   id: string;
+  type: SnapTargetType;
   angleDeg: number;
   radiusMm: number;
 }
@@ -58,6 +60,10 @@ export interface BandEntity {
   svgGroupId: string;
   snapTargets: BandSnapTarget[];
   relationships: BandRelationship[];
+  dependencyIds: BandId[];
+  affectedObjectIds: BandId[];
+  dirty: boolean;
+  lastUpdatedIso: string;
   validationState: BandValidationState;
   manufacturingWarnings: string[];
   geometry: DonutGeometry;

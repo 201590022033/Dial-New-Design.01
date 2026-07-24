@@ -12,37 +12,52 @@ import { useBandsStore, useGlobalSettingsStore } from '@/stores';
 export const App = () => {
   const syncWithGeometryEngine = useBandsStore((state) => state.syncWithGeometryEngine);
   const caseDiameterMm = useGlobalSettingsStore((state) => state.caseDiameterMm);
-  const caseThicknessMm = useGlobalSettingsStore((state) => state.caseThicknessMm);
   const dialDiameterMm = useGlobalSettingsStore((state) => state.dialDiameterMm);
   const movementDiameterMm = useGlobalSettingsStore((state) => state.movementDiameterMm);
+  const movementCentreHoleMm = useGlobalSettingsStore((state) => state.movementCentreHoleMm);
+  const bandClearanceMm = useGlobalSettingsStore((state) => state.bandClearanceMm);
+  const bandGapMm = useGlobalSettingsStore((state) => state.bandGapMm);
+  const chapterRingWidthMm = useGlobalSettingsStore((state) => state.chapterRingWidthMm);
+  const innerBezelWidthMm = useGlobalSettingsStore((state) => state.innerBezelWidthMm);
+  const outerBezelWidthMm = useGlobalSettingsStore((state) => state.outerBezelWidthMm);
   const manufacturingToleranceMm = useGlobalSettingsStore((state) => state.manufacturingToleranceMm);
   const laserKerfMm = useGlobalSettingsStore((state) => state.laserKerfMm);
   const minimumLineWidthMm = useGlobalSettingsStore((state) => state.minimumLineWidthMm);
-  const minimumTextSizePt = useGlobalSettingsStore((state) => state.minimumTextSizePt);
-  const bandSpacingMm = useGlobalSettingsStore((state) => state.bandSpacingMm);
+  const minimumTextHeightMm = useGlobalSettingsStore((state) => state.minimumTextHeightMm);
+  const units = useGlobalSettingsStore((state) => state.units);
 
   const geometryParams = useMemo(
     () => ({
       caseDiameterMm,
-      caseThicknessMm,
       dialDiameterMm,
       movementDiameterMm,
+      movementCentreHoleMm,
+      bandClearanceMm,
+      bandGapMm,
+      chapterRingWidthMm,
+      innerBezelWidthMm,
+      outerBezelWidthMm,
       manufacturingToleranceMm,
       laserKerfMm,
       minimumLineWidthMm,
-      minimumTextSizePt,
-      bandSpacingMm
+      minimumTextHeightMm,
+      defaultUnits: units
     }),
     [
       caseDiameterMm,
-      caseThicknessMm,
       dialDiameterMm,
       movementDiameterMm,
+      movementCentreHoleMm,
+      bandClearanceMm,
+      bandGapMm,
+      chapterRingWidthMm,
+      innerBezelWidthMm,
+      outerBezelWidthMm,
       manufacturingToleranceMm,
       laserKerfMm,
       minimumLineWidthMm,
-      minimumTextSizePt,
-      bandSpacingMm
+      minimumTextHeightMm,
+      units
     ]
   );
 

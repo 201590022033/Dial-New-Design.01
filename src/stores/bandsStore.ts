@@ -1,14 +1,14 @@
 import { create } from 'zustand';
 import { createBand } from '@/domain/bands/bandRegistry';
 import type { BandEntity, BandId, BandKind } from '@/domain/bands/types';
-import { chainConcentricBands } from '@/domain/geometry/geometryEngine';
-import type { GlobalGeometryParameters } from '@/domain/geometry/types';
-import { validateManufacturing } from '@/domain/manufacturing/validationEngine';
+import { runGeometryEngine } from '@/domain/geometry/geometryEngine';
+import type { GlobalGeometryParameters, StructuredValidationResult } from '@/domain/geometry/types';
 import type { DonutGeometry } from '@/types/geometry';
 
 interface BandsState {
   bands: BandEntity[];
   warnings: string[];
+  validationResults: StructuredValidationResult[];
   addBand: (kind: BandKind, geometry: DonutGeometry) => void;
   updateBand: (id: BandId, updater: (band: BandEntity) => BandEntity) => void;
   removeBand: (id: BandId) => void;
@@ -26,6 +26,7 @@ const initialBands: BandEntity[] = [
 export const useBandsStore = create<BandsState>((set) => ({
   bands: initialBands,
   warnings: [],
+  validationResults: [],
   addBand: (kind, geometry) =>
     set((state) => ({
       bands: [
@@ -63,25 +64,24 @@ export const useBandsStore = create<BandsState>((set) => ({
     }),
   syncWithGeometryEngine: (params) =>
     set((state) => {
-      const chained = chainConcentricBands(state.bands, params);
-      const manufacturing = validateManufacturing(chained.bands, params);
+      const engine = runGeometryEngine(state.bands, params);
       const warnings = [
-        ...chained.warnings.map((warning) => warning.message),
-        ...manufacturing.warnings.map((warning) => warning.message)
+        ...engine.warnings.map((warning) => warning.message),
+        ...engine.constraintViolations.map((violation) => violation.description)
       ];
 
       const warningsByBand = new Map<string, string[]>();
-      manufacturing.warnings.forEach((warning) => {
-        if (!warning.bandId) {
+      engine.validationResults.forEach((result) => {
+        if (!result.affectedObject || !result.affectedObject.startsWith('band-')) {
           return;
         }
-        const existing = warningsByBand.get(warning.bandId) ?? [];
-        existing.push(warning.message);
-        warningsByBand.set(warning.bandId, existing);
+        const existing = warningsByBand.get(result.affectedObject) ?? [];
+        existing.push(result.description);
+        warningsByBand.set(result.affectedObject, existing);
       });
 
       return {
-        bands: chained.bands.map((band) => {
+        bands: engine.bands.map((band) => {
           const bandWarnings = warningsByBand.get(band.id) ?? [];
           return {
             ...band,
@@ -92,7 +92,8 @@ export const useBandsStore = create<BandsState>((set) => ({
             manufacturingWarnings: bandWarnings
           };
         }),
-        warnings
+        warnings,
+        validationResults: engine.validationResults
       };
     })
 }));

@@ -1,21 +1,21 @@
 import { create } from 'zustand';
-import {
-  defaultGeometryParameters,
-  deriveGeometryContext,
-  validateGeometryParameters
-} from '@/domain/geometry/geometryEngine';
+import { defaultGeometryParameters, normalizeGeometryParameters, validateGeometryParameters } from '@/domain/geometry/geometryEngine';
 import type { GlobalGeometryParameters } from '@/domain/geometry/types';
 
 export interface GlobalSettingsState {
   caseDiameterMm: number;
-  caseThicknessMm: number;
   dialDiameterMm: number;
   movementDiameterMm: number;
+  movementCentreHoleMm: number;
+  bandClearanceMm: number;
+  bandGapMm: number;
+  chapterRingWidthMm: number;
+  innerBezelWidthMm: number;
+  outerBezelWidthMm: number;
   manufacturingToleranceMm: number;
   laserKerfMm: number;
   minimumLineWidthMm: number;
-  minimumTextSizePt: number;
-  bandSpacingMm: number;
+  minimumTextHeightMm: number;
   units: 'mm';
   setCaseDiameter: (diameterMm: number) => void;
   updateGeometryParams: (params: Partial<GlobalGeometryParameters>) => void;
@@ -25,20 +25,24 @@ export interface GlobalSettingsState {
 
 export const useGlobalSettingsStore = create<GlobalSettingsState>((set, get) => ({
   caseDiameterMm: defaultGeometryParameters.caseDiameterMm,
-  caseThicknessMm: defaultGeometryParameters.caseThicknessMm,
   dialDiameterMm: defaultGeometryParameters.dialDiameterMm,
   movementDiameterMm: defaultGeometryParameters.movementDiameterMm,
+  movementCentreHoleMm: defaultGeometryParameters.movementCentreHoleMm,
+  bandClearanceMm: defaultGeometryParameters.bandClearanceMm,
+  bandGapMm: defaultGeometryParameters.bandGapMm,
+  chapterRingWidthMm: defaultGeometryParameters.chapterRingWidthMm,
+  innerBezelWidthMm: defaultGeometryParameters.innerBezelWidthMm,
+  outerBezelWidthMm: defaultGeometryParameters.outerBezelWidthMm,
   manufacturingToleranceMm: defaultGeometryParameters.manufacturingToleranceMm,
   laserKerfMm: defaultGeometryParameters.laserKerfMm,
   minimumLineWidthMm: defaultGeometryParameters.minimumLineWidthMm,
-  minimumTextSizePt: defaultGeometryParameters.minimumTextSizePt,
-  bandSpacingMm: defaultGeometryParameters.bandSpacingMm,
+  minimumTextHeightMm: defaultGeometryParameters.minimumTextHeightMm,
   units: 'mm',
   setCaseDiameter: (caseDiameterMm) => {
-    const nextDiameter = Math.max(10, caseDiameterMm);
+    const nextDiameter = Math.max(20, caseDiameterMm);
     set((state) => {
-      const dialDiameterMm = Math.min(state.dialDiameterMm, nextDiameter - 1);
-      const movementDiameterMm = Math.min(state.movementDiameterMm, dialDiameterMm - 0.5);
+      const dialDiameterMm = Math.min(state.dialDiameterMm, nextDiameter - state.bandClearanceMm * 2);
+      const movementDiameterMm = Math.min(state.movementDiameterMm, dialDiameterMm);
       return {
         caseDiameterMm: nextDiameter,
         dialDiameterMm,
@@ -48,25 +52,27 @@ export const useGlobalSettingsStore = create<GlobalSettingsState>((set, get) => 
   },
   updateGeometryParams: (params) => {
     set((state) => {
-      const merged: GlobalGeometryParameters = {
+      const merged = normalizeGeometryParameters({
         caseDiameterMm: state.caseDiameterMm,
-        caseThicknessMm: state.caseThicknessMm,
         dialDiameterMm: state.dialDiameterMm,
         movementDiameterMm: state.movementDiameterMm,
+        movementCentreHoleMm: state.movementCentreHoleMm,
+        bandClearanceMm: state.bandClearanceMm,
+        bandGapMm: state.bandGapMm,
+        chapterRingWidthMm: state.chapterRingWidthMm,
+        innerBezelWidthMm: state.innerBezelWidthMm,
+        outerBezelWidthMm: state.outerBezelWidthMm,
         manufacturingToleranceMm: state.manufacturingToleranceMm,
         laserKerfMm: state.laserKerfMm,
         minimumLineWidthMm: state.minimumLineWidthMm,
-        minimumTextSizePt: state.minimumTextSizePt,
-        bandSpacingMm: state.bandSpacingMm,
+        minimumTextHeightMm: state.minimumTextHeightMm,
+        defaultUnits: 'mm',
         ...params
-      };
-
-      const derived = deriveGeometryContext(merged);
+      });
 
       return {
         ...merged,
-        dialDiameterMm: Math.min(merged.dialDiameterMm, derived.caseRadiusMm * 2),
-        movementDiameterMm: Math.min(merged.movementDiameterMm, derived.dialRadiusMm * 2)
+        units: merged.defaultUnits
       };
     });
   },
@@ -74,14 +80,19 @@ export const useGlobalSettingsStore = create<GlobalSettingsState>((set, get) => 
     const state = get();
     return {
       caseDiameterMm: state.caseDiameterMm,
-      caseThicknessMm: state.caseThicknessMm,
       dialDiameterMm: state.dialDiameterMm,
       movementDiameterMm: state.movementDiameterMm,
+      movementCentreHoleMm: state.movementCentreHoleMm,
+      bandClearanceMm: state.bandClearanceMm,
+      bandGapMm: state.bandGapMm,
+      chapterRingWidthMm: state.chapterRingWidthMm,
+      innerBezelWidthMm: state.innerBezelWidthMm,
+      outerBezelWidthMm: state.outerBezelWidthMm,
       manufacturingToleranceMm: state.manufacturingToleranceMm,
       laserKerfMm: state.laserKerfMm,
       minimumLineWidthMm: state.minimumLineWidthMm,
-      minimumTextSizePt: state.minimumTextSizePt,
-      bandSpacingMm: state.bandSpacingMm
+      minimumTextHeightMm: state.minimumTextHeightMm,
+      defaultUnits: state.units
     };
   },
   getGeometryWarnings: () => {
