@@ -209,14 +209,14 @@ export const App = () => {
   return (
     <div
       className={[
-        'grid min-h-screen gap-3 p-3 md:p-4',
+        'grid h-screen gap-3 overflow-hidden p-3 md:p-4',
         presentationMode ? 'grid-rows-[1fr]' : 'grid-rows-[auto_1fr_auto]'
       ].join(' ')}
     >
-      {presentationMode ? null : <TopToolbar />}
+      {presentationMode ? null : <div className="min-h-0 overflow-hidden"><TopToolbar /></div>}
       <main
         className={[
-          'grid min-h-0 grid-cols-1 gap-3',
+          'grid min-h-0 grid-cols-1 gap-3 overflow-hidden',
           presentationMode ? '' : 'xl:grid-cols-[300px_minmax(0,1fr)_360px]'
         ].join(' ')}
       >
@@ -224,7 +224,7 @@ export const App = () => {
           <LeftBandsPanel />
         </aside>
 
-        <section className="flex min-h-[560px] min-w-0 items-center justify-center xl:min-h-0">
+        <section className="flex min-h-0 min-w-0 items-center justify-center overflow-hidden">
           <CentreCanvas
             presentationMode={presentationMode}
             onTogglePresentationMode={() => setPresentationMode((value) => !value)}
@@ -247,7 +247,7 @@ export const App = () => {
           </Suspense>
         </aside>
       </main>
-      {presentationMode ? null : <BottomStatusBar />}
+      {presentationMode ? null : <div className="min-h-0 overflow-hidden"><BottomStatusBar /></div>}
       <Suspense fallback={null}>
         <HelpCenter />
       </Suspense>

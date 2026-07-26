@@ -39,6 +39,9 @@ export interface ScaleTick {
   direction: TickDirection;
   style: TickStyle;
   label?: string;
+  value?: number;
+  tier?: 'primary' | 'secondary' | 'tertiary' | 'micro';
+  ringId?: 'outer' | 'inner';
 }
 
 export interface ScaleLabel {
@@ -48,6 +51,8 @@ export interface ScaleLabel {
   orientation: 'radial' | 'horizontal' | 'curved';
   rotationDeg: number;
   placement: LabelPlacement;
+  value?: number;
+  ringId?: 'outer' | 'inner';
 }
 
 export interface ScaleValidationResult {
@@ -85,6 +90,30 @@ export interface ScalePluginConfig {
   bandInnerRadiusMm: number;
   bandOuterRadiusMm: number;
   minimumLineWidthMm: number;
+  logarithmicBase?: number;
+  tickDensityProfile?: 'sparse' | 'balanced' | 'dense';
+  includeMinorLabels?: boolean;
+  engineeringPreset?:
+    | 'precision'
+    | 'aviation'
+    | 'scientific'
+    | 'circular-calculator'
+    | 'aviation-slide-rule'
+    | 'scientific-calculator'
+    | 'engineering-calculator'
+    | 'navitimer-geometry'
+    | 'e6b-geometry';
+  outerRadiusMm?: number;
+  innerRadiusMm?: number;
+  outerRotationOffsetDeg?: number;
+  innerRotationOffsetDeg?: number;
+  ringSyncMode?: 'independent' | 'locked' | 'outer-drives-inner' | 'inner-drives-outer';
+  lockRingMovement?: boolean;
+  ringCouplingEnabled?: boolean;
+  referenceIndexDeg?: number;
+  cursorType?: 'transparent' | 'fixed' | 'rotating' | 'bezel';
+  calculationMode?: 'multiplication' | 'division' | 'ratio' | 'proportion' | 'sync';
+  validationVisibility?: boolean;
 }
 
 export interface ScaleMathContext {
@@ -95,6 +124,30 @@ export interface ScaleMathContext {
 export interface ScaleGeometryOutput {
   ticks: ScaleTick[];
   labels: ScaleLabel[];
+}
+
+export interface ScaleManufacturingMetadata {
+  minimumPrintableSpacingDeg: number;
+  minimumEngravingSpacingDeg?: number;
+  minimumStrokeWidthMm: number;
+  suggestedTickDepthMm: number;
+  ringDensityWarnings?: string[];
+  smallTextWarnings?: string[];
+  suitability: {
+    laser: boolean;
+    cnc: boolean;
+    uv: boolean;
+  };
+}
+
+export interface ScaleEngineeringReadout {
+  ringId: 'outer' | 'inner';
+  value: number;
+  normalized: number;
+  angleDeg: number;
+  radiusMm: number;
+  nearestTick: ScaleTick | null;
+  nearestLabel: ScaleLabel | null;
 }
 
 export interface ScaleInspectorField {
@@ -136,6 +189,11 @@ export interface ScalePlugin {
   previewGenerator: (config: ScalePluginConfig, context: ScaleMathContext) => string;
   validate: (config: ScalePluginConfig, ticks: ScaleTick[], labels: ScaleLabel[]) => ScaleValidationResult;
   svgOutput: (ticks: ScaleTick[], labels: ScaleLabel[]) => string;
+  manufacturingMetadata?: (
+    ticks: ScaleTick[],
+    labels: ScaleLabel[],
+    config: ScalePluginConfig
+  ) => ScaleManufacturingMetadata | undefined;
 }
 
 export interface ScaleRegistryEntry {

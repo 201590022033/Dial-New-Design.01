@@ -414,7 +414,13 @@ export const LeftBandsPanel = () => {
 
           <div className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2.5 py-2 text-[11px] text-engineering-muted">
             <p>Intended use: {activeWorkspace} watch design workflow.</p>
-            <p className="mt-1">Workspace recommendations: {activeRecommendations.length} actions available.</p>
+            <p className="mt-1">Choose a base template first, then apply workspace recommendations below.</p>
+          </div>
+        </CollapsibleCard>
+
+        <CollapsibleCard title="Workspace Recommendations" accent="teal" defaultOpen>
+          <div className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2.5 py-2 text-[11px] text-engineering-muted">
+            <p>{activeRecommendations.length} recommendation(s) for {activeWorkspace}.</p>
             <p className="mt-1">Applied: {appliedRecommendationIds.length}/{activeRecommendations.length}</p>
           </div>
 
@@ -563,24 +569,6 @@ export const LeftBandsPanel = () => {
             <p className="text-xs text-engineering-muted">Select a watch component in Watch Structure to edit it in the inspector.</p>
           )}
           <p className="text-[11px] text-engineering-muted">Inspector now follows the selected watch object directly.</p>
-        </CollapsibleCard>
-
-        <CollapsibleCard title="Movement" accent="amber" defaultOpen>
-          <label className="block">
-            <span className="ds-label-inspector">Movement Template</span>
-            <select
-              className="ds-input mt-1"
-              value={selectedMovementId}
-              onChange={(event) => selectMovement(event.target.value)}
-            >
-              {movementLibrary.map((movement) => (
-                <option key={movement.id} value={movement.id}>
-                  {movement.name}
-                </option>
-              ))}
-            </select>
-          </label>
-          <p className="text-[11px] text-engineering-muted">Movement selection updates centre-hole and chapter-ring recommendations.</p>
         </CollapsibleCard>
 
         <CollapsibleCard title="Validation" accent="amber" defaultOpen={false}>

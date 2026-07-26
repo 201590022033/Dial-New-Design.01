@@ -1,12 +1,14 @@
 import { createCircularPlugin } from '@/domain/scales/plugins/createCircularPlugin';
-import { logarithmicToAngle } from '@/domain/scales/math';
+import { linearEngineeringPlugin } from '@/domain/scales/plugins/linearEngineeringPlugin';
+import { circularLogarithmicScalePlugin } from '@/domain/scales/plugins/circularLogarithmicScalePlugin';
+import { slideRuleScalePlugin } from '@/domain/scales/plugins/slideRuleScalePlugin';
 import type { ScalePlugin } from '@/domain/scales/types';
 
 export const builtInScalePlugins: ScalePlugin[] = [
-  createCircularPlugin({ kind: 'linear', displayName: 'Linear Scale', description: 'Linear engineering scale.', category: 'utility', mathematicalModel: 'linear' }),
+  linearEngineeringPlugin,
   createCircularPlugin({ kind: 'circular', displayName: 'Circular Scale', description: 'Generic circular graduation.', category: 'utility', mathematicalModel: 'circular' }),
-  createCircularPlugin({ kind: 'logarithmic', displayName: 'Logarithmic Scale', description: 'Logarithmic progression for scientific scales.', category: 'scientific', mathematicalModel: 'logarithmic', toAngle: logarithmicToAngle }),
-  createCircularPlugin({ kind: 'slide-rule', displayName: 'Slide Rule', description: 'Slide-rule style logarithmic scales.', category: 'scientific', mathematicalModel: 'logarithmic', toAngle: logarithmicToAngle }),
+  circularLogarithmicScalePlugin,
+  slideRuleScalePlugin,
   createCircularPlugin({ kind: 'tachymeter', displayName: 'Tachymeter Scale', description: 'Speed over distance timing scale.', category: 'timing', mathematicalModel: 'linear' }),
   createCircularPlugin({ kind: 'telemeter', displayName: 'Telemeter Scale', description: 'Distance to event based on timing.', category: 'timing', mathematicalModel: 'linear' }),
   createCircularPlugin({ kind: 'pulsometer', displayName: 'Pulsometer Scale', description: 'Pulse rate timing scale.', category: 'timing', mathematicalModel: 'linear' }),

@@ -37,6 +37,8 @@ export const RightInspector = () => {
   const scaleValidation = useScaleStore((s) => s.validation);
   const setSelectedScaleKind = useScaleStore((s) => s.setSelectedScaleKind);
   const updateScaleConfig = useScaleStore((s) => s.updatePluginConfig);
+  const scaleContext = useScaleStore((s) => s.context);
+  const setScaleContext = useScaleStore((s) => s.setContext);
   const setScalePreviewEnabled = useScaleStore((s) => s.setPreviewEnabled);
   const scalePreviewEnabled = useScaleStore((s) => s.previewEnabled);
 
@@ -429,6 +431,234 @@ export const RightInspector = () => {
             </label>
           </div>
 
+          {selectedScaleKind === 'logarithmic' || selectedScaleKind === 'slide-rule' ? (
+            <>
+              <div className="grid grid-cols-2 gap-2">
+                <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+                  <span className="ds-label-inspector">Direction</span>
+                  <select
+                    className="ds-input mt-1"
+                    value={scaleConfig.direction}
+                    onChange={(event) =>
+                      updateScaleConfig({ direction: event.target.value as typeof scaleConfig.direction })
+                    }
+                  >
+                    <option value="clockwise">Clockwise</option>
+                    <option value="counter-clockwise">Counter-clockwise</option>
+                  </select>
+                </label>
+                <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+                  <span className="ds-label-inspector">Radius (mm)</span>
+                  <input
+                    type="number"
+                    step="0.1"
+                    className="ds-input mt-1"
+                    value={scaleConfig.radiusMm}
+                    onChange={(event) => updateScaleConfig({ radiusMm: Number(event.target.value) })}
+                  />
+                </label>
+                <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+                  <span className="ds-label-inspector">Tick Density</span>
+                  <select
+                    className="ds-input mt-1"
+                    value={scaleConfig.tickDensityProfile ?? 'balanced'}
+                    onChange={(event) =>
+                      updateScaleConfig({
+                        tickDensityProfile: event.target.value as NonNullable<typeof scaleConfig.tickDensityProfile>
+                      })
+                    }
+                  >
+                    <option value="sparse">Sparse</option>
+                    <option value="balanced">Balanced</option>
+                    <option value="dense">Dense</option>
+                  </select>
+                </label>
+                <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+                  <span className="ds-label-inspector">Engineering Preset</span>
+                  <select
+                    className="ds-input mt-1"
+                    value={
+                      selectedScaleKind === 'slide-rule'
+                        ? scaleConfig.engineeringPreset ?? 'circular-calculator'
+                        : scaleConfig.engineeringPreset ?? 'precision'
+                    }
+                    onChange={(event) =>
+                      updateScaleConfig({
+                        engineeringPreset: event.target.value as NonNullable<typeof scaleConfig.engineeringPreset>
+                      })
+                    }
+                  >
+                    {selectedScaleKind === 'slide-rule' ? (
+                      <>
+                        <option value="circular-calculator">Generic Circular Calculator</option>
+                        <option value="aviation-slide-rule">Generic Aviation Slide Rule</option>
+                        <option value="scientific-calculator">Scientific Calculator</option>
+                        <option value="engineering-calculator">Engineering Calculator</option>
+                        <option value="navitimer-geometry">Navitimer-style Layout (Geometry)</option>
+                        <option value="e6b-geometry">E6B-style Layout (Geometry)</option>
+                      </>
+                    ) : (
+                      <>
+                        <option value="precision">Precision</option>
+                        <option value="aviation">Aviation</option>
+                        <option value="scientific">Scientific</option>
+                      </>
+                    )}
+                  </select>
+                </label>
+              </div>
+              <label className="flex items-center justify-between rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5 text-xs">
+                <span className="ds-label-inspector">Minor Labels</span>
+                <input
+                  type="checkbox"
+                  checked={scaleConfig.includeMinorLabels ?? false}
+                  onChange={(event) => updateScaleConfig({ includeMinorLabels: event.target.checked })}
+                />
+              </label>
+
+              {selectedScaleKind === 'slide-rule' ? (
+                <>
+                  <div className="grid grid-cols-2 gap-2">
+                    <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+                      <span className="ds-label-inspector">Outer Radius</span>
+                      <input
+                        type="number"
+                        step="0.1"
+                        className="ds-input mt-1"
+                        value={scaleConfig.outerRadiusMm ?? scaleConfig.radiusMm + 0.9}
+                        onChange={(event) => updateScaleConfig({ outerRadiusMm: Number(event.target.value) })}
+                      />
+                    </label>
+                    <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+                      <span className="ds-label-inspector">Inner Radius</span>
+                      <input
+                        type="number"
+                        step="0.1"
+                        className="ds-input mt-1"
+                        value={scaleConfig.innerRadiusMm ?? Math.max(scaleConfig.bandInnerRadiusMm, scaleConfig.radiusMm - 0.9)}
+                        onChange={(event) => updateScaleConfig({ innerRadiusMm: Number(event.target.value) })}
+                      />
+                    </label>
+                    <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+                      <span className="ds-label-inspector">Outer Rotation</span>
+                      <input
+                        type="number"
+                        step="0.1"
+                        className="ds-input mt-1"
+                        value={scaleConfig.outerRotationOffsetDeg ?? 0}
+                        onChange={(event) =>
+                          updateScaleConfig({ outerRotationOffsetDeg: Number(event.target.value) })
+                        }
+                      />
+                    </label>
+                    <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+                      <span className="ds-label-inspector">Inner Rotation</span>
+                      <input
+                        type="number"
+                        step="0.1"
+                        className="ds-input mt-1"
+                        value={scaleConfig.innerRotationOffsetDeg ?? 0}
+                        onChange={(event) =>
+                          updateScaleConfig({ innerRotationOffsetDeg: Number(event.target.value) })
+                        }
+                      />
+                    </label>
+                    <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+                      <span className="ds-label-inspector">Ring Sync</span>
+                      <select
+                        className="ds-input mt-1"
+                        value={scaleConfig.ringSyncMode ?? 'independent'}
+                        onChange={(event) =>
+                          updateScaleConfig({
+                            ringSyncMode: event.target.value as NonNullable<typeof scaleConfig.ringSyncMode>
+                          })
+                        }
+                      >
+                        <option value="independent">Independent</option>
+                        <option value="locked">Locked</option>
+                        <option value="outer-drives-inner">Outer Drives Inner</option>
+                        <option value="inner-drives-outer">Inner Drives Outer</option>
+                      </select>
+                    </label>
+                    <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+                      <span className="ds-label-inspector">Calculation Mode</span>
+                      <select
+                        className="ds-input mt-1"
+                        value={scaleConfig.calculationMode ?? 'multiplication'}
+                        onChange={(event) =>
+                          updateScaleConfig({
+                            calculationMode: event.target.value as NonNullable<typeof scaleConfig.calculationMode>
+                          })
+                        }
+                      >
+                        <option value="multiplication">Multiplication</option>
+                        <option value="division">Division</option>
+                        <option value="ratio">Ratio</option>
+                        <option value="proportion">Proportion</option>
+                        <option value="sync">Sync</option>
+                      </select>
+                    </label>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+                      <span className="ds-label-inspector">Cursor Type</span>
+                      <select
+                        className="ds-input mt-1"
+                        value={scaleConfig.cursorType ?? 'transparent'}
+                        onChange={(event) =>
+                          updateScaleConfig({ cursorType: event.target.value as NonNullable<typeof scaleConfig.cursorType> })
+                        }
+                      >
+                        <option value="transparent">Transparent</option>
+                        <option value="fixed">Fixed</option>
+                        <option value="rotating">Rotating</option>
+                        <option value="bezel">Bezel</option>
+                      </select>
+                    </label>
+                    <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+                      <span className="ds-label-inspector">Reference Index</span>
+                      <input
+                        type="number"
+                        step="0.1"
+                        className="ds-input mt-1"
+                        value={scaleConfig.referenceIndexDeg ?? 0}
+                        onChange={(event) => updateScaleConfig({ referenceIndexDeg: Number(event.target.value) })}
+                      />
+                    </label>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <label className="flex items-center justify-between rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5 text-xs">
+                      <span className="ds-label-inspector">Ring Coupling</span>
+                      <input
+                        type="checkbox"
+                        checked={scaleConfig.ringCouplingEnabled ?? true}
+                        onChange={(event) =>
+                          updateScaleConfig({ ringCouplingEnabled: event.target.checked })
+                        }
+                      />
+                    </label>
+                    <label className="flex items-center justify-between rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5 text-xs">
+                      <span className="ds-label-inspector">Lock Movement</span>
+                      <input
+                        type="checkbox"
+                        checked={scaleConfig.lockRingMovement ?? false}
+                        onChange={(event) => updateScaleConfig({ lockRingMovement: event.target.checked })}
+                      />
+                    </label>
+                    <label className="col-span-2 flex items-center justify-between rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5 text-xs">
+                      <span className="ds-label-inspector">Validation Visibility</span>
+                      <input
+                        type="checkbox"
+                        checked={scaleConfig.validationVisibility ?? true}
+                        onChange={(event) => updateScaleConfig({ validationVisibility: event.target.checked })}
+                      />
+                    </label>
+                  </div>
+                </>
+              ) : null}
+            </>
+          ) : null}
+
           <label className="block rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
             <span className="ds-label-inspector">Chapter Ring Scale Attachment</span>
             <select
@@ -465,6 +695,56 @@ export const RightInspector = () => {
           <p>
             Intended use: {schema.id === 'outer-slide-rule' || schema.id === 'inner-slide-rule' ? 'Slide rule mathematics' : 'General scale mathematics'}.
           </p>
+          {selectedScaleKind === 'logarithmic' || selectedScaleKind === 'slide-rule' ? (
+            <div className="grid grid-cols-2 gap-2 border-t border-engineering-border/70 pt-2">
+              <label className="rounded-md border border-engineering-border bg-engineering-bg/45 px-2 py-1.5">
+                <span className="ds-label-inspector">Start Angle</span>
+                <input
+                  type="number"
+                  step="0.1"
+                  className="ds-input mt-1"
+                  value={scaleContext.startAngleDeg}
+                  onChange={(event) => setScaleContext({ startAngleDeg: Number(event.target.value) })}
+                />
+              </label>
+              <label className="rounded-md border border-engineering-border bg-engineering-bg/45 px-2 py-1.5">
+                <span className="ds-label-inspector">End Angle</span>
+                <input
+                  type="number"
+                  step="0.1"
+                  className="ds-input mt-1"
+                  value={scaleContext.endAngleDeg}
+                  onChange={(event) => setScaleContext({ endAngleDeg: Number(event.target.value) })}
+                />
+              </label>
+              <label className="rounded-md border border-engineering-border bg-engineering-bg/45 px-2 py-1.5">
+                <span className="ds-label-inspector">Text Orientation</span>
+                <select
+                  className="ds-input mt-1"
+                  value={scaleConfig.labelOrientation}
+                  onChange={(event) =>
+                    updateScaleConfig({
+                      labelOrientation: event.target.value as typeof scaleConfig.labelOrientation
+                    })
+                  }
+                >
+                  <option value="radial">Radial</option>
+                  <option value="horizontal">Horizontal</option>
+                  <option value="curved">Tangential</option>
+                </select>
+              </label>
+              <label className="rounded-md border border-engineering-border bg-engineering-bg/45 px-2 py-1.5">
+                <span className="ds-label-inspector">Rotation Offset</span>
+                <input
+                  type="number"
+                  step="0.1"
+                  className="ds-input mt-1"
+                  value={scaleConfig.rotationOffsetDeg}
+                  onChange={(event) => updateScaleConfig({ rotationOffsetDeg: Number(event.target.value) })}
+                />
+              </label>
+            </div>
+          ) : null}
         </div>
       );
     }

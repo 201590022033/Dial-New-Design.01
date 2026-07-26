@@ -7,6 +7,7 @@ import { useRenderer } from '@/renderer/useRenderer';
 import { nextZoomValue } from '@/renderer/services/zoomService';
 import { createPanState, resolvePan, type PanState } from '@/renderer/services/panService';
 import { resolveHighlightBandIds } from '@/features/shared/objectInspectorSchemas';
+import { resolveSlideRuleReadout, screenPointToPolarSample } from '@/domain/scales/framework';
 import { useBandsStore, useDesignEngineStore, useScaleStore, useSelectionStore, useViewportStore } from '@/stores';
 import { mmToPixels } from '@/utils/math';
 
@@ -25,6 +26,11 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode }: Cen
   const showGuides = useViewportStore((s) => s.showGuides);
   const showSnapping = useViewportStore((s) => s.showSnapping);
   const scalePreview = useScaleStore((s) => s.preview);
+  const selectedScaleKind = useScaleStore((s) => s.selectedScaleKind);
+  const scaleConfig = useScaleStore((s) => s.pluginConfig);
+  const scaleContext = useScaleStore((s) => s.context);
+  const engineeringReadout = useScaleStore((s) => s.engineeringReadout);
+  const setEngineeringReadout = useScaleStore((s) => s.setEngineeringReadout);
   const designOverlay = useDesignEngineStore((s) => s.overlay);
   const setZoom = useViewportStore((s) => s.setZoom);
   const selectedBandId = useSelectionStore((s) => s.selectedBandId);
@@ -40,10 +46,26 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode }: Cen
   const { width, height } = useResizeObserver(container);
   const panState = useRef<PanState | null>(null);
   const lastPan = useRef({ x: panX, y: panY });
+  const wheelFrameRef = useRef<number | null>(null);
+  const pendingWheelRef = useRef<{ zoom: number; panX: number; panY: number } | null>(null);
 
   useEffect(() => {
     lastPan.current = { x: panX, y: panY };
   }, [panX, panY]);
+
+  useEffect(() => {
+    return () => {
+      if (wheelFrameRef.current !== null) {
+        window.cancelAnimationFrame(wheelFrameRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (selectedScaleKind !== 'slide-rule') {
+      setEngineeringReadout(null);
+    }
+  }, [selectedScaleKind, setEngineeringReadout]);
 
   const renderContext = useMemo(
     () => ({
@@ -75,6 +97,13 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode }: Cen
       fitWidthZoom: Number((fitWidthScale / fitToWatchScale).toFixed(2)),
       actualSizeZoom: Number((1 / fitToWatchScale).toFixed(2))
     };
+  }, [bands, width, height]);
+
+  const previewFitScale = useMemo(() => {
+    const maxOuterRadiusMm = bands.reduce((current, band) => Math.max(current, band.geometry.outerRadius), 20);
+    const nominalDiameterPx = Math.max(1, mmToPixels(maxOuterRadiusMm * 2));
+    const targetDiameterPx = Math.min(width, height) * 0.9;
+    return Math.max(1, Math.min(2.6, targetDiameterPx / nominalDiameterPx));
   }, [bands, width, height]);
 
   const fitToWatch = () => {
@@ -117,102 +146,184 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode }: Cen
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       className={[
-        'relative h-full w-full overflow-hidden rounded-panel border border-engineering-border shadow-panel',
+        'relative flex h-full w-full min-h-0 flex-col overflow-hidden rounded-panel border border-engineering-border shadow-panel',
         presentationMode ? 'bg-[#edf0f4]' : 'bg-engineering-bg/85',
-        presentationMode ? 'max-w-[1420px]' : 'max-w-[1320px]'
+        presentationMode ? 'max-w-[1440px]' : 'max-w-[1360px]'
       ].join(' ')}
     >
-      <div
-        ref={setContainer}
-        className={[
-          'h-full w-full cursor-crosshair overflow-hidden rounded-panel',
-          showGrid && !presentationMode ? 'bg-grid bg-[size:62px_62px]' : ''
-        ].join(' ')}
-        onWheel={(event) => {
-          event.preventDefault();
+      <div className="relative min-h-0 flex-1">
+        <div
+          ref={setContainer}
+          className={[
+            'h-full w-full cursor-crosshair overflow-hidden',
+            showGrid && !presentationMode ? 'bg-grid bg-[size:62px_62px]' : ''
+          ].join(' ')}
+          onWheel={(event) => {
+            event.preventDefault();
 
-          const targetRect = event.currentTarget.getBoundingClientRect();
-          const relativeX = event.clientX - targetRect.left;
-          const relativeY = event.clientY - targetRect.top;
-          const fromCenterX = relativeX - renderContext.centerX;
-          const fromCenterY = relativeY - renderContext.centerY;
+            const targetRect = event.currentTarget.getBoundingClientRect();
+            const relativeX = event.clientX - targetRect.left;
+            const relativeY = event.clientY - targetRect.top;
+            const fromCenterX = relativeX - renderContext.centerX;
+            const fromCenterY = relativeY - renderContext.centerY;
 
-          const nextZoom = nextZoomValue(zoom, event.deltaY);
-          const currentPan = lastPan.current;
+            const nextZoom = nextZoomValue(zoom, event.deltaY);
+            const currentPan = lastPan.current;
 
-          if (nextZoom === zoom) {
-            return;
-          }
-
-          const nextPanX = fromCenterX - ((fromCenterX - currentPan.x) / zoom) * nextZoom;
-          const nextPanY = fromCenterY - ((fromCenterY - currentPan.y) / zoom) * nextZoom;
-
-          panBy(nextPanX - currentPan.x, nextPanY - currentPan.y);
-          lastPan.current = { x: nextPanX, y: nextPanY };
-          setZoom(nextZoom);
-        }}
-        onMouseDown={(event) => {
-          if (event.button !== 1 && event.button !== 0) return;
-          if (event.button === 1 || event.shiftKey) {
-            panState.current = createPanState(event.clientX, event.clientY, panX, panY);
-          }
-        }}
-        onMouseMove={(event) => {
-          const targetRect = event.currentTarget.getBoundingClientRect();
-          const relativeX = event.clientX - targetRect.left;
-          const relativeY = event.clientY - targetRect.top;
-          setMousePosition(relativeX, relativeY);
-
-          if (panState.current) {
-            const next = resolvePan(panState.current, event.clientX, event.clientY);
-            const dx = next.x - lastPan.current.x;
-            const dy = next.y - lastPan.current.y;
-            if (dx !== 0 || dy !== 0) {
-              panBy(dx, dy);
-              lastPan.current = next;
+            if (nextZoom === zoom) {
+              return;
             }
-            return;
-          }
 
-          const hit = renderer.hitTest(event.clientX, event.clientY);
-          hoverBand(hit);
-        }}
-        onMouseUp={(event) => {
-          if (panState.current) {
-            panState.current = null;
-            return;
-          }
-          if (event.button === 0) {
+            const nextPanX = fromCenterX - ((fromCenterX - currentPan.x) / zoom) * nextZoom;
+            const nextPanY = fromCenterY - ((fromCenterY - currentPan.y) / zoom) * nextZoom;
+
+            pendingWheelRef.current = {
+              zoom: nextZoom,
+              panX: nextPanX,
+              panY: nextPanY
+            };
+
+            if (wheelFrameRef.current !== null) {
+              return;
+            }
+
+            wheelFrameRef.current = window.requestAnimationFrame(() => {
+              const pending = pendingWheelRef.current;
+              wheelFrameRef.current = null;
+              if (!pending) {
+                return;
+              }
+
+              useViewportStore.setState({
+                zoom: pending.zoom,
+                panX: pending.panX,
+                panY: pending.panY
+              });
+              lastPan.current = { x: pending.panX, y: pending.panY };
+              pendingWheelRef.current = null;
+            });
+          }}
+          onMouseDown={(event) => {
+            if (event.button !== 1 && event.button !== 0) return;
+            if (event.button === 1 || event.shiftKey) {
+              panState.current = createPanState(event.clientX, event.clientY, panX, panY);
+            }
+          }}
+          onMouseMove={(event) => {
+            const targetRect = event.currentTarget.getBoundingClientRect();
+            const relativeX = event.clientX - targetRect.left;
+            const relativeY = event.clientY - targetRect.top;
+            setMousePosition(relativeX, relativeY);
+
+            if (panState.current) {
+              const next = resolvePan(panState.current, event.clientX, event.clientY);
+              const dx = next.x - lastPan.current.x;
+              const dy = next.y - lastPan.current.y;
+              if (dx !== 0 || dy !== 0) {
+                panBy(dx, dy);
+                lastPan.current = next;
+              }
+              return;
+            }
+
+            if (selectedScaleKind === 'slide-rule' && scalePreview) {
+              const sample = screenPointToPolarSample({
+                screenX: relativeX,
+                screenY: relativeY,
+                centerX: renderContext.centerX,
+                centerY: renderContext.centerY,
+                panX: renderContext.panX,
+                panY: renderContext.panY,
+                renderScale: renderContext.zoom * previewFitScale
+              });
+              const readout = resolveSlideRuleReadout(
+                sample,
+                scaleConfig,
+                scaleContext,
+                scalePreview.ticks,
+                scalePreview.labels
+              );
+              setEngineeringReadout(readout);
+            }
+
             const hit = renderer.hitTest(event.clientX, event.clientY);
-            selectBand(hit);
-          }
-        }}
-        onMouseLeave={() => {
-          panState.current = null;
-          hoverBand(null);
-          setMousePosition(0, 0);
-        }}
-        onDoubleClick={() => {
-          fitToWatch();
-        }}
-      />
+            hoverBand(hit);
+          }}
+          onMouseUp={(event) => {
+            if (panState.current) {
+              panState.current = null;
+              return;
+            }
+            if (event.button === 0) {
+              const hit = renderer.hitTest(event.clientX, event.clientY);
+              selectBand(hit);
+            }
+          }}
+          onMouseLeave={() => {
+            panState.current = null;
+            hoverBand(null);
+            setMousePosition(0, 0);
+            setEngineeringReadout(null);
+          }}
+          onDoubleClick={() => {
+            fitToWatch();
+          }}
+        />
 
-      {presentationMode ? null : (
-        <>
-          <div className="pointer-events-none absolute left-1/2 top-1/2 h-[88%] w-[88%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-engineering-amber/8" />
-          <div className="pointer-events-none absolute left-1/2 top-1/2 h-[72%] w-[72%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-engineering-teal/8" />
-          <div className="pointer-events-none absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-engineering-teal/8" />
-          <div className="pointer-events-none absolute left-0 top-1/2 h-px w-full -translate-y-1/2 bg-engineering-teal/8" />
-        </>
-      )}
+        {presentationMode ? null : (
+          <>
+            <div className="pointer-events-none absolute left-1/2 top-1/2 h-[88%] w-[88%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-engineering-amber/8" />
+            <div className="pointer-events-none absolute left-1/2 top-1/2 h-[72%] w-[72%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-engineering-teal/8" />
+            <div className="pointer-events-none absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-engineering-teal/8" />
+            <div className="pointer-events-none absolute left-0 top-1/2 h-px w-full -translate-y-1/2 bg-engineering-teal/8" />
+          </>
+        )}
 
-      {presentationMode ? null : (
-        <div className="pointer-events-none absolute right-3 top-3 rounded-md border border-engineering-border bg-engineering-panel/78 px-2 py-1 font-mono text-xs text-engineering-muted">
-          Wheel Zoom to Cursor | Shift+Drag Pan | Double Click Fit to Watch
-        </div>
-      )}
+        {presentationMode ? null : (
+          <div className="pointer-events-none absolute right-3 top-3 rounded-md border border-engineering-border bg-engineering-panel/78 px-2 py-1 font-mono text-xs text-engineering-muted">
+            Wheel Zoom to Cursor | Shift+Drag Pan | Double Click Fit to Watch
+          </div>
+        )}
 
-      <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-lg border border-engineering-border bg-engineering-panel/90 px-2 py-1 shadow-panel">
+        {presentationMode ? null : (
+          <div className="pointer-events-none absolute left-3 top-3 flex items-center gap-2 rounded-md border border-engineering-border bg-engineering-panel/72 px-2 py-1 text-[11px] text-engineering-muted">
+            <Ruler className="ds-icon-sm text-engineering-amber" />
+            Construction Guides
+          </div>
+        )}
+
+        {presentationMode ? null : (
+          <div className="pointer-events-none absolute left-3 bottom-3 flex items-center gap-2 rounded-md border border-engineering-border bg-engineering-panel/72 px-2 py-1 text-[11px] text-engineering-muted">
+            <Move className="ds-icon-sm text-engineering-teal" />
+            Precision overlays stay subtle by default
+          </div>
+        )}
+
+        {presentationMode || selectedScaleKind !== 'slide-rule' || !engineeringReadout ? null : (
+          <div className="pointer-events-none absolute left-3 top-14 w-[280px] rounded-md border border-engineering-border bg-engineering-panel/84 px-2 py-2 text-[11px] text-engineering-muted shadow-panel">
+            <p className="font-mono text-engineering-amber">Slide Rule Readout</p>
+            <div className="mt-1 grid grid-cols-2 gap-x-2 gap-y-1 font-mono">
+              <span>Ring</span>
+              <span className="text-engineering-text">{engineeringReadout.ringId}</span>
+              <span>Value</span>
+              <span className="text-engineering-text">{engineeringReadout.value.toFixed(6)}</span>
+              <span>Normalized</span>
+              <span className="text-engineering-text">{engineeringReadout.normalized.toFixed(6)}</span>
+              <span>Angle</span>
+              <span className="text-engineering-text">{engineeringReadout.angleDeg.toFixed(3)} deg</span>
+              <span>Radius</span>
+              <span className="text-engineering-text">{engineeringReadout.radiusMm.toFixed(3)} mm</span>
+              <span>Tick</span>
+              <span className="text-engineering-text">{engineeringReadout.nearestTick?.label ?? engineeringReadout.nearestTick?.tier ?? '--'}</span>
+              <span>Label</span>
+              <span className="text-engineering-text">{engineeringReadout.nearestLabel?.text ?? '--'}</span>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="border-t border-engineering-border/70 bg-engineering-panel/75 px-3 py-2">
+        <div className="mx-auto flex w-full max-w-5xl items-center justify-center gap-2 overflow-x-auto">
         <Button variant="status" size="sm" onClick={() => setZoom(Math.max(0.25, zoom - 0.1))}>
           <ZoomOut className="ds-icon-sm" />
         </Button>
@@ -245,21 +356,8 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode }: Cen
           {presentationMode ? <Minimize2 className="ds-icon-sm" /> : <Maximize2 className="ds-icon-sm" />}
           {presentationMode ? 'Exit Presentation' : 'Presentation'}
         </Button>
+        </div>
       </div>
-
-      {presentationMode ? null : (
-        <div className="pointer-events-none absolute left-3 top-3 flex items-center gap-2 rounded-md border border-engineering-border bg-engineering-panel/72 px-2 py-1 text-[11px] text-engineering-muted">
-          <Ruler className="ds-icon-sm text-engineering-amber" />
-          Construction Guides
-        </div>
-      )}
-
-      {presentationMode ? null : (
-        <div className="pointer-events-none absolute left-3 bottom-3 flex items-center gap-2 rounded-md border border-engineering-border bg-engineering-panel/72 px-2 py-1 text-[11px] text-engineering-muted">
-          <Move className="ds-icon-sm text-engineering-teal" />
-          Precision overlays stay subtle by default
-        </div>
-      )}
     </motion.section>
   );
 };

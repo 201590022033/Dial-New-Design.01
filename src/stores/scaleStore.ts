@@ -1,7 +1,13 @@
 import { create } from 'zustand';
 import type { BandEntity } from '@/domain/bands/types';
 import { getScalePlugin } from '@/domain/scales/scaleRegistry';
-import type { ScaleKind, ScaleMathContext, ScalePluginConfig, ScaleValidationResult } from '@/domain/scales/types';
+import type {
+  ScaleEngineeringReadout,
+  ScaleKind,
+  ScaleMathContext,
+  ScalePluginConfig,
+  ScaleValidationResult
+} from '@/domain/scales/types';
 import { runScalePlugin } from '@/services/scaleEngineService';
 
 interface ScaleState {
@@ -11,10 +17,12 @@ interface ScaleState {
   previewEnabled: boolean;
   validation: ScaleValidationResult | null;
   preview: ReturnType<typeof runScalePlugin>;
+  engineeringReadout: ScaleEngineeringReadout | null;
   setSelectedScaleKind: (kind: ScaleKind) => void;
   updatePluginConfig: (params: Partial<ScalePluginConfig>) => void;
   setPreviewEnabled: (enabled: boolean) => void;
   setContext: (context: Partial<ScaleMathContext>) => void;
+  setEngineeringReadout: (readout: ScaleEngineeringReadout | null) => void;
   syncFromBand: (band: BandEntity | null, minimumLineWidthMm: number) => void;
   regeneratePreview: () => void;
   hydrateScaleState: (snapshot: {
@@ -65,6 +73,7 @@ export const useScaleStore = create<ScaleState>((set, get) => ({
   previewEnabled: true,
   validation: null,
   preview: null,
+  engineeringReadout: null,
   setSelectedScaleKind: (kind) => {
     const plugin = getScalePlugin(kind);
     const nextConfig = plugin?.defaultConfig ?? get().pluginConfig;
@@ -100,6 +109,9 @@ export const useScaleStore = create<ScaleState>((set, get) => ({
 
     get().regeneratePreview();
   },
+  setEngineeringReadout: (readout) => {
+    set({ engineeringReadout: readout });
+  },
   syncFromBand: (band, minimumLineWidthMm) => {
     if (!band) {
       return;
@@ -123,7 +135,7 @@ export const useScaleStore = create<ScaleState>((set, get) => ({
   regeneratePreview: () => {
     const state = get();
     if (!state.previewEnabled) {
-      set({ preview: null, validation: null });
+      set({ preview: null, validation: null, engineeringReadout: null });
       return;
     }
 
@@ -148,7 +160,8 @@ export const useScaleStore = create<ScaleState>((set, get) => ({
       context: defaultContext,
       previewEnabled: true,
       validation: null,
-      preview: null
+      preview: null,
+      engineeringReadout: null
     });
     get().regeneratePreview();
   }

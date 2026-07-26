@@ -4,6 +4,7 @@ import type {
   ScaleKind,
   ScaleLabel,
   ScaleMathContext,
+  ScaleManufacturingMetadata,
   ScalePluginConfig,
   ScaleTick,
   ScaleValidationResult
@@ -18,6 +19,7 @@ export interface ScaleRunResult {
   validation: ScaleValidationResult;
   svg: string;
   preview: string;
+  manufacturingMetadata?: ScaleManufacturingMetadata;
 }
 
 const resultCache = new Map<string, ScaleRunResult>();
@@ -55,7 +57,8 @@ export const runScalePlugin = (
     geometry,
     validation,
     svg: plugin.svgOutput(ticks, labels),
-    preview: plugin.previewGenerator(config, context)
+    preview: plugin.previewGenerator(config, context),
+    manufacturingMetadata: plugin.manufacturingMetadata?.(ticks, labels, config)
   };
 
   resultCache.set(cacheKey, result);
