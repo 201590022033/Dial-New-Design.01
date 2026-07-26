@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect, useMemo } from 'react';
+import { Suspense, lazy, useEffect, useMemo, useState } from 'react';
 import { LeftBandsPanel } from '@/components/layout/LeftBandsPanel';
 import { TopToolbar } from '@/components/layout/TopToolbar';
 import { CentreCanvas } from '@/components/layout/CentreCanvas';
@@ -28,6 +28,7 @@ const HelpCenter = lazy(() =>
 );
 
 export const App = () => {
+  const [presentationMode, setPresentationMode] = useState(false);
   const syncWithGeometryEngine = useBandsStore((state) => state.syncWithGeometryEngine);
   const bands = useBandsStore((state) => state.bands);
   const selectedBandId = useSelectionStore((state) => state.selectedBandId);
@@ -206,18 +207,37 @@ export const App = () => {
   ]);
 
   return (
-    <div className="grid min-h-screen grid-rows-[auto_1fr_auto] gap-3 p-3 md:p-4">
-      <TopToolbar />
-      <main className="grid min-h-0 grid-cols-1 gap-3 xl:grid-cols-[320px_minmax(0,1fr)_390px]">
-        <aside className="min-h-0 overflow-hidden">
+    <div
+      className={[
+        'grid min-h-screen gap-3 p-3 md:p-4',
+        presentationMode ? 'grid-rows-[1fr]' : 'grid-rows-[auto_1fr_auto]'
+      ].join(' ')}
+    >
+      {presentationMode ? null : <TopToolbar />}
+      <main
+        className={[
+          'grid min-h-0 grid-cols-1 gap-3',
+          presentationMode ? '' : 'xl:grid-cols-[300px_minmax(0,1fr)_360px]'
+        ].join(' ')}
+      >
+        <aside className={presentationMode ? 'hidden' : 'min-h-0 overflow-hidden'}>
           <LeftBandsPanel />
         </aside>
 
-        <section className="flex min-h-[500px] min-w-0 items-center justify-center xl:min-h-0">
-          <CentreCanvas />
+        <section className="flex min-h-[560px] min-w-0 items-center justify-center xl:min-h-0">
+          <CentreCanvas
+            presentationMode={presentationMode}
+            onTogglePresentationMode={() => setPresentationMode((value) => !value)}
+          />
         </section>
 
-        <aside className="grid min-h-0 grid-rows-[minmax(0,1.2fr)_minmax(0,1fr)_auto] gap-3 overflow-hidden">
+        <aside
+          className={
+            presentationMode
+              ? 'hidden'
+              : 'grid min-h-0 grid-rows-[minmax(0,1.2fr)_minmax(0,1fr)_auto] gap-3 overflow-hidden'
+          }
+        >
           <RightInspector />
           <Suspense fallback={<div className="ds-panel p-3 text-xs text-engineering-muted">Loading feature stack...</div>}>
             <RightFeatureStack />
@@ -227,7 +247,7 @@ export const App = () => {
           </Suspense>
         </aside>
       </main>
-      <BottomStatusBar />
+      {presentationMode ? null : <BottomStatusBar />}
       <Suspense fallback={null}>
         <HelpCenter />
       </Suspense>

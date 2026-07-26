@@ -40,8 +40,8 @@ export class SvgRenderer implements RendererAdapter {
       return Math.max(current, band.geometry.outerRadius);
     }, 20);
     const nominalDiameterPx = Math.max(1, mmToPixels(maxOuterRadiusMm * 2));
-    const targetDiameterPx = Math.min(context.width, context.height) * 0.82;
-    const fitScale = Math.max(1, Math.min(2.4, targetDiameterPx / nominalDiameterPx));
+    const targetDiameterPx = Math.min(context.width, context.height) * 0.9;
+    const fitScale = Math.max(1, Math.min(2.6, targetDiameterPx / nominalDiameterPx));
     this.latestFitScale = fitScale;
 
     const layer = this.root.group().id('bands');
@@ -169,8 +169,8 @@ export class SvgRenderer implements RendererAdapter {
       const outerR = mmToPixels(band.geometry.outerRadius);
       const innerR = mmToPixels(band.geometry.innerRadius);
       const isHighlighted = highlightedBandIds.has(band.id);
-      const fadedOpacity = hasFocusSelection && !isHighlighted ? Math.max(0.12, band.style.opacity * 0.42) : band.style.opacity;
-      const strokeWidth = isHighlighted ? band.style.strokeWidth + 0.45 : band.style.strokeWidth;
+      const fadedOpacity = hasFocusSelection && !isHighlighted ? Math.max(0.25, band.style.opacity * 0.72) : band.style.opacity;
+      const strokeWidth = isHighlighted ? band.style.strokeWidth + 0.35 : band.style.strokeWidth;
       const strokeColor = isHighlighted ? '#E2E8F0' : band.style.stroke;
 
       const outer = layer.circle(outerR * 2).center(context.centerX, context.centerY);

@@ -42,7 +42,16 @@ export const CollapsibleCard = ({
         <h3 className="ds-panel-title text-engineering-text">{title}</h3>
         <ChevronDown className={cn('ds-icon-sm text-engineering-muted ds-transition', isOpen && 'rotate-180')} />
       </button>
-      {isOpen ? <div className="mt-3 space-y-3">{children}</div> : null}
+      <div
+        className={cn(
+          'grid transition-[grid-template-rows,opacity] duration-300 ease-in-out',
+          isOpen ? 'mt-3 grid-rows-[1fr] opacity-100' : 'mt-0 grid-rows-[0fr] opacity-0'
+        )}
+      >
+        <div className="overflow-hidden">
+          <div className="space-y-3 pb-0.5">{children}</div>
+        </div>
+      </div>
     </section>
   );
 };

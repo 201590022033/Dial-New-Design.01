@@ -5,15 +5,15 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: dark;
-  --dd-bg: #0f172a;
-  --dd-bg-elevated: #0b1220;
-  --dd-panel: #111c36;
-  --dd-panel-soft: #16243f;
-  --dd-border: #24395f;
-  --dd-divider: rgba(123, 153, 201, 0.22);
-  --dd-text: #dde7ff;
-  --dd-text-muted: #94a7cf;
+  color-scheme: light;
+  --dd-bg: #edf1f6;
+  --dd-bg-elevated: #f7f9fc;
+  --dd-panel: #f8fafc;
+  --dd-panel-soft: #f1f5f9;
+  --dd-border: #d5deea;
+  --dd-divider: rgba(100, 116, 139, 0.18);
+  --dd-text: #0f172a;
+  --dd-text-muted: #55637f;
   --dd-teal: #14b8a6;
   --dd-amber: #f59e0b;
   --dd-danger: #ef4444;
@@ -25,19 +25,19 @@
   --dd-space-3: 12px;
   --dd-space-4: 16px;
   --dd-space-5: 24px;
-  --dd-shadow-soft: 0 10px 24px rgba(3, 7, 18, 0.35);
-  --dd-shadow-panel: 0 14px 38px rgba(2, 6, 23, 0.5);
-  --dd-shadow-focus: 0 0 0 1px rgba(20, 184, 166, 0.66), 0 0 0 3px rgba(20, 184, 166, 0.15);
-  --dd-speed-fast: 140ms;
-  --dd-speed-normal: 220ms;
+  --dd-shadow-soft: 0 6px 18px rgba(15, 23, 42, 0.08);
+  --dd-shadow-panel: 0 14px 30px rgba(15, 23, 42, 0.12);
+  --dd-shadow-focus: 0 0 0 1px rgba(20, 184, 166, 0.52), 0 0 0 4px rgba(20, 184, 166, 0.15);
+  --dd-speed-fast: 180ms;
+  --dd-speed-normal: 260ms;
 }
 
 body {
   @apply m-0 min-h-screen bg-engineering-bg text-engineering-text antialiased;
   background-image:
-    radial-gradient(circle at 20% 20%, rgba(20, 184, 166, 0.08), transparent 36%),
-    radial-gradient(circle at 80% 0%, rgba(245, 158, 11, 0.1), transparent 28%),
-    linear-gradient(to bottom right, #0f172a, #0b1224);
+    radial-gradient(circle at 18% 18%, rgba(56, 189, 248, 0.08), transparent 38%),
+    radial-gradient(circle at 80% 5%, rgba(245, 158, 11, 0.08), transparent 30%),
+    linear-gradient(to bottom right, #f8fafc, #e9eff5);
 }
 
 #root {
@@ -46,7 +46,7 @@ body {
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(123, 153, 201, 0.35) rgba(15, 23, 42, 0.2);
+  scrollbar-color: rgba(100, 116, 139, 0.35) rgba(148, 163, 184, 0.16);
 }
 
 *::-webkit-scrollbar {
@@ -55,18 +55,18 @@ body {
 }
 
 *::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, rgba(20, 184, 166, 0.4), rgba(123, 153, 201, 0.4));
+  background: linear-gradient(180deg, rgba(20, 184, 166, 0.38), rgba(100, 116, 139, 0.26));
   border-radius: 999px;
-  border: 2px solid rgba(15, 23, 42, 0.2);
+  border: 2px solid rgba(248, 250, 252, 0.65);
 }
 
 *::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.28);
+  background: rgba(148, 163, 184, 0.16);
 }
 
 @layer components {
   .ds-panel {
-    @apply rounded-panel border border-engineering-border bg-engineering-panel/85 shadow-panel backdrop-blur-sm;
+    @apply rounded-panel border border-engineering-border bg-engineering-panel/90 shadow-panel backdrop-blur-sm;
   }
 
   .ds-panel-title {
@@ -99,7 +99,7 @@ body {
   }
 
   .ds-input {
-    @apply w-full rounded-md border border-engineering-border bg-engineering-bg/60 px-3 py-2 text-sm text-engineering-text outline-none transition;
+    @apply w-full rounded-md border border-engineering-border bg-engineering-bg/55 px-3 py-2 text-sm text-engineering-text outline-none transition;
   }
 
   .ds-input:focus-visible {
@@ -107,14 +107,14 @@ body {
   }
 
   .ds-card {
-    @apply rounded-lg border border-engineering-border bg-engineering-bg/45 p-3;
+    @apply rounded-lg border border-engineering-border bg-engineering-bg/45 p-3.5;
   }
 }
 
 @layer utilities {
   .ds-transition {
     transition-duration: var(--dd-speed-normal);
-    @apply transition-all ease-out;
+    @apply transition-all ease-in-out;
   }
 
   .ds-focus-ring:focus-visible {
