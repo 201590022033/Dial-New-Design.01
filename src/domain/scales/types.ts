@@ -37,6 +37,78 @@ export type ScaleMathModel =
   | 'time'
   | 'distance';
 
+export type ProjectionKind =
+  | 'identity'
+  | 'linear'
+  | 'logarithmic'
+  | 'reciprocal-logarithmic'
+  | 'square'
+  | 'square-root'
+  | 'cube'
+  | 'cube-root'
+  | 'natural-log'
+  | 'log-log'
+  | 'exponential'
+  | 'custom';
+
+export type EngineeringProfileKind =
+  | 'C'
+  | 'D'
+  | 'CI'
+  | 'A'
+  | 'B'
+  | 'K'
+  | 'L'
+  | 'LL0'
+  | 'LL1'
+  | 'LL2'
+  | 'LL3'
+  | 'fuel-consumption'
+  | 'distance-planning'
+  | 'ground-speed'
+  | 'true-air-speed'
+  | 'time'
+  | 'climb'
+  | 'descent'
+  | 'rate-of-climb'
+  | 'wind-correction'
+  | 'conversion'
+  | 'unit-conversion'
+  | 'fuel-burn'
+  | 'holding-pattern'
+  | 'glide-ratio'
+  | 'cross-country-planning'
+  | 'navitimer'
+  | 'aviation'
+  | 'scientific'
+  | 'engineering'
+  | 'navigation'
+  | 'physics'
+  | 'chemistry'
+  | 'mathematics'
+  | 'metric-conversion'
+  | 'imperial-conversion'
+  | 'length'
+  | 'mass'
+  | 'pressure'
+  | 'temperature'
+  | 'velocity'
+  | 'power'
+  | 'torque'
+  | 'mechanical-advantage'
+  | 'ratio'
+  | 'proportion'
+  | 'custom';
+
+export type FormatterKind =
+  | 'engineering'
+  | 'scientific'
+  | 'slide-rule'
+  | 'navitimer'
+  | 'mantissa'
+  | 'decimal'
+  | 'custom';
+
 export type TickDirection = 'inside' | 'outside' | 'bidirectional';
 export type TickStyle = 'line' | 'block' | 'decorative';
 export type LabelPlacement = 'inside' | 'outside';
@@ -167,6 +239,12 @@ export interface ScalePluginConfig {
     | 'LL'
     | 'aviation'
     | 'custom';
+  projectionKind?: ProjectionKind;
+  engineeringProfileKind?: EngineeringProfileKind;
+  formatterKind?: FormatterKind;
+  customProjectionExponent?: number;
+  customProjectionScale?: number;
+  customProjectionOffset?: number;
 }
 
 export interface ScaleMathContext {

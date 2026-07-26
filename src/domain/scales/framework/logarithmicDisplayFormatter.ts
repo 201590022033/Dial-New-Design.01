@@ -34,7 +34,7 @@ export const formatLogarithmicLabel = (
   config: ScalePluginConfig
 ): string => {
   const multiplier = config.logarithmicDisplayMultiplier ?? 1;
-  const format = config.logarithmicDisplayFormat ?? 'engineering';
+  const format = config.logarithmicDisplayFormat ?? config.formatterKind ?? 'engineering';
   const labelStyle = config.logarithmicLabelStyle ?? 'value';
   const base = config.logarithmicBase ?? 10;
   const displayed = value * multiplier;
@@ -43,10 +43,15 @@ export const formatLogarithmicLabel = (
     return formatScientific(displayed);
   }
 
-  if (labelStyle === 'mantissa' || format === 'navitimer' || format === 'slide-rule') {
+  if (labelStyle === 'mantissa' || format === 'mantissa' || format === 'navitimer' || format === 'slide-rule') {
     const mantissa = resolveMantissa(displayed, base);
     const mantissaDigits = tier === 'primary' ? 3 : 2;
     return trimZeros(Number(mantissa.toFixed(mantissaDigits)));
+  }
+
+  if (format === 'decimal') {
+    const digits = tier === 'primary' ? 2 : 1;
+    return trimZeros(Number(displayed.toFixed(digits)));
   }
 
   if (format === 'custom') {

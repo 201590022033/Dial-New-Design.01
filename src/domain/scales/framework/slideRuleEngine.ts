@@ -1,11 +1,13 @@
 import type {
+  ProjectionKind,
   ScaleEngineeringReadout,
   ScaleLabel,
   ScaleMathContext,
   ScalePluginConfig,
   ScaleTick
 } from '@/domain/scales/types';
-import { CircularLogarithmicMathematics } from '@/domain/scales/framework/circularLogarithmicMath';
+import { applyEngineeringProfile } from '@/domain/scales/framework/projectionProfileEngine';
+import { getProjection, resolveProjectionKindFromConfig } from '@/domain/scales/framework/projectionEngine';
 import type { CircularProjectionContext } from '@/domain/scales/framework/circularProjection';
 
 export type SlideRuleRingId = 'outer' | 'inner';
@@ -20,7 +22,7 @@ export interface SlideRuleRingState {
 export interface SlideRuleState {
   outer: SlideRuleRingState;
   inner: SlideRuleRingState;
-  sharedModel: 'logarithmic';
+  sharedModel: ProjectionKind;
   relativeRotationDeg: number;
 }
 
@@ -60,8 +62,6 @@ export interface InverseProjectionResult {
   angleDeg: number;
 }
 
-const mathematics = new CircularLogarithmicMathematics();
-
 const normalizeAngleDeg = (angleDeg: number): number => {
   let normalized = angleDeg % 360;
   if (normalized < 0) {
@@ -69,12 +69,6 @@ const normalizeAngleDeg = (angleDeg: number): number => {
   }
   return normalized;
 };
-
-const clamp01 = (value: number): number => Math.max(0, Math.min(1, value));
-
-const toLogSpace = (value: number, base: number): number => Math.log(value) / Math.log(base);
-
-const fromLogSpace = (value: number, base: number): number => Math.pow(base, value);
 
 const toRingContext = (
   config: ScalePluginConfig,
@@ -185,7 +179,8 @@ export const buildCoupledSlideRuleState = (
   sourceConfig: ScalePluginConfig,
   context: ScaleMathContext
 ): SlideRuleState => {
-  const config = resolveSlideRulePreset(sourceConfig);
+  const config = applyEngineeringProfile(resolveSlideRulePreset(sourceConfig));
+  const sharedModel = resolveProjectionKindFromConfig(config);
 
   const outerRotationOffsetDeg = asNumber(config.outerRotationOffsetDeg, 0);
   const innerRotationOffsetDeg = asNumber(config.innerRotationOffsetDeg, 0);
@@ -207,7 +202,7 @@ export const buildCoupledSlideRuleState = (
   return {
     outer,
     inner,
-    sharedModel: 'logarithmic',
+    sharedModel,
     relativeRotationDeg: inner.rotationOffsetDeg - outer.rotationOffsetDeg
   };
 };
@@ -348,26 +343,27 @@ export const inverseProjectSlideRuleValue = (
   context: ScaleMathContext,
   ringId: SlideRuleRingId
 ): InverseProjectionResult => {
-  const config = resolveSlideRulePreset(sourceConfig);
+  const config = applyEngineeringProfile(resolveSlideRulePreset(sourceConfig));
   const state = buildCoupledSlideRuleState(config, context);
   const ring = ringId === 'outer' ? state.outer : state.inner;
-  const base = config.logarithmicBase ?? 10;
+  const projection = getProjection(resolveProjectionKindFromConfig(config));
 
-  const span = ring.context.endAngleDeg - ring.context.startAngleDeg;
-  const signedSpan = ring.context.direction === 'clockwise' ? span : -span;
+  const raw = normalizeAngleDeg(sample.angleDeg);
+  const normalizedValue = projection.inverseFromAngle(
+    raw,
+    {
+      ...config,
+      rotationOffsetDeg: ring.context.rotationOffsetDeg ?? 0
+    },
+    context
+  );
 
-  const raw = normalizeAngleDeg(sample.angleDeg - (ring.context.rotationOffsetDeg ?? 0));
-  const normalized = clamp01((raw - normalizeAngleDeg(ring.context.startAngleDeg)) / Math.max(1e-9, signedSpan));
-
-  const startLog = toLogSpace(config.startValue, base);
-  const endLog = toLogSpace(config.endValue, base);
-  const logValue = startLog + normalized * (endLog - startLog);
-  const value = fromLogSpace(logValue, base);
+  const normalized = projection.normalize(normalizedValue, config);
 
   return {
     ringId,
     normalized,
-    value,
+    value: normalizedValue,
     radiusMm: sample.radiusMm,
     angleDeg: sample.angleDeg
   };
@@ -393,7 +389,7 @@ export const resolveSlideRuleReadout = (
   ticks: ScaleTick[],
   labels: ScaleLabel[]
 ): ScaleEngineeringReadout | null => {
-  const config = resolveSlideRulePreset(sourceConfig);
+  const config = applyEngineeringProfile(resolveSlideRulePreset(sourceConfig));
   const state = buildCoupledSlideRuleState(config, context);
   const outerDistance = Math.abs(sample.radiusMm - state.outer.radiusMm);
   const innerDistance = Math.abs(sample.radiusMm - state.inner.radiusMm);
@@ -440,15 +436,16 @@ export const projectValueForRing = (
   context: ScaleMathContext,
   ringId: SlideRuleRingId
 ): { angleDeg: number; normalized: number } => {
-  const config = resolveSlideRulePreset(sourceConfig);
+  const config = applyEngineeringProfile(resolveSlideRulePreset(sourceConfig));
   const state = buildCoupledSlideRuleState(config, context);
   const ring = ringId === 'outer' ? state.outer : state.inner;
+  const projection = getProjection(resolveProjectionKindFromConfig(config));
 
-  const angleDeg = mathematics.valueToAngle(value, {
+  const angleDeg = projection.valueToAngle(value, {
     ...config,
     rotationOffsetDeg: ring.rotationOffsetDeg
   }, context);
-  const normalized = mathematics.normalizeValue(value, config);
+  const normalized = projection.normalize(value, config);
 
   return {
     angleDeg,

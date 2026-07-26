@@ -4,6 +4,12 @@ import { Panel } from '@/components/ui/Panel';
 import { CollapsibleCard } from '@/components/ui/CollapsibleCard';
 import { Button } from '@/components/ui/Button';
 import { listScalePlugins } from '@/domain/scales/scaleRegistry';
+import {
+  buildProfileDefaults,
+  listEngineeringProfiles,
+  listFormatterKinds,
+  listProjectionKinds
+} from '@/domain/scales/framework';
 import { listTexturePlugins } from '@/domain/generators/textureEngine';
 import {
   getComponentInspectorSchema,
@@ -505,7 +511,7 @@ export const RightInspector = () => {
       return (
         <div className="space-y-2">
           <label className="block">
-            <span className="ds-label-inspector">Scale Type</span>
+            <span className="ds-label-inspector">Projection System</span>
             <select
               className="ds-input mt-1"
               value={selectedScaleKind}
@@ -546,8 +552,69 @@ export const RightInspector = () => {
             </label>
           </div>
 
-          {selectedScaleKind === 'logarithmic' ? (
+          {selectedScaleKind === 'logarithmic' || selectedScaleKind === 'slide-rule' ? (
             <div className="grid grid-cols-2 gap-2">
+              <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+                <span className="ds-label-inspector">Projection</span>
+                <select
+                  className="ds-input mt-1"
+                  value={scaleConfig.projectionKind ?? 'logarithmic'}
+                  onChange={(event) =>
+                    updateScaleConfig({
+                      projectionKind: event.target.value as NonNullable<typeof scaleConfig.projectionKind>
+                    })
+                  }
+                >
+                  {listProjectionKinds().map((projectionKind) => (
+                    <option key={projectionKind} value={projectionKind}>
+                      {projectionKind}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+                <span className="ds-label-inspector">Profile</span>
+                <select
+                  className="ds-input mt-1"
+                  value={scaleConfig.engineeringProfileKind ?? 'C'}
+                  onChange={(event) =>
+                    updateScaleConfig(
+                      buildProfileDefaults(
+                        event.target.value as NonNullable<typeof scaleConfig.engineeringProfileKind>,
+                        scaleConfig,
+                        {
+                          overrideExisting: true,
+                          preserveProjection: true
+                        }
+                      )
+                    )
+                  }
+                >
+                  {listEngineeringProfiles().map((profileKind) => (
+                    <option key={profileKind} value={profileKind}>
+                      {profileKind}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+                <span className="ds-label-inspector">Formatter</span>
+                <select
+                  className="ds-input mt-1"
+                  value={scaleConfig.formatterKind ?? 'engineering'}
+                  onChange={(event) =>
+                    updateScaleConfig({
+                      formatterKind: event.target.value as NonNullable<typeof scaleConfig.formatterKind>
+                    })
+                  }
+                >
+                  {listFormatterKinds().map((formatterKind) => (
+                    <option key={formatterKind} value={formatterKind}>
+                      {formatterKind}
+                    </option>
+                  ))}
+                </select>
+              </label>
               <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
                 <span className="ds-label-inspector">Logarithmic Base</span>
                 <input
@@ -621,7 +688,7 @@ export const RightInspector = () => {
                 </select>
               </label>
               <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
-                <span className="ds-label-inspector">Ring Type</span>
+                <span className="ds-label-inspector">Engineering Ring Hint</span>
                 <select
                   className="ds-input mt-1"
                   value={scaleConfig.logarithmicRingType ?? 'C'}

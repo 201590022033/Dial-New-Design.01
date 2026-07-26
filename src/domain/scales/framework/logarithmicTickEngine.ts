@@ -1,6 +1,7 @@
 import type { TickGenerator } from '@/domain/scales/framework/interfaces';
-import type { ScaleTick } from '@/domain/scales/types';
-import { resolveLogarithmicDomain, valueFromMantissaAndDecade } from '@/domain/scales/framework/logarithmicDomainEngine';
+import { applyEngineeringProfile } from '@/domain/scales/framework/projectionProfileEngine';
+import { getProjection, resolveProjectionKindFromConfig } from '@/domain/scales/framework/projectionEngine';
+import type { ScalePluginConfig, ScaleTick } from '@/domain/scales/types';
 
 interface TickSpec {
   offset: number;
@@ -18,6 +19,14 @@ interface TickDensityRule {
 
 const TERTIARY_OFFSETS: number[] = [0.2, 0.4, 0.6, 0.8];
 const MICRO_OFFSETS: number[] = [0.1, 0.3, 0.7, 0.9];
+
+const projectionFamiliesWithDecadeMode = new Set([
+  'logarithmic',
+  'reciprocal-logarithmic',
+  'natural-log',
+  'log-log',
+  'exponential'
+]);
 
 const rulesByProfile: Record<'sparse' | 'balanced' | 'dense' | 'ultra-dense' | 'engineering', TickDensityRule> = {
   sparse: {
@@ -127,6 +136,10 @@ const pushTick = (
   direction: ScaleTick['direction'],
   style: ScaleTick['style']
 ): void => {
+  if (!Number.isFinite(value) || value <= 0) {
+    return;
+  }
+
   const major = spec.tier === 'primary';
   const secondary = spec.tier === 'secondary';
 
@@ -144,6 +157,22 @@ const pushTick = (
   });
 };
 
+const dedupeAndSortTicks = (ticks: ScaleTick[]): ScaleTick[] => {
+  const deduped = new Map<string, ScaleTick>();
+  ticks.forEach((tick) => {
+    const key = `${tick.value?.toFixed(6) ?? 'n/a'}:${tick.tier ?? 'none'}`;
+    deduped.set(key, tick);
+  });
+
+  return [...deduped.values()].sort((left, right) => left.angleDeg - right.angleDeg);
+};
+
+const valueInConfiguredRange = (value: number, config: ScalePluginConfig): boolean => {
+  const min = Math.min(config.startValue, config.endValue);
+  const max = Math.max(config.startValue, config.endValue);
+  return value >= min && value <= max;
+};
+
 export const createLogarithmicTickEngine = (): TickGenerator => {
   return {
     generate: ({ config, context, toAngle }) => {
@@ -151,31 +180,34 @@ export const createLogarithmicTickEngine = (): TickGenerator => {
       const majorTicks: ScaleTick[] = [];
       const minorTicks: ScaleTick[] = [];
 
-      const domain = resolveLogarithmicDomain(config);
-      if (!domain) {
+      const effectiveConfig = applyEngineeringProfile(config);
+      const projectionKind = resolveProjectionKindFromConfig(effectiveConfig);
+      const projection = getProjection(projectionKind);
+      const metadata = projection.generateMetadata(effectiveConfig);
+      if (!metadata) {
         return {
           majorTicks,
           minorTicks,
           ticks,
-          effectiveMinorStep: config.minorStep
+          effectiveMinorStep: effectiveConfig.minorStep
         };
       }
 
-      const profile = getProfile(config.tickDensityProfile);
-      const radix = Math.max(2, Math.floor(domain.base));
-      const majorStride = clampCount(config.logMajorTickDensity, 1, 12);
+      const profile = getProfile(effectiveConfig.tickDensityProfile);
+      const base = Math.max(2, Math.floor(effectiveConfig.logarithmicBase ?? 10));
+      const majorStride = clampCount(effectiveConfig.logMajorTickDensity, 1, 12);
       const secondaryCount = clampCount(
-        config.logMinorTickDensity,
+        effectiveConfig.logMinorTickDensity,
         profile.secondary ? 1 : 0,
         6
       );
       const tertiaryCount = clampCount(
-        config.logMicroTickDensity,
+        effectiveConfig.logMicroTickDensity,
         profile.tertiary ? TERTIARY_OFFSETS.length : 0,
         8
       );
       const microCount = clampCount(
-        profile.micro ? (config.logMicroTickDensity ?? MICRO_OFFSETS.length) : 0,
+        profile.micro ? (effectiveConfig.logMicroTickDensity ?? MICRO_OFFSETS.length) : 0,
         profile.micro ? MICRO_OFFSETS.length : 0,
         8
       );
@@ -184,158 +216,271 @@ export const createLogarithmicTickEngine = (): TickGenerator => {
       const tertiaryOffsets = pickOffsets(TERTIARY_OFFSETS, tertiaryCount, () => createEvenOffsets(tertiaryCount));
       const microOffsets = pickOffsets(MICRO_OFFSETS, microCount, () => createEvenOffsets(microCount));
 
-      for (let decade = domain.startDecade; decade <= domain.endDecade; decade += 1) {
-        const decadeStart = domain.base ** decade;
-        const decadeEnd = domain.base ** (decade + 1);
+      const useDecadeMode = metadata.decadeFriendly && projectionFamiliesWithDecadeMode.has(projectionKind);
 
-        for (let mantissaIndex = 1; mantissaIndex <= radix - 1; mantissaIndex += 1) {
-          const intervalStartMantissa = mantissaIndex;
-          const intervalEndMantissa = Math.min(mantissaIndex + 1, domain.base);
-          const intervalStartValue = valueFromMantissaAndDecade(intervalStartMantissa, decade, domain.base);
-          const intervalEndValue = valueFromMantissaAndDecade(intervalEndMantissa, decade, domain.base);
+      if (useDecadeMode) {
+        const startDecade = Math.floor(Math.log(metadata.mappedStart) / Math.log(base));
+        const endDecade = Math.ceil(Math.log(metadata.mappedEnd) / Math.log(base)) - 1;
 
-          if (intervalEndValue < domain.startValue || intervalStartValue > domain.endValue) {
-            continue;
-          }
+        for (let decade = startDecade; decade <= endDecade; decade += 1) {
+          const decadeStart = base ** decade;
+          const decadeEnd = base ** (decade + 1);
 
-          const intervalStartAngle = toAngle(intervalStartValue, config, context) + config.rotationOffsetDeg;
-          const intervalEndAngle = toAngle(intervalEndValue, config, context) + config.rotationOffsetDeg;
-          const spacingDeg = Math.abs(intervalEndAngle - intervalStartAngle);
+          for (let mantissaIndex = 1; mantissaIndex <= base - 1; mantissaIndex += 1) {
+            const intervalStartMapped = mantissaIndex * base ** decade;
+            const intervalEndMapped = Math.min(mantissaIndex + 1, base) * base ** decade;
 
-          if ((mantissaIndex - 1) % majorStride === 0) {
-            if (intervalStartValue >= domain.startValue && intervalStartValue <= domain.endValue) {
+            if (intervalEndMapped < metadata.mappedStart || intervalStartMapped > metadata.mappedEnd) {
+              continue;
+            }
+
+            const intervalStartValue = projection.inverse(intervalStartMapped, effectiveConfig);
+            const intervalEndValue = projection.inverse(intervalEndMapped, effectiveConfig);
+            const intervalStartAngle = toAngle(intervalStartValue, effectiveConfig, context) + effectiveConfig.rotationOffsetDeg;
+            const intervalEndAngle = toAngle(intervalEndValue, effectiveConfig, context) + effectiveConfig.rotationOffsetDeg;
+            const spacingDeg = Math.abs(intervalEndAngle - intervalStartAngle);
+
+            if ((mantissaIndex - 1) % majorStride === 0 && valueInConfiguredRange(intervalStartValue, effectiveConfig)) {
               pushTick(
                 ticks,
                 intervalStartValue,
                 { offset: 0, tier: 'primary' },
                 intervalStartAngle,
-                config.radiusMm,
-                config.majorTickLengthMm,
-                config.minorTickLengthMm,
-                config.majorTickWidthMm,
-                config.minorTickWidthMm,
-                config.tickDirection,
-                config.tickStyle
+                effectiveConfig.radiusMm,
+                effectiveConfig.majorTickLengthMm,
+                effectiveConfig.minorTickLengthMm,
+                effectiveConfig.majorTickWidthMm,
+                effectiveConfig.minorTickWidthMm,
+                effectiveConfig.tickDirection,
+                effectiveConfig.tickStyle
               );
+            }
+
+            if (profile.secondary && spacingDeg >= profile.minSecondarySpacingDeg) {
+              secondaryOffsets.forEach((offset) => {
+                const mapped = (mantissaIndex + offset) * base ** decade;
+                if (mapped < metadata.mappedStart || mapped > metadata.mappedEnd) {
+                  return;
+                }
+
+                const value = projection.inverse(mapped, effectiveConfig);
+                if (!valueInConfiguredRange(value, effectiveConfig)) {
+                  return;
+                }
+
+                const angleDeg = toAngle(value, effectiveConfig, context) + effectiveConfig.rotationOffsetDeg;
+                pushTick(
+                  ticks,
+                  value,
+                  { offset, tier: 'secondary' },
+                  angleDeg,
+                  effectiveConfig.radiusMm,
+                  effectiveConfig.majorTickLengthMm,
+                  effectiveConfig.minorTickLengthMm,
+                  effectiveConfig.majorTickWidthMm,
+                  effectiveConfig.minorTickWidthMm,
+                  effectiveConfig.tickDirection,
+                  effectiveConfig.tickStyle
+                );
+              });
+            }
+
+            if (profile.tertiary && spacingDeg >= profile.minTertiarySpacingDeg) {
+              tertiaryOffsets.forEach((offset) => {
+                const mapped = (mantissaIndex + offset) * base ** decade;
+                if (mapped < metadata.mappedStart || mapped > metadata.mappedEnd) {
+                  return;
+                }
+
+                const value = projection.inverse(mapped, effectiveConfig);
+                if (!valueInConfiguredRange(value, effectiveConfig)) {
+                  return;
+                }
+
+                const angleDeg = toAngle(value, effectiveConfig, context) + effectiveConfig.rotationOffsetDeg;
+                pushTick(
+                  ticks,
+                  value,
+                  { offset, tier: 'tertiary' },
+                  angleDeg,
+                  effectiveConfig.radiusMm,
+                  effectiveConfig.majorTickLengthMm,
+                  effectiveConfig.minorTickLengthMm,
+                  effectiveConfig.majorTickWidthMm,
+                  effectiveConfig.minorTickWidthMm,
+                  effectiveConfig.tickDirection,
+                  effectiveConfig.tickStyle
+                );
+              });
+            }
+
+            if (profile.micro && spacingDeg >= profile.minMicroSpacingDeg) {
+              microOffsets.forEach((offset) => {
+                const mapped = (mantissaIndex + offset) * base ** decade;
+                if (mapped < metadata.mappedStart || mapped > metadata.mappedEnd) {
+                  return;
+                }
+
+                const value = projection.inverse(mapped, effectiveConfig);
+                if (!valueInConfiguredRange(value, effectiveConfig)) {
+                  return;
+                }
+
+                const angleDeg = toAngle(value, effectiveConfig, context) + effectiveConfig.rotationOffsetDeg;
+                pushTick(
+                  ticks,
+                  value,
+                  { offset, tier: 'micro' },
+                  angleDeg,
+                  effectiveConfig.radiusMm,
+                  effectiveConfig.majorTickLengthMm,
+                  effectiveConfig.minorTickLengthMm,
+                  effectiveConfig.majorTickWidthMm,
+                  effectiveConfig.minorTickWidthMm,
+                  effectiveConfig.tickDirection,
+                  effectiveConfig.tickStyle
+                );
+              });
             }
           }
 
+          [decadeStart, Math.min(decadeEnd, metadata.mappedEnd)].forEach((boundaryMapped) => {
+            if (boundaryMapped < metadata.mappedStart || boundaryMapped > metadata.mappedEnd) {
+              return;
+            }
+            const boundaryValue = projection.inverse(boundaryMapped, effectiveConfig);
+            if (!valueInConfiguredRange(boundaryValue, effectiveConfig)) {
+              return;
+            }
+            const boundaryAngle = toAngle(boundaryValue, effectiveConfig, context) + effectiveConfig.rotationOffsetDeg;
+            pushTick(
+              ticks,
+              boundaryValue,
+              { offset: 0, tier: 'primary' },
+              boundaryAngle,
+              effectiveConfig.radiusMm,
+              effectiveConfig.majorTickLengthMm,
+              effectiveConfig.minorTickLengthMm,
+              effectiveConfig.majorTickWidthMm,
+              effectiveConfig.minorTickWidthMm,
+              effectiveConfig.tickDirection,
+              effectiveConfig.tickStyle
+            );
+          });
+        }
+      } else {
+        const primarySegments = Math.max(10, majorStride * 10);
+        const mappedSpan = metadata.mappedSpan;
+
+        for (let segment = 0; segment <= primarySegments; segment += 1) {
+          const startT = segment / primarySegments;
+          const mapped = metadata.mappedStart + startT * mappedSpan;
+          const value = projection.inverse(mapped, effectiveConfig);
+          if (!valueInConfiguredRange(value, effectiveConfig)) {
+            continue;
+          }
+
+          const angleDeg = toAngle(value, effectiveConfig, context) + effectiveConfig.rotationOffsetDeg;
+          pushTick(
+            ticks,
+            value,
+            { offset: startT, tier: 'primary' },
+            angleDeg,
+            effectiveConfig.radiusMm,
+            effectiveConfig.majorTickLengthMm,
+            effectiveConfig.minorTickLengthMm,
+            effectiveConfig.majorTickWidthMm,
+            effectiveConfig.minorTickWidthMm,
+            effectiveConfig.tickDirection,
+            effectiveConfig.tickStyle
+          );
+
+          if (segment === primarySegments) {
+            continue;
+          }
+
+          const nextMapped = metadata.mappedStart + ((segment + 1) / primarySegments) * mappedSpan;
+          const startValue = projection.inverse(mapped, effectiveConfig);
+          const endValue = projection.inverse(nextMapped, effectiveConfig);
+          const startAngle = toAngle(startValue, effectiveConfig, context) + effectiveConfig.rotationOffsetDeg;
+          const endAngle = toAngle(endValue, effectiveConfig, context) + effectiveConfig.rotationOffsetDeg;
+          const spacingDeg = Math.abs(endAngle - startAngle);
+
           if (profile.secondary && spacingDeg >= profile.minSecondarySpacingDeg) {
             secondaryOffsets.forEach((offset) => {
-              const value = valueFromMantissaAndDecade(intervalStartMantissa + offset, decade, domain.base);
-              if (value < domain.startValue || value > domain.endValue) {
+              const intermediateMapped = mapped + (nextMapped - mapped) * offset;
+              const intermediateValue = projection.inverse(intermediateMapped, effectiveConfig);
+              if (!valueInConfiguredRange(intermediateValue, effectiveConfig)) {
                 return;
               }
-
-              const angleDeg = toAngle(value, config, context) + config.rotationOffsetDeg;
+              const intermediateAngle = toAngle(intermediateValue, effectiveConfig, context) + effectiveConfig.rotationOffsetDeg;
               pushTick(
                 ticks,
-                value,
+                intermediateValue,
                 { offset, tier: 'secondary' },
-                angleDeg,
-                config.radiusMm,
-                config.majorTickLengthMm,
-                config.minorTickLengthMm,
-                config.majorTickWidthMm,
-                config.minorTickWidthMm,
-                config.tickDirection,
-                config.tickStyle
+                intermediateAngle,
+                effectiveConfig.radiusMm,
+                effectiveConfig.majorTickLengthMm,
+                effectiveConfig.minorTickLengthMm,
+                effectiveConfig.majorTickWidthMm,
+                effectiveConfig.minorTickWidthMm,
+                effectiveConfig.tickDirection,
+                effectiveConfig.tickStyle
               );
             });
           }
 
           if (profile.tertiary && spacingDeg >= profile.minTertiarySpacingDeg) {
             tertiaryOffsets.forEach((offset) => {
-              const value = valueFromMantissaAndDecade(intervalStartMantissa + offset, decade, domain.base);
-              if (value < domain.startValue || value > domain.endValue) {
+              const intermediateMapped = mapped + (nextMapped - mapped) * offset;
+              const intermediateValue = projection.inverse(intermediateMapped, effectiveConfig);
+              if (!valueInConfiguredRange(intermediateValue, effectiveConfig)) {
                 return;
               }
-
-              const angleDeg = toAngle(value, config, context) + config.rotationOffsetDeg;
+              const intermediateAngle = toAngle(intermediateValue, effectiveConfig, context) + effectiveConfig.rotationOffsetDeg;
               pushTick(
                 ticks,
-                value,
+                intermediateValue,
                 { offset, tier: 'tertiary' },
-                angleDeg,
-                config.radiusMm,
-                config.majorTickLengthMm,
-                config.minorTickLengthMm,
-                config.majorTickWidthMm,
-                config.minorTickWidthMm,
-                config.tickDirection,
-                config.tickStyle
+                intermediateAngle,
+                effectiveConfig.radiusMm,
+                effectiveConfig.majorTickLengthMm,
+                effectiveConfig.minorTickLengthMm,
+                effectiveConfig.majorTickWidthMm,
+                effectiveConfig.minorTickWidthMm,
+                effectiveConfig.tickDirection,
+                effectiveConfig.tickStyle
               );
             });
           }
 
           if (profile.micro && spacingDeg >= profile.minMicroSpacingDeg) {
             microOffsets.forEach((offset) => {
-              const value = valueFromMantissaAndDecade(intervalStartMantissa + offset, decade, domain.base);
-              if (value < domain.startValue || value > domain.endValue) {
+              const intermediateMapped = mapped + (nextMapped - mapped) * offset;
+              const intermediateValue = projection.inverse(intermediateMapped, effectiveConfig);
+              if (!valueInConfiguredRange(intermediateValue, effectiveConfig)) {
                 return;
               }
-
-              const angleDeg = toAngle(value, config, context) + config.rotationOffsetDeg;
+              const intermediateAngle = toAngle(intermediateValue, effectiveConfig, context) + effectiveConfig.rotationOffsetDeg;
               pushTick(
                 ticks,
-                value,
+                intermediateValue,
                 { offset, tier: 'micro' },
-                angleDeg,
-                config.radiusMm,
-                config.majorTickLengthMm,
-                config.minorTickLengthMm,
-                config.majorTickWidthMm,
-                config.minorTickWidthMm,
-                config.tickDirection,
-                config.tickStyle
+                intermediateAngle,
+                effectiveConfig.radiusMm,
+                effectiveConfig.majorTickLengthMm,
+                effectiveConfig.minorTickLengthMm,
+                effectiveConfig.majorTickWidthMm,
+                effectiveConfig.minorTickWidthMm,
+                effectiveConfig.tickDirection,
+                effectiveConfig.tickStyle
               );
             });
           }
         }
-
-        const boundaryValue = Math.min(decadeEnd, domain.endValue);
-        if (boundaryValue >= domain.startValue && boundaryValue <= domain.endValue) {
-          const boundaryAngle = toAngle(boundaryValue, config, context) + config.rotationOffsetDeg;
-          pushTick(
-            ticks,
-            boundaryValue,
-            { offset: 0, tier: 'primary' },
-            boundaryAngle,
-            config.radiusMm,
-            config.majorTickLengthMm,
-            config.minorTickLengthMm,
-            config.majorTickWidthMm,
-            config.minorTickWidthMm,
-            config.tickDirection,
-            config.tickStyle
-          );
-        }
-
-        if (decadeStart >= domain.startValue && decadeStart <= domain.endValue) {
-          const startAngle = toAngle(decadeStart, config, context) + config.rotationOffsetDeg;
-          pushTick(
-            ticks,
-            decadeStart,
-            { offset: 0, tier: 'primary' },
-            startAngle,
-            config.radiusMm,
-            config.majorTickLengthMm,
-            config.minorTickLengthMm,
-            config.majorTickWidthMm,
-            config.minorTickWidthMm,
-            config.tickDirection,
-            config.tickStyle
-          );
-        }
       }
 
-      const deduped = new Map<string, ScaleTick>();
-      ticks.forEach((tick) => {
-        const key = `${tick.value?.toFixed(4) ?? 'n/a'}:${tick.tier ?? 'none'}`;
-        deduped.set(key, tick);
-      });
-
-      const merged = [...deduped.values()].sort((left, right) => left.angleDeg - right.angleDeg);
+      const merged = dedupeAndSortTicks(ticks);
       merged.forEach((tick) => {
         if (tick.weight === 'major') {
           majorTicks.push(tick);
@@ -348,7 +493,7 @@ export const createLogarithmicTickEngine = (): TickGenerator => {
         majorTicks,
         minorTicks,
         ticks: merged,
-        effectiveMinorStep: config.minorStep
+        effectiveMinorStep: effectiveConfig.minorStep
       };
     }
   };

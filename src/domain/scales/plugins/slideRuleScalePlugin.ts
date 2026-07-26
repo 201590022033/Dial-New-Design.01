@@ -1,8 +1,12 @@
 import {
-  CircularLogarithmicMathematics,
+  applyEngineeringProfile,
   createCollisionFramework,
+  getProjection,
+  getProfileManufacturingDiagnostics,
   createLogarithmicLabelEngine,
   createLogarithmicTickEngine,
+  resolveEngineeringProfile,
+  resolveProjectionKindFromConfig,
   createScaleExporter,
   createScaleValidationEngine,
   buildCoupledSlideRuleState,
@@ -20,7 +24,6 @@ import type {
   ScaleValidationResult
 } from '@/domain/scales/types';
 
-const mathematics = new CircularLogarithmicMathematics();
 const tickEngine = createLogarithmicTickEngine();
 const labelEngine = createLogarithmicLabelEngine();
 const validationEngine = createScaleValidationEngine();
@@ -154,6 +157,7 @@ const createRingTicks = (
   context: ScaleMathContext,
   ringId: 'outer' | 'inner'
 ): ScaleTick[] => {
+  const projection = getProjection(resolveProjectionKindFromConfig(config));
   const state = buildCoupledSlideRuleState(config, context);
   const ring = ringId === 'outer' ? state.outer : state.inner;
 
@@ -166,7 +170,7 @@ const createRingTicks = (
   const { ticks } = tickEngine.generate({
     config: ringConfig,
     context,
-    toAngle: mathematics.valueToAngle.bind(mathematics)
+    toAngle: projection.valueToAngle
   });
 
   return ticks.map((tick) => ({
@@ -176,7 +180,7 @@ const createRingTicks = (
 };
 
 const generateTicks = (sourceConfig: ScalePluginConfig, context: ScaleMathContext): ScaleTick[] => {
-  const config = resolveSlideRulePreset(sourceConfig);
+  const config = applyEngineeringProfile(resolveSlideRulePreset(sourceConfig));
   const outerTicks = createRingTicks(config, context, 'outer');
   const innerTicks = createRingTicks(config, context, 'inner');
   return [...outerTicks, ...innerTicks];
@@ -209,7 +213,11 @@ export const slideRuleScalePlugin: ScalePlugin = {
   mathematicalModel: 'logarithmic',
   displayName: 'General Circular Slide Rule',
   defaultConfig,
-  mathematics: (value, config, context) => mathematics.valueToAngle(value, config, context),
+  mathematics: (value, sourceConfig, context) => {
+    const config = applyEngineeringProfile(resolveSlideRulePreset(sourceConfig));
+    const projection = getProjection(resolveProjectionKindFromConfig(config));
+    return projection.valueToAngle(value, config, context);
+  },
   tickGenerator: (config, context) => generateTicks(config, context),
   labelGenerator: (ticks, sourceConfig) => {
     const config = resolveSlideRulePreset(sourceConfig);
@@ -246,8 +254,9 @@ export const slideRuleScalePlugin: ScalePlugin = {
     return `General Circular Slide Rule: ${preview.tickCount} ticks, ${preview.labelCount} labels, cursor ${cursor.type}`;
   },
   validate: (sourceConfig, ticks, labels) => {
-    const config = resolveSlideRulePreset(sourceConfig);
-    const domainWarnings = mathematics.validateDomain(config);
+    const config = applyEngineeringProfile(resolveSlideRulePreset(sourceConfig));
+    const projection = getProjection(resolveProjectionKindFromConfig(config));
+    const domainWarnings = projection.validateDomain(config);
     const collisions = collisionFramework.detect({
       ticks,
       labels,
@@ -298,6 +307,10 @@ export const slideRuleScalePlugin: ScalePlugin = {
     if ((config.innerRadiusMm ?? config.radiusMm) < 12 && innerLabelCount > 18) {
       smallTextWarnings.push('Inner ring radius and label count may produce text smaller than preferred engraving readability.');
     }
+
+    const profile = resolveEngineeringProfile(config);
+    const profileDiagnostics = getProfileManufacturingDiagnostics(profile, config);
+    ringDensityWarnings.push(...profileDiagnostics);
 
     return {
       ...baseMetadata,

@@ -8,6 +8,8 @@ export * from '@/domain/scales/framework/labelEngine';
 export * from '@/domain/scales/framework/logarithmicLabelEngine';
 export * from '@/domain/scales/framework/logarithmicDomainEngine';
 export * from '@/domain/scales/framework/logarithmicDisplayFormatter';
+export * from '@/domain/scales/framework/projectionEngine';
+export * from '@/domain/scales/framework/projectionProfileEngine';
 export * from '@/domain/scales/framework/slideRuleEngine';
 export * from '@/domain/scales/framework/intelligentLayoutEngine';
 export * from '@/domain/scales/framework/validationEngine';

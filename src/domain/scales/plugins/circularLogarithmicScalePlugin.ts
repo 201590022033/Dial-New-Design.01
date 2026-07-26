@@ -1,8 +1,12 @@
 import {
-  CircularLogarithmicMathematics,
+  applyEngineeringProfile,
   createCollisionFramework,
+  getProjection,
+  getProfileManufacturingDiagnostics,
   createLogarithmicLabelEngine,
   createLogarithmicTickEngine,
+  resolveEngineeringProfile,
+  resolveProjectionKindFromConfig,
   createScaleExporter,
   createScaleValidationEngine
 } from '@/domain/scales/framework';
@@ -16,7 +20,6 @@ import type {
   ScaleValidationResult
 } from '@/domain/scales/types';
 
-const mathematics = new CircularLogarithmicMathematics();
 const tickEngine = createLogarithmicTickEngine();
 const labelEngine = createLogarithmicLabelEngine();
 const validationEngine = createScaleValidationEngine();
@@ -24,6 +27,24 @@ const collisionFramework = createCollisionFramework();
 const exporter = createScaleExporter();
 
 const inspectorConfiguration: ScalePlugin['inspectorConfiguration'] = [
+  {
+    key: 'projectionKind',
+    label: 'Projection',
+    type: 'select',
+    description: 'Select mathematical projection independent from formatting and profile.'
+  },
+  {
+    key: 'engineeringProfileKind',
+    label: 'Profile',
+    type: 'select',
+    description: 'Engineering intent profile (C, CI, A, K, L, LL, aviation, etc.).'
+  },
+  {
+    key: 'formatterKind',
+    label: 'Formatter',
+    type: 'select',
+    description: 'Display formatting layer independent from projection mathematics.'
+  },
   {
     key: 'startValue',
     label: 'Domain Start',
@@ -175,7 +196,10 @@ const defaultConfig: ScalePluginConfig = {
   logarithmicRingType: 'C',
   tickDensityProfile: 'balanced',
   includeMinorLabels: false,
-  engineeringPreset: 'precision'
+  engineeringPreset: 'precision',
+  projectionKind: 'logarithmic',
+  engineeringProfileKind: 'C',
+  formatterKind: 'engineering'
 };
 
 const toValidationResult = (
@@ -287,19 +311,21 @@ const evaluatePrecision = (ticks: ScaleTick[]): ScaleValidationIssue[] => {
 };
 
 const applyEngineeringPreset = (config: ScalePluginConfig): ScalePluginConfig => {
-  if (config.engineeringPreset === 'aviation') {
+  const profiled = applyEngineeringProfile(config);
+
+  if (profiled.engineeringPreset === 'aviation') {
     return {
-      ...config,
+      ...profiled,
       tickDensityProfile: 'dense',
       includeMinorLabels: true,
-      majorTickLengthMm: Math.max(config.majorTickLengthMm, 2.4),
-      minorTickLengthMm: Math.max(config.minorTickLengthMm, 0.95)
+      majorTickLengthMm: Math.max(profiled.majorTickLengthMm, 2.4),
+      minorTickLengthMm: Math.max(profiled.minorTickLengthMm, 0.95)
     };
   }
 
-  if (config.engineeringPreset === 'scientific') {
+  if (profiled.engineeringPreset === 'scientific') {
     return {
-      ...config,
+      ...profiled,
       tickDensityProfile: 'balanced',
       includeMinorLabels: true,
       labelOrientation: 'horizontal'
@@ -307,18 +333,19 @@ const applyEngineeringPreset = (config: ScalePluginConfig): ScalePluginConfig =>
   }
 
   return {
-    ...config,
-    tickDensityProfile: config.tickDensityProfile ?? 'balanced',
-    includeMinorLabels: config.includeMinorLabels ?? false
+    ...profiled,
+    tickDensityProfile: profiled.tickDensityProfile ?? 'balanced',
+    includeMinorLabels: profiled.includeMinorLabels ?? false
   };
 };
 
 const generateTicks = (config: ScalePluginConfig, context: ScaleMathContext): ScaleTick[] => {
   const effectiveConfig = applyEngineeringPreset(config);
+  const projection = getProjection(resolveProjectionKindFromConfig(effectiveConfig));
   const { ticks } = tickEngine.generate({
     config: effectiveConfig,
     context,
-    toAngle: mathematics.valueToAngle.bind(mathematics)
+    toAngle: projection.valueToAngle
   });
 
   return ticks;
@@ -351,7 +378,11 @@ export const circularLogarithmicScalePlugin: ScalePlugin = {
   mathematicalModel: 'logarithmic',
   displayName: 'Circular Logarithmic Scale',
   defaultConfig,
-  mathematics: (value, config, context) => mathematics.valueToAngle(value, config, context),
+  mathematics: (value, config, context) => {
+    const effectiveConfig = applyEngineeringPreset(config);
+    const projection = getProjection(resolveProjectionKindFromConfig(effectiveConfig));
+    return projection.valueToAngle(value, effectiveConfig, context);
+  },
   tickGenerator: generateTicks,
   labelGenerator: (ticks, config) => {
     const effectiveConfig = applyEngineeringPreset(config);
@@ -367,7 +398,8 @@ export const circularLogarithmicScalePlugin: ScalePlugin = {
   },
   validate: (config, ticks, labels) => {
     const effectiveConfig = applyEngineeringPreset(config);
-    const domainWarnings = mathematics.validateDomain(effectiveConfig);
+    const projection = getProjection(resolveProjectionKindFromConfig(effectiveConfig));
+    const domainWarnings = projection.validateDomain(effectiveConfig);
     const collisions = collisionFramework.detect({
       ticks,
       labels,
@@ -393,6 +425,19 @@ export const circularLogarithmicScalePlugin: ScalePlugin = {
     return toValidationResult(issues, valid, baseValidation.healthReport);
   },
   svgOutput: (ticks, labels) => exporter.toSvg({ kind: 'logarithmic', ticks, labels }),
-  manufacturingMetadata: (ticks, labels, config) =>
-    exporter.manufacturingMetadata?.({ kind: 'logarithmic', ticks, labels }, config)
+  manufacturingMetadata: (ticks, labels, sourceConfig) => {
+    const config = applyEngineeringPreset(sourceConfig);
+    const metadata = exporter.manufacturingMetadata?.({ kind: 'logarithmic', ticks, labels }, config);
+    if (!metadata) {
+      return undefined;
+    }
+
+    const profile = resolveEngineeringProfile(config);
+    const profileDiagnostics = getProfileManufacturingDiagnostics(profile, config);
+
+    return {
+      ...metadata,
+      ringDensityWarnings: [...(metadata.ringDensityWarnings ?? []), ...profileDiagnostics]
+    };
+  }
 };
