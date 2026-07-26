@@ -97,7 +97,7 @@ export const BottomStatusBar = () => {
         <div className="flex items-center gap-1.5">
           <span className="ds-label-status">Readout</span>
           <span className="font-mono text-engineering-text">
-            {`${engineeringReadout.ringId} ${engineeringReadout.value.toFixed(4)} @ ${engineeringReadout.angleDeg.toFixed(2)}deg`}
+            {`${engineeringReadout.scaleKind ?? currentScale} ${engineeringReadout.pluginName ?? ''} v=${engineeringReadout.value.toFixed(4)} n=${engineeringReadout.normalized.toFixed(4)} a=${engineeringReadout.angleDeg.toFixed(2)}deg r=${engineeringReadout.radiusMm.toFixed(2)}mm ring=${engineeringReadout.ringId} C=${engineeringReadout.collisionStatus ?? 'ok'} M=${engineeringReadout.manufacturingStatus ?? 'ok'} E=${(engineeringReadout.engineeringScore ?? 0).toFixed(2)}`}
           </span>
         </div>
       ) : null}

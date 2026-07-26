@@ -2,67 +2,115 @@
 
 ## Overview
 
-The Intelligent Layout Engine is a reusable scale post-processing subsystem that operates after mathematics and before final validation/export.
+The Intelligent Layout Engine is a plugin-agnostic post-math pipeline used by scale plugins after tick/label generation and before final validation and export.
 
-It is generic and plugin-agnostic.
+It never alters the mathematical mapping of values to angles.
+
+## Architectural Position
+
+The engine composes with the existing framework modules:
+
+1. Tick engine (mathematical projection)
+2. Label engine (placement)
+3. Collision framework (diagnostics)
+4. Layout optimizer (optional readability improvements)
+5. Manufacturing diagnostics (process constraints)
+6. Validation engine (health score synthesis)
+
+This keeps the Geometry Engine, Renderer, Scale Engine, and Plugin Registry unchanged while allowing each plugin to inherit layout intelligence.
 
 ## Responsibilities
 
-- Adaptive density selection
-- Optional collision optimization
-- Readability-oriented label and tick balancing
-- Manufacturing spacing diagnostics
-- Validation score enrichment
+- Determine adaptive density profile from available arc length and radius
+- Optionally optimize layout for readability using conservative, configurable transforms
+- Provide manufacturing spacing diagnostics without mutating export geometry
+- Enrich validation results with collision/manufacturing diagnostics
+- Compute engineering health scoring inputs
 
-## Pipeline
+## Adaptive Density Algorithm
 
-1. Generate mathematical ticks
-2. Generate labels
-3. Detect collisions
-4. Optionally optimize layout (no math-value changes)
-5. Re-evaluate collisions
-6. Evaluate manufacturing spacing
-7. Merge diagnostics into validation
-8. Produce engineering health scores
+Inputs:
 
-## Key Algorithms
+- Angular span
+- Reference radius
+- Requested profile
 
-### Adaptive Density
+Outputs:
 
-Density profile is selected from available arc length:
+- Effective profile: ultra-dense, dense, engineering, balanced, sparse
+- Major tick budget
+- Minor tick budget
+- Micro tick budget
+- Minimum label frequency
 
-- ultra-dense
-- dense
-- engineering
+Selection strategy is circumference-aware to keep ring density proportional to available printable arc length.
+
+## Collision Resolution Strategy
+
+Optimization is configurable via plugin config and includes:
+
+- Micro angular staggering
+- Small radial label offsets
+- Typography compaction for long labels
+- Adaptive label omission with priority weighting
+- Micro tick simplification in dense regions
+
+Supported label priority modes:
+
 - balanced
-- sparse
+- major-critical
+- uniform
 
-The profile drives tick tier strategy and minimum label frequency.
+All transforms are display/layout transforms only; scale values remain unchanged.
 
-### Collision Optimization
+## Manufacturing Optimization Diagnostics
 
-Configurable optimization techniques:
+The engine computes per-scale minimum spacing estimates:
 
-- micro angular staggering
-- small radial offsets
-- adaptive label omission
-- micro tick simplification
+- Printable spacing
+- Engraving spacing
+- Laser spacing
+- CNC spacing
+- UV spacing
+- Pad-print spacing
 
-No optimization modifies mathematical values.
+Warnings are emitted into validation diagnostics, but exported geometry is not silently altered.
 
-### Health Reporting
+## Engineering Health Report
 
-Each scale emits:
+Each validation result includes:
 
-- mathematical health
-- readability score
-- collision score
-- manufacturing score
-- validation score
-- overall engineering score
+- Mathematical Health
+- Readability Score
+- Collision Score
+- Manufacturing Score
+- Validation Score
+- Overall Engineering Score
 
-## Extension Points
+Scoring weights currently prioritize mathematical correctness and manufacturability while still accounting for readability/collision quality.
 
-- plugin-specific label priority weights
-- custom typography scale-down rules
-- deterministic omission strategies for legal/regulated scales
+## Engineering Assumptions
+
+- Circular arc projections are wrap-safe in angular comparisons
+- Small visual offsets are acceptable for readability when value-angle mapping is preserved
+- Label text length can approximate arc occupancy for first-pass collision risk
+- Manufacturing process thresholds are conservative generic defaults, not machine-specific calibration data
+
+## Numerical Precision Notes
+
+- Angular deltas use circular normalization with 360-degree wrap handling
+- Threshold comparisons use bounded floating-point tolerances to avoid flicker diagnostics
+- Spacing diagnostics are rounded for deterministic reporting
+
+## Performance Considerations
+
+- Collision checks are intentionally bounded and lightweight for interactive inspector updates
+- Near-miss detection avoids full geometric intersection solving for real-time UX
+- Optimization passes are linear over ticks/labels with minimal allocations
+
+## Future Extensions
+
+- Font-metric-aware arc occupancy estimation
+- Ring-segment-specific density profiles
+- Manufacturing profile packs for process-specific calibration
+- Deterministic legal/compliance label retention policies

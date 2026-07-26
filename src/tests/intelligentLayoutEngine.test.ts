@@ -68,6 +68,36 @@ describe('intelligent layout engine', () => {
     expect(optimized.optimizations.length).toBeGreaterThan(0);
   });
 
+  it('supports label priority weighting during adaptive omission', () => {
+    const collisions = [
+      { kind: 'label-label' as const, severity: 'warning' as const, message: 'Overlap', ids: ['10', '11'] }
+    ];
+
+    const testLabels: ScaleLabel[] = [
+      { text: '10', angleDeg: 0, radiusMm: 18, orientation: 'radial', rotationDeg: 0, placement: 'outside' },
+      { text: '11', angleDeg: 0.04, radiusMm: 18, orientation: 'radial', rotationDeg: 0, placement: 'outside' },
+      { text: '12', angleDeg: 0.08, radiusMm: 18, orientation: 'radial', rotationDeg: 0, placement: 'outside' }
+    ];
+
+    const optimized = optimizeLayoutForReadability(ticks, testLabels, collisions, {
+      enabled: true,
+      labelPriorityMode: 'major-critical'
+    });
+
+    expect(optimized.labels.length).toBeGreaterThan(0);
+    expect(optimized.optimizations.length).toBeGreaterThan(0);
+  });
+
+  it('applies typography compaction for long labels when enabled', () => {
+    const collisions = [{ kind: 'text-overflow' as const, severity: 'warning' as const, message: 'Overflow', ids: ['LONG-LABEL-ONE'] }];
+    const optimized = optimizeLayoutForReadability(ticks, labels, collisions, {
+      enabled: true,
+      allowTypographyScaling: true
+    });
+
+    expect(optimized.labels.some((label) => label.text.length < 14)).toBe(true);
+  });
+
   it('produces manufacturing diagnostics with process-specific spacing outputs', () => {
     const diagnostics = evaluateManufacturingOptimization(ticks, labels);
 

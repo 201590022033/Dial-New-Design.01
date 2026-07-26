@@ -47,10 +47,45 @@ describe('professional scale library', () => {
     expect(result?.labels.length).toBeGreaterThan(0);
   });
 
+  it('supports telemeter unit switching', () => {
+    const km = runScalePlugin(
+      'telemeter',
+      { ...baseConfig, startValue: 1, endValue: 20, majorStep: 1, minorStep: 0.5, telemeterUnit: 'km' },
+      context
+    );
+    const mi = runScalePlugin(
+      'telemeter',
+      { ...baseConfig, startValue: 1, endValue: 20, majorStep: 1, minorStep: 0.5, telemeterUnit: 'mi' },
+      context
+    );
+
+    expect(km?.labels[0]?.text.includes('km')).toBe(true);
+    expect(mi?.labels[0]?.text.includes('mi')).toBe(true);
+  });
+
   it('runs professional pulsometer plugin', () => {
     const result = runScalePlugin('pulsometer', { ...baseConfig, startValue: 40, endValue: 220, majorStep: 10, minorStep: 5 }, context);
     expect(result?.pluginName).toBe('Professional Pulsometer');
     expect(result?.validation.healthReport?.overallEngineeringScore).toBeGreaterThan(0);
+  });
+
+  it('supports pulsometer calibration configuration', () => {
+    const result = runScalePlugin(
+      'pulsometer',
+      {
+        ...baseConfig,
+        startValue: 40,
+        endValue: 220,
+        majorStep: 10,
+        minorStep: 5,
+        pulsometerBeats: 15,
+        pulsometerCalibrationSeconds: 30
+      },
+      context
+    );
+
+    expect(result?.ticks.length).toBeGreaterThan(0);
+    expect(result?.validation.valid).toBe(true);
   });
 
   it('runs professional compass and countdown plugins', () => {
@@ -68,5 +103,42 @@ describe('professional scale library', () => {
     expect(gmt?.pluginName).toBe('Professional GMT Ring');
     expect(conversion?.pluginName).toBe('Engineering Conversion Ring');
     expect(conversion?.manufacturingMetadata?.ringDensityWarnings).toBeDefined();
+  });
+
+  it('supports multiple GMT label formats', () => {
+    const utc = runScalePlugin(
+      'gmt',
+      { ...baseConfig, startValue: 0, endValue: 24, majorStep: 1, minorStep: 0.5, gmtLabelFormat: '24h-utc' },
+      context
+    );
+    const twelveHour = runScalePlugin(
+      'gmt',
+      { ...baseConfig, startValue: 0, endValue: 24, majorStep: 1, minorStep: 0.5, gmtLabelFormat: '12h' },
+      context
+    );
+
+    expect(utc?.labels.some((label) => label.text.endsWith('Z'))).toBe(true);
+    expect(twelveHour?.labels.some((label) => /[AP]$/.test(label.text))).toBe(true);
+  });
+
+  it('supports custom conversion mappings', () => {
+    const custom = runScalePlugin(
+      'conversion',
+      {
+        ...baseConfig,
+        startValue: 10,
+        endValue: 200,
+        majorStep: 10,
+        minorStep: 5,
+        conversionMode: 'custom',
+        conversionCustomSourceUnit: 'kg',
+        conversionCustomTargetUnit: 'lb',
+        conversionCustomFactor: 2.20462
+      },
+      context
+    );
+
+    expect(custom?.labels.some((label) => label.text.includes('kg|'))).toBe(true);
+    expect(custom?.labels.some((label) => label.text.includes('lb'))).toBe(true);
   });
 });

@@ -48,11 +48,21 @@ const inspectorConfiguration: ScalePlugin['inspectorConfiguration'] = [
   { key: 'majorStep', label: 'Major Tick Interval', type: 'number', description: 'Interval of major ticks.' },
   { key: 'minorStep', label: 'Minor Tick Interval', type: 'number', description: 'Interval of minor ticks.' },
   { key: 'tickDensityProfile', label: 'Density Profile', type: 'select', description: 'Adaptive tick profile.' },
+  { key: 'optimizeLayout', label: 'Optimize Layout', type: 'boolean', description: 'Enable conservative collision optimization.' },
+  { key: 'labelPriorityMode', label: 'Label Priority', type: 'select', description: 'Priority weighting for adaptive label omission.' },
   { key: 'labelFrequency', label: 'Label Frequency', type: 'number', description: 'Show every nth major label.' },
   { key: 'labelOrientation', label: 'Text Orientation', type: 'select', description: 'Label orientation mode.' },
   { key: 'direction', label: 'Direction', type: 'select', description: 'Clockwise/counter-clockwise direction.' },
   { key: 'radiusMm', label: 'Radius', type: 'number', description: 'Ring radius in mm.' },
-  { key: 'rotationOffsetDeg', label: 'Rotation Offset', type: 'number', description: 'Global angular offset.' }
+  { key: 'rotationOffsetDeg', label: 'Rotation Offset', type: 'number', description: 'Global angular offset.' },
+  { key: 'telemeterUnit', label: 'Telemeter Unit', type: 'select', description: 'Display unit for telemeter labels.' },
+  { key: 'pulsometerBeats', label: 'Pulsometer Beats', type: 'number', description: 'Beat sample count used for BPM calibration.' },
+  { key: 'pulsometerCalibrationSeconds', label: 'Pulse Calibration', type: 'number', description: 'Reference measurement interval in seconds.' },
+  { key: 'gmtLabelFormat', label: 'GMT Label Format', type: 'select', description: '24-hour, UTC, or 12-hour labels.' },
+  { key: 'conversionMode', label: 'Conversion Mode', type: 'select', description: 'Metric/imperial or custom conversion pair.' },
+  { key: 'conversionCustomSourceUnit', label: 'Custom Source Unit', type: 'text', description: 'Custom conversion source unit label.' },
+  { key: 'conversionCustomTargetUnit', label: 'Custom Target Unit', type: 'text', description: 'Custom conversion target unit label.' },
+  { key: 'conversionCustomFactor', label: 'Custom Conversion Factor', type: 'number', description: 'Multiplier applied to source value for custom target unit.' }
 ];
 
 const baseConfig = (overrides: Partial<ScalePluginConfig>): ScalePluginConfig => ({
@@ -82,6 +92,21 @@ const baseConfig = (overrides: Partial<ScalePluginConfig>): ScalePluginConfig =>
   tickDensityProfile: 'engineering',
   includeMinorLabels: false,
   validationVisibility: true,
+  optimizeLayout: true,
+  allowAngularAdjustment: true,
+  allowRadialOffset: true,
+  allowTypographyScaling: true,
+  allowAdaptiveLabelOmission: true,
+  allowTickSimplification: true,
+  labelPriorityMode: 'balanced',
+  telemeterUnit: 'km',
+  pulsometerBeats: 30,
+  pulsometerCalibrationSeconds: 60,
+  gmtLabelFormat: '24h',
+  conversionMode: 'metric-imperial',
+  conversionCustomSourceUnit: 'src',
+  conversionCustomTargetUnit: 'dst',
+  conversionCustomFactor: 1,
   ...overrides
 });
 
@@ -180,7 +205,13 @@ const createProfessionalPlugin = (definition: ProfessionalPluginDefinition): Sca
       });
 
       const optimized = optimizeLayoutForReadability(ticks, labels, collisions, {
-        enabled: true
+        enabled: config.optimizeLayout ?? true,
+        allowAngularAdjustment: config.allowAngularAdjustment ?? true,
+        allowRadialOffset: config.allowRadialOffset ?? true,
+        allowTypographyScaling: config.allowTypographyScaling ?? true,
+        allowAdaptiveLabelOmission: config.allowAdaptiveLabelOmission ?? true,
+        allowTickSimplification: config.allowTickSimplification ?? true,
+        labelPriorityMode: config.labelPriorityMode ?? 'balanced'
       });
 
       const secondPassCollisions = collisionFramework.detect({
@@ -233,20 +264,30 @@ const tachymeterToAngle = (value: number, config: ScalePluginConfig, context: Sc
 };
 
 const telemeterToAngle = (value: number, config: ScalePluginConfig, context: ScaleMathContext): number => {
-  const distanceMeters = value * 1000;
+  const distanceMeters = config.telemeterUnit === 'mi' ? value * 1609.344 : value * 1000;
   const seconds = (distanceMeters * 2) / 343;
-  const startSeconds = (Math.max(config.startValue, 0.01) * 1000 * 2) / 343;
-  const endSeconds = (Math.max(config.endValue, 0.01) * 1000 * 2) / 343;
+  const startDistanceMeters =
+    config.telemeterUnit === 'mi'
+      ? Math.max(config.startValue, 0.01) * 1609.344
+      : Math.max(config.startValue, 0.01) * 1000;
+  const endDistanceMeters =
+    config.telemeterUnit === 'mi'
+      ? Math.max(config.endValue, 0.01) * 1609.344
+      : Math.max(config.endValue, 0.01) * 1000;
+  const startSeconds = (startDistanceMeters * 2) / 343;
+  const endSeconds = (endDistanceMeters * 2) / 343;
   const ratio = linearInterpolate(seconds, startSeconds, endSeconds);
   return circularAngleForRatio(ratio, context, config.direction);
 };
 
 const pulsometerToAngle = (value: number, config: ScalePluginConfig, context: ScaleMathContext): number => {
-  const beats = 30;
+  const beats = Math.max(5, config.pulsometerBeats ?? 30);
+  const calibrationSeconds = Math.max(1, config.pulsometerCalibrationSeconds ?? 60);
+  const calibrationScale = calibrationSeconds / 60;
   const safeValue = Math.max(value, 1);
-  const seconds = (beats * 60) / safeValue;
-  const startSeconds = (beats * 60) / Math.max(config.startValue, 1);
-  const endSeconds = (beats * 60) / Math.max(config.endValue, 1);
+  const seconds = ((beats * 60) / safeValue) * calibrationScale;
+  const startSeconds = ((beats * 60) / Math.max(config.startValue, 1)) * calibrationScale;
+  const endSeconds = ((beats * 60) / Math.max(config.endValue, 1)) * calibrationScale;
   const ratio = linearInterpolate(seconds, startSeconds, endSeconds);
   return circularAngleForRatio(ratio, context, config.direction);
 };
@@ -265,16 +306,38 @@ const compassFormatter = (value: number): string => {
   return String(normalized);
 };
 
-const gmtFormatter = (value: number): string => String(Math.round(value) % 24).padStart(2, '0');
+const gmtFormatter = (value: number, config: ScalePluginConfig): string => {
+  const hour24 = ((Math.round(value) % 24) + 24) % 24;
+
+  if (config.gmtLabelFormat === '12h') {
+    const hour12 = hour24 % 12 === 0 ? 12 : hour24 % 12;
+    const suffix = hour24 < 12 ? 'A' : 'P';
+    return `${hour12}${suffix}`;
+  }
+
+  if (config.gmtLabelFormat === '24h-utc') {
+    return `${String(hour24).padStart(2, '0')}Z`;
+  }
+
+  return String(hour24).padStart(2, '0');
+};
 
 const conversionFormatter = (value: number, config: ScalePluginConfig): string => {
-  const mode = config.engineeringPreset ?? 'engineering-calculator';
-  if (mode === 'engineering-calculator') {
-    const inches = value / 25.4;
-    return `${Math.round(value)}mm|${inches.toFixed(2)}in`;
+  if (config.conversionMode === 'custom') {
+    const source = config.conversionCustomSourceUnit ?? 'src';
+    const target = config.conversionCustomTargetUnit ?? 'dst';
+    const factor = Math.max(0.000001, Math.abs(config.conversionCustomFactor ?? 1));
+    const converted = value * factor;
+    return `${Math.round(value)}${source}|${converted.toFixed(2)}${target}`;
   }
-  const kilometers = value * 1.60934;
-  return `${Math.round(value)}mi|${kilometers.toFixed(2)}km`;
+
+  if (config.conversionMode === 'imperial-metric') {
+    const kilometers = value * 1.60934;
+    return `${Math.round(value)}mi|${kilometers.toFixed(2)}km`;
+  }
+
+  const inches = value / 25.4;
+  return `${Math.round(value)}mm|${inches.toFixed(2)}in`;
 };
 
 export const professionalTachymeterPlugin = createProfessionalPlugin({
@@ -313,9 +376,10 @@ export const professionalTelemeterPlugin = createProfessionalPlugin({
     endValue: 20,
     majorStep: 1,
     minorStep: 0.5,
-    tickDensityProfile: 'balanced'
+    tickDensityProfile: 'balanced',
+    telemeterUnit: 'km'
   }),
-  labelFormatter: (value) => `${value.toFixed(1)}km`,
+  labelFormatter: (value, config) => `${value.toFixed(1)}${config.telemeterUnit ?? 'km'}`,
   help: {
     purpose: 'Estimate distance from event flash-to-sound delay.',
     history: 'Telemeter scales appeared on military and field chronographs.',
@@ -338,7 +402,9 @@ export const professionalPulsometerPlugin = createProfessionalPlugin({
     endValue: 220,
     majorStep: 10,
     minorStep: 5,
-    tickDensityProfile: 'balanced'
+    tickDensityProfile: 'balanced',
+    pulsometerBeats: 30,
+    pulsometerCalibrationSeconds: 60
   }),
   labelFormatter: (value) => `${Math.round(value)} bpm`,
   help: {
@@ -412,7 +478,8 @@ export const professionalGmtRingPlugin = createProfessionalPlugin({
     endValue: 24,
     majorStep: 1,
     minorStep: 0.5,
-    tickDensityProfile: 'balanced'
+    tickDensityProfile: 'balanced',
+    gmtLabelFormat: '24h'
   }),
   labelFormatter: gmtFormatter,
   help: {
@@ -438,7 +505,11 @@ export const professionalConversionRingPlugin = createProfessionalPlugin({
     majorStep: 10,
     minorStep: 5,
     tickDensityProfile: 'balanced',
-    engineeringPreset: 'engineering-calculator'
+    engineeringPreset: 'engineering-calculator',
+    conversionMode: 'metric-imperial',
+    conversionCustomSourceUnit: 'src',
+    conversionCustomTargetUnit: 'dst',
+    conversionCustomFactor: 1
   }),
   labelFormatter: conversionFormatter,
   help: {

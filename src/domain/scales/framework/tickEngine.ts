@@ -54,7 +54,8 @@ export const createTickGenerationEngine = (options?: TickEngineOptions): TickGen
           weight: major ? 'major' : 'minor',
           direction: config.tickDirection,
           style: config.tickStyle,
-          label: major ? `${Math.round(value * 1000) / 1000}` : undefined
+          label: major ? `${Math.round(value * 1000) / 1000}` : undefined,
+          value
         };
 
         if (major) {

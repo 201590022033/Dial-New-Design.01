@@ -8,6 +8,7 @@ import { nextZoomValue } from '@/renderer/services/zoomService';
 import { createPanState, resolvePan, type PanState } from '@/renderer/services/panService';
 import { resolveHighlightBandIds } from '@/features/shared/objectInspectorSchemas';
 import { resolveSlideRuleReadout, screenPointToPolarSample } from '@/domain/scales/framework';
+import type { ScaleEngineeringReadout } from '@/domain/scales/types';
 import { useBandsStore, useDesignEngineStore, useScaleStore, useSelectionStore, useViewportStore } from '@/stores';
 import { mmToPixels } from '@/utils/math';
 
@@ -237,15 +238,49 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode }: Cen
                 renderScale: renderContext.zoom * previewFitScale
               });
 
-              const readout =
+              const hasCollisionWarnings = scalePreview.validation.structuredWarnings.some(
+                (warning) =>
+                  warning.description.toLowerCase().includes('collision') ||
+                  warning.description.toLowerCase().includes('overlap') ||
+                  warning.affectedObject === 'layout-engine'
+              );
+              const hasManufacturingWarnings =
+                scalePreview.validation.structuredWarnings.some(
+                  (warning) => warning.affectedObject === 'manufacturing-engine'
+                ) || (scalePreview.manufacturingMetadata?.ringDensityWarnings?.length ?? 0) > 0;
+
+              const readout: ScaleEngineeringReadout | null =
                 selectedScaleKind === 'slide-rule'
-                  ? resolveSlideRuleReadout(
-                      sample,
-                      scaleConfig,
-                      scaleContext,
-                      scalePreview.ticks,
-                      scalePreview.labels
-                    )
+                  ? (() => {
+                      const rawReadout = resolveSlideRuleReadout(
+                        sample,
+                        scaleConfig,
+                        scaleContext,
+                        scalePreview.ticks,
+                        scalePreview.labels
+                      );
+
+                      if (!rawReadout) {
+                        return null;
+                      }
+
+                      const collisionStatus: ScaleEngineeringReadout['collisionStatus'] = hasCollisionWarnings
+                        ? 'warning'
+                        : 'ok';
+                      const manufacturingStatus: ScaleEngineeringReadout['manufacturingStatus'] =
+                        hasManufacturingWarnings ? 'warning' : 'ok';
+
+                      return {
+                        ...rawReadout,
+                        scaleKind: selectedScaleKind,
+                        pluginName: scalePreview.pluginName,
+                        collisionStatus,
+                        manufacturingStatus,
+                        engineeringScore:
+                          scalePreview.validation.healthReport?.overallEngineeringScore ??
+                          (hasCollisionWarnings || hasManufacturingWarnings ? 70 : 92)
+                      };
+                    })()
                   : (() => {
                       const nearestTick = scalePreview.ticks.reduce<typeof scalePreview.ticks[number] | null>(
                         (closest, tick) => {
@@ -282,10 +317,20 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode }: Cen
                           : (nearestValue - scaleConfig.startValue) /
                             (scaleConfig.endValue - scaleConfig.startValue);
 
-                      const warningCount = scalePreview.validation.warnings.length;
                       const hasErrors = scalePreview.validation.structuredWarnings.some(
                         (warning) => warning.severity === 'error'
                       );
+                      const collisionStatus: ScaleEngineeringReadout['collisionStatus'] = hasCollisionWarnings
+                        ? 'warning'
+                        : hasErrors
+                          ? 'error'
+                          : 'ok';
+                      const manufacturingStatus: ScaleEngineeringReadout['manufacturingStatus'] =
+                        hasManufacturingWarnings
+                          ? 'warning'
+                          : hasErrors
+                            ? 'error'
+                            : 'ok';
 
                       return {
                         ringId: 'outer' as const,
@@ -297,11 +342,8 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode }: Cen
                         radiusMm: sample.radiusMm,
                         nearestTick,
                         nearestLabel,
-                        collisionStatus: warningCount > 0 ? 'warning' : 'ok',
-                        manufacturingStatus:
-                          hasErrors || (scalePreview.manufacturingMetadata?.ringDensityWarnings?.length ?? 0) > 0
-                            ? 'warning'
-                            : 'ok',
+                        collisionStatus,
+                        manufacturingStatus,
                         engineeringScore:
                           scalePreview.validation.healthReport?.overallEngineeringScore ??
                           (hasErrors ? 50 : 90)

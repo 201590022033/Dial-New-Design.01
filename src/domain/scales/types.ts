@@ -26,7 +26,16 @@ export type ScaleCategory =
   | 'utility'
   | 'custom';
 
-export type ScaleMathModel = 'linear' | 'circular' | 'logarithmic' | 'angular' | 'polar' | 'radial';
+export type ScaleMathModel =
+  | 'linear'
+  | 'circular'
+  | 'logarithmic'
+  | 'angular'
+  | 'polar'
+  | 'radial'
+  | 'ratio'
+  | 'time'
+  | 'distance';
 
 export type TickDirection = 'inside' | 'outside' | 'bidirectional';
 export type TickStyle = 'line' | 'block' | 'decorative';
@@ -103,6 +112,13 @@ export interface ScalePluginConfig {
   logarithmicBase?: number;
   tickDensityProfile?: 'ultra-dense' | 'dense' | 'balanced' | 'sparse' | 'engineering';
   includeMinorLabels?: boolean;
+  optimizeLayout?: boolean;
+  allowAngularAdjustment?: boolean;
+  allowRadialOffset?: boolean;
+  allowTypographyScaling?: boolean;
+  allowAdaptiveLabelOmission?: boolean;
+  allowTickSimplification?: boolean;
+  labelPriorityMode?: 'balanced' | 'major-critical' | 'uniform';
   engineeringPreset?:
     | 'precision'
     | 'aviation'
@@ -124,6 +140,14 @@ export interface ScalePluginConfig {
   cursorType?: 'transparent' | 'fixed' | 'rotating' | 'bezel';
   calculationMode?: 'multiplication' | 'division' | 'ratio' | 'proportion' | 'sync';
   validationVisibility?: boolean;
+  telemeterUnit?: 'km' | 'mi';
+  pulsometerBeats?: number;
+  pulsometerCalibrationSeconds?: number;
+  gmtLabelFormat?: '24h' | '24h-utc' | '12h';
+  conversionMode?: 'metric-imperial' | 'imperial-metric' | 'custom';
+  conversionCustomSourceUnit?: string;
+  conversionCustomTargetUnit?: string;
+  conversionCustomFactor?: number;
 }
 
 export interface ScaleMathContext {

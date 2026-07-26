@@ -1,5 +1,6 @@
 import type {
   ScaleCollisionIssue,
+  ScaleValidationIssue,
   ScaleValidatorResult,
   TickGenerationResult
 } from '@/domain/scales/framework/interfaces';
@@ -20,6 +21,7 @@ export interface LayoutOptimizationConfig {
   allowTypographyScaling: boolean;
   allowAdaptiveLabelOmission: boolean;
   allowTickSimplification: boolean;
+  labelPriorityMode: 'balanced' | 'major-critical' | 'uniform';
 }
 
 export interface LayoutOptimizationResult {
@@ -27,6 +29,25 @@ export interface LayoutOptimizationResult {
   labels: ScaleLabel[];
   optimizations: string[];
 }
+
+const labelPriorityScore = (
+  label: ScaleLabel,
+  mode: LayoutOptimizationConfig['labelPriorityMode']
+): number => {
+  const hasUnitSuffix = /[a-zA-Z]/.test(label.text);
+  const numericValue = Number.parseFloat(label.text.replace(/[^0-9.-]/g, ''));
+  const isRoundNumber = Number.isFinite(numericValue) && Math.abs(numericValue % 10) < 1e-9;
+
+  if (mode === 'uniform') {
+    return 1;
+  }
+
+  if (mode === 'major-critical') {
+    return (isRoundNumber ? 3 : 0) + (hasUnitSuffix ? 2 : 0) + 1;
+  }
+
+  return (isRoundNumber ? 2 : 0) + (hasUnitSuffix ? 1 : 0) + 1;
+};
 
 export interface LayoutManufacturingDiagnostics {
   minimumPrintableSpacingDeg: number;
@@ -132,6 +153,7 @@ export const optimizeLayoutForReadability = (
     allowTypographyScaling: true,
     allowAdaptiveLabelOmission: true,
     allowTickSimplification: true,
+    labelPriorityMode: 'balanced',
     ...options
   };
 
@@ -150,12 +172,24 @@ export const optimizeLayoutForReadability = (
       .forEach((issue) => issue.ids.forEach((id) => collisionLabelIds.add(id)));
 
     if (collisionLabelIds.size > 0) {
-      outputLabels = outputLabels.filter((label, index) => {
-        if (index % 2 === 0) {
-          return true;
-        }
-        return !collisionLabelIds.has(label.text);
-      });
+      const scored = outputLabels.map((label) => ({
+        label,
+        priority: labelPriorityScore(label, cfg.labelPriorityMode)
+      }));
+
+      outputLabels = scored
+        .filter((entry, entryIndex) => {
+          if (!collisionLabelIds.has(entry.label.text)) {
+            return true;
+          }
+
+          if (entry.priority >= 3) {
+            return true;
+          }
+
+          return entryIndex % 2 === 0;
+        })
+        .map((entry) => entry.label);
       optimizations.push('Applied adaptive label omission to reduce label overlap.');
     }
   }
@@ -179,6 +213,30 @@ export const optimizeLayoutForReadability = (
       angleDeg: label.angleDeg + (index % 2 === 0 ? 0.08 : -0.08)
     }));
     optimizations.push('Applied micro angular staggering for labels.');
+  }
+
+  if (cfg.allowTypographyScaling) {
+    outputLabels = outputLabels.map((label) => {
+      const textLength = Math.max(1, label.text.length);
+      if (textLength <= 8) {
+        return label;
+      }
+
+      // Trim non-critical unit/decimals for dense zones instead of changing values.
+      const compactText = label.text
+        .replace(/\.0+\b/g, '')
+        .replace(/\s+/g, '')
+        .replace(/-/g, '')
+        .replace(/(km|mi|bpm|UTC)$/i, '');
+
+      const boundedText = compactText.length > 12 ? compactText.slice(0, 12) : compactText;
+
+      return {
+        ...label,
+        text: boundedText.length >= 3 ? boundedText : label.text
+      };
+    });
+    optimizations.push('Applied typography compaction for long labels.');
   }
 
   if (cfg.allowTickSimplification && outputLabels.length < labels.length) {
@@ -242,20 +300,24 @@ export const mergeValidationWithLayoutDiagnostics = (
   diagnostics: LayoutManufacturingDiagnostics,
   layoutCollisions: ScaleCollisionIssue[]
 ): ScaleValidatorResult => {
-  const additionalIssues = [...layoutCollisions].map((collision) => ({
-    severity: collision.severity,
-    code:
+  const additionalIssues = [...layoutCollisions].map((collision) => {
+    const code: ScaleValidationIssue['code'] =
       collision.kind === 'ring-ring' || collision.kind === 'cross-ring'
         ? 'RING_INTERFERENCE'
         : collision.kind === 'text-overflow' || collision.kind === 'curved-baseline-overflow'
           ? 'TEXT_OVERFLOW'
           : collision.kind === 'boundary-overflow' || collision.kind === 'label-boundary'
             ? 'OUTSIDE_BAND'
-            : 'ANGULAR_OVERLAP',
-    message: collision.message,
-    affectedObject: 'layout-engine',
-    suggestedFix: 'Adjust density profile, labels, or ring spacing presets.'
-  }));
+            : 'ANGULAR_OVERLAP';
+
+    return {
+      severity: collision.severity,
+      code,
+      message: collision.message,
+      affectedObject: 'layout-engine',
+      suggestedFix: 'Adjust density profile, labels, or ring spacing presets.'
+    };
+  });
 
   const manufacturingIssues = diagnostics.warnings.map((warning) => ({
     severity: 'warning' as const,

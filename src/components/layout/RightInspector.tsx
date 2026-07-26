@@ -63,6 +63,21 @@ export const RightInspector = () => {
     () => scalePlugins.find((plugin) => plugin.kind === selectedScaleKind) ?? null,
     [scalePlugins, selectedScaleKind]
   );
+  const isProfessionalScaleKind = useMemo(
+    () =>
+      [
+        'tachymeter',
+        'telemeter',
+        'pulsometer',
+        'compass',
+        'countdown',
+        'gmt',
+        'conversion'
+      ].includes(selectedScaleKind),
+    [selectedScaleKind]
+  );
+  const supportsAdvancedScaleControls =
+    selectedScaleKind === 'logarithmic' || selectedScaleKind === 'slide-rule' || isProfessionalScaleKind;
   const texturePlugins = useMemo(() => listTexturePlugins(), []);
 
   const renderSection = (section: InspectorSectionSchema) => {
@@ -431,7 +446,7 @@ export const RightInspector = () => {
             </label>
           </div>
 
-          {selectedScaleKind === 'logarithmic' || selectedScaleKind === 'slide-rule' ? (
+          {supportsAdvancedScaleControls ? (
             <>
               <div className="grid grid-cols-2 gap-2">
                 <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
@@ -517,6 +532,152 @@ export const RightInspector = () => {
                   onChange={(event) => updateScaleConfig({ includeMinorLabels: event.target.checked })}
                 />
               </label>
+
+              <div className="grid grid-cols-2 gap-2">
+                <label className="flex items-center justify-between rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5 text-xs">
+                  <span className="ds-label-inspector">Layout Optimization</span>
+                  <input
+                    type="checkbox"
+                    checked={scaleConfig.optimizeLayout ?? true}
+                    onChange={(event) => updateScaleConfig({ optimizeLayout: event.target.checked })}
+                  />
+                </label>
+                <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+                  <span className="ds-label-inspector">Label Priority</span>
+                  <select
+                    className="ds-input mt-1"
+                    value={scaleConfig.labelPriorityMode ?? 'balanced'}
+                    onChange={(event) =>
+                      updateScaleConfig({
+                        labelPriorityMode: event.target.value as NonNullable<typeof scaleConfig.labelPriorityMode>
+                      })
+                    }
+                  >
+                    <option value="balanced">Balanced</option>
+                    <option value="major-critical">Major Critical</option>
+                    <option value="uniform">Uniform</option>
+                  </select>
+                </label>
+              </div>
+
+              {selectedScaleKind === 'telemeter' ? (
+                <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+                  <span className="ds-label-inspector">Telemeter Unit</span>
+                  <select
+                    className="ds-input mt-1"
+                    value={scaleConfig.telemeterUnit ?? 'km'}
+                    onChange={(event) =>
+                      updateScaleConfig({
+                        telemeterUnit: event.target.value as NonNullable<typeof scaleConfig.telemeterUnit>
+                      })
+                    }
+                  >
+                    <option value="km">km</option>
+                    <option value="mi">mi</option>
+                  </select>
+                </label>
+              ) : null}
+
+              {selectedScaleKind === 'pulsometer' ? (
+                <div className="grid grid-cols-2 gap-2">
+                  <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+                    <span className="ds-label-inspector">Beats</span>
+                    <input
+                      type="number"
+                      step="1"
+                      min={5}
+                      className="ds-input mt-1"
+                      value={scaleConfig.pulsometerBeats ?? 30}
+                      onChange={(event) => updateScaleConfig({ pulsometerBeats: Number(event.target.value) })}
+                    />
+                  </label>
+                  <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+                    <span className="ds-label-inspector">Calibration (s)</span>
+                    <input
+                      type="number"
+                      step="1"
+                      min={1}
+                      className="ds-input mt-1"
+                      value={scaleConfig.pulsometerCalibrationSeconds ?? 60}
+                      onChange={(event) =>
+                        updateScaleConfig({ pulsometerCalibrationSeconds: Number(event.target.value) })
+                      }
+                    />
+                  </label>
+                </div>
+              ) : null}
+
+              {selectedScaleKind === 'gmt' ? (
+                <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+                  <span className="ds-label-inspector">GMT Label Format</span>
+                  <select
+                    className="ds-input mt-1"
+                    value={scaleConfig.gmtLabelFormat ?? '24h'}
+                    onChange={(event) =>
+                      updateScaleConfig({
+                        gmtLabelFormat: event.target.value as NonNullable<typeof scaleConfig.gmtLabelFormat>
+                      })
+                    }
+                  >
+                    <option value="24h">24h</option>
+                    <option value="24h-utc">24h UTC</option>
+                    <option value="12h">12h</option>
+                  </select>
+                </label>
+              ) : null}
+
+              {selectedScaleKind === 'conversion' ? (
+                <>
+                  <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+                    <span className="ds-label-inspector">Conversion Mode</span>
+                    <select
+                      className="ds-input mt-1"
+                      value={scaleConfig.conversionMode ?? 'metric-imperial'}
+                      onChange={(event) =>
+                        updateScaleConfig({
+                          conversionMode: event.target.value as NonNullable<typeof scaleConfig.conversionMode>
+                        })
+                      }
+                    >
+                      <option value="metric-imperial">Metric to Imperial</option>
+                      <option value="imperial-metric">Imperial to Metric</option>
+                      <option value="custom">Custom</option>
+                    </select>
+                  </label>
+                  {(scaleConfig.conversionMode ?? 'metric-imperial') === 'custom' ? (
+                    <div className="grid grid-cols-3 gap-2">
+                      <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+                        <span className="ds-label-inspector">Source Unit</span>
+                        <input
+                          type="text"
+                          className="ds-input mt-1"
+                          value={scaleConfig.conversionCustomSourceUnit ?? 'src'}
+                          onChange={(event) => updateScaleConfig({ conversionCustomSourceUnit: event.target.value })}
+                        />
+                      </label>
+                      <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+                        <span className="ds-label-inspector">Target Unit</span>
+                        <input
+                          type="text"
+                          className="ds-input mt-1"
+                          value={scaleConfig.conversionCustomTargetUnit ?? 'dst'}
+                          onChange={(event) => updateScaleConfig({ conversionCustomTargetUnit: event.target.value })}
+                        />
+                      </label>
+                      <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+                        <span className="ds-label-inspector">Factor</span>
+                        <input
+                          type="number"
+                          step="0.0001"
+                          className="ds-input mt-1"
+                          value={scaleConfig.conversionCustomFactor ?? 1}
+                          onChange={(event) => updateScaleConfig({ conversionCustomFactor: Number(event.target.value) })}
+                        />
+                      </label>
+                    </div>
+                  ) : null}
+                </>
+              ) : null}
 
               {selectedScaleKind === 'slide-rule' ? (
                 <>
@@ -676,8 +837,12 @@ export const RightInspector = () => {
               <option value="circular">Circular</option>
               <option value="slide-rule">Slide Rule</option>
               <option value="tachymeter">Tachymeter</option>
+              <option value="telemeter">Telemeter</option>
+              <option value="pulsometer">Pulsometer</option>
+              <option value="gmt">GMT</option>
               <option value="compass">Compass</option>
               <option value="countdown">Countdown</option>
+              <option value="conversion">Conversion</option>
               <option value="custom">Custom</option>
             </select>
           </label>
@@ -697,7 +862,7 @@ export const RightInspector = () => {
           <p>
             Intended use: {schema.id === 'outer-slide-rule' || schema.id === 'inner-slide-rule' ? 'Slide rule mathematics' : 'General scale mathematics'}.
           </p>
-          {selectedScaleKind === 'logarithmic' || selectedScaleKind === 'slide-rule' ? (
+          {supportsAdvancedScaleControls ? (
             <div className="grid grid-cols-2 gap-2 border-t border-engineering-border/70 pt-2">
               <label className="rounded-md border border-engineering-border bg-engineering-bg/45 px-2 py-1.5">
                 <span className="ds-label-inspector">Start Angle</span>
