@@ -32,6 +32,14 @@
   --dd-speed-normal: 260ms;
 }
 
+:root[data-ui-theme='soft'] {
+  --dd-bg: #f3f6fa;
+  --dd-bg-elevated: #fbfcfe;
+  --dd-panel: #fbfdff;
+  --dd-panel-soft: #f6f8fc;
+  --dd-border: #dbe4ef;
+}
+
 body {
   @apply m-0 min-h-screen bg-engineering-bg text-engineering-text antialiased;
   background-image:

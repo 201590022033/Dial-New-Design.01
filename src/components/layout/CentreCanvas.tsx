@@ -147,9 +147,9 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode }: Cen
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       className={[
-        'relative flex h-full w-full min-h-0 flex-col overflow-hidden rounded-panel border border-engineering-border shadow-panel',
+        'relative flex h-full w-full min-h-0 min-w-0 flex-col overflow-hidden rounded-panel border border-engineering-border shadow-panel',
         presentationMode ? 'bg-[#edf0f4]' : 'bg-engineering-bg/85',
-        presentationMode ? 'max-w-[1440px]' : 'max-w-[1360px]'
+        'max-w-none'
       ].join(' ')}
     >
       <div className="relative min-h-0 flex-1">

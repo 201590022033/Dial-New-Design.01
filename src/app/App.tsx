@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect, useMemo, useState } from 'react';
+import { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react';
 import { LeftBandsPanel } from '@/components/layout/LeftBandsPanel';
 import { TopToolbar } from '@/components/layout/TopToolbar';
 import { CentreCanvas } from '@/components/layout/CentreCanvas';
@@ -17,18 +17,18 @@ import {
   useViewportStore
 } from '@/stores';
 
-const RightFeatureStack = lazy(() =>
-  import('@/components/layout/RightFeatureStack').then((mod) => ({ default: mod.RightFeatureStack }))
-);
-const ExtensionPointsPanel = lazy(() =>
-  import('@/components/layout/ExtensionPointsPanel').then((mod) => ({ default: mod.ExtensionPointsPanel }))
-);
 const HelpCenter = lazy(() =>
   import('@/components/layout/HelpCenter').then((mod) => ({ default: mod.HelpCenter }))
 );
 
 export const App = () => {
   const [presentationMode, setPresentationMode] = useState(false);
+  const topToolbarRef = useRef<HTMLDivElement | null>(null);
+  const workspaceRef = useRef<HTMLElement | null>(null);
+  const leftPanelRef = useRef<HTMLElement | null>(null);
+  const centrePanelRef = useRef<HTMLElement | null>(null);
+  const rightPanelRef = useRef<HTMLElement | null>(null);
+  const bottomStatusRef = useRef<HTMLDivElement | null>(null);
   const syncWithGeometryEngine = useBandsStore((state) => state.syncWithGeometryEngine);
   const bands = useBandsStore((state) => state.bands);
   const selectedBandId = useSelectionStore((state) => state.selectedBandId);
@@ -206,48 +206,176 @@ export const App = () => {
     zoom
   ]);
 
-  return (
-    <div
-      className={[
-        'grid h-screen gap-3 overflow-hidden p-3 md:p-4',
-        presentationMode ? 'grid-rows-[1fr]' : 'grid-rows-[auto_1fr_auto]'
-      ].join(' ')}
-    >
-      {presentationMode ? null : <div className="min-h-0 overflow-hidden"><TopToolbar /></div>}
-      <main
-        className={[
-          'grid min-h-0 grid-cols-1 gap-3 overflow-hidden',
-          presentationMode ? '' : 'xl:grid-cols-[300px_minmax(0,1fr)_360px]'
-        ].join(' ')}
-      >
-        <aside className={presentationMode ? 'hidden' : 'min-h-0 overflow-hidden'}>
-          <LeftBandsPanel />
-        </aside>
+  useEffect(() => {
+    if (presentationMode) {
+      return;
+    }
 
-        <section className="flex min-h-0 min-w-0 items-center justify-center overflow-hidden">
-          <CentreCanvas
+    const validateLayoutContract = () => {
+      const issues: string[] = [];
+      const top = topToolbarRef.current;
+      const workspace = workspaceRef.current;
+      const left = leftPanelRef.current;
+      const centre = centrePanelRef.current;
+      const right = rightPanelRef.current;
+      const bottom = bottomStatusRef.current;
+      const root = document.documentElement;
+
+      if (!top) issues.push('TopToolbar not mounted');
+      if (!workspace) issues.push('Workspace not mounted');
+      if (!left) issues.push('Left Workflow panel not mounted');
+      if (!centre) issues.push('CentreCanvas not mounted');
+      if (!right) issues.push('RightInspector not mounted');
+      if (!bottom) issues.push('BottomStatusBar not mounted');
+
+      if (top && workspace && left && centre && right && bottom) {
+        const topRect = top.getBoundingClientRect();
+        const workspaceRect = workspace.getBoundingClientRect();
+        const leftRect = left.getBoundingClientRect();
+        const centreRect = centre.getBoundingClientRect();
+        const rightRect = right.getBoundingClientRect();
+        const bottomRect = bottom.getBoundingClientRect();
+
+        if (topRect.height < 56 || topRect.height > 96) {
+          issues.push(`TopToolbar height out of compact range: ${topRect.height.toFixed(1)}px`);
+        }
+
+        if (topRect.bottom >= workspaceRect.top) {
+          issues.push('Toolbar intersects or pushes into workspace');
+        }
+
+        if (workspaceRect.bottom <= bottomRect.top) {
+          issues.push('Workspace does not stay above status bar');
+        }
+
+        const columnCount = workspace.querySelectorAll('[data-layout-column]').length;
+        if (columnCount !== 3) {
+          issues.push(`Workspace column contract broken: expected 3, got ${columnCount}`);
+        }
+
+        if (!(leftRect.left < centreRect.left && centreRect.left < rightRect.left)) {
+          issues.push('Columns are not simultaneously arranged left-to-right');
+        }
+
+        if (centre.clientHeight < 240) {
+          issues.push(`Centre canvas region too short: ${centre.clientHeight}px`);
+        }
+
+        if (workspace.scrollHeight > workspace.clientHeight + 1) {
+          issues.push('Workspace has vertical clipping/overflow');
+        }
+
+        if (root.scrollHeight > window.innerHeight + 1) {
+          issues.push('Application is vertically scrolling');
+        }
+
+        const verticalOverlap =
+          topRect.bottom > workspaceRect.top || workspaceRect.bottom > bottomRect.top;
+        if (verticalOverlap) {
+          issues.push('Vertical overlap detected between layout regions');
+        }
+
+        const columnsClipped =
+          leftRect.top < workspaceRect.top ||
+          centreRect.top < workspaceRect.top ||
+          rightRect.top < workspaceRect.top ||
+          leftRect.bottom > workspaceRect.bottom ||
+          centreRect.bottom > workspaceRect.bottom ||
+          rightRect.bottom > workspaceRect.bottom;
+        if (columnsClipped) {
+          issues.push('One or more columns are clipped outside workspace bounds');
+        }
+      }
+
+      if (issues.length > 0) {
+        console.warn('[layout-guard] UI composition contract warning:', issues.join(' | '));
+      }
+    };
+
+    validateLayoutContract();
+    window.addEventListener('resize', validateLayoutContract);
+    return () => {
+      window.removeEventListener('resize', validateLayoutContract);
+    };
+  }, [presentationMode]);
+
+  return (
+    <div className="flex h-screen flex-col gap-3 overflow-hidden p-3 md:p-4">
+      {presentationMode ? null : (
+        <div ref={topToolbarRef} className="flex-none" data-layout-region="top-toolbar">
+          <TopToolbar
             presentationMode={presentationMode}
             onTogglePresentationMode={() => setPresentationMode((value) => !value)}
           />
-        </section>
+        </div>
+      )}
 
-        <aside
-          className={
+      <main
+        ref={workspaceRef}
+        className="flex min-h-0 flex-1 overflow-x-auto overflow-y-hidden"
+        data-layout-region="workspace"
+      >
+        {/*
+        ============================================================
+        ARCHITECTURAL RULE
+
+        TopToolbar = Navigation only.
+
+        Left Panel = Guided Engineering Workflow.
+
+        Centre = Engineering Canvas.
+
+        Right Panel = Object Inspector.
+
+        Bottom = Status.
+
+        Workflow components must NEVER migrate into TopToolbar.
+        ============================================================
+        */}
+        <div
+          className={[
+            'grid min-h-0 h-full flex-1 gap-3 overflow-hidden',
             presentationMode
-              ? 'hidden'
-              : 'grid min-h-0 grid-rows-[minmax(0,1.2fr)_minmax(0,1fr)_auto] gap-3 overflow-hidden'
-          }
+              ? 'min-w-0 grid-cols-[minmax(0,1fr)]'
+              : 'min-w-[1260px] grid-cols-[300px_minmax(600px,1fr)_360px]'
+          ].join(' ')}
+          data-layout-columns="3"
         >
-          <RightInspector />
-          <Suspense fallback={<div className="ds-panel p-3 text-xs text-engineering-muted">Loading feature stack...</div>}>
-            <RightFeatureStack />
-          </Suspense>
-          <Suspense fallback={<div className="ds-panel p-3 text-xs text-engineering-muted">Loading extension points...</div>}>
-            <ExtensionPointsPanel />
-          </Suspense>
-        </aside>
+          <aside
+            ref={leftPanelRef}
+            data-layout-column="left-workflow"
+            className={presentationMode ? 'hidden' : 'min-h-0 overflow-hidden'}
+          >
+            <LeftBandsPanel />
+          </aside>
+
+          <section
+            ref={centrePanelRef}
+            data-layout-column="centre-canvas"
+            className="flex min-h-0 min-w-0 items-center justify-center overflow-auto"
+          >
+            <CentreCanvas
+              presentationMode={presentationMode}
+              onTogglePresentationMode={() => setPresentationMode((value) => !value)}
+            />
+          </section>
+
+          <aside
+            ref={rightPanelRef}
+            data-layout-column="right-inspector"
+            className={presentationMode ? 'hidden' : 'min-h-0 overflow-hidden'}
+          >
+            <RightInspector />
+          </aside>
+        </div>
       </main>
-      {presentationMode ? null : <div className="min-h-0 overflow-hidden"><BottomStatusBar /></div>}
+
+      {presentationMode ? null : (
+        <div ref={bottomStatusRef} className="flex-none" data-layout-region="bottom-status-bar">
+          <BottomStatusBar />
+        </div>
+      )}
+
       <Suspense fallback={null}>
         <HelpCenter />
       </Suspense>
