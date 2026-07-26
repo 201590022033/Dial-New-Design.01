@@ -6,6 +6,7 @@ import { useResizeObserver } from '@/hooks/useResizeObserver';
 import { useRenderer } from '@/renderer/useRenderer';
 import { nextZoomValue } from '@/renderer/services/zoomService';
 import { createPanState, resolvePan, type PanState } from '@/renderer/services/panService';
+import { resolveHighlightBandIds } from '@/features/shared/objectInspectorSchemas';
 import { useBandsStore, useDesignEngineStore, useScaleStore, useSelectionStore, useViewportStore } from '@/stores';
 
 export const CentreCanvas = () => {
@@ -19,6 +20,8 @@ export const CentreCanvas = () => {
   const scalePreview = useScaleStore((s) => s.preview);
   const designOverlay = useDesignEngineStore((s) => s.overlay);
   const setZoom = useViewportStore((s) => s.setZoom);
+  const selectedBandId = useSelectionStore((s) => s.selectedBandId);
+  const selectedComponentId = useSelectionStore((s) => s.selectedComponentId);
   const selectBand = useSelectionStore((s) => s.selectBand);
   const hoverBand = useSelectionStore((s) => s.hoverBand);
   const panBy = useViewportStore((s) => s.panBy);
@@ -47,19 +50,30 @@ export const CentreCanvas = () => {
     [width, height, zoom, panX, panY]
   );
 
+  const highlightedBandIds = useMemo(
+    () => resolveHighlightBandIds(bands, selectedBandId, selectedComponentId),
+    [bands, selectedBandId, selectedComponentId]
+  );
+
   useEffect(() => {
-    renderer.renderBands(bands, renderContext, { showGuides, showSnapping, scalePreview, designOverlay });
-  }, [renderer, bands, renderContext, showGuides, showSnapping, scalePreview, designOverlay]);
+    renderer.renderBands(bands, renderContext, {
+      showGuides,
+      showSnapping,
+      scalePreview,
+      designOverlay,
+      highlightedBandIds
+    });
+  }, [renderer, bands, renderContext, showGuides, showSnapping, scalePreview, designOverlay, highlightedBandIds]);
 
   return (
     <motion.section
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="relative h-full overflow-hidden rounded-panel border border-engineering-border bg-engineering-bg/80 shadow-panel"
+      className="relative h-full w-full max-w-[1220px] overflow-hidden rounded-panel border border-engineering-border bg-engineering-bg/85 shadow-panel"
     >
       <div
         ref={setContainer}
-        className="h-full w-full cursor-crosshair overflow-hidden rounded-panel bg-grid bg-[size:36px_36px]"
+        className="h-full w-full cursor-crosshair overflow-hidden rounded-panel bg-grid bg-[size:52px_52px]"
         onWheel={(event) => {
           event.preventDefault();
           setZoom(nextZoomValue(zoom, event.deltaY));
@@ -111,12 +125,12 @@ export const CentreCanvas = () => {
         }}
       />
 
-      <div className="pointer-events-none absolute left-1/2 top-1/2 h-[74%] w-[74%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-engineering-amber/20" />
-      <div className="pointer-events-none absolute left-1/2 top-1/2 h-[58%] w-[58%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-engineering-teal/25" />
-      <div className="pointer-events-none absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-engineering-teal/25" />
-      <div className="pointer-events-none absolute left-0 top-1/2 h-px w-full -translate-y-1/2 bg-engineering-teal/25" />
+      <div className="pointer-events-none absolute left-1/2 top-1/2 h-[84%] w-[84%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-engineering-amber/10" />
+      <div className="pointer-events-none absolute left-1/2 top-1/2 h-[67%] w-[67%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-engineering-teal/12" />
+      <div className="pointer-events-none absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-engineering-teal/12" />
+      <div className="pointer-events-none absolute left-0 top-1/2 h-px w-full -translate-y-1/2 bg-engineering-teal/12" />
 
-      <div className="pointer-events-none absolute right-3 top-3 rounded-md border border-engineering-border bg-engineering-panel/90 px-2 py-1 font-mono text-xs text-engineering-muted">
+      <div className="pointer-events-none absolute right-3 top-3 rounded-md border border-engineering-border bg-engineering-panel/78 px-2 py-1 font-mono text-xs text-engineering-muted">
         Wheel Zoom | Shift+Drag Pan | Double Click Reset
       </div>
 
@@ -135,12 +149,12 @@ export const CentreCanvas = () => {
         </Button>
       </div>
 
-      <div className="pointer-events-none absolute left-3 top-3 flex items-center gap-2 rounded-md border border-engineering-border bg-engineering-panel/90 px-2 py-1 text-[11px] text-engineering-muted">
+      <div className="pointer-events-none absolute left-3 top-3 flex items-center gap-2 rounded-md border border-engineering-border bg-engineering-panel/72 px-2 py-1 text-[11px] text-engineering-muted">
         <Ruler className="ds-icon-sm text-engineering-amber" />
         Construction Guides
       </div>
 
-      <div className="pointer-events-none absolute left-3 bottom-3 flex items-center gap-2 rounded-md border border-engineering-border bg-engineering-panel/90 px-2 py-1 text-[11px] text-engineering-muted">
+      <div className="pointer-events-none absolute left-3 bottom-3 flex items-center gap-2 rounded-md border border-engineering-border bg-engineering-panel/72 px-2 py-1 text-[11px] text-engineering-muted">
         <Move className="ds-icon-sm text-engineering-teal" />
         Future snapping and alignment overlays
       </div>

@@ -39,6 +39,7 @@ export interface RendererOptions {
   showSnapping: boolean;
   scalePreview: ScaleRunResult | null;
   designOverlay: DesignOverlay | null;
+  highlightedBandIds: string[];
 }
 
 export interface RendererAdapter {

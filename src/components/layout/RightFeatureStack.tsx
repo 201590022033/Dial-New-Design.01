@@ -43,7 +43,7 @@ const placeholderPanels: PlaceholderPanel[] = [
 
 export const RightFeatureStack = () => {
   return (
-    <div className="space-y-3 overflow-auto pr-1">
+    <div className="h-full space-y-3 overflow-auto pr-1">
       {placeholderPanels.map((panel) => (
         <Panel key={panel.title} className="p-3">
           <div className="flex items-center gap-2">

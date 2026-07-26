@@ -208,16 +208,16 @@ export const App = () => {
   return (
     <div className="grid min-h-screen grid-rows-[auto_1fr_auto] gap-3 p-3 md:p-4">
       <TopToolbar />
-      <main className="grid min-h-0 grid-cols-1 gap-3 xl:grid-cols-[320px_1fr_390px]">
-        <aside className="min-h-0">
+      <main className="grid min-h-0 grid-cols-1 gap-3 xl:grid-cols-[320px_minmax(0,1fr)_390px]">
+        <aside className="min-h-0 overflow-hidden">
           <LeftBandsPanel />
         </aside>
 
-        <section className="min-h-[420px] xl:min-h-0">
+        <section className="flex min-h-[500px] min-w-0 items-center justify-center xl:min-h-0">
           <CentreCanvas />
         </section>
 
-        <aside className="grid min-h-0 grid-rows-[auto_1fr_auto] gap-3">
+        <aside className="grid min-h-0 grid-rows-[minmax(0,1.2fr)_minmax(0,1fr)_auto] gap-3 overflow-hidden">
           <RightInspector />
           <Suspense fallback={<div className="ds-panel p-3 text-xs text-engineering-muted">Loading feature stack...</div>}>
             <RightFeatureStack />

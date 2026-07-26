@@ -165,13 +165,25 @@ export const buildEngineeringExport = (request: EngineeringExportRequest): {
 
 export const exportEngineeringByFormat = (request: EngineeringExportRequest): ExportPreviewSummary => {
   const built = buildEngineeringExport(request);
+  const metadataKeys: Array<keyof ExportMetadata> = [
+    'projectName',
+    'movement',
+    'caseDiameter',
+    'revision',
+    'designer',
+    'date',
+    'material',
+    'units',
+    'manufacturingNotes'
+  ];
   const mappedMetadata = request.metadata
-    ? Object.fromEntries(
-        Object.entries(request.metadata).filter((entry): entry is [string, string | number | boolean] => {
-          const value = entry[1];
-          return typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean';
-        })
-      )
+    ? metadataKeys.reduce<Record<string, string | number | boolean>>((accumulator, key) => {
+        const value = request.metadata?.[key];
+        if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+          accumulator[key] = value;
+        }
+        return accumulator;
+      }, {})
     : undefined;
   exportByFormat({
     format: built.format,

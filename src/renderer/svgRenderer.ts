@@ -11,6 +11,7 @@ export class SvgRenderer implements RendererAdapter {
   private container: HTMLElement | null = null;
   private latestBands: BandEntity[] = [];
   private latestContext: RenderContext | null = null;
+  private latestFitScale = 1;
 
   mount(container: HTMLElement): void {
     this.container = container;
@@ -35,9 +36,19 @@ export class SvgRenderer implements RendererAdapter {
       renderGuides(this.root, context.width, context.height);
     }
 
+    const maxOuterRadiusMm = bands.reduce((current, band) => {
+      return Math.max(current, band.geometry.outerRadius);
+    }, 20);
+    const nominalDiameterPx = Math.max(1, mmToPixels(maxOuterRadiusMm * 2));
+    const targetDiameterPx = Math.min(context.width, context.height) * 0.82;
+    const fitScale = Math.max(1, Math.min(2.4, targetDiameterPx / nominalDiameterPx));
+    this.latestFitScale = fitScale;
+
     const layer = this.root.group().id('bands');
     layer.translate(context.panX, context.panY);
-    layer.scale(context.zoom);
+    layer.scale(context.zoom * fitScale);
+    const highlightedBandIds = new Set(options.highlightedBandIds);
+    const hasFocusSelection = highlightedBandIds.size > 0;
 
     if (options.designOverlay) {
       const overlay = options.designOverlay;
@@ -157,17 +168,29 @@ export class SvgRenderer implements RendererAdapter {
       if (!band.visible) continue;
       const outerR = mmToPixels(band.geometry.outerRadius);
       const innerR = mmToPixels(band.geometry.innerRadius);
+      const isHighlighted = highlightedBandIds.has(band.id);
+      const fadedOpacity = hasFocusSelection && !isHighlighted ? Math.max(0.12, band.style.opacity * 0.42) : band.style.opacity;
+      const strokeWidth = isHighlighted ? band.style.strokeWidth + 0.45 : band.style.strokeWidth;
+      const strokeColor = isHighlighted ? '#E2E8F0' : band.style.stroke;
 
       const outer = layer.circle(outerR * 2).center(context.centerX, context.centerY);
       const inner = layer.circle(innerR * 2).center(context.centerX, context.centerY);
       const donut = outer
-        .fill({ color: band.style.fill, opacity: band.style.opacity })
-        .stroke({ color: band.style.stroke, width: band.style.strokeWidth });
+        .fill({ color: band.style.fill, opacity: fadedOpacity })
+        .stroke({ color: strokeColor, width: strokeWidth });
 
       if (innerR > 0) {
         donut.maskWith(layer.mask().add(outer).add(inner.fill({ color: '#000000' })));
       }
       donut.attr('data-band-id', band.id);
+
+      if (isHighlighted) {
+        layer
+          .circle(outerR * 2)
+          .center(context.centerX, context.centerY)
+          .fill({ opacity: 0 })
+          .stroke({ color: '#E2E8F0', width: 0.6, opacity: 0.45 });
+      }
     }
 
     if (options.scalePreview) {
@@ -229,7 +252,7 @@ export class SvgRenderer implements RendererAdapter {
     const rect = this.container.getBoundingClientRect();
     const x = screenX - rect.left - this.latestContext.panX - this.latestContext.centerX;
     const y = screenY - rect.top - this.latestContext.panY - this.latestContext.centerY;
-    const distPx = Math.sqrt(x * x + y * y) / this.latestContext.zoom;
+    const distPx = Math.sqrt(x * x + y * y) / (this.latestContext.zoom * this.latestFitScale);
     const distMm = distPx / 10;
 
     for (const band of [...this.latestBands].sort((a, b) => b.zIndex - a.zIndex)) {

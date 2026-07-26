@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { CircleHelp, X } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { helpDocPages } from '@/domain/extensions/helpDocs';
@@ -7,6 +7,21 @@ import { engineeringHelpIndex } from '@/domain/extensions/engineeringHelpIndex';
 export const HelpCenter = () => {
   const [open, setOpen] = useState(false);
   const [selectedDocId, setSelectedDocId] = useState(helpDocPages[0]?.id ?? '');
+
+  useEffect(() => {
+    const handleOpen = (event: Event) => {
+      const detail = (event as CustomEvent<{ docId?: string }>).detail;
+      if (detail?.docId) {
+        setSelectedDocId(detail.docId);
+      }
+      setOpen(true);
+    };
+
+    window.addEventListener('dial-help:open', handleOpen);
+    return () => {
+      window.removeEventListener('dial-help:open', handleOpen);
+    };
+  }, []);
 
   const selectedDoc = useMemo(
     () => helpDocPages.find((doc) => doc.id === selectedDocId) ?? helpDocPages[0],
