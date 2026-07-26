@@ -106,7 +106,8 @@ const defaultConfig: ScalePluginConfig = {
 
 const toValidationResult = (
   frameworkIssues: ScaleValidationIssue[],
-  valid: boolean
+  valid: boolean,
+  healthReport?: ScaleValidationResult['healthReport']
 ): ScaleValidationResult => {
   return {
     valid,
@@ -116,7 +117,8 @@ const toValidationResult = (
       description: issue.message,
       affectedObject: issue.affectedObject,
       suggestedFix: issue.suggestedFix
-    }))
+    })),
+    healthReport
   };
 };
 
@@ -314,7 +316,7 @@ export const circularLogarithmicScalePlugin: ScalePlugin = {
     const issues = [...baseValidation.issues, ...customIssues];
     const valid = !issues.some((issue) => issue.severity === 'error');
 
-    return toValidationResult(issues, valid);
+    return toValidationResult(issues, valid, baseValidation.healthReport);
   },
   svgOutput: (ticks, labels) => exporter.toSvg({ kind: 'logarithmic', ticks, labels }),
   manufacturingMetadata: (ticks, labels, config) =>

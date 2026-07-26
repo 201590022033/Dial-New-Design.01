@@ -62,10 +62,10 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode }: Cen
   }, []);
 
   useEffect(() => {
-    if (selectedScaleKind !== 'slide-rule') {
+    if (!scalePreview) {
       setEngineeringReadout(null);
     }
-  }, [selectedScaleKind, setEngineeringReadout]);
+  }, [scalePreview, setEngineeringReadout]);
 
   const renderContext = useMemo(
     () => ({
@@ -226,7 +226,7 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode }: Cen
               return;
             }
 
-            if (selectedScaleKind === 'slide-rule' && scalePreview) {
+            if (scalePreview) {
               const sample = screenPointToPolarSample({
                 screenX: relativeX,
                 screenY: relativeY,
@@ -236,13 +236,78 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode }: Cen
                 panY: renderContext.panY,
                 renderScale: renderContext.zoom * previewFitScale
               });
-              const readout = resolveSlideRuleReadout(
-                sample,
-                scaleConfig,
-                scaleContext,
-                scalePreview.ticks,
-                scalePreview.labels
-              );
+
+              const readout =
+                selectedScaleKind === 'slide-rule'
+                  ? resolveSlideRuleReadout(
+                      sample,
+                      scaleConfig,
+                      scaleContext,
+                      scalePreview.ticks,
+                      scalePreview.labels
+                    )
+                  : (() => {
+                      const nearestTick = scalePreview.ticks.reduce<typeof scalePreview.ticks[number] | null>(
+                        (closest, tick) => {
+                          if (!closest) {
+                            return tick;
+                          }
+
+                          return Math.abs(tick.angleDeg - sample.angleDeg) <
+                            Math.abs(closest.angleDeg - sample.angleDeg)
+                            ? tick
+                            : closest;
+                        },
+                        null
+                      );
+
+                      const nearestLabel = scalePreview.labels.reduce<typeof scalePreview.labels[number] | null>(
+                        (closest, label) => {
+                          if (!closest) {
+                            return label;
+                          }
+
+                          return Math.abs(label.angleDeg - sample.angleDeg) <
+                            Math.abs(closest.angleDeg - sample.angleDeg)
+                            ? label
+                            : closest;
+                        },
+                        null
+                      );
+
+                      const nearestValue = nearestTick?.value ?? scaleConfig.startValue;
+                      const normalized =
+                        scaleConfig.endValue === scaleConfig.startValue
+                          ? 0
+                          : (nearestValue - scaleConfig.startValue) /
+                            (scaleConfig.endValue - scaleConfig.startValue);
+
+                      const warningCount = scalePreview.validation.warnings.length;
+                      const hasErrors = scalePreview.validation.structuredWarnings.some(
+                        (warning) => warning.severity === 'error'
+                      );
+
+                      return {
+                        ringId: 'outer' as const,
+                        scaleKind: selectedScaleKind,
+                        pluginName: scalePreview.pluginName,
+                        value: nearestValue,
+                        normalized,
+                        angleDeg: sample.angleDeg,
+                        radiusMm: sample.radiusMm,
+                        nearestTick,
+                        nearestLabel,
+                        collisionStatus: warningCount > 0 ? 'warning' : 'ok',
+                        manufacturingStatus:
+                          hasErrors || (scalePreview.manufacturingMetadata?.ringDensityWarnings?.length ?? 0) > 0
+                            ? 'warning'
+                            : 'ok',
+                        engineeringScore:
+                          scalePreview.validation.healthReport?.overallEngineeringScore ??
+                          (hasErrors ? 50 : 90)
+                      };
+                    })();
+
               setEngineeringReadout(readout);
             }
 
@@ -299,10 +364,14 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode }: Cen
           </div>
         )}
 
-        {presentationMode || selectedScaleKind !== 'slide-rule' || !engineeringReadout ? null : (
+        {presentationMode || !engineeringReadout ? null : (
           <div className="pointer-events-none absolute left-3 top-14 w-[280px] rounded-md border border-engineering-border bg-engineering-panel/84 px-2 py-2 text-[11px] text-engineering-muted shadow-panel">
-            <p className="font-mono text-engineering-amber">Slide Rule Readout</p>
+            <p className="font-mono text-engineering-amber">Engineering Readout</p>
             <div className="mt-1 grid grid-cols-2 gap-x-2 gap-y-1 font-mono">
+              <span>Scale</span>
+              <span className="text-engineering-text">{engineeringReadout.scaleKind ?? selectedScaleKind}</span>
+              <span>Plugin</span>
+              <span className="text-engineering-text">{engineeringReadout.pluginName ?? scalePreview?.pluginName ?? '--'}</span>
               <span>Ring</span>
               <span className="text-engineering-text">{engineeringReadout.ringId}</span>
               <span>Value</span>
@@ -317,6 +386,14 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode }: Cen
               <span className="text-engineering-text">{engineeringReadout.nearestTick?.label ?? engineeringReadout.nearestTick?.tier ?? '--'}</span>
               <span>Label</span>
               <span className="text-engineering-text">{engineeringReadout.nearestLabel?.text ?? '--'}</span>
+              <span>Collision</span>
+              <span className="text-engineering-text">{engineeringReadout.collisionStatus ?? '--'}</span>
+              <span>Manufacturing</span>
+              <span className="text-engineering-text">{engineeringReadout.manufacturingStatus ?? '--'}</span>
+              <span>Score</span>
+              <span className="text-engineering-text">
+                {engineeringReadout.engineeringScore ? engineeringReadout.engineeringScore.toFixed(2) : '--'}
+              </span>
             </div>
           </div>
         )}

@@ -156,11 +156,46 @@ export const createScaleValidationEngine = (): ScaleValidator => {
 
       const warnings = issues.map((issue) => issue.message);
       const valid = !issues.some((issue) => issue.severity === 'error');
+      const errorCount = issues.filter((issue) => issue.severity === 'error').length;
+      const warningCount = issues.filter((issue) => issue.severity === 'warning').length;
+      const infoCount = issues.filter((issue) => issue.severity === 'info').length;
+      const collisionCount = (collisions ?? []).length;
+      const majorTickCount = ticks.filter((tick) => tick.weight === 'major').length;
+
+      const mathematicalHealth = Math.max(0, 100 - errorCount * 28 - warningCount * 8);
+      const readabilityScore = Math.max(
+        0,
+        100 - Math.max(0, labels.length - majorTickCount) * 2 - collisionCount * 6
+      );
+      const collisionScore = Math.max(0, 100 - collisionCount * 10);
+      const manufacturingScore = Math.max(
+        0,
+        100 -
+          issues.filter((issue) => issue.code === 'MANUFACTURING_LIMIT' || issue.code === 'OUTSIDE_BAND').length * 15
+      );
+      const validationScore = Math.max(0, 100 - errorCount * 25 - warningCount * 6 - infoCount * 2);
+      const overallEngineeringScore = Number(
+        (
+          mathematicalHealth * 0.3 +
+          readabilityScore * 0.2 +
+          collisionScore * 0.2 +
+          manufacturingScore * 0.2 +
+          validationScore * 0.1
+        ).toFixed(2)
+      );
 
       return {
         valid,
         warnings,
-        issues
+        issues,
+        healthReport: {
+          mathematicalHealth,
+          readabilityScore,
+          collisionScore,
+          manufacturingScore,
+          validationScore,
+          overallEngineeringScore
+        }
       };
     }
   };

@@ -7,6 +7,7 @@ export * from '@/domain/scales/framework/logarithmicTickEngine';
 export * from '@/domain/scales/framework/labelEngine';
 export * from '@/domain/scales/framework/logarithmicLabelEngine';
 export * from '@/domain/scales/framework/slideRuleEngine';
+export * from '@/domain/scales/framework/intelligentLayoutEngine';
 export * from '@/domain/scales/framework/validationEngine';
 export * from '@/domain/scales/framework/collisionFramework';
 export * from '@/domain/scales/framework/exporter';

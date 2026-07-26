@@ -81,7 +81,10 @@ const defaultConfig: ScalePluginConfig = {
   validationVisibility: true
 };
 
-const toValidationResult = (issues: ScaleValidationIssue[]): ScaleValidationResult => ({
+const toValidationResult = (
+  issues: ScaleValidationIssue[],
+  healthReport?: ScaleValidationResult['healthReport']
+): ScaleValidationResult => ({
   valid: !issues.some((issue) => issue.severity === 'error'),
   warnings: issues.map((issue) => issue.message),
   structuredWarnings: issues.map((issue) => ({
@@ -89,7 +92,8 @@ const toValidationResult = (issues: ScaleValidationIssue[]): ScaleValidationResu
     description: issue.message,
     affectedObject: issue.affectedObject,
     suggestedFix: issue.suggestedFix
-  }))
+  })),
+  healthReport
 });
 
 const classifySlideRuleIssues = (
@@ -271,7 +275,7 @@ export const slideRuleScalePlugin: ScalePlugin = {
       });
     }
 
-    return toValidationResult([...baseValidation.issues, ...customIssues]);
+    return toValidationResult([...baseValidation.issues, ...customIssues], baseValidation.healthReport);
   },
   svgOutput: (ticks, labels) => exporter.toSvg({ kind: 'slide-rule', ticks, labels }),
   manufacturingMetadata: (ticks, labels, sourceConfig) => {

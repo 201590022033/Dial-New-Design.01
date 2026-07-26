@@ -18,7 +18,7 @@ interface TickDensityRule {
 const TERTIARY_OFFSETS: number[] = [0.2, 0.4, 0.6, 0.8];
 const MICRO_OFFSETS: number[] = [0.1, 0.3, 0.7, 0.9];
 
-const rulesByProfile: Record<'sparse' | 'balanced' | 'dense', TickDensityRule> = {
+const rulesByProfile: Record<'sparse' | 'balanced' | 'dense' | 'ultra-dense' | 'engineering', TickDensityRule> = {
   sparse: {
     secondary: true,
     tertiary: false,
@@ -42,11 +42,32 @@ const rulesByProfile: Record<'sparse' | 'balanced' | 'dense', TickDensityRule> =
     minSecondarySpacingDeg: 3,
     minTertiarySpacingDeg: 1.5,
     minMicroSpacingDeg: 0.75
+  },
+  'ultra-dense': {
+    secondary: true,
+    tertiary: true,
+    micro: true,
+    minSecondarySpacingDeg: 2.2,
+    minTertiarySpacingDeg: 1,
+    minMicroSpacingDeg: 0.4
+  },
+  engineering: {
+    secondary: true,
+    tertiary: true,
+    micro: true,
+    minSecondarySpacingDeg: 2.8,
+    minTertiarySpacingDeg: 1.3,
+    minMicroSpacingDeg: 0.62
   }
 };
 
 const getProfile = (profile: string | undefined): TickDensityRule => {
-  if (profile === 'sparse' || profile === 'dense') {
+  if (
+    profile === 'sparse' ||
+    profile === 'dense' ||
+    profile === 'ultra-dense' ||
+    profile === 'engineering'
+  ) {
     return rulesByProfile[profile];
   }
   return rulesByProfile.balanced;

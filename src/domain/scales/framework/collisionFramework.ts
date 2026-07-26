@@ -90,6 +90,84 @@ export const createCollisionFramework = (): CollisionDetector => {
         }
       });
 
+      const sortedTicks = [...ticks].sort((left, right) => left.angleDeg - right.angleDeg);
+      for (let index = 1; index < sortedTicks.length; index += 1) {
+        const previous = sortedTicks[index - 1];
+        const current = sortedTicks[index];
+        if (!previous || !current) {
+          continue;
+        }
+
+        const delta = angularDelta(previous.angleDeg, current.angleDeg);
+        if (delta < 0.12) {
+          issues.push({
+            kind: 'tick-tick',
+            severity: 'warning',
+            message: `Tick crowding detected near ${current.angleDeg.toFixed(3)} degrees.`,
+            ids: [
+              `${previous.ringId ?? 'ring'}-${index - 1}`,
+              `${current.ringId ?? 'ring'}-${index}`
+            ]
+          });
+        }
+      }
+
+      const outerTicks = ticks.filter((tick) => tick.ringId === 'outer');
+      const innerTicks = ticks.filter((tick) => tick.ringId === 'inner');
+      if (outerTicks.length > 0 && innerTicks.length > 0) {
+        const radialGap = Math.abs(
+          (outerTicks[0]?.radiusMm ?? 0) -
+            (innerTicks[0]?.radiusMm ?? 0)
+        );
+
+        if (radialGap < 0.65) {
+          issues.push({
+            kind: 'ring-ring',
+            severity: 'warning',
+            message: 'Ring-to-ring radial spacing is tight and may cause visual interference.',
+            ids: ['outer-ring', 'inner-ring']
+          });
+        }
+
+        let crossRingNearMisses = 0;
+        outerTicks.slice(0, 120).forEach((outerTick) => {
+          innerTicks.slice(0, 120).forEach((innerTick) => {
+            if (angularDelta(outerTick.angleDeg, innerTick.angleDeg) < 0.08) {
+              crossRingNearMisses += 1;
+            }
+          });
+        });
+
+        if (crossRingNearMisses > 10) {
+          issues.push({
+            kind: 'cross-ring',
+            severity: 'info',
+            message: 'Cross-ring angular interference density is elevated.',
+            ids: ['outer-ring', 'inner-ring']
+          });
+        }
+      }
+
+      labels.forEach((label) => {
+        if (label.text.length > 14) {
+          issues.push({
+            kind: 'text-overflow',
+            severity: 'warning',
+            message: `Label ${label.text} may overflow available arc width.`,
+            ids: [label.text]
+          });
+        }
+
+        if (label.orientation === 'curved' && label.text.length > 10 && label.radiusMm < input.config.radiusMm) {
+          issues.push({
+            kind: 'curved-baseline-overflow',
+            severity: 'info',
+            message: `Curved baseline for ${label.text} may exceed inner arc comfort radius.`,
+            ids: [label.text]
+          });
+        }
+      });
+
       return issues;
     }
   };

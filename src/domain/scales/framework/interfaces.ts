@@ -7,7 +7,16 @@ import type {
 } from '@/domain/scales/types';
 
 export interface ScaleCollisionIssue {
-  kind: 'label-label' | 'tick-label' | 'label-boundary' | 'boundary-overflow';
+  kind:
+    | 'label-label'
+    | 'tick-label'
+    | 'tick-tick'
+    | 'label-boundary'
+    | 'boundary-overflow'
+    | 'ring-ring'
+    | 'cross-ring'
+    | 'text-overflow'
+    | 'curved-baseline-overflow';
   severity: 'info' | 'warning' | 'error';
   message: string;
   ids: string[];
@@ -58,7 +67,9 @@ export interface ScaleValidationIssue {
     | 'DUPLICATE_LABELS'
     | 'MISSING_LABELS'
     | 'OUTSIDE_BAND'
-    | 'MANUFACTURING_LIMIT';
+    | 'MANUFACTURING_LIMIT'
+    | 'RING_INTERFERENCE'
+    | 'TEXT_OVERFLOW';
   message: string;
   affectedObject: string;
   suggestedFix: string;
@@ -76,6 +87,14 @@ export interface ScaleValidatorResult {
   valid: boolean;
   warnings: string[];
   issues: ScaleValidationIssue[];
+  healthReport?: {
+    mathematicalHealth: number;
+    readabilityScore: number;
+    collisionScore: number;
+    manufacturingScore: number;
+    validationScore: number;
+    overallEngineeringScore: number;
+  };
 }
 
 export interface ScaleValidator {

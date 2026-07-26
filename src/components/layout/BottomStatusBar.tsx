@@ -22,7 +22,6 @@ export const BottomStatusBar = () => {
   const caseDiameterMm = useGlobalSettingsStore((s) => s.caseDiameterMm);
   const units = useGlobalSettingsStore((s) => s.units);
   const scalePreview = useScaleStore((s) => s.preview);
-  const selectedScaleKind = useScaleStore((s) => s.selectedScaleKind);
   const engineeringReadout = useScaleStore((s) => s.engineeringReadout);
   const scaleValidation = useScaleStore((s) => s.validation);
   const activeTemplateId = useDesignEngineStore((s) => s.activeTemplateId);
@@ -94,13 +93,11 @@ export const BottomStatusBar = () => {
           {scaleValidation ? (scaleValidation.valid ? 'OK' : `${scaleValidation.warnings.length} warning(s)`) : 'Idle'}
         </span>
       </div>
-      {selectedScaleKind === 'slide-rule' ? (
+      {engineeringReadout ? (
         <div className="flex items-center gap-1.5">
           <span className="ds-label-status">Readout</span>
           <span className="font-mono text-engineering-text">
-            {engineeringReadout
-              ? `${engineeringReadout.ringId} ${engineeringReadout.value.toFixed(4)} @ ${engineeringReadout.angleDeg.toFixed(2)}deg`
-              : 'Idle'}
+            {`${engineeringReadout.ringId} ${engineeringReadout.value.toFixed(4)} @ ${engineeringReadout.angleDeg.toFixed(2)}deg`}
           </span>
         </div>
       ) : null}

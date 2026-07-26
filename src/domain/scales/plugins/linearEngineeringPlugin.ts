@@ -122,7 +122,8 @@ const toValidationResult = (
       description: issue.message,
       affectedObject: issue.affectedObject,
       suggestedFix: issue.suggestedFix
-    }))
+    })),
+    healthReport: frameworkResult.healthReport
   };
 };
 

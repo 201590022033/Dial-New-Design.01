@@ -468,9 +468,11 @@ export const RightInspector = () => {
                       })
                     }
                   >
+                    <option value="ultra-dense">Ultra Dense</option>
                     <option value="sparse">Sparse</option>
                     <option value="balanced">Balanced</option>
                     <option value="dense">Dense</option>
+                    <option value="engineering">Engineering</option>
                   </select>
                 </label>
                 <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
@@ -843,6 +845,40 @@ export const RightInspector = () => {
             <p className="ds-label-inspector">Collision Warnings</p>
             <p className="font-mono text-engineering-text">{collisionWarnings.length}</p>
           </div>
+          {scaleValidation?.healthReport ? (
+            <>
+              <div className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+                <p className="ds-label-inspector">Math Health</p>
+                <p className="font-mono text-engineering-text">
+                  {scaleValidation.healthReport.mathematicalHealth.toFixed(0)}
+                </p>
+              </div>
+              <div className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+                <p className="ds-label-inspector">Readability</p>
+                <p className="font-mono text-engineering-text">
+                  {scaleValidation.healthReport.readabilityScore.toFixed(0)}
+                </p>
+              </div>
+              <div className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+                <p className="ds-label-inspector">Collision Score</p>
+                <p className="font-mono text-engineering-text">
+                  {scaleValidation.healthReport.collisionScore.toFixed(0)}
+                </p>
+              </div>
+              <div className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+                <p className="ds-label-inspector">Manufacturing</p>
+                <p className="font-mono text-engineering-text">
+                  {scaleValidation.healthReport.manufacturingScore.toFixed(0)}
+                </p>
+              </div>
+              <div className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5 col-span-2">
+                <p className="ds-label-inspector">Overall Engineering Score</p>
+                <p className="font-mono text-engineering-amber">
+                  {scaleValidation.healthReport.overallEngineeringScore.toFixed(2)}
+                </p>
+              </div>
+            </>
+          ) : null}
         </div>
       );
     }

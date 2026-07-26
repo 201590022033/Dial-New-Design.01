@@ -14,6 +14,8 @@ export type ScaleKind =
   | 'altitude'
   | 'pressure'
   | 'temperature'
+  | 'gmt'
+  | 'conversion'
   | 'custom';
 
 export type ScaleCategory =
@@ -64,6 +66,14 @@ export interface ScaleValidationResult {
     affectedObject: string;
     suggestedFix: string;
   }>;
+  healthReport?: {
+    mathematicalHealth: number;
+    readabilityScore: number;
+    collisionScore: number;
+    manufacturingScore: number;
+    validationScore: number;
+    overallEngineeringScore: number;
+  };
 }
 
 export interface ScalePluginConfig {
@@ -91,7 +101,7 @@ export interface ScalePluginConfig {
   bandOuterRadiusMm: number;
   minimumLineWidthMm: number;
   logarithmicBase?: number;
-  tickDensityProfile?: 'sparse' | 'balanced' | 'dense';
+  tickDensityProfile?: 'ultra-dense' | 'dense' | 'balanced' | 'sparse' | 'engineering';
   includeMinorLabels?: boolean;
   engineeringPreset?:
     | 'precision'
@@ -142,12 +152,17 @@ export interface ScaleManufacturingMetadata {
 
 export interface ScaleEngineeringReadout {
   ringId: 'outer' | 'inner';
+  scaleKind?: ScaleKind;
+  pluginName?: string;
   value: number;
   normalized: number;
   angleDeg: number;
   radiusMm: number;
   nearestTick: ScaleTick | null;
   nearestLabel: ScaleLabel | null;
+  collisionStatus?: 'ok' | 'warning' | 'error';
+  manufacturingStatus?: 'ok' | 'warning' | 'error';
+  engineeringScore?: number;
 }
 
 export interface ScaleInspectorField {
