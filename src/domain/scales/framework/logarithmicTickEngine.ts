@@ -1,5 +1,6 @@
 import type { TickGenerator } from '@/domain/scales/framework/interfaces';
 import type { ScaleTick } from '@/domain/scales/types';
+import { resolveLogarithmicDomain, valueFromMantissaAndDecade } from '@/domain/scales/framework/logarithmicDomainEngine';
 
 interface TickSpec {
   offset: number;
@@ -73,6 +74,46 @@ const getProfile = (profile: string | undefined): TickDensityRule => {
   return rulesByProfile.balanced;
 };
 
+const clampCount = (value: number | undefined, fallback: number, max: number): number => {
+  const source = value ?? fallback;
+  if (!Number.isFinite(source)) {
+    return fallback;
+  }
+  return Math.max(0, Math.min(max, Math.round(source)));
+};
+
+const createEvenOffsets = (count: number): number[] => {
+  if (count <= 0) {
+    return [];
+  }
+
+  const result: number[] = [];
+  for (let index = 1; index <= count; index += 1) {
+    result.push(index / (count + 1));
+  }
+  return result;
+};
+
+const pickOffsets = (
+  preferred: number[],
+  requestedCount: number,
+  fallbackBuilder?: () => number[]
+): number[] => {
+  if (requestedCount <= 0) {
+    return [];
+  }
+
+  if (requestedCount <= preferred.length) {
+    return preferred.slice(0, requestedCount);
+  }
+
+  if (fallbackBuilder) {
+    return fallbackBuilder();
+  }
+
+  return preferred;
+};
+
 const pushTick = (
   ticks: ScaleTick[],
   value: number,
@@ -110,7 +151,8 @@ export const createLogarithmicTickEngine = (): TickGenerator => {
       const majorTicks: ScaleTick[] = [];
       const minorTicks: ScaleTick[] = [];
 
-      if (config.startValue <= 0 || config.endValue <= 0 || config.startValue >= config.endValue) {
+      const domain = resolveLogarithmicDomain(config);
+      if (!domain) {
         return {
           majorTicks,
           minorTicks,
@@ -120,48 +162,145 @@ export const createLogarithmicTickEngine = (): TickGenerator => {
       }
 
       const profile = getProfile(config.tickDensityProfile);
+      const radix = Math.max(2, Math.floor(domain.base));
+      const majorStride = clampCount(config.logMajorTickDensity, 1, 12);
+      const secondaryCount = clampCount(
+        config.logMinorTickDensity,
+        profile.secondary ? 1 : 0,
+        6
+      );
+      const tertiaryCount = clampCount(
+        config.logMicroTickDensity,
+        profile.tertiary ? TERTIARY_OFFSETS.length : 0,
+        8
+      );
+      const microCount = clampCount(
+        profile.micro ? (config.logMicroTickDensity ?? MICRO_OFFSETS.length) : 0,
+        profile.micro ? MICRO_OFFSETS.length : 0,
+        8
+      );
 
-      for (let segment = 1; segment <= 9; segment += 1) {
-        const from = segment;
-        const to = segment + 1;
-        if (to < config.startValue || from > config.endValue) {
-          continue;
-        }
+      const secondaryOffsets = pickOffsets([0.5, 0.33, 0.67], secondaryCount, () => createEvenOffsets(secondaryCount));
+      const tertiaryOffsets = pickOffsets(TERTIARY_OFFSETS, tertiaryCount, () => createEvenOffsets(tertiaryCount));
+      const microOffsets = pickOffsets(MICRO_OFFSETS, microCount, () => createEvenOffsets(microCount));
 
-        const startAngle = toAngle(from, config, context) + config.rotationOffsetDeg;
-        const endAngle = toAngle(to, config, context) + config.rotationOffsetDeg;
-        const spacingDeg = Math.abs(endAngle - startAngle);
+      for (let decade = domain.startDecade; decade <= domain.endDecade; decade += 1) {
+        const decadeStart = domain.base ** decade;
+        const decadeEnd = domain.base ** (decade + 1);
 
-        const specs: TickSpec[] = [{ offset: 0, tier: 'primary' }];
+        for (let mantissaIndex = 1; mantissaIndex <= radix - 1; mantissaIndex += 1) {
+          const intervalStartMantissa = mantissaIndex;
+          const intervalEndMantissa = Math.min(mantissaIndex + 1, domain.base);
+          const intervalStartValue = valueFromMantissaAndDecade(intervalStartMantissa, decade, domain.base);
+          const intervalEndValue = valueFromMantissaAndDecade(intervalEndMantissa, decade, domain.base);
 
-        if (profile.secondary && spacingDeg >= profile.minSecondarySpacingDeg) {
-          specs.push({ offset: 0.5, tier: 'secondary' });
-        }
-
-        if (profile.tertiary && spacingDeg >= profile.minTertiarySpacingDeg) {
-          TERTIARY_OFFSETS.forEach((offset) => {
-            specs.push({ offset, tier: 'tertiary' });
-          });
-        }
-
-        if (profile.micro && spacingDeg >= profile.minMicroSpacingDeg) {
-          MICRO_OFFSETS.forEach((offset) => {
-            specs.push({ offset, tier: 'micro' });
-          });
-        }
-
-        specs.forEach((spec) => {
-          const value = from + spec.offset;
-          if (value < config.startValue || value > config.endValue) {
-            return;
+          if (intervalEndValue < domain.startValue || intervalStartValue > domain.endValue) {
+            continue;
           }
 
-          const angleDeg = toAngle(value, config, context) + config.rotationOffsetDeg;
+          const intervalStartAngle = toAngle(intervalStartValue, config, context) + config.rotationOffsetDeg;
+          const intervalEndAngle = toAngle(intervalEndValue, config, context) + config.rotationOffsetDeg;
+          const spacingDeg = Math.abs(intervalEndAngle - intervalStartAngle);
+
+          if ((mantissaIndex - 1) % majorStride === 0) {
+            if (intervalStartValue >= domain.startValue && intervalStartValue <= domain.endValue) {
+              pushTick(
+                ticks,
+                intervalStartValue,
+                { offset: 0, tier: 'primary' },
+                intervalStartAngle,
+                config.radiusMm,
+                config.majorTickLengthMm,
+                config.minorTickLengthMm,
+                config.majorTickWidthMm,
+                config.minorTickWidthMm,
+                config.tickDirection,
+                config.tickStyle
+              );
+            }
+          }
+
+          if (profile.secondary && spacingDeg >= profile.minSecondarySpacingDeg) {
+            secondaryOffsets.forEach((offset) => {
+              const value = valueFromMantissaAndDecade(intervalStartMantissa + offset, decade, domain.base);
+              if (value < domain.startValue || value > domain.endValue) {
+                return;
+              }
+
+              const angleDeg = toAngle(value, config, context) + config.rotationOffsetDeg;
+              pushTick(
+                ticks,
+                value,
+                { offset, tier: 'secondary' },
+                angleDeg,
+                config.radiusMm,
+                config.majorTickLengthMm,
+                config.minorTickLengthMm,
+                config.majorTickWidthMm,
+                config.minorTickWidthMm,
+                config.tickDirection,
+                config.tickStyle
+              );
+            });
+          }
+
+          if (profile.tertiary && spacingDeg >= profile.minTertiarySpacingDeg) {
+            tertiaryOffsets.forEach((offset) => {
+              const value = valueFromMantissaAndDecade(intervalStartMantissa + offset, decade, domain.base);
+              if (value < domain.startValue || value > domain.endValue) {
+                return;
+              }
+
+              const angleDeg = toAngle(value, config, context) + config.rotationOffsetDeg;
+              pushTick(
+                ticks,
+                value,
+                { offset, tier: 'tertiary' },
+                angleDeg,
+                config.radiusMm,
+                config.majorTickLengthMm,
+                config.minorTickLengthMm,
+                config.majorTickWidthMm,
+                config.minorTickWidthMm,
+                config.tickDirection,
+                config.tickStyle
+              );
+            });
+          }
+
+          if (profile.micro && spacingDeg >= profile.minMicroSpacingDeg) {
+            microOffsets.forEach((offset) => {
+              const value = valueFromMantissaAndDecade(intervalStartMantissa + offset, decade, domain.base);
+              if (value < domain.startValue || value > domain.endValue) {
+                return;
+              }
+
+              const angleDeg = toAngle(value, config, context) + config.rotationOffsetDeg;
+              pushTick(
+                ticks,
+                value,
+                { offset, tier: 'micro' },
+                angleDeg,
+                config.radiusMm,
+                config.majorTickLengthMm,
+                config.minorTickLengthMm,
+                config.majorTickWidthMm,
+                config.minorTickWidthMm,
+                config.tickDirection,
+                config.tickStyle
+              );
+            });
+          }
+        }
+
+        const boundaryValue = Math.min(decadeEnd, domain.endValue);
+        if (boundaryValue >= domain.startValue && boundaryValue <= domain.endValue) {
+          const boundaryAngle = toAngle(boundaryValue, config, context) + config.rotationOffsetDeg;
           pushTick(
             ticks,
-            value,
-            spec,
-            angleDeg,
+            boundaryValue,
+            { offset: 0, tier: 'primary' },
+            boundaryAngle,
             config.radiusMm,
             config.majorTickLengthMm,
             config.minorTickLengthMm,
@@ -170,24 +309,24 @@ export const createLogarithmicTickEngine = (): TickGenerator => {
             config.tickDirection,
             config.tickStyle
           );
-        });
-      }
+        }
 
-      if (config.endValue === 10) {
-        const angleDeg = toAngle(10, config, context) + config.rotationOffsetDeg;
-        pushTick(
-          ticks,
-          10,
-          { offset: 0, tier: 'primary' },
-          angleDeg,
-          config.radiusMm,
-          config.majorTickLengthMm,
-          config.minorTickLengthMm,
-          config.majorTickWidthMm,
-          config.minorTickWidthMm,
-          config.tickDirection,
-          config.tickStyle
-        );
+        if (decadeStart >= domain.startValue && decadeStart <= domain.endValue) {
+          const startAngle = toAngle(decadeStart, config, context) + config.rotationOffsetDeg;
+          pushTick(
+            ticks,
+            decadeStart,
+            { offset: 0, tier: 'primary' },
+            startAngle,
+            config.radiusMm,
+            config.majorTickLengthMm,
+            config.minorTickLengthMm,
+            config.majorTickWidthMm,
+            config.minorTickWidthMm,
+            config.tickDirection,
+            config.tickStyle
+          );
+        }
       }
 
       const deduped = new Map<string, ScaleTick>();

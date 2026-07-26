@@ -148,6 +148,25 @@ export interface ScalePluginConfig {
   conversionCustomSourceUnit?: string;
   conversionCustomTargetUnit?: string;
   conversionCustomFactor?: number;
+  logarithmicDecades?: number;
+  logarithmicDisplayMultiplier?: number;
+  logarithmicDisplayFormat?: 'engineering' | 'scientific' | 'navitimer' | 'slide-rule' | 'custom';
+  logarithmicLabelStyle?: 'value' | 'mantissa' | 'scientific';
+  logMajorTickDensity?: number;
+  logMinorTickDensity?: number;
+  logMicroTickDensity?: number;
+  logarithmicRingType?:
+    | 'C'
+    | 'D'
+    | 'CI'
+    | 'DI'
+    | 'A'
+    | 'B'
+    | 'K'
+    | 'L'
+    | 'LL'
+    | 'aviation'
+    | 'custom';
 }
 
 export interface ScaleMathContext {

@@ -521,7 +521,9 @@ export const RightInspector = () => {
 
           <div className="grid grid-cols-2 gap-2">
             <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
-              <span className="ds-label-inspector">Start</span>
+              <span className="ds-label-inspector">
+                {selectedScaleKind === 'logarithmic' ? 'Domain Start' : 'Start'}
+              </span>
               <input
                 type="number"
                 step="0.1"
@@ -531,7 +533,9 @@ export const RightInspector = () => {
               />
             </label>
             <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
-              <span className="ds-label-inspector">End</span>
+              <span className="ds-label-inspector">
+                {selectedScaleKind === 'logarithmic' ? 'Domain End' : 'End'}
+              </span>
               <input
                 type="number"
                 step="0.1"
@@ -541,6 +545,141 @@ export const RightInspector = () => {
               />
             </label>
           </div>
+
+          {selectedScaleKind === 'logarithmic' ? (
+            <div className="grid grid-cols-2 gap-2">
+              <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+                <span className="ds-label-inspector">Logarithmic Base</span>
+                <input
+                  type="number"
+                  min={2}
+                  step="0.1"
+                  className="ds-input mt-1"
+                  value={scaleConfig.logarithmicBase ?? 10}
+                  onChange={(event) => updateScaleConfig({ logarithmicBase: Number(event.target.value) })}
+                />
+              </label>
+              <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+                <span className="ds-label-inspector">Number of Decades</span>
+                <input
+                  type="number"
+                  min={1}
+                  step="1"
+                  className="ds-input mt-1"
+                  value={scaleConfig.logarithmicDecades ?? 1}
+                  onChange={(event) => updateScaleConfig({ logarithmicDecades: Number(event.target.value) })}
+                />
+              </label>
+              <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+                <span className="ds-label-inspector">Display Multiplier</span>
+                <input
+                  type="number"
+                  step="0.1"
+                  className="ds-input mt-1"
+                  value={scaleConfig.logarithmicDisplayMultiplier ?? 1}
+                  onChange={(event) =>
+                    updateScaleConfig({ logarithmicDisplayMultiplier: Number(event.target.value) })
+                  }
+                />
+              </label>
+              <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+                <span className="ds-label-inspector">Display Format</span>
+                <select
+                  className="ds-input mt-1"
+                  value={scaleConfig.logarithmicDisplayFormat ?? 'engineering'}
+                  onChange={(event) =>
+                    updateScaleConfig({
+                      logarithmicDisplayFormat: event.target.value as NonNullable<
+                        typeof scaleConfig.logarithmicDisplayFormat
+                      >
+                    })
+                  }
+                >
+                  <option value="engineering">Engineering</option>
+                  <option value="scientific">Scientific</option>
+                  <option value="navitimer">Navitimer</option>
+                  <option value="slide-rule">Slide Rule</option>
+                  <option value="custom">Custom</option>
+                </select>
+              </label>
+              <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+                <span className="ds-label-inspector">Label Style</span>
+                <select
+                  className="ds-input mt-1"
+                  value={scaleConfig.logarithmicLabelStyle ?? 'value'}
+                  onChange={(event) =>
+                    updateScaleConfig({
+                      logarithmicLabelStyle: event.target.value as NonNullable<
+                        typeof scaleConfig.logarithmicLabelStyle
+                      >
+                    })
+                  }
+                >
+                  <option value="value">Value</option>
+                  <option value="mantissa">Mantissa</option>
+                  <option value="scientific">Scientific</option>
+                </select>
+              </label>
+              <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+                <span className="ds-label-inspector">Ring Type</span>
+                <select
+                  className="ds-input mt-1"
+                  value={scaleConfig.logarithmicRingType ?? 'C'}
+                  onChange={(event) =>
+                    updateScaleConfig({
+                      logarithmicRingType: event.target.value as NonNullable<
+                        typeof scaleConfig.logarithmicRingType
+                      >
+                    })
+                  }
+                >
+                  {(['C', 'D', 'CI', 'DI', 'A', 'B', 'K', 'L', 'LL', 'aviation', 'custom'] as const).map(
+                    (ringType) => (
+                      <option key={ringType} value={ringType}>
+                        {ringType}
+                      </option>
+                    )
+                  )}
+                </select>
+              </label>
+              <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+                <span className="ds-label-inspector">Major Tick Density</span>
+                <input
+                  type="number"
+                  min={1}
+                  max={12}
+                  step="1"
+                  className="ds-input mt-1"
+                  value={scaleConfig.logMajorTickDensity ?? 1}
+                  onChange={(event) => updateScaleConfig({ logMajorTickDensity: Number(event.target.value) })}
+                />
+              </label>
+              <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+                <span className="ds-label-inspector">Minor Tick Density</span>
+                <input
+                  type="number"
+                  min={0}
+                  max={8}
+                  step="1"
+                  className="ds-input mt-1"
+                  value={scaleConfig.logMinorTickDensity ?? 1}
+                  onChange={(event) => updateScaleConfig({ logMinorTickDensity: Number(event.target.value) })}
+                />
+              </label>
+              <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+                <span className="ds-label-inspector">Micro Tick Density</span>
+                <input
+                  type="number"
+                  min={0}
+                  max={8}
+                  step="1"
+                  className="ds-input mt-1"
+                  value={scaleConfig.logMicroTickDensity ?? 4}
+                  onChange={(event) => updateScaleConfig({ logMicroTickDensity: Number(event.target.value) })}
+                />
+              </label>
+            </div>
+          ) : null}
 
           {supportsAdvancedScaleControls ? (
             <>
@@ -1013,6 +1152,35 @@ export const RightInspector = () => {
     }
 
     if (section.kind === 'tick-marks') {
+      if (selectedScaleKind === 'logarithmic') {
+        return (
+          <div className="grid grid-cols-2 gap-2">
+            <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+              <span className="ds-label-inspector">Tick Direction</span>
+              <select
+                className="ds-input mt-1"
+                value={scaleConfig.tickDirection}
+                onChange={(event) =>
+                  updateScaleConfig({ tickDirection: event.target.value as typeof scaleConfig.tickDirection })
+                }
+              >
+                <option value="outside">Outside</option>
+                <option value="inside">Inside</option>
+                <option value="bidirectional">Bidirectional</option>
+              </select>
+            </label>
+            <label className="flex items-center justify-between rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5 text-xs">
+              <span className="ds-label-inspector">Live Preview</span>
+              <input
+                type="checkbox"
+                checked={scalePreviewEnabled}
+                onChange={(event) => setScalePreviewEnabled(event.target.checked)}
+              />
+            </label>
+          </div>
+        );
+      }
+
       return (
         <div className="grid grid-cols-2 gap-2">
           <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">

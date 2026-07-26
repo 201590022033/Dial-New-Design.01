@@ -34,12 +34,10 @@ export const App = () => {
   const selectedBandId = useSelectionStore((state) => state.selectedBandId);
   const syncScaleFromBand = useScaleStore((state) => state.syncFromBand);
   const regenerateScalePreview = useScaleStore((state) => state.regeneratePreview);
-  const setSelectedScaleKind = useScaleStore((state) => state.setSelectedScaleKind);
   const selectedScaleKind = useScaleStore((state) => state.selectedScaleKind);
   const scalePluginConfig = useScaleStore((state) => state.pluginConfig);
   const scaleContext = useScaleStore((state) => state.context);
   const scalePreview = useScaleStore((state) => state.preview);
-  const suggestedScaleKind = useDesignEngineStore((state) => state.suggestedScaleKind);
   const overlay = useDesignEngineStore((state) => state.overlay);
   const chapterRingConfig = useDesignEngineStore((state) => state.chapterRingConfig);
   const setCollisionWarnings = useDesignEngineStore((state) => state.setCollisionWarnings);
@@ -148,12 +146,6 @@ export const App = () => {
   useEffect(() => {
     regenerateScalePreview();
   }, [regenerateScalePreview]);
-
-  useEffect(() => {
-    if (selectedScaleKind !== suggestedScaleKind) {
-      setSelectedScaleKind(suggestedScaleKind);
-    }
-  }, [selectedScaleKind, setSelectedScaleKind, suggestedScaleKind]);
 
   useEffect(() => {
     loadAutosave();

@@ -25,6 +25,48 @@ const exporter = createScaleExporter();
 
 const inspectorConfiguration: ScalePlugin['inspectorConfiguration'] = [
   {
+    key: 'startValue',
+    label: 'Domain Start',
+    type: 'number',
+    description: 'Lower bound of the logarithmic domain.'
+  },
+  {
+    key: 'endValue',
+    label: 'Domain End',
+    type: 'number',
+    description: 'Upper bound of the logarithmic domain.'
+  },
+  {
+    key: 'logarithmicBase',
+    label: 'Logarithmic Base',
+    type: 'number',
+    description: 'Base used for logarithmic normalization and projection.'
+  },
+  {
+    key: 'logarithmicDecades',
+    label: 'Number of Decades',
+    type: 'number',
+    description: 'Optional decade span clamp from the domain start.'
+  },
+  {
+    key: 'logarithmicDisplayMultiplier',
+    label: 'Display Multiplier',
+    type: 'number',
+    description: 'Display-only multiplier for labels without affecting placement.'
+  },
+  {
+    key: 'logarithmicDisplayFormat',
+    label: 'Display Format',
+    type: 'select',
+    description: 'Engineering, scientific, slide-rule, or custom formatting.'
+  },
+  {
+    key: 'logarithmicLabelStyle',
+    label: 'Label Style',
+    type: 'select',
+    description: 'Render labels by value, mantissa, or scientific notation.'
+  },
+  {
     key: 'direction',
     label: 'Direction',
     type: 'select',
@@ -41,6 +83,24 @@ const inspectorConfiguration: ScalePlugin['inspectorConfiguration'] = [
     label: 'Tick Density',
     type: 'select',
     description: 'Adaptive subdivision profile for logarithmic intervals.'
+  },
+  {
+    key: 'logMajorTickDensity',
+    label: 'Major Tick Density',
+    type: 'number',
+    description: 'Controls major interval retention density.'
+  },
+  {
+    key: 'logMinorTickDensity',
+    label: 'Minor Tick Density',
+    type: 'number',
+    description: 'Controls secondary tick generation density.'
+  },
+  {
+    key: 'logMicroTickDensity',
+    label: 'Micro Tick Density',
+    type: 'number',
+    description: 'Controls tertiary and micro tick generation density.'
   },
   {
     key: 'labelFrequency',
@@ -71,6 +131,12 @@ const inspectorConfiguration: ScalePlugin['inspectorConfiguration'] = [
     label: 'Engineering Preset',
     type: 'select',
     description: 'Preset for precision, aviation, and scientific workflows.'
+  },
+  {
+    key: 'logarithmicRingType',
+    label: 'Ring Type',
+    type: 'select',
+    description: 'Profile identifier for C/D/CI/DI/A/B/K/L/LL and aviation rings.'
   }
 ];
 
@@ -99,6 +165,14 @@ const defaultConfig: ScalePluginConfig = {
   bandOuterRadiusMm: 20,
   minimumLineWidthMm: 0.1,
   logarithmicBase: 10,
+  logarithmicDecades: 1,
+  logarithmicDisplayMultiplier: 1,
+  logarithmicDisplayFormat: 'engineering',
+  logarithmicLabelStyle: 'value',
+  logMajorTickDensity: 1,
+  logMinorTickDensity: 1,
+  logMicroTickDensity: 4,
+  logarithmicRingType: 'C',
   tickDensityProfile: 'balanced',
   includeMinorLabels: false,
   engineeringPreset: 'precision'
