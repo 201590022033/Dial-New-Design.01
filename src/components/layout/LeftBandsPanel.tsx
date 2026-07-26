@@ -71,13 +71,52 @@ const watchStructure: WatchStructureItem[] = [
   { label: 'Bezel', depth: 0, componentId: 'bezel', bandKind: null },
   { label: 'Outer Slide Rule', depth: 1, componentId: 'outer-slide-rule', bandKind: 'outer-bezel' },
   { label: 'Inner Slide Rule', depth: 1, componentId: 'inner-slide-rule', bandKind: 'inner-bezel' },
+  { label: 'Rotating Bezel', depth: 1, componentId: 'watch-rotating-bezel', bandKind: 'outer-bezel' },
+  { label: 'Fixed Bezel', depth: 1, componentId: 'watch-fixed-bezel', bandKind: 'outer-bezel' },
   { label: 'Chapter Ring', depth: 0, componentId: 'chapter-ring', bandKind: 'chapter-ring' },
+  { label: 'Rehaut', depth: 1, componentId: 'watch-rehaut', bandKind: 'chapter-ring' },
   { label: 'Minute Track', depth: 1, componentId: 'minute-track', bandKind: 'chapter-ring' },
   { label: 'Hour Markers', depth: 1, componentId: 'hour-markers', bandKind: 'indices' },
+  { label: 'Applied Indices', depth: 1, componentId: 'watch-applied-indices', bandKind: 'indices' },
+  { label: 'Printed Indices', depth: 1, componentId: 'watch-printed-indices', bandKind: 'indices' },
+  { label: 'Mixed Index Sets', depth: 1, componentId: 'watch-mixed-index-sets', bandKind: 'indices' },
+  { label: 'Arabic Numerals', depth: 1, componentId: 'watch-arabic-numerals', bandKind: 'indices' },
+  { label: 'Roman Numerals', depth: 1, componentId: 'watch-roman-numerals', bandKind: 'indices' },
+  { label: 'Baton Markers', depth: 1, componentId: 'watch-baton-markers', bandKind: 'indices' },
+  { label: 'Dot Markers', depth: 1, componentId: 'watch-dot-markers', bandKind: 'indices' },
+  { label: 'Triangle Markers', depth: 1, componentId: 'watch-triangle-markers', bandKind: 'indices' },
   { label: 'Dial Face', depth: 0, componentId: 'dial-face', bandKind: 'dial-face' },
+  { label: 'Crystal', depth: 1, componentId: 'watch-crystal', bandKind: 'dial-face' },
+  { label: 'Flat Sapphire', depth: 1, componentId: 'watch-flat-sapphire', bandKind: 'dial-face' },
+  { label: 'Domed Sapphire', depth: 1, componentId: 'watch-domed-sapphire', bandKind: 'dial-face' },
+  { label: 'Double Domed Sapphire', depth: 1, componentId: 'watch-double-domed-sapphire', bandKind: 'dial-face' },
   { label: 'Logo', depth: 1, componentId: 'logo', bandKind: 'logo' },
+  { label: 'Brand Text', depth: 1, componentId: 'watch-brand-text', bandKind: 'text' },
+  { label: 'Water Resistance Text', depth: 1, componentId: 'watch-water-resistance-text', bandKind: 'text' },
+  { label: 'Automatic / Quartz Text', depth: 1, componentId: 'watch-movement-text', bandKind: 'text' },
   { label: 'Hands', depth: 0, componentId: 'hands', bandKind: 'hands' },
+  { label: 'Hour Hand', depth: 1, componentId: 'watch-hour-hand', bandKind: 'hands' },
+  { label: 'Minute Hand', depth: 1, componentId: 'watch-minute-hand', bandKind: 'hands' },
+  { label: 'Central Seconds', depth: 1, componentId: 'watch-central-seconds', bandKind: 'hands' },
+  { label: 'GMT Hand', depth: 1, componentId: 'watch-gmt-hand', bandKind: 'hands' },
+  { label: 'Chronograph Seconds', depth: 1, componentId: 'watch-chronograph-seconds', bandKind: 'hands' },
   { label: 'Complications', depth: 0, componentId: 'complications', bandKind: 'complications' }
+  ,{ label: '30-minute Counter', depth: 1, componentId: 'watch-counter-30m', bandKind: 'complications' }
+  ,{ label: '12-hour Counter', depth: 1, componentId: 'watch-counter-12h', bandKind: 'complications' }
+  ,{ label: 'Running Seconds', depth: 1, componentId: 'watch-running-seconds', bandKind: 'complications' }
+  ,{ label: 'Date Window', depth: 1, componentId: 'watch-date-window', bandKind: 'complications' }
+  ,{ label: 'Day Window', depth: 1, componentId: 'watch-day-window', bandKind: 'complications' }
+  ,{ label: 'Moonphase', depth: 1, componentId: 'watch-moonphase', bandKind: 'complications' }
+  ,{ label: 'Power Reserve', depth: 1, componentId: 'watch-power-reserve', bandKind: 'complications' }
+  ,{ label: 'Open Heart', depth: 1, componentId: 'watch-open-heart', bandKind: 'complications' }
+  ,{ label: 'Tourbillon Aperture', depth: 1, componentId: 'watch-tourbillon-aperture', bandKind: 'complications' }
+  ,{ label: 'Crown', depth: 0, componentId: 'watch-crown', bandKind: 'outer-bezel' }
+  ,{ label: 'Pushers', depth: 1, componentId: 'watch-pushers', bandKind: 'outer-bezel' }
+  ,{ label: 'Helium Valve', depth: 1, componentId: 'watch-helium-valve', bandKind: 'outer-bezel' }
+  ,{ label: 'Caseback', depth: 0, componentId: 'watch-caseback', bandKind: 'outer-bezel' }
+  ,{ label: 'Lugs', depth: 1, componentId: 'watch-lugs', bandKind: 'outer-bezel' }
+  ,{ label: 'Strap Integration', depth: 1, componentId: 'watch-strap-integration', bandKind: 'outer-bezel' }
+  ,{ label: 'Bracelet Integration', depth: 1, componentId: 'watch-bracelet-integration', bandKind: 'outer-bezel' }
 ];
 
 export const LeftBandsPanel = () => {
@@ -345,7 +384,7 @@ export const LeftBandsPanel = () => {
 
     const preview = buildEngineeringExport({ ...request, format: 'svg' }).preview;
     setPreviewWarnings(preview.warnings.map((warning) => warning.message));
-    exportEngineeringByFormat(request);
+    void exportEngineeringByFormat(request);
   };
 
   return (

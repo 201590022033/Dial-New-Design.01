@@ -17,6 +17,7 @@ import {
   useScaleStore,
   useSelectionStore
 } from '@/stores';
+import { useWatchComponentStore } from '@/stores/watchComponentStore';
 
 export const RightInspector = () => {
   const selectedBandId = useSelectionStore((s) => s.selectedBandId);
@@ -57,6 +58,14 @@ export const RightInspector = () => {
 
   const activeComponent = resolveSelectedComponentId(selectedBand, selectedComponentId);
   const schema = getComponentInspectorSchema(activeComponent);
+  const watchComponents = useWatchComponentStore((s) => s.components);
+  const updateWatchMaterialAndTexture = useWatchComponentStore((s) => s.updateMaterialAndTexture);
+  const setWatchVisibility = useWatchComponentStore((s) => s.setVisibility);
+  const setWatchLocked = useWatchComponentStore((s) => s.setLocked);
+  const selectedWatchComponent = useMemo(
+    () => watchComponents.find((component) => component.definition.inspectorSchemaId === activeComponent) ?? null,
+    [activeComponent, watchComponents]
+  );
 
   const scalePlugins = useMemo(() => listScalePlugins(true), []);
   const currentScalePlugin = useMemo(
@@ -82,6 +91,21 @@ export const RightInspector = () => {
 
   const renderSection = (section: InspectorSectionSchema) => {
     if (section.kind === 'geometry') {
+      if (selectedWatchComponent) {
+        return (
+          <div className="grid grid-cols-2 gap-2">
+            <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+              <span className="ds-label-inspector">Diameter</span>
+              <input type="number" className="ds-input mt-1" value={selectedWatchComponent.dimensions.diameterMm} readOnly />
+            </label>
+            <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+              <span className="ds-label-inspector">Width</span>
+              <input type="number" className="ds-input mt-1" value={selectedWatchComponent.dimensions.widthMm} readOnly />
+            </label>
+          </div>
+        );
+      }
+
       return (
         <div className="space-y-3">
           <label className="block rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
@@ -144,6 +168,29 @@ export const RightInspector = () => {
               </p>
             </div>
           </div>
+        </div>
+      );
+    }
+
+    if (section.kind === 'dimensions') {
+      if (!selectedWatchComponent) {
+        return <p className="text-xs text-engineering-muted">No dimensions available for this object.</p>;
+      }
+
+      return (
+        <div className="grid grid-cols-2 gap-2">
+          <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+            <span className="ds-label-inspector">Thickness</span>
+            <input type="number" className="ds-input mt-1" value={selectedWatchComponent.dimensions.thicknessMm} readOnly />
+          </label>
+          <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+            <span className="ds-label-inspector">Offset X</span>
+            <input type="number" className="ds-input mt-1" value={selectedWatchComponent.dimensions.offsetXmm} readOnly />
+          </label>
+          <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+            <span className="ds-label-inspector">Offset Y</span>
+            <input type="number" className="ds-input mt-1" value={selectedWatchComponent.dimensions.offsetYmm} readOnly />
+          </label>
         </div>
       );
     }
@@ -319,6 +366,55 @@ export const RightInspector = () => {
                   }
                 })
               }
+            />
+          </label>
+        </div>
+      );
+    }
+
+    if (section.kind === 'material') {
+      if (!selectedWatchComponent) {
+        return <p className="text-xs text-engineering-muted">Material controls are band-driven for this object.</p>;
+      }
+
+      return (
+        <div className="grid grid-cols-2 gap-2">
+          <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+            <span className="ds-label-inspector">Material</span>
+            <input
+              type="text"
+              className="ds-input mt-1"
+              value={selectedWatchComponent.material}
+              onChange={(event) =>
+                updateWatchMaterialAndTexture(selectedWatchComponent.id, event.target.value, selectedWatchComponent.texture)
+              }
+            />
+          </label>
+          <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+            <span className="ds-label-inspector">Texture</span>
+            <input
+              type="text"
+              className="ds-input mt-1"
+              value={selectedWatchComponent.texture}
+              onChange={(event) =>
+                updateWatchMaterialAndTexture(selectedWatchComponent.id, selectedWatchComponent.material, event.target.value)
+              }
+            />
+          </label>
+          <label className="flex items-center justify-between rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5 text-xs">
+            <span className="ds-label-inspector">Visible</span>
+            <input
+              type="checkbox"
+              checked={selectedWatchComponent.visible}
+              onChange={(event) => setWatchVisibility(selectedWatchComponent.id, event.target.checked)}
+            />
+          </label>
+          <label className="flex items-center justify-between rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5 text-xs">
+            <span className="ds-label-inspector">Locked</span>
+            <input
+              type="checkbox"
+              checked={selectedWatchComponent.locked}
+              onChange={(event) => setWatchLocked(selectedWatchComponent.id, event.target.checked)}
             />
           </label>
         </div>
@@ -1044,6 +1140,37 @@ export const RightInspector = () => {
               </div>
             </>
           ) : null}
+        </div>
+      );
+    }
+
+    if (section.kind === 'export') {
+      return (
+        <div className="space-y-2 text-xs text-engineering-muted">
+          <p>Export compatibility: SVG, DXF, Technical PDF, PNG preview.</p>
+          <p>No manufacturing geometry is silently modified. Diagnostics and recommendations only.</p>
+          {selectedWatchComponent ? (
+            <p className="text-engineering-text">Export Enabled: {selectedWatchComponent.exportEnabled ? 'Yes' : 'No'}</p>
+          ) : null}
+        </div>
+      );
+    }
+
+    if (section.kind === 'metadata') {
+      return (
+        <div className="space-y-2 text-xs text-engineering-muted">
+          <p>Component: {selectedWatchComponent?.definition.displayName ?? schema.title}</p>
+          <p>Revision: {selectedWatchComponent?.metadata.revision ?? 'A'}</p>
+          <p>Category: {selectedWatchComponent?.definition.category ?? 'general'}</p>
+        </div>
+      );
+    }
+
+    if (section.kind === 'future-extensions') {
+      return (
+        <div className="space-y-2 text-xs text-engineering-muted">
+          <p>Object is registered for plugin lifecycle extension.</p>
+          <p>Future interfaces: component physics, assembly constraints, advanced material BRDF presets.</p>
         </div>
       );
     }

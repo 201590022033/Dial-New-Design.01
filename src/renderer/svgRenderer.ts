@@ -12,6 +12,7 @@ export class SvgRenderer implements RendererAdapter {
   private latestBands: BandEntity[] = [];
   private latestContext: RenderContext | null = null;
   private latestFitScale = 1;
+  private latestRenderKey = '';
 
   mount(container: HTMLElement): void {
     this.container = container;
@@ -28,6 +29,32 @@ export class SvgRenderer implements RendererAdapter {
 
   renderBands(bands: BandEntity[], context: RenderContext, options: RendererOptions): void {
     if (!this.root) return;
+    const renderKey = JSON.stringify({
+      bands: bands.map((band) => ({
+        id: band.id,
+        visible: band.visible,
+        inner: band.geometry.innerRadius,
+        outer: band.geometry.outerRadius,
+        style: band.style,
+        z: band.zIndex
+      })),
+      context,
+      options: {
+        showGuides: options.showGuides,
+        showSnapping: options.showSnapping,
+        highlightedBandIds: options.highlightedBandIds,
+        scaleTickCount: options.scalePreview?.ticks.length ?? 0,
+        scaleLabelCount: options.scalePreview?.labels.length ?? 0,
+        overlayMarkers: options.designOverlay?.markers.length ?? 0,
+        overlayText: options.designOverlay?.typography.length ?? 0
+      }
+    });
+
+    if (renderKey === this.latestRenderKey) {
+      return;
+    }
+
+    this.latestRenderKey = renderKey;
     this.latestBands = bands;
     this.latestContext = context;
 
@@ -196,10 +223,14 @@ export class SvgRenderer implements RendererAdapter {
     if (options.scalePreview) {
       const overlay = layer.group().id('scale-preview');
       const { ticks, labels } = options.scalePreview;
+      const maxPreviewRadiusPx = Math.min(context.width, context.height) * 0.62;
 
       ticks.forEach((tick, index) => {
         const tickLength = mmToPixels(tick.lengthMm);
         const baseRadius = mmToPixels(tick.radiusMm);
+        if (baseRadius > maxPreviewRadiusPx) {
+          return;
+        }
 
         const directionMultiplier =
           tick.direction === 'inside' ? -1 : tick.direction === 'outside' ? 1 : 0;
@@ -231,6 +262,9 @@ export class SvgRenderer implements RendererAdapter {
       });
 
       labels.forEach((label, index) => {
+        if (mmToPixels(label.radiusMm) > maxPreviewRadiusPx) {
+          return;
+        }
         const point = polarToCartesian(mmToPixels(label.radiusMm), label.angleDeg);
         overlay
           .text(label.text)

@@ -12,6 +12,8 @@ import {
 import { buildExportPreviewSummary, type ExportPreviewSummary } from '@/services/exportPreviewService';
 import type { ScaleRunResult } from '@/services/scaleEngineService';
 import type { ManufacturingWarning } from '@/domain/manufacturing/validationEngine';
+import { generateManufacturingReport, verifyNativeSvg } from '@/services/manufacturingSuiteService';
+import { createWatchComponentEntities } from '@/domain/watch-components/factory';
 
 export interface ExportPayload {
   svgMarkup: string;
@@ -77,18 +79,66 @@ const mimeForFormat = (format: ExtendedExportRequest['format']): string => {
   }
 };
 
-export const exportByFormat = (request: ExtendedExportRequest): void => {
+const exportBlob = (blob: Blob, filename: string): void => {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(url);
+};
+
+const rasterizeSvgToPngBlob = async (svgMarkup: string): Promise<Blob> => {
+  const svgBlob = new Blob([svgMarkup], { type: 'image/svg+xml;charset=utf-8' });
+  const url = URL.createObjectURL(svgBlob);
+
+  try {
+    const image = new Image();
+    await new Promise<void>((resolve, reject) => {
+      image.onload = () => resolve();
+      image.onerror = () => reject(new Error('Unable to rasterize SVG to PNG.'));
+      image.src = url;
+    });
+
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, image.width || 1200);
+    canvas.height = Math.max(1, image.height || 1200);
+    const context = canvas.getContext('2d');
+    if (!context) {
+      throw new Error('Canvas context unavailable for PNG export.');
+    }
+
+    context.drawImage(image, 0, 0);
+
+    const pngBlob = await new Promise<Blob>((resolve, reject) => {
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          reject(new Error('Failed to encode PNG blob.'));
+          return;
+        }
+        resolve(blob);
+      }, 'image/png');
+    });
+
+    return pngBlob;
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+};
+
+export const exportByFormat = async (request: ExtendedExportRequest): Promise<void> => {
   const payload = request.metadata
     ? `${request.content}\n<!-- metadata: ${JSON.stringify(request.metadata)} -->`
     : request.content;
 
+  if (request.format === 'png') {
+    const pngBlob = await rasterizeSvgToPngBlob(request.content);
+    exportBlob(pngBlob, request.filename);
+    return;
+  }
+
   const blob = new Blob([payload], { type: mimeForFormat(request.format) });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = request.filename;
-  link.click();
-  URL.revokeObjectURL(url);
+  exportBlob(blob, request.filename);
 };
 
 export const buildGroupedSvgExport = (bands: BandEntity[]): string => {
@@ -163,8 +213,24 @@ export const buildEngineeringExport = (request: EngineeringExportRequest): {
   };
 };
 
-export const exportEngineeringByFormat = (request: EngineeringExportRequest): ExportPreviewSummary => {
+export const exportEngineeringByFormat = async (request: EngineeringExportRequest): Promise<ExportPreviewSummary> => {
   const built = buildEngineeringExport(request);
+  const svgForVerification = request.format === 'svg' ? built.content : generateEngineeringSvg({
+    target: request.target,
+    bands: request.bands,
+    selectedBandId: request.selectedBandId,
+    context: request.context,
+    scalePreview: request.scalePreview,
+    designOverlay: request.designOverlay,
+    metadata: request.metadata
+  });
+  const nativeSvgValidation = verifyNativeSvg(svgForVerification);
+  const manufacturingReport = generateManufacturingReport({
+    svgMarkup: svgForVerification,
+    bands: request.bands,
+    watchComponents: createWatchComponentEntities()
+  });
+
   const metadataKeys: Array<keyof ExportMetadata> = [
     'projectName',
     'movement',
@@ -185,11 +251,23 @@ export const exportEngineeringByFormat = (request: EngineeringExportRequest): Ex
         return accumulator;
       }, {})
     : undefined;
-  exportByFormat({
+  await exportByFormat({
     format: built.format,
     filename: request.filename,
     content: built.content,
-    metadata: mappedMetadata
+    metadata: {
+      ...mappedMetadata,
+      nativeSvgValid: nativeSvgValidation.valid,
+      manufacturingScore: manufacturingReport.score
+    }
   });
-  return built.preview;
+
+  return {
+    ...built.preview,
+    warnings: [
+      ...built.preview.warnings,
+      ...nativeSvgValidation.issues.map((message) => ({ level: 'warning' as const, code: 'MIN_LINE_WIDTH' as const, message })),
+      ...manufacturingReport.findings.map((message) => ({ level: 'warning' as const, code: 'MIN_LINE_WIDTH' as const, message }))
+    ]
+  };
 };

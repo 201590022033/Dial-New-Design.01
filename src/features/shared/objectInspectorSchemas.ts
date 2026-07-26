@@ -2,7 +2,9 @@ import type { BandEntity, BandKind } from '@/domain/bands/types';
 
 export type InspectorSectionKind =
   | 'geometry'
+  | 'dimensions'
   | 'appearance'
+  | 'material'
   | 'surface-finish'
   | 'texture'
   | 'colour'
@@ -12,6 +14,9 @@ export type InspectorSectionKind =
   | 'tick-marks'
   | 'manufacturing'
   | 'validation'
+  | 'export'
+  | 'metadata'
+  | 'future-extensions'
   | 'preview'
   | 'placeholder';
 
@@ -126,36 +131,72 @@ const componentSchemas: Record<string, ComponentInspectorSchema> = {
     id: 'logo',
     title: 'Logo',
     linkedBandKinds: ['logo'],
-    placeholder: true,
     sections: [
-      { id: 'logo-geometry', title: 'Geometry', kind: 'placeholder', defaultOpen: true },
-      { id: 'logo-appearance', title: 'Appearance', kind: 'placeholder', defaultOpen: true },
-      { id: 'logo-manufacturing', title: 'Manufacturing', kind: 'placeholder' },
-      { id: 'logo-preview', title: 'Preview', kind: 'placeholder' }
+      { id: 'logo-geometry', title: 'Geometry', kind: 'geometry', defaultOpen: true },
+      { id: 'logo-dimensions', title: 'Dimensions', kind: 'dimensions', defaultOpen: true },
+      { id: 'logo-material', title: 'Material', kind: 'material', defaultOpen: true },
+      { id: 'logo-colour', title: 'Colour', kind: 'colour' },
+      { id: 'logo-typography', title: 'Typography', kind: 'typography' },
+      { id: 'logo-manufacturing', title: 'Manufacturing', kind: 'manufacturing' },
+      { id: 'logo-validation', title: 'Validation', kind: 'validation' },
+      { id: 'logo-export', title: 'Export', kind: 'export' },
+      { id: 'logo-metadata', title: 'Metadata', kind: 'metadata' },
+      { id: 'logo-future', title: 'Future Extensions', kind: 'future-extensions' },
+      { id: 'logo-preview', title: 'Preview', kind: 'preview' }
     ]
   },
   hands: {
     id: 'hands',
     title: 'Hands',
     linkedBandKinds: ['hands'],
-    placeholder: true,
     sections: [
-      { id: 'hands-geometry', title: 'Geometry', kind: 'placeholder', defaultOpen: true },
-      { id: 'hands-appearance', title: 'Appearance', kind: 'placeholder', defaultOpen: true },
-      { id: 'hands-manufacturing', title: 'Manufacturing', kind: 'placeholder' },
-      { id: 'hands-preview', title: 'Preview', kind: 'placeholder' }
+      { id: 'hands-geometry', title: 'Geometry', kind: 'geometry', defaultOpen: true },
+      { id: 'hands-dimensions', title: 'Dimensions', kind: 'dimensions', defaultOpen: true },
+      { id: 'hands-material', title: 'Material', kind: 'material', defaultOpen: true },
+      { id: 'hands-colour', title: 'Colour', kind: 'colour' },
+      { id: 'hands-texture', title: 'Texture', kind: 'texture' },
+      { id: 'hands-manufacturing', title: 'Manufacturing', kind: 'manufacturing' },
+      { id: 'hands-validation', title: 'Validation', kind: 'validation' },
+      { id: 'hands-export', title: 'Export', kind: 'export' },
+      { id: 'hands-metadata', title: 'Metadata', kind: 'metadata' },
+      { id: 'hands-future', title: 'Future Extensions', kind: 'future-extensions' },
+      { id: 'hands-preview', title: 'Preview', kind: 'preview' }
     ]
   },
   complications: {
     id: 'complications',
     title: 'Complications',
     linkedBandKinds: ['complications'],
-    placeholder: true,
     sections: [
-      { id: 'complications-layout', title: 'Layout', kind: 'placeholder', defaultOpen: true },
-      { id: 'complications-geometry', title: 'Geometry', kind: 'placeholder', defaultOpen: true },
-      { id: 'complications-manufacturing', title: 'Manufacturing', kind: 'placeholder' },
-      { id: 'complications-preview', title: 'Preview', kind: 'placeholder' }
+      { id: 'complications-layout', title: 'Layout', kind: 'geometry', defaultOpen: true },
+      { id: 'complications-dimensions', title: 'Dimensions', kind: 'dimensions', defaultOpen: true },
+      { id: 'complications-material', title: 'Material', kind: 'material', defaultOpen: true },
+      { id: 'complications-colour', title: 'Colour', kind: 'colour' },
+      { id: 'complications-manufacturing', title: 'Manufacturing', kind: 'manufacturing' },
+      { id: 'complications-validation', title: 'Validation', kind: 'validation' },
+      { id: 'complications-export', title: 'Export', kind: 'export' },
+      { id: 'complications-metadata', title: 'Metadata', kind: 'metadata' },
+      { id: 'complications-future', title: 'Future Extensions', kind: 'future-extensions' },
+      { id: 'complications-preview', title: 'Preview', kind: 'preview' }
+    ]
+  },
+  'watch-components': {
+    id: 'watch-components',
+    title: 'Watch Component',
+    linkedBandKinds: ['dial-face', 'chapter-ring', 'inner-bezel', 'outer-bezel', 'hands', 'indices', 'text', 'logo', 'complications'],
+    sections: [
+      { id: 'watch-geometry', title: 'Geometry', kind: 'geometry', defaultOpen: true },
+      { id: 'watch-dimensions', title: 'Dimensions', kind: 'dimensions', defaultOpen: true },
+      { id: 'watch-material', title: 'Material', kind: 'material', defaultOpen: true },
+      { id: 'watch-colour', title: 'Colour', kind: 'colour' },
+      { id: 'watch-texture', title: 'Texture', kind: 'texture' },
+      { id: 'watch-typography', title: 'Typography', kind: 'typography' },
+      { id: 'watch-manufacturing', title: 'Manufacturing', kind: 'manufacturing' },
+      { id: 'watch-validation', title: 'Validation', kind: 'validation' },
+      { id: 'watch-export', title: 'Export', kind: 'export' },
+      { id: 'watch-metadata', title: 'Metadata', kind: 'metadata' },
+      { id: 'watch-future', title: 'Future Extensions', kind: 'future-extensions' },
+      { id: 'watch-preview', title: 'Preview', kind: 'preview' }
     ]
   }
 };
@@ -184,6 +225,9 @@ export const getComponentInspectorSchema = (id: string): ComponentInspectorSchem
   const fallback = componentSchemas[defaultInspectorComponentId];
   if (!fallback) {
     throw new Error('Missing default inspector schema');
+  }
+  if (id.startsWith('watch-')) {
+    return componentSchemas['watch-components'] ?? fallback;
   }
   return componentSchemas[id] ?? fallback;
 };

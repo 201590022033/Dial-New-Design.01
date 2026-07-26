@@ -239,11 +239,49 @@ export const generatePseudoDxf = (input: EngineeringExportInput): string => {
     ];
   });
 
-  return [`0`, `SECTION`, `2`, `ENTITIES`, ...lines, `0`, `ENDSEC`, `0`, `EOF`].join('\n');
+  return [
+    `0`,
+    `SECTION`,
+    `2`,
+    `HEADER`,
+    `9`,
+    `$ACADVER`,
+    `1`,
+    `AC1021`,
+    `0`,
+    `ENDSEC`,
+    `0`,
+    `SECTION`,
+    `2`,
+    `ENTITIES`,
+    ...lines,
+    `0`,
+    `ENDSEC`,
+    `0`,
+    `EOF`
+  ].join('\n');
 };
 
 export const generatePseudoPdf = (svgMarkup: string): string => {
-  return `%PDF-1.4\n% Dial Designer pseudo PDF wrapper\n${svgMarkup}`;
+  const byteLength = new Blob([svgMarkup]).size;
+  return [
+    `%PDF-1.4`,
+    `% Dial Designer Technical Drawing`,
+    `1 0 obj`,
+    `<< /Type /Catalog /Pages 2 0 R >>`,
+    `endobj`,
+    `2 0 obj`,
+    `<< /Type /Pages /Count 1 /Kids [3 0 R] >>`,
+    `endobj`,
+    `3 0 obj`,
+    `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 841.89 595.28] >>`,
+    `endobj`,
+    `% Embedded SVG bytes: ${byteLength}`,
+    `% ${svgMarkup.replace(/\n/g, ' ')}`,
+    `trailer`,
+    `<< /Root 1 0 R >>`,
+    `%%EOF`
+  ].join('\n');
 };
 
 export const estimateOutputSize = (payload: string): number => {

@@ -392,7 +392,7 @@ export const TopToolbar = () => {
       return;
     }
 
-    exportEngineeringByFormat(pendingExportRequest);
+    void exportEngineeringByFormat(pendingExportRequest);
     setPreviewOpen(false);
   };
 
@@ -439,213 +439,89 @@ export const TopToolbar = () => {
           </div>
         </div>
 
-        <div className="grid gap-2 2xl:grid-cols-[minmax(0,1.1fr)_minmax(0,1.4fr)_minmax(0,1.1fr)_minmax(0,0.9fr)_minmax(0,0.8fr)]">
-          <section className="rounded-md border border-engineering-border bg-engineering-bg/35 p-2">
-            <p className="ds-panel-title mb-2">Project</p>
-            <div className="flex flex-wrap items-center gap-2">
-              <Button variant="toolbar" size="sm" onClick={() => setProjectDialogOpen(true)}>
-                <Watch className="ds-icon-sm" /> New
-              </Button>
-              <Button variant="toolbar" size="sm" onClick={handleOpenProject}>
-                <FolderOpen className="ds-icon-sm" /> Open
-              </Button>
-              <Button
-                variant="toolbar"
-                size="sm"
-                onClick={() => {
-                  historyPush(exportProjectJson());
-                  saveProject();
-                }}
-              >
-                <Save className="ds-icon-sm" /> Save
-              </Button>
-              <Button
-                variant="toolbar"
-                size="sm"
-                onClick={() => {
-                  const snapshot = historyUndo();
-                  if (typeof snapshot === 'string') {
-                    importProjectJson(snapshot);
-                  }
-                }}
-              >
-                <Undo2 className="ds-icon-sm" /> Undo
-              </Button>
-              <Button
-                variant="toolbar"
-                size="sm"
-                onClick={() => {
-                  const snapshot = historyRedo();
-                  if (typeof snapshot === 'string') {
-                    importProjectJson(snapshot);
-                  }
-                }}
-              >
-                <Redo2 className="ds-icon-sm" /> Redo
-              </Button>
-            </div>
-          </section>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button variant="toolbar" size="sm" onClick={() => setProjectDialogOpen(true)}>
+            <Watch className="ds-icon-sm" /> New
+          </Button>
+          <Button variant="toolbar" size="sm" onClick={handleOpenProject}>
+            <FolderOpen className="ds-icon-sm" /> Open
+          </Button>
+          <Button
+            variant="toolbar"
+            size="sm"
+            onClick={() => {
+              historyPush(exportProjectJson());
+              saveProject();
+            }}
+          >
+            <Save className="ds-icon-sm" /> Save
+          </Button>
+          <Button
+            variant="toolbar"
+            size="sm"
+            onClick={() => {
+              const snapshot = historyUndo();
+              if (typeof snapshot === 'string') {
+                importProjectJson(snapshot);
+              }
+            }}
+          >
+            <Undo2 className="ds-icon-sm" /> Undo
+          </Button>
+          <Button
+            variant="toolbar"
+            size="sm"
+            onClick={() => {
+              const snapshot = historyRedo();
+              if (typeof snapshot === 'string') {
+                importProjectJson(snapshot);
+              }
+            }}
+          >
+            <Redo2 className="ds-icon-sm" /> Redo
+          </Button>
 
-          <section className="rounded-md border border-engineering-border bg-engineering-bg/35 p-2">
-            <p className="ds-panel-title mb-2">Watch Configuration</p>
-            <div className="grid gap-2 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)_110px]">
-              <label className="block">
-                <span className="ds-label-inspector">Movement</span>
-                <select
-                  className="ds-focus-ring mt-1 w-full rounded-md border border-engineering-border bg-engineering-bg/60 px-2 py-1.5 text-xs text-engineering-muted"
-                  value={selectedMovementId}
-                  onChange={(event) => selectMovement(event.target.value)}
-                >
-                  {movementLibrary.map((movement) => (
-                    <option key={movement.id} value={movement.id}>
-                      {movement.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
+          <select
+            className="ds-focus-ring rounded-md border border-engineering-border bg-engineering-bg/60 px-2 py-1.5 text-xs text-engineering-muted"
+            value={activeWorkspace}
+            onChange={(event) => {
+              const workspace = event.target.value as WorkspaceMode;
+              setActiveWorkspace(workspace);
+              setAppliedRecommendationIds([]);
+              setWorkspacePanelOpen(true);
+            }}
+          >
+            {workspaceModes.map((workspace) => (
+              <option key={workspace} value={workspace}>
+                Workspace: {workspace}
+              </option>
+            ))}
+          </select>
 
-              <div className="rounded-md border border-engineering-border bg-engineering-bg/45 px-3 py-1.5">
-                <div className="mb-1 flex items-center justify-between gap-2">
-                  <label className="ds-label-inspector" htmlFor="toolbar-case-diameter">
-                    Case Diameter
-                  </label>
-                  <span className="ds-label-dimension">{caseDiameterMm.toFixed(1)}mm</span>
-                </div>
-                <input
-                  id="toolbar-case-diameter"
-                  type="range"
-                  min={34}
-                  max={55}
-                  step={0.1}
-                  value={caseDiameterMm}
-                  onChange={(event) => setCaseDiameter(Number(event.target.value))}
-                  className="h-1.5 w-full accent-amber-400"
-                />
-                <div className="mt-2 flex flex-wrap gap-1.5">
-                  {diameterPresets.map((preset) => (
-                    <Button
-                      key={preset}
-                      variant="toolbar"
-                      size="sm"
-                      active={Math.round(caseDiameterMm) === preset}
-                      onClick={() => setCaseDiameter(preset)}
-                    >
-                      {preset}
-                    </Button>
-                  ))}
-                </div>
-              </div>
+          <Button
+            variant="toolbar"
+            size="sm"
+            onClick={() => {
+              setFormat(exportFormat);
+              handleExportPreview();
+            }}
+          >
+            <FileDown className="ds-icon-sm" /> Export
+          </Button>
 
-              <label className="block">
-                <span className="ds-label-inspector">Units</span>
-                <select
-                  disabled
-                  className="ds-focus-ring mt-1 w-full rounded-md border border-engineering-border bg-engineering-bg/60 px-2 py-1.5 text-xs text-engineering-muted"
-                  value="mm"
-                >
-                  <option value="mm">Millimetres</option>
-                </select>
-              </label>
-            </div>
-          </section>
+          <Button variant="toolbar" size="sm" onClick={() => openEngineeringHelp('template-library')}>
+            <CircleHelp className="ds-icon-sm" /> Help
+          </Button>
+          <Button variant="icon" size="sm" aria-label="Settings" onClick={() => setProjectDialogOpen(true)}>
+            <Settings className="ds-icon-sm" />
+          </Button>
 
-          <section className="rounded-md border border-engineering-border bg-engineering-bg/35 p-2">
-            <div className="mb-2 flex items-center justify-between gap-2">
-              <p className="ds-panel-title">Workspace</p>
-              <span className="ds-badge border-engineering-amber/45 bg-engineering-amber/10 text-engineering-amber">
-                Active: {activeWorkspace}
-              </span>
-            </div>
-            <div className="flex flex-wrap gap-1.5">
-              {workspaceModes.map((workspace) => (
-                <Button
-                  key={workspace}
-                  variant="toolbar"
-                  size="sm"
-                  active={workspace === activeWorkspace}
-                  onClick={() => {
-                    setActiveWorkspace(workspace);
-                    setAppliedRecommendationIds([]);
-                    setWorkspacePanelOpen(true);
-                  }}
-                >
-                  {workspace}
-                </Button>
-              ))}
-            </div>
-            <p className="mt-2 text-[11px] text-engineering-muted">
-              Selecting a workspace only loads recommendations. Your current design is unchanged until you apply suggestions.
-            </p>
-          </section>
-
-          <section className="rounded-md border border-engineering-border bg-engineering-bg/35 p-2">
-            <p className="ds-panel-title mb-2">Export</p>
-            <div className="flex flex-wrap items-center gap-2">
-              <select
-                className="ds-focus-ring rounded-md border border-engineering-border bg-engineering-bg/60 px-2 py-1.5 text-xs text-engineering-muted"
-                value={exportTarget}
-                onChange={(event) => setTarget(event.target.value as typeof exportTarget)}
-              >
-                <option value="entire-project">Entire Project</option>
-                <option value="dial-face">Dial Face Only</option>
-                <option value="chapter-ring">Chapter Ring Only</option>
-                <option value="inner-bezel">Inner Bezel Only</option>
-                <option value="outer-bezel">Outer Bezel Only</option>
-                <option value="selected-band">Selected Band</option>
-                <option value="manufacturing-package">Manufacturing Package</option>
-              </select>
-
-              {(['svg', 'dxf', 'pdf', 'png'] as const).map((format) => (
-                <Button
-                  key={format}
-                  variant="toolbar"
-                  size="sm"
-                  active={exportFormat === format}
-                  onClick={() => {
-                    setFormat(format);
-                    handleExportPreview();
-                  }}
-                >
-                  <FileDown className="ds-icon-sm" /> {format.toUpperCase()}
-                </Button>
-              ))}
-            </div>
-          </section>
-
-          <section className="rounded-md border border-engineering-border bg-engineering-bg/35 p-2">
-            <p className="ds-panel-title mb-2">Engineering Help</p>
-            <div className="flex flex-wrap items-center gap-2">
-              <Button variant="toolbar" size="sm" onClick={() => openEngineeringHelp('template-library')}>
-                <CircleHelp className="ds-icon-sm" /> Knowledge Base
-              </Button>
-              <Button variant="toolbar" size="sm" onClick={() => openEngineeringHelp('project-files')}>
-                <BookOpen className="ds-icon-sm" /> Documentation
-              </Button>
-              <Button variant="icon" size="sm" aria-label="Settings" onClick={() => setProjectDialogOpen(true)}>
-                <Settings className="ds-icon-sm" />
-              </Button>
-              <label className="relative">
-                <span className="sr-only">Theme selector</span>
-                <MoonStar className="pointer-events-none absolute left-2 top-1.5 ds-icon-sm text-engineering-muted" />
-                <select className="ds-focus-ring rounded-md border border-engineering-border bg-engineering-bg/60 py-1.5 pl-7 pr-2 text-xs text-engineering-muted">
-                  <option>Engineering Dark</option>
-                  <option>Deep Slate</option>
-                  <option>Night Workshop</option>
-                </select>
-              </label>
-            </div>
-            <div className="mt-2 flex flex-wrap gap-2 text-[11px] text-engineering-muted">
-              <span className="inline-flex items-center gap-1 rounded-md border border-engineering-border bg-engineering-bg/45 px-2 py-1">
-                <Keyboard className="ds-icon-sm" /> Shift+Drag Pan
-              </span>
-              <span className="inline-flex items-center gap-1 rounded-md border border-engineering-border bg-engineering-bg/45 px-2 py-1">
-                <Wrench className="ds-icon-sm" /> Pro Workflow
-              </span>
-              <span className="inline-flex items-center gap-1 rounded-md border border-engineering-border bg-engineering-bg/45 px-2 py-1">
-                <History className="ds-icon-sm" /> {autosaveEnabled ? 'Auto-Save On' : 'Auto-Save Off'}
-              </span>
-            </div>
-          </section>
+          <span className="inline-flex items-center gap-1 rounded-md border border-engineering-border bg-engineering-bg/45 px-2 py-1 text-[11px] text-engineering-muted">
+            <Keyboard className="ds-icon-sm" /> Shift+Drag Pan
+          </span>
+          <span className="inline-flex items-center gap-1 rounded-md border border-engineering-border bg-engineering-bg/45 px-2 py-1 text-[11px] text-engineering-muted">
+            <History className="ds-icon-sm" /> {autosaveEnabled ? 'Auto-Save On' : 'Auto-Save Off'}
+          </span>
         </div>
 
         {workspacePanelOpen ? (
