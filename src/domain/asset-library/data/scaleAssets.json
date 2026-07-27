@@ -1,0 +1,139 @@
+[
+  {
+    "id": "sr-c",
+    "family": "classical-slide-rule",
+    "label": "C",
+    "scaleKind": "slide-rule",
+    "projectionKind": "logarithmic",
+    "formatterKind": "slide-rule",
+    "typography": { "family": "railroad", "scale": 1 },
+    "tickHierarchy": { "primary": 10, "secondary": 5, "tertiary": 1 },
+    "tickLengthsMm": { "primary": 1.3, "secondary": 1, "tertiary": 0.6 },
+    "labelPriorities": ["1", "2", "3", "5", "10"],
+    "numeralPositioning": "outside",
+    "ringWidthRecommendationMm": { "min": 2.6, "preferred": 3.2, "max": 3.8 },
+    "manufacturingRecommendations": ["Prefer high-contrast pad print for dense mantissa labels."],
+    "chapterRingCompatibility": ["printed", "railroad", "pilot"],
+    "markerCompatibility": ["baton", "railroad", "arabic"]
+  },
+  {
+    "id": "sr-d",
+    "family": "classical-slide-rule",
+    "label": "D",
+    "scaleKind": "slide-rule",
+    "projectionKind": "logarithmic",
+    "formatterKind": "slide-rule",
+    "typography": { "family": "railroad", "scale": 1 },
+    "tickHierarchy": { "primary": 10, "secondary": 5, "tertiary": 1 },
+    "tickLengthsMm": { "primary": 1.3, "secondary": 1, "tertiary": 0.6 },
+    "labelPriorities": ["1", "2", "3", "5", "10"],
+    "numeralPositioning": "inside",
+    "ringWidthRecommendationMm": { "min": 2.6, "preferred": 3.2, "max": 3.8 },
+    "manufacturingRecommendations": ["Keep tertiary ticks above supplier minimum line width."],
+    "chapterRingCompatibility": ["printed", "railroad", "pilot"],
+    "markerCompatibility": ["baton", "railroad", "arabic"]
+  },
+  {
+    "id": "sr-ci",
+    "family": "classical-slide-rule",
+    "label": "CI",
+    "scaleKind": "slide-rule",
+    "projectionKind": "reciprocal-logarithmic",
+    "formatterKind": "slide-rule",
+    "typography": { "family": "railroad", "scale": 0.95 },
+    "tickHierarchy": { "primary": 10, "secondary": 5, "tertiary": 1 },
+    "tickLengthsMm": { "primary": 1.2, "secondary": 0.9, "tertiary": 0.55 },
+    "labelPriorities": ["10", "5", "3", "2", "1"],
+    "numeralPositioning": "inside",
+    "ringWidthRecommendationMm": { "min": 2.8, "preferred": 3.3, "max": 3.9 },
+    "manufacturingRecommendations": ["Use clear numeral inversion to preserve reading direction."],
+    "chapterRingCompatibility": ["printed", "pilot"],
+    "markerCompatibility": ["baton", "railroad"]
+  },
+  {
+    "id": "sr-a", "family": "classical-slide-rule", "label": "A", "scaleKind": "slide-rule", "projectionKind": "square", "formatterKind": "engineering",
+    "typography": { "family": "railroad", "scale": 0.95 }, "tickHierarchy": { "primary": 10, "secondary": 2, "tertiary": 1 },
+    "tickLengthsMm": { "primary": 1.2, "secondary": 0.85, "tertiary": 0.5 }, "labelPriorities": ["1", "2", "4", "10"], "numeralPositioning": "outside",
+    "ringWidthRecommendationMm": { "min": 2.5, "preferred": 3, "max": 3.6 }, "manufacturingRecommendations": ["Reduce tertiary labels on narrow rings."],
+    "chapterRingCompatibility": ["printed", "dress"], "markerCompatibility": ["baton", "roman"]
+  },
+  {
+    "id": "sr-b", "family": "classical-slide-rule", "label": "B", "scaleKind": "slide-rule", "projectionKind": "square", "formatterKind": "engineering",
+    "typography": { "family": "railroad", "scale": 0.95 }, "tickHierarchy": { "primary": 10, "secondary": 2, "tertiary": 1 },
+    "tickLengthsMm": { "primary": 1.2, "secondary": 0.85, "tertiary": 0.5 }, "labelPriorities": ["1", "2", "4", "10"], "numeralPositioning": "inside",
+    "ringWidthRecommendationMm": { "min": 2.5, "preferred": 3, "max": 3.6 }, "manufacturingRecommendations": ["Preserve arc spacing for index furniture."],
+    "chapterRingCompatibility": ["printed", "dress"], "markerCompatibility": ["baton", "roman"]
+  },
+  {
+    "id": "sr-k", "family": "classical-slide-rule", "label": "K", "scaleKind": "slide-rule", "projectionKind": "cube", "formatterKind": "engineering",
+    "typography": { "family": "railroad", "scale": 0.9 }, "tickHierarchy": { "primary": 10, "secondary": 2, "tertiary": 1 },
+    "tickLengthsMm": { "primary": 1.1, "secondary": 0.8, "tertiary": 0.45 }, "labelPriorities": ["1", "2", "5", "10"], "numeralPositioning": "outside",
+    "ringWidthRecommendationMm": { "min": 2.7, "preferred": 3.3, "max": 4 }, "manufacturingRecommendations": ["Use heavier tertiary stroke for UV process stability."],
+    "chapterRingCompatibility": ["printed", "pilot"], "markerCompatibility": ["baton", "arabic"]
+  },
+  {
+    "id": "sr-l", "family": "classical-slide-rule", "label": "L", "scaleKind": "slide-rule", "projectionKind": "linear", "formatterKind": "decimal",
+    "typography": { "family": "din", "scale": 0.95 }, "tickHierarchy": { "primary": 10, "secondary": 5, "tertiary": 1 },
+    "tickLengthsMm": { "primary": 1.1, "secondary": 0.8, "tertiary": 0.5 }, "labelPriorities": ["0", "1", "2", "3", "10"], "numeralPositioning": "inside",
+    "ringWidthRecommendationMm": { "min": 2.3, "preferred": 2.8, "max": 3.5 }, "manufacturingRecommendations": ["Linear labels can be tightened on photochemical processes."],
+    "chapterRingCompatibility": ["printed", "railroad"], "markerCompatibility": ["baton", "railroad"]
+  },
+  {
+    "id": "sr-ll0", "family": "classical-slide-rule", "label": "LL0", "scaleKind": "slide-rule", "projectionKind": "log-log", "formatterKind": "scientific",
+    "typography": { "family": "din", "scale": 0.86 }, "tickHierarchy": { "primary": 8, "secondary": 4, "tertiary": 1 },
+    "tickLengthsMm": { "primary": 1, "secondary": 0.75, "tertiary": 0.45 }, "labelPriorities": ["1", "1.1", "1.2", "2"], "numeralPositioning": "outside",
+    "ringWidthRecommendationMm": { "min": 2.9, "preferred": 3.4, "max": 4 }, "manufacturingRecommendations": ["LL scales need strict text-height controls."],
+    "chapterRingCompatibility": ["printed", "pilot"], "markerCompatibility": ["baton"]
+  },
+  {
+    "id": "sr-ll1", "family": "classical-slide-rule", "label": "LL1", "scaleKind": "slide-rule", "projectionKind": "log-log", "formatterKind": "scientific",
+    "typography": { "family": "din", "scale": 0.86 }, "tickHierarchy": { "primary": 8, "secondary": 4, "tertiary": 1 },
+    "tickLengthsMm": { "primary": 1, "secondary": 0.75, "tertiary": 0.45 }, "labelPriorities": ["1", "1.5", "2", "3"], "numeralPositioning": "outside",
+    "ringWidthRecommendationMm": { "min": 2.9, "preferred": 3.4, "max": 4 }, "manufacturingRecommendations": ["Reserve ring width for legibility."],
+    "chapterRingCompatibility": ["printed", "pilot"], "markerCompatibility": ["baton"]
+  },
+  {
+    "id": "sr-ll2", "family": "classical-slide-rule", "label": "LL2", "scaleKind": "slide-rule", "projectionKind": "log-log", "formatterKind": "scientific",
+    "typography": { "family": "din", "scale": 0.86 }, "tickHierarchy": { "primary": 8, "secondary": 4, "tertiary": 1 },
+    "tickLengthsMm": { "primary": 1, "secondary": 0.75, "tertiary": 0.45 }, "labelPriorities": ["2", "3", "4", "6"], "numeralPositioning": "outside",
+    "ringWidthRecommendationMm": { "min": 2.9, "preferred": 3.4, "max": 4 }, "manufacturingRecommendations": ["Prefer simple label set on narrow chapter rings."],
+    "chapterRingCompatibility": ["printed", "pilot"], "markerCompatibility": ["baton"]
+  },
+  {
+    "id": "sr-ll3", "family": "classical-slide-rule", "label": "LL3", "scaleKind": "slide-rule", "projectionKind": "log-log", "formatterKind": "scientific",
+    "typography": { "family": "din", "scale": 0.86 }, "tickHierarchy": { "primary": 8, "secondary": 4, "tertiary": 1 },
+    "tickLengthsMm": { "primary": 1, "secondary": 0.75, "tertiary": 0.45 }, "labelPriorities": ["5", "10", "20", "50"], "numeralPositioning": "outside",
+    "ringWidthRecommendationMm": { "min": 3, "preferred": 3.5, "max": 4.1 }, "manufacturingRecommendations": ["Use higher contrast ink stack for LL3 numerals."],
+    "chapterRingCompatibility": ["printed", "pilot"], "markerCompatibility": ["baton"]
+  },
+  {
+    "id": "av-navitimer-c", "family": "aviation", "label": "Navitimer C", "scaleKind": "conversion", "projectionKind": "logarithmic", "formatterKind": "navitimer",
+    "typography": { "family": "pilot", "scale": 0.9 }, "tickHierarchy": { "primary": 12, "secondary": 6, "tertiary": 1 },
+    "tickLengthsMm": { "primary": 1.2, "secondary": 0.9, "tertiary": 0.55 }, "labelPriorities": ["10", "20", "30", "60"], "numeralPositioning": "outside",
+    "ringWidthRecommendationMm": { "min": 3, "preferred": 3.6, "max": 4.2 }, "manufacturingRecommendations": ["Instrument printing profile recommended."],
+    "chapterRingCompatibility": ["pilot", "printed", "railroad"], "markerCompatibility": ["arabic", "baton", "railroad"]
+  },
+  {
+    "id": "av-navitimer-d", "family": "aviation", "label": "Navitimer D", "scaleKind": "conversion", "projectionKind": "logarithmic", "formatterKind": "navitimer",
+    "typography": { "family": "pilot", "scale": 0.9 }, "tickHierarchy": { "primary": 12, "secondary": 6, "tertiary": 1 },
+    "tickLengthsMm": { "primary": 1.2, "secondary": 0.9, "tertiary": 0.55 }, "labelPriorities": ["10", "20", "30", "60"], "numeralPositioning": "inside",
+    "ringWidthRecommendationMm": { "min": 3, "preferred": 3.6, "max": 4.2 }, "manufacturingRecommendations": ["Control marker conflicts near 12/3/6/9."],
+    "chapterRingCompatibility": ["pilot", "printed", "railroad"], "markerCompatibility": ["arabic", "baton", "railroad"]
+  },
+  { "id": "av-fuel", "family": "aviation", "label": "Fuel", "scaleKind": "fuel", "projectionKind": "ratio", "formatterKind": "engineering", "typography": { "family": "pilot", "scale": 0.92 }, "tickHierarchy": { "primary": 10, "secondary": 5, "tertiary": 1 }, "tickLengthsMm": { "primary": 1.1, "secondary": 0.8, "tertiary": 0.5 }, "labelPriorities": ["5", "10", "20", "30"], "numeralPositioning": "outside", "ringWidthRecommendationMm": { "min": 2.8, "preferred": 3.4, "max": 4 }, "manufacturingRecommendations": ["Prefer high-contrast white on matte dial."], "chapterRingCompatibility": ["pilot", "printed"], "markerCompatibility": ["arabic", "baton"] },
+  { "id": "av-distance", "family": "aviation", "label": "Distance", "scaleKind": "distance", "projectionKind": "ratio", "formatterKind": "engineering", "typography": { "family": "pilot", "scale": 0.92 }, "tickHierarchy": { "primary": 10, "secondary": 5, "tertiary": 1 }, "tickLengthsMm": { "primary": 1.1, "secondary": 0.8, "tertiary": 0.5 }, "labelPriorities": ["10", "20", "40", "80"], "numeralPositioning": "outside", "ringWidthRecommendationMm": { "min": 2.8, "preferred": 3.4, "max": 4 }, "manufacturingRecommendations": ["Keep tertiary labels optional by supplier capability."], "chapterRingCompatibility": ["pilot", "printed"], "markerCompatibility": ["arabic", "baton"] },
+  { "id": "av-time", "family": "aviation", "label": "Time", "scaleKind": "time", "projectionKind": "angular", "formatterKind": "engineering", "typography": { "family": "pilot", "scale": 0.9 }, "tickHierarchy": { "primary": 12, "secondary": 6, "tertiary": 1 }, "tickLengthsMm": { "primary": 1.1, "secondary": 0.8, "tertiary": 0.5 }, "labelPriorities": ["5", "10", "15", "60"], "numeralPositioning": "outside", "ringWidthRecommendationMm": { "min": 2.6, "preferred": 3.1, "max": 3.9 }, "manufacturingRecommendations": ["Pair with railroad minute track."], "chapterRingCompatibility": ["pilot", "railroad"], "markerCompatibility": ["railroad", "arabic"] },
+  { "id": "av-unit-conversion", "family": "aviation", "label": "Unit Conversion", "scaleKind": "conversion", "projectionKind": "linear", "formatterKind": "engineering", "typography": { "family": "din", "scale": 0.88 }, "tickHierarchy": { "primary": 10, "secondary": 5, "tertiary": 1 }, "tickLengthsMm": { "primary": 1.1, "secondary": 0.75, "tertiary": 0.45 }, "labelPriorities": ["NM", "KM", "SM"], "numeralPositioning": "mixed", "ringWidthRecommendationMm": { "min": 2.7, "preferred": 3.2, "max": 3.9 }, "manufacturingRecommendations": ["Label abbreviations to reduce clutter."], "chapterRingCompatibility": ["pilot", "printed"], "markerCompatibility": ["baton", "arabic"] },
+  { "id": "av-ground-speed", "family": "aviation", "label": "Ground Speed", "scaleKind": "speed", "projectionKind": "ratio", "formatterKind": "navitimer", "typography": { "family": "pilot", "scale": 0.9 }, "tickHierarchy": { "primary": 10, "secondary": 5, "tertiary": 1 }, "tickLengthsMm": { "primary": 1.2, "secondary": 0.8, "tertiary": 0.5 }, "labelPriorities": ["60", "90", "120", "180"], "numeralPositioning": "outside", "ringWidthRecommendationMm": { "min": 2.9, "preferred": 3.5, "max": 4.1 }, "manufacturingRecommendations": ["Dense labels need supplier profile with 1.0mm minimum text."], "chapterRingCompatibility": ["pilot", "printed"], "markerCompatibility": ["arabic", "baton"] },
+  { "id": "av-wind-correction", "family": "aviation", "label": "Wind Correction", "scaleKind": "conversion", "projectionKind": "angular", "formatterKind": "navitimer", "typography": { "family": "pilot", "scale": 0.88 }, "tickHierarchy": { "primary": 12, "secondary": 6, "tertiary": 1 }, "tickLengthsMm": { "primary": 1.1, "secondary": 0.8, "tertiary": 0.5 }, "labelPriorities": ["WCA", "HDG", "TAS"], "numeralPositioning": "mixed", "ringWidthRecommendationMm": { "min": 3, "preferred": 3.5, "max": 4.2 }, "manufacturingRecommendations": ["Use two-pass print for contrasting reference labels."], "chapterRingCompatibility": ["pilot", "printed"], "markerCompatibility": ["arabic", "railroad"] },
+  { "id": "av-rate-of-climb", "family": "aviation", "label": "Rate of Climb", "scaleKind": "altitude", "projectionKind": "linear", "formatterKind": "engineering", "typography": { "family": "pilot", "scale": 0.9 }, "tickHierarchy": { "primary": 10, "secondary": 5, "tertiary": 1 }, "tickLengthsMm": { "primary": 1.1, "secondary": 0.8, "tertiary": 0.45 }, "labelPriorities": ["500", "1000", "1500"], "numeralPositioning": "outside", "ringWidthRecommendationMm": { "min": 2.8, "preferred": 3.2, "max": 3.8 }, "manufacturingRecommendations": ["Avoid excessive tertiary digits for readability."], "chapterRingCompatibility": ["pilot", "printed"], "markerCompatibility": ["arabic", "baton"] },
+  { "id": "av-descent", "family": "aviation", "label": "Descent", "scaleKind": "altitude", "projectionKind": "linear", "formatterKind": "engineering", "typography": { "family": "pilot", "scale": 0.9 }, "tickHierarchy": { "primary": 10, "secondary": 5, "tertiary": 1 }, "tickLengthsMm": { "primary": 1.1, "secondary": 0.8, "tertiary": 0.45 }, "labelPriorities": ["500", "1000", "1500"], "numeralPositioning": "outside", "ringWidthRecommendationMm": { "min": 2.8, "preferred": 3.2, "max": 3.8 }, "manufacturingRecommendations": ["Descent labels can share geometry profile with climb."], "chapterRingCompatibility": ["pilot", "printed"], "markerCompatibility": ["arabic", "baton"] },
+  { "id": "av-glide", "family": "aviation", "label": "Glide", "scaleKind": "distance", "projectionKind": "ratio", "formatterKind": "engineering", "typography": { "family": "pilot", "scale": 0.9 }, "tickHierarchy": { "primary": 10, "secondary": 5, "tertiary": 1 }, "tickLengthsMm": { "primary": 1.1, "secondary": 0.8, "tertiary": 0.45 }, "labelPriorities": ["6", "8", "10", "12"], "numeralPositioning": "outside", "ringWidthRecommendationMm": { "min": 2.8, "preferred": 3.3, "max": 3.9 }, "manufacturingRecommendations": ["Ground-speed and glide labels should not collide at 6 o'clock."], "chapterRingCompatibility": ["pilot", "printed"], "markerCompatibility": ["arabic", "baton"] },
+  { "id": "ch-tachymeter", "family": "chronograph", "label": "Tachymeter", "scaleKind": "tachymeter", "projectionKind": "logarithmic", "formatterKind": "engineering", "typography": { "family": "chronograph", "scale": 0.95 }, "tickHierarchy": { "primary": 10, "secondary": 5, "tertiary": 1 }, "tickLengthsMm": { "primary": 1.2, "secondary": 0.85, "tertiary": 0.5 }, "labelPriorities": ["60", "100", "120", "240"], "numeralPositioning": "outside", "ringWidthRecommendationMm": { "min": 2.7, "preferred": 3.1, "max": 3.8 }, "manufacturingRecommendations": ["Use crisp edge definition for high-speed numerals."], "chapterRingCompatibility": ["printed", "dress", "sport"], "markerCompatibility": ["baton", "roman", "arabic"] },
+  { "id": "ch-telemeter", "family": "chronograph", "label": "Telemeter", "scaleKind": "telemeter", "projectionKind": "linear", "formatterKind": "engineering", "typography": { "family": "chronograph", "scale": 0.92 }, "tickHierarchy": { "primary": 10, "secondary": 5, "tertiary": 1 }, "tickLengthsMm": { "primary": 1.1, "secondary": 0.85, "tertiary": 0.5 }, "labelPriorities": ["1", "2", "5", "10"], "numeralPositioning": "inside", "ringWidthRecommendationMm": { "min": 2.6, "preferred": 3, "max": 3.7 }, "manufacturingRecommendations": ["Prefer medium-density typography."], "chapterRingCompatibility": ["printed", "dress"], "markerCompatibility": ["roman", "baton"] },
+  { "id": "ch-pulsometer", "family": "chronograph", "label": "Pulsometer", "scaleKind": "pulsometer", "projectionKind": "logarithmic", "formatterKind": "engineering", "typography": { "family": "chronograph", "scale": 0.92 }, "tickHierarchy": { "primary": 10, "secondary": 5, "tertiary": 1 }, "tickLengthsMm": { "primary": 1.1, "secondary": 0.85, "tertiary": 0.5 }, "labelPriorities": ["60", "80", "120"], "numeralPositioning": "inside", "ringWidthRecommendationMm": { "min": 2.6, "preferred": 3.1, "max": 3.8 }, "manufacturingRecommendations": ["Min text height should be validated for small bpm labels."], "chapterRingCompatibility": ["printed", "dress"], "markerCompatibility": ["roman", "baton"] },
+  { "id": "ch-decimal-timer", "family": "chronograph", "label": "Decimal Timer", "scaleKind": "countdown", "projectionKind": "linear", "formatterKind": "decimal", "typography": { "family": "chronograph", "scale": 0.9 }, "tickHierarchy": { "primary": 10, "secondary": 5, "tertiary": 1 }, "tickLengthsMm": { "primary": 1.1, "secondary": 0.8, "tertiary": 0.45 }, "labelPriorities": ["10", "20", "30", "100"], "numeralPositioning": "outside", "ringWidthRecommendationMm": { "min": 2.6, "preferred": 3, "max": 3.7 }, "manufacturingRecommendations": ["Uniform decimal labels improve production readability."], "chapterRingCompatibility": ["printed", "sport"], "markerCompatibility": ["baton", "arabic"] },
+  { "id": "ch-production-timer", "family": "chronograph", "label": "Production Timer", "scaleKind": "countdown", "projectionKind": "linear", "formatterKind": "engineering", "typography": { "family": "chronograph", "scale": 0.9 }, "tickHierarchy": { "primary": 6, "secondary": 3, "tertiary": 1 }, "tickLengthsMm": { "primary": 1.1, "secondary": 0.8, "tertiary": 0.45 }, "labelPriorities": ["5", "10", "15", "30"], "numeralPositioning": "outside", "ringWidthRecommendationMm": { "min": 2.6, "preferred": 3, "max": 3.7 }, "manufacturingRecommendations": ["Align segment boundaries with major hour markers."], "chapterRingCompatibility": ["printed", "sport"], "markerCompatibility": ["baton", "arabic"] },
+  { "id": "ch-yacht-timer", "family": "chronograph", "label": "Yacht Timer", "scaleKind": "countdown", "projectionKind": "angular", "formatterKind": "engineering", "typography": { "family": "dive", "scale": 0.92 }, "tickHierarchy": { "primary": 6, "secondary": 3, "tertiary": 1 }, "tickLengthsMm": { "primary": 1.2, "secondary": 0.9, "tertiary": 0.5 }, "labelPriorities": ["1", "2", "3", "5"], "numeralPositioning": "outside", "ringWidthRecommendationMm": { "min": 2.8, "preferred": 3.2, "max": 3.9 }, "manufacturingRecommendations": ["Use bold numerals for regatta readability."], "chapterRingCompatibility": ["dive", "sport", "printed"], "markerCompatibility": ["rectangle", "triangle", "maxi"] },
+  { "id": "ch-dive-timer", "family": "chronograph", "label": "Dive Timer", "scaleKind": "countdown", "projectionKind": "angular", "formatterKind": "engineering", "typography": { "family": "dive", "scale": 0.95 }, "tickHierarchy": { "primary": 6, "secondary": 2, "tertiary": 1 }, "tickLengthsMm": { "primary": 1.3, "secondary": 0.95, "tertiary": 0.55 }, "labelPriorities": ["10", "20", "30", "50"], "numeralPositioning": "outside", "ringWidthRecommendationMm": { "min": 3, "preferred": 3.5, "max": 4.2 }, "manufacturingRecommendations": ["Pair with lume-capable marker family."], "chapterRingCompatibility": ["dive", "coin-edge", "fluted"], "markerCompatibility": ["round", "rectangle", "triangle", "maxi"] }
+]

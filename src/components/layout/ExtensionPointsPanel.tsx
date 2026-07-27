@@ -3,6 +3,8 @@ import { placeholderFeatures } from '@/domain/extensions/placeholderFeatures';
 import { Panel } from '@/components/ui/Panel';
 import { useBandsStore, useWatchComponentStore } from '@/stores';
 import { manufacturingProfiles } from '@/services/manufacturingSuiteService';
+import { supplierProfiles } from '@/domain/manufacturing/supplierProfiles';
+import { assetLibrarySummary, getManufacturingSourceCategories } from '@/services/assetLibraryService';
 
 export const ExtensionPointsPanel = () => {
   const warnings = useBandsStore((state) => state.warnings);
@@ -11,6 +13,8 @@ export const ExtensionPointsPanel = () => {
 
   const visibleWatchComponents = watchComponents.filter((component) => component.visible).length;
   const lockedWatchComponents = watchComponents.filter((component) => component.locked).length;
+  const assetSummary = assetLibrarySummary();
+  const sourceCategories = getManufacturingSourceCategories();
 
   return (
     <Panel className="p-3">
@@ -47,11 +51,48 @@ export const ExtensionPointsPanel = () => {
 
       <div className="ds-divider my-3" />
       <div>
+        <p className="ds-label-inspector mb-2">Asset Libraries</p>
+        <div className="grid grid-cols-2 gap-1 text-[11px]">
+          <div className="rounded-md border border-engineering-border bg-engineering-bg/40 px-2 py-1 text-engineering-muted">Scales: {assetSummary.scales}</div>
+          <div className="rounded-md border border-engineering-border bg-engineering-bg/40 px-2 py-1 text-engineering-muted">Chapter Rings: {assetSummary.chapterRings}</div>
+          <div className="rounded-md border border-engineering-border bg-engineering-bg/40 px-2 py-1 text-engineering-muted">Markers: {assetSummary.markers}</div>
+          <div className="rounded-md border border-engineering-border bg-engineering-bg/40 px-2 py-1 text-engineering-muted">Hands: {assetSummary.hands}</div>
+          <div className="rounded-md border border-engineering-border bg-engineering-bg/40 px-2 py-1 text-engineering-muted">Materials: {assetSummary.materials}</div>
+          <div className="rounded-md border border-engineering-border bg-engineering-bg/40 px-2 py-1 text-engineering-muted">Typography: {assetSummary.typography}</div>
+        </div>
+      </div>
+
+      <div className="ds-divider my-3" />
+      <div>
         <p className="ds-label-inspector mb-2">Manufacturing Profiles</p>
         <div className="grid grid-cols-2 gap-1">
           {manufacturingProfiles.map((profile) => (
             <div key={profile.id} className="rounded-md border border-engineering-border bg-engineering-bg/40 px-2 py-1 text-[11px] text-engineering-muted">
               {profile.displayName}: min {profile.minimumFeatureMm.toFixed(2)}mm
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="ds-divider my-3" />
+      <div>
+        <p className="ds-label-inspector mb-2">Supplier Profiles</p>
+        <div className="space-y-1">
+          {supplierProfiles.map((profile) => (
+            <div key={profile.id} className="rounded-md border border-engineering-border bg-engineering-bg/40 px-2 py-1 text-[11px] text-engineering-muted">
+              <span className="text-engineering-text">{profile.displayName}</span>: {profile.capabilities.printingMethods.join(', ')}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="ds-divider my-3" />
+      <div>
+        <p className="ds-label-inspector mb-2">Manufacturing Source Categories</p>
+        <div className="space-y-1">
+          {sourceCategories.map((category) => (
+            <div key={category} className="rounded-md border border-engineering-border bg-engineering-bg/40 px-2 py-1 text-[11px] text-engineering-muted">
+              {category}
             </div>
           ))}
         </div>

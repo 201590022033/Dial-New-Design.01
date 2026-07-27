@@ -1,0 +1,11 @@
+[
+  {"id":"typo-pilot","family":"pilot","kerning":0.02,"radialSpacingMm":0.1,"baselineCorrectionMm":0.03,"minimumPrintableSizeMm":1,"recommendedArcSpacingMm":0.14},
+  {"id":"typo-military","family":"military","kerning":0.01,"radialSpacingMm":0.1,"baselineCorrectionMm":0.02,"minimumPrintableSizeMm":1,"recommendedArcSpacingMm":0.13},
+  {"id":"typo-dive","family":"dive","kerning":0.03,"radialSpacingMm":0.11,"baselineCorrectionMm":0.02,"minimumPrintableSizeMm":1.05,"recommendedArcSpacingMm":0.14},
+  {"id":"typo-dress","family":"dress","kerning":0.04,"radialSpacingMm":0.12,"baselineCorrectionMm":0.03,"minimumPrintableSizeMm":1.2,"recommendedArcSpacingMm":0.16},
+  {"id":"typo-bauhaus","family":"bauhaus","kerning":0.02,"radialSpacingMm":0.11,"baselineCorrectionMm":0.01,"minimumPrintableSizeMm":1.05,"recommendedArcSpacingMm":0.14},
+  {"id":"typo-din","family":"din","kerning":0.01,"radialSpacingMm":0.1,"baselineCorrectionMm":0.01,"minimumPrintableSizeMm":1,"recommendedArcSpacingMm":0.13},
+  {"id":"typo-railroad","family":"railroad","kerning":0.01,"radialSpacingMm":0.1,"baselineCorrectionMm":0.02,"minimumPrintableSizeMm":1,"recommendedArcSpacingMm":0.13},
+  {"id":"typo-vintage","family":"vintage","kerning":0.03,"radialSpacingMm":0.12,"baselineCorrectionMm":0.03,"minimumPrintableSizeMm":1.15,"recommendedArcSpacingMm":0.15},
+  {"id":"typo-chronograph","family":"chronograph","kerning":0.02,"radialSpacingMm":0.1,"baselineCorrectionMm":0.02,"minimumPrintableSizeMm":1.05,"recommendedArcSpacingMm":0.14}
+]

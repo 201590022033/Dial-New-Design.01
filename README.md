@@ -1,5 +1,7 @@
 # Dial Designer v0.3
 
+## Version 3 – Professional Watch Engineering Studio
+
 Production-ready engineering workspace for custom watch dial design with strict geometry, scale plugins, manufacturing validation, and export workflows.
 
 ## Stack
@@ -33,6 +35,9 @@ Production-ready engineering workspace for custom watch dial design with strict 
 - Export Preview: preview image, layers, dimensions, warnings, estimated process sizes, file size summary.
 - Native project files: `.dial` (versioned, JSON-based) with autosave and recent project support.
 - Manufacturing validation and collision detection integrated into inspector/status/export preview.
+- Traceable manufacturing rules classify guidance as verified manufacturer capability, industry best practice, or engineering assumption.
+- Supplier profile library provides data-driven manufacturing capability presets for print-, applied-, and instrument-oriented dial programs.
+- Design Advisor highlights authenticity, geometry, beauty, and manufacturability recommendations from the current dial state.
 - Movement recommendations for production-safe dial and bezel sizing guidance.
 
 ## Project Structure
@@ -89,9 +94,15 @@ npm run build
 - [Scale Guide](docs/SCALE_GUIDE.md)
 - [Movement Guide](docs/MOVEMENT_GUIDE.md)
 - [Project File Format](docs/PROJECT_FILE_FORMAT.md)
+- [Watch Design Guidelines](WATCH_DESIGN_GUIDELINES.md)
+- [Manufacturing Rules](MANUFACTURING_RULES.md)
+- [Supplier Profile Library](SUPPLIER_PROFILE_LIBRARY.md)
+- [Design Advisor](DESIGN_ADVISOR.md)
+- [Asset Library Architecture](ASSET_LIBRARY_ARCHITECTURE.md)
 
 ## Current Status
 
 - Core geometry, scale, design, export, and project persistence systems are operational.
 - Strict TypeScript, linting, and tests are enforced.
+- Manufacturing intelligence now includes traceable rules, supplier archetypes, and contextual design recommendations without redesigning the frozen architecture.
 - Additional plugin surfaces are scaffolded for advanced watchmaking extensions.

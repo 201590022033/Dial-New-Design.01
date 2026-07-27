@@ -228,7 +228,8 @@ export const exportEngineeringByFormat = async (request: EngineeringExportReques
   const manufacturingReport = generateManufacturingReport({
     svgMarkup: svgForVerification,
     bands: request.bands,
-    watchComponents: createWatchComponentEntities()
+    watchComponents: createWatchComponentEntities(),
+    warnings: request.warnings
   });
 
   const metadataKeys: Array<keyof ExportMetadata> = [
@@ -267,6 +268,7 @@ export const exportEngineeringByFormat = async (request: EngineeringExportReques
     warnings: [
       ...built.preview.warnings,
       ...nativeSvgValidation.issues.map((message) => ({ level: 'warning' as const, code: 'MIN_LINE_WIDTH' as const, message })),
+      ...manufacturingReport.traceableFindings,
       ...manufacturingReport.findings.map((message) => ({ level: 'warning' as const, code: 'MIN_LINE_WIDTH' as const, message }))
     ]
   };

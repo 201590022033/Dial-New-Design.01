@@ -1,8 +1,16 @@
 import type { BandEntity } from '@/domain/bands/types';
 import type { WatchComponentEntity } from '@/domain/watch-components/types';
+import {
+  defaultSupplierProfile,
+  getSupplierProfileById,
+  supplierProfiles,
+  type SupplierProfile
+} from '@/domain/manufacturing/supplierProfiles';
+import type { ManufacturingProcessId } from '@/domain/manufacturing/ruleLibrary';
+import type { ManufacturingWarning } from '@/domain/manufacturing/validationEngine';
 
 export interface ManufacturingProcessProfile {
-  id: 'laser' | 'pad-print' | 'uv-print' | 'cnc' | 'engraving' | 'etching' | 'photochemical';
+  id: ManufacturingProcessId;
   displayName: string;
   minimumFeatureMm: number;
   minimumGapMm: number;
@@ -31,8 +39,11 @@ export interface ManufacturingReport {
   score: number;
   valid: boolean;
   processProfiles: ManufacturingProcessProfile[];
+  supplierProfiles: SupplierProfile[];
+  activeSupplier: SupplierProfile;
   nativeSvg: NativeSvgVerificationResult;
   findings: string[];
+  traceableFindings: ManufacturingWarning[];
 }
 
 export const manufacturingProfiles: ManufacturingProcessProfile[] = [
@@ -130,9 +141,13 @@ export const generateManufacturingReport = (input: {
   svgMarkup: string;
   bands: BandEntity[];
   watchComponents: WatchComponentEntity[];
+  warnings?: ManufacturingWarning[];
+  supplierProfileId?: string | null;
 }): ManufacturingReport => {
+  const activeSupplier = getSupplierProfileById(input.supplierProfileId) ?? defaultSupplierProfile;
   const nativeSvg = verifyNativeSvg(input.svgMarkup);
   const findings: string[] = [...nativeSvg.issues];
+  const traceableFindings: ManufacturingWarning[] = [...(input.warnings ?? [])];
 
   const disabledExports = input.watchComponents.filter((component) => !component.exportEnabled);
   if (disabledExports.length > 0) {
@@ -149,13 +164,20 @@ export const generateManufacturingReport = (input: {
     findings.push(`${invalidComponents.length} watch components report validation warnings.`);
   }
 
-  const score = Math.max(0, 100 - findings.length * 8);
+  input.warnings?.forEach((warning) => {
+    findings.push(warning.message);
+  });
+
+  const score = Math.max(0, 100 - (findings.length + traceableFindings.filter((warning) => warning.level === 'error').length) * 6);
 
   return {
     score,
     valid: findings.length === 0,
     processProfiles: manufacturingProfiles,
+    supplierProfiles,
+    activeSupplier,
     nativeSvg,
-    findings
+    findings,
+    traceableFindings
   };
 };
