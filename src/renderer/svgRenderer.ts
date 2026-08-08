@@ -1,4 +1,5 @@
 import { SVG, type Svg } from '@svgdotjs/svg.js';
+import { resolvePhysicalAssembly } from '@/domain/assembly/physicalAssembly';
 import type { BandEntity } from '@/domain/bands/types';
 import type { RenderContext, RendererAdapter, RendererOptions } from '@/renderer/types';
 import { mmToPixels, polarToCartesian } from '@/utils/math';
@@ -45,8 +46,7 @@ export class SvgRenderer implements RendererAdapter {
         highlightedBandIds: options.highlightedBandIds,
         scaleTickCount: options.scalePreview?.ticks.length ?? 0,
         scaleLabelCount: options.scalePreview?.labels.length ?? 0,
-        overlayMarkers: options.designOverlay?.markers.length ?? 0,
-        overlayText: options.designOverlay?.typography.length ?? 0
+        designOverlay: options.designOverlay
       }
     });
 
@@ -76,11 +76,15 @@ export class SvgRenderer implements RendererAdapter {
     layer.scale(context.zoom * fitScale);
     const highlightedBandIds = new Set(options.highlightedBandIds);
     const hasFocusSelection = highlightedBandIds.size > 0;
+    const physicalAssembly = resolvePhysicalAssembly(bands);
+    const dialFaceRegion = physicalAssembly.regions['dial-face'];
+    const chapterRingRegion = physicalAssembly.regions['chapter-ring'];
 
     if (options.designOverlay) {
       const overlay = options.designOverlay;
       const overlayLayer = layer.group().id('design-overlay');
-      const dialRadiusPx = mmToPixels(14);
+      const dialRadiusMm = dialFaceRegion?.outerRadiusMm ?? 14;
+      const dialRadiusPx = mmToPixels(dialRadiusMm);
       const centreHoleRadiusPx = mmToPixels(overlay.dialFace.centreHoleMm / 2);
 
       const dialFace = overlayLayer
@@ -107,14 +111,17 @@ export class SvgRenderer implements RendererAdapter {
 
       overlay.markers.forEach((entry) => {
         const marker = entry.marker;
-        const inner = polarToCartesian(mmToPixels(marker.innerRadiusMm), marker.angleDeg);
-        const outer = polarToCartesian(mmToPixels(marker.outerRadiusMm), marker.angleDeg);
+        const markerLengthMm = Math.max(0, marker.outerRadiusMm - marker.innerRadiusMm);
+        const outerRadiusMm = Math.min(marker.outerRadiusMm, dialRadiusMm);
+        const innerRadiusMm = Math.max(0, outerRadiusMm - markerLengthMm);
+        const inner = polarToCartesian(mmToPixels(innerRadiusMm), marker.angleDeg);
+        const outer = polarToCartesian(mmToPixels(outerRadiusMm), marker.angleDeg);
         const color = entry.lumed ? '#C7F9CC' : '#E2E8F0';
 
         if (entry.kind === 'round') {
           const dotRadiusPx = Math.max(1.5, mmToPixels(marker.widthMm));
           const midpoint = polarToCartesian(
-            mmToPixels((marker.innerRadiusMm + marker.outerRadiusMm) / 2),
+            mmToPixels((innerRadiusMm + outerRadiusMm) / 2),
             marker.angleDeg
           );
           overlayLayer
@@ -127,7 +134,7 @@ export class SvgRenderer implements RendererAdapter {
 
         if (entry.kind === 'triangle') {
           const midpoint = polarToCartesian(
-            mmToPixels((marker.innerRadiusMm + marker.outerRadiusMm) / 2),
+            mmToPixels((innerRadiusMm + outerRadiusMm) / 2),
             marker.angleDeg
           );
           const size = Math.max(2, mmToPixels(marker.widthMm * 2));
@@ -141,7 +148,7 @@ export class SvgRenderer implements RendererAdapter {
         }
 
         if (marker.text) {
-          const textPoint = polarToCartesian(mmToPixels(marker.outerRadiusMm + 0.5), marker.angleDeg);
+          const textPoint = polarToCartesian(mmToPixels(Math.min(dialRadiusMm, outerRadiusMm + 0.5)), marker.angleDeg);
           overlayLayer
             .text(marker.text)
             .font({ size: 10, family: '"IBM Plex Mono", monospace', anchor: 'middle' })
@@ -177,8 +184,16 @@ export class SvgRenderer implements RendererAdapter {
       });
 
       overlay.chapterRingMarkers.forEach((marker, index) => {
-        const inner = polarToCartesian(mmToPixels(marker.innerRadiusMm), marker.angleDeg);
-        const outer = polarToCartesian(mmToPixels(marker.outerRadiusMm), marker.angleDeg);
+        if (!chapterRingRegion) {
+          return;
+        }
+        const innerRadiusMm = Math.max(chapterRingRegion.innerRadiusMm, marker.innerRadiusMm);
+        const outerRadiusMm = Math.min(chapterRingRegion.outerRadiusMm, marker.outerRadiusMm);
+        if (outerRadiusMm <= innerRadiusMm) {
+          return;
+        }
+        const inner = polarToCartesian(mmToPixels(innerRadiusMm), marker.angleDeg);
+        const outer = polarToCartesian(mmToPixels(outerRadiusMm), marker.angleDeg);
         overlayLayer
           .line(
             context.centerX + inner.x,
@@ -219,6 +234,8 @@ export class SvgRenderer implements RendererAdapter {
           .stroke({ color: '#E2E8F0', width: 0.6, opacity: 0.45 });
       }
     }
+
+    layer.findOne('#design-overlay')?.front();
 
     if (options.scalePreview) {
       const overlay = layer.group().id('scale-preview');
@@ -290,6 +307,7 @@ export class SvgRenderer implements RendererAdapter {
     const distMm = distPx / 10;
 
     for (const band of [...this.latestBands].sort((a, b) => b.zIndex - a.zIndex)) {
+      if (!band.visible) continue;
       if (distMm >= band.geometry.innerRadius && distMm <= band.geometry.outerRadius) {
         return band.id;
       }

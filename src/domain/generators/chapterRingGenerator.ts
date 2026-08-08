@@ -52,7 +52,7 @@ const scaleByStyle: Record<ChapterRingStyle, ScaleKind> = {
 };
 
 export const defaultChapterRingConfig: ChapterRingConfiguration = {
-  style: 'minute-track',
+  style: 'plain',
   manufacturing: 'printed',
   majorTickStep: 5,
   minorTickStep: 1,
@@ -90,14 +90,15 @@ const countTicks = (step: number): number => {
 
 export const generateChapterRing = (input: ChapterRingConfiguration): ChapterRingResult => {
   const scaleAttachment = input.scaleAttachment || scaleByStyle[input.style];
+  const hasMarkings = input.style !== 'plain';
   const markerConfig = {
     ...input.markerConfig,
     radiusInnerMm: input.radiusInnerMm,
     radiusOuterMm: input.radiusOuterMm
   };
 
-  const markers = generateMarkers(markerConfig);
-  const typography = generateTypographyLayout({
+  const markers = hasMarkings ? generateMarkers(markerConfig) : [];
+  const typography = hasMarkings ? generateTypographyLayout({
     content: input.curvedText,
     layout: input.textOrientation,
     fontCategory: 'railroad',
@@ -112,7 +113,7 @@ export const generateChapterRing = (input: ChapterRingConfiguration): ChapterRin
     curvature: 0.9,
     color: '#E2E8F0',
     fontSizeMm: 1.2
-  });
+  }) : [];
 
   const warnings: string[] = [];
   if (input.radiusOuterMm <= input.radiusInnerMm) {
@@ -130,8 +131,8 @@ export const generateChapterRing = (input: ChapterRingConfiguration): ChapterRin
     scaleAttachment,
     markers,
     typography,
-    majorTickCount: countTicks(input.majorTickStep),
-    minorTickCount: countTicks(input.minorTickStep),
+    majorTickCount: hasMarkings ? countTicks(input.majorTickStep) : 0,
+    minorTickCount: hasMarkings ? countTicks(input.minorTickStep) : 0,
     warnings,
     layers: [
       {

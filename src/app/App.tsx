@@ -1,4 +1,5 @@
 import { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react';
+import { resolveOuterNeighbor, resolvePhysicalAssembly } from '@/domain/assembly/physicalAssembly';
 import { LeftBandsPanel } from '@/components/layout/LeftBandsPanel';
 import { TopToolbar } from '@/components/layout/TopToolbar';
 import { CentreCanvas } from '@/components/layout/CentreCanvas';
@@ -6,6 +7,7 @@ import { RightInspector } from '@/components/layout/RightInspector';
 import { BottomStatusBar } from '@/components/layout/BottomStatusBar';
 import { evaluateCollisions } from '@/domain/geometry/collisionEngine';
 import { materialById } from '@/domain/materials/materialLibrary';
+import { hydrateRuntimeProject } from '@/services/runtimeProjectHydrationService';
 import {
   useBandsStore,
   useDesignEngineStore,
@@ -40,6 +42,7 @@ export const App = () => {
   const scalePreview = useScaleStore((state) => state.preview);
   const overlay = useDesignEngineStore((state) => state.overlay);
   const chapterRingConfig = useDesignEngineStore((state) => state.chapterRingConfig);
+  const syncDesignFromAssembly = useDesignEngineStore((state) => state.syncFromAssembly);
   const setCollisionWarnings = useDesignEngineStore((state) => state.setCollisionWarnings);
   const markerConfig = useDesignEngineStore((state) => state.markerConfig);
   const typographyConfig = useDesignEngineStore((state) => state.typographyConfig);
@@ -107,6 +110,16 @@ export const App = () => {
     ]
   );
 
+  const physicalAssembly = useMemo(() => resolvePhysicalAssembly(bands), [bands]);
+  const chapterOuterRadiusMm = physicalAssembly.regions['chapter-ring']?.outerRadiusMm ?? 0;
+  const chapterBezelBoundaryMm =
+    resolveOuterNeighbor(physicalAssembly, 'chapter-ring')?.innerRadiusMm ??
+    geometryParams.caseDiameterMm / 2;
+
+  useEffect(() => {
+    syncDesignFromAssembly(bands);
+  }, [bands, chapterRingConfig.radiusInnerMm, chapterRingConfig.radiusOuterMm, syncDesignFromAssembly]);
+
   useEffect(() => {
     const material = materialById(projectInfo.material);
     const collisions = evaluateCollisions({
@@ -115,8 +128,8 @@ export const App = () => {
       chapterRingMarkers: overlay.chapterRingMarkers,
       scalePreview,
       caseRadiusMm: geometryParams.caseDiameterMm / 2,
-      chapterOuterRadiusMm: chapterRingConfig.radiusOuterMm,
-      bezelInnerRadiusMm: geometryParams.dialDiameterMm / 2,
+      chapterOuterRadiusMm,
+      bezelInnerRadiusMm: chapterBezelBoundaryMm,
       includeDateWindow: true,
       includeSubdial: true
     });
@@ -127,12 +140,13 @@ export const App = () => {
       selectedMaterial: material
     });
   }, [
-    chapterRingConfig.radiusOuterMm,
     geometryParams,
     overlay.chapterRingMarkers,
     overlay.markers,
     overlay.typography,
     projectInfo.material,
+    chapterOuterRadiusMm,
+    chapterBezelBoundaryMm,
     scalePreview,
     setCollisionWarnings,
     syncWithGeometryEngine
@@ -148,7 +162,10 @@ export const App = () => {
   }, [regenerateScalePreview]);
 
   useEffect(() => {
-    loadAutosave();
+    const project = loadAutosave();
+    if (project) {
+      hydrateRuntimeProject(project);
+    }
   }, [loadAutosave]);
 
   useEffect(() => {

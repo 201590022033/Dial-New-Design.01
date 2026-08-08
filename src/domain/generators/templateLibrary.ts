@@ -64,7 +64,7 @@ export const templateLibrary: TemplateDefinition[] = [
     texture: 'matte',
     markerKind: 'roman-numeral',
     typographyFont: 'vintage',
-    chapterRingStyle: 'minute-track',
+    chapterRingStyle: 'plain',
     bezelType: 'fixed',
     movementSuggestions: ['eta-2824', 'eta-2892', 'nh38'],
     scaleSuggestion: 'circular',

@@ -192,6 +192,17 @@ const widthByKind = (kind: BandEntity['kind'], params: GlobalGeometryParameters)
   }
 };
 
+const structuralBandOrder: BandEntity['kind'][] = [
+  'outer-bezel',
+  'inner-bezel',
+  'chapter-ring'
+];
+
+const structuralBandKinds = new Set<BandEntity['kind']>([
+  'dial-face',
+  ...structuralBandOrder
+]);
+
 export const chainConcentricBands = (
   sourceBands: BandEntity[],
   params: GlobalGeometryParameters
@@ -199,43 +210,46 @@ export const chainConcentricBands = (
   const normalized = normalizeGeometryParameters(params);
   const context = deriveGeometryContext(normalized);
   const warnings = validateGeometryParameters(normalized);
-  let currentInner = 0;
+  const geometryById = new Map<string, { innerRadius: number; outerRadius: number }>();
+  let currentOuterRadiusMm = context.usableBandRadiusMm;
 
-  const bands = sourceBands
-    .slice()
-    .sort((a, b) => a.zIndex - b.zIndex)
-    .map((band) => {
-      const currentWidth = Math.max(widthByKind(band.kind, normalized), normalized.minimumLineWidthMm);
-      const innerDiameterMm = currentInner * 2;
-      let outerDiameterMm = innerDiameterMm + currentWidth * 2;
+  structuralBandOrder.forEach((kind) => {
+    const band = sourceBands.find((candidate) => candidate.kind === kind && candidate.visible);
+    if (!band) {
+      return;
+    }
 
-      if (outerDiameterMm / 2 > context.usableBandRadiusMm) {
-        warnings.push({
-          code: 'BAND_OVERFLOW',
-          message: `${band.displayName} exceeded available dial radius and was clamped.`,
-          severity: 'warning'
-        });
-        outerDiameterMm = context.usableBandRadiusMm * 2;
-      }
+    const widthMm = Math.max(widthByKind(kind, normalized), normalized.minimumLineWidthMm);
+    const innerRadius = Math.max(0, currentOuterRadiusMm - widthMm);
+    geometryById.set(band.id, { innerRadius, outerRadius: currentOuterRadiusMm });
+    currentOuterRadiusMm = Math.max(0, innerRadius - normalized.bandGapMm);
+  });
 
-      const updated = updateBandGeometry(
-        {
-          ...band,
-          innerDiameterMm,
-          outerDiameterMm,
-          calculatedWidthMm: calculateWidth(outerDiameterMm, innerDiameterMm).value,
-          dirty: true,
-          lastUpdatedIso: new Date().toISOString()
-        },
-        {
-          innerRadius: innerDiameterMm / 2,
-          outerRadius: outerDiameterMm / 2
-        }
-      );
+  const dialFace = sourceBands.find((band) => band.kind === 'dial-face' && band.visible);
+  if (dialFace) {
+    geometryById.set(dialFace.id, { innerRadius: 0, outerRadius: currentOuterRadiusMm });
+  }
 
-      currentInner = updated.outerDiameterMm / 2 + normalized.bandGapMm;
-      return updated;
-    });
+  const bands = sourceBands.map((band) => {
+    const geometry = geometryById.get(band.id);
+    if (!geometry || !structuralBandKinds.has(band.kind)) {
+      return band;
+    }
+
+    const innerDiameterMm = geometry.innerRadius * 2;
+    const outerDiameterMm = geometry.outerRadius * 2;
+    return updateBandGeometry(
+      {
+        ...band,
+        innerDiameterMm,
+        outerDiameterMm,
+        calculatedWidthMm: calculateWidth(outerDiameterMm, innerDiameterMm).value,
+        dirty: true,
+        lastUpdatedIso: new Date().toISOString()
+      },
+      geometry
+    );
+  });
 
   return { bands, warnings };
 };

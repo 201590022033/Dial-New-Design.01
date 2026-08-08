@@ -6,6 +6,7 @@ import { ProjectWorkflowDialog } from '@/components/layout/ProjectWorkflowDialog
 import { defaultGeometryParameters } from '@/domain/geometry/geometryEngine';
 import { createBand } from '@/domain/bands/bandRegistry';
 import { deserializeDialProject } from '@/services/projectFileService';
+import { hydrateRuntimeProject } from '@/services/runtimeProjectHydrationService';
 import { useBandsStore, useDesignEngineStore, useGlobalSettingsStore, useHistoryStore, useProjectStore, useScaleStore, useSelectionStore, useViewportStore } from '@/stores';
 
 const workspaceModes = ['Classic', 'Pilot', 'Diver', 'Racing', 'Dress', 'Field'] as const;
@@ -26,7 +27,6 @@ export const TopToolbar = ({ presentationMode, onTogglePresentationMode }: TopTo
 
   const setBandsSnapshot = useBandsStore((state) => state.setBandsSnapshot);
   const selectBand = useSelectionStore((state) => state.selectBand);
-  const hydrateDesignState = useDesignEngineStore((state) => state.hydrateDesignState);
   const resetDesignState = useDesignEngineStore((state) => state.resetDesignState);
 
   const projectInfo = useProjectStore((state) => state.info);
@@ -41,11 +41,9 @@ export const TopToolbar = ({ presentationMode, onTogglePresentationMode }: TopTo
   const importProjectJson = useProjectStore((state) => state.importProjectJson);
   const setAutosaveEnabled = useProjectStore((state) => state.setAutosaveEnabled);
   const updateGeometryParams = useGlobalSettingsStore((state) => state.updateGeometryParams);
-  const hydrateScaleState = useScaleStore((state) => state.hydrateScaleState);
   const resetScaleState = useScaleStore((state) => state.resetScaleState);
   const setZoom = useViewportStore((state) => state.setZoom);
   const resetPan = useViewportStore((state) => state.resetPan);
-  const panBy = useViewportStore((state) => state.panBy);
 
   const historyPush = useHistoryStore((state) => state.pushSnapshot);
   const historyUndo = useHistoryStore((state) => state.undo);
@@ -56,20 +54,7 @@ export const TopToolbar = ({ presentationMode, onTogglePresentationMode }: TopTo
 
   const applyProjectPayload = (input: string) => {
     const project = deserializeDialProject(input);
-    updateGeometryParams(project.geometry);
-    setBandsSnapshot(project.bands);
-    hydrateScaleState(project.scale);
-    hydrateDesignState({
-      templateId: project.design.templateId,
-      markerConfig: project.design.markerConfig,
-      typographyConfig: project.design.typographyConfig,
-      textureConfig: project.design.textureConfig,
-      colors: project.design.colors
-    });
-    setZoom(project.viewport.zoom);
-    resetPan();
-    panBy(project.viewport.panX, project.viewport.panY);
-    selectBand(project.selection.selectedBandId);
+    hydrateRuntimeProject(project);
     importProjectJson(input);
   };
 

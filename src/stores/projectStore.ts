@@ -82,7 +82,7 @@ interface ProjectStoreState {
   newProject: () => void;
   setAutosaveEnabled: (enabled: boolean) => void;
   autosaveNow: () => void;
-  loadAutosave: () => void;
+  loadAutosave: () => DialProjectFile | null;
 }
 
 const defaultBands = (): BandEntity[] => [
@@ -327,7 +327,7 @@ export const useProjectStore = create<ProjectStoreState>((set, get) => ({
   loadAutosave: () => {
     const payload = localStorage.getItem(AUTOSAVE_KEY);
     if (!payload) {
-      return;
+      return null;
     }
 
     try {
@@ -351,8 +351,10 @@ export const useProjectStore = create<ProjectStoreState>((set, get) => ({
         historyCounts: project.history,
         dirty: false
       });
+      return project;
     } catch {
       localStorage.removeItem(AUTOSAVE_KEY);
+      return null;
     }
   }
 }));

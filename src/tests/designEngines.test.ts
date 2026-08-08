@@ -25,6 +25,8 @@ import {
 } from '@/domain/generators/templateLibrary';
 import { resolveTexturePlugin } from '@/domain/generators/textureEngine';
 import { getMovementDesignRecommendations } from '@/services/movementRecommendationService';
+import { createBand } from '@/domain/bands/bandRegistry';
+import { useDesignEngineStore } from '@/stores/designEngineStore';
 
 describe('design engines', () => {
   it('loads a template with editable payload', () => {
@@ -85,6 +87,37 @@ describe('design engines', () => {
     expect(result.style).toBe('tachymeter-ring');
     expect(result.markers.length).toBeGreaterThan(0);
     expect(result.majorTickCount).toBeGreaterThan(0);
+  });
+
+  it('keeps a plain chapter ring free of generated markings', () => {
+    const result = generateChapterRing({
+      ...defaultChapterRingConfig,
+      style: 'plain'
+    });
+
+    expect(result.markers).toEqual([]);
+    expect(result.typography).toEqual([]);
+    expect(result.majorTickCount).toBe(0);
+    expect(result.minorTickCount).toBe(0);
+  });
+
+  it('derives generator radii and visibility from the physical assembly', () => {
+    const chapter = createBand('chapter', 'chapter-ring', { innerRadius: 14.2, outerRadius: 16 });
+    const bands = [
+      createBand('dial', 'dial-face', { innerRadius: 0, outerRadius: 14 }),
+      chapter
+    ];
+
+    useDesignEngineStore.getState().syncFromAssembly(bands);
+    expect(useDesignEngineStore.getState().chapterRingConfig.radiusInnerMm).toBe(14.2);
+    expect(useDesignEngineStore.getState().chapterRingConfig.radiusOuterMm).toBe(16);
+
+    chapter.visible = false;
+    useDesignEngineStore.getState().syncFromAssembly(bands);
+    expect(useDesignEngineStore.getState().chapterRingVisible).toBe(false);
+    expect(useDesignEngineStore.getState().overlay.chapterRingMarkers).toEqual([]);
+
+    useDesignEngineStore.getState().resetDesignState();
   });
 
   it('generates bezel metadata', () => {

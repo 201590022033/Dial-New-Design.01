@@ -1,4 +1,5 @@
 import type { BandEntity } from '@/domain/bands/types';
+import { resolvePhysicalAssembly } from '@/domain/assembly/physicalAssembly';
 import type {
   ConstraintViolation,
   DerivedGeometryContext,
@@ -20,8 +21,13 @@ export const evaluateGeometryConstraints = (
   const violations: ConstraintViolation[] = [];
   const minBandWidth = Math.max(params.minimumLineWidthMm, 0.2);
   const maxBandWidth = Math.max(1, params.caseDiameterMm / 3);
+  const bandById = new Map(bands.map((band) => [band.id, band]));
+  const radialBands = resolvePhysicalAssembly(bands).centerOut.flatMap((region) => {
+    const band = bandById.get(region.bandId);
+    return band ? [band] : [];
+  });
 
-  bands.forEach((band, index) => {
+  bands.forEach((band) => {
     const width = band.calculatedWidthMm;
 
     if (width < 0) {
@@ -84,8 +90,9 @@ export const evaluateGeometryConstraints = (
       });
     }
 
-    if (index > 0) {
-      const previous = bands[index - 1];
+    const radialIndex = radialBands.findIndex((candidate) => candidate.id === band.id);
+    if (radialIndex > 0) {
+      const previous = radialBands[radialIndex - 1];
       if (!previous) {
         return;
       }

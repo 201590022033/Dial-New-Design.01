@@ -1,4 +1,6 @@
 import { create } from 'zustand';
+import type { BandEntity } from '@/domain/bands/types';
+import { fitSpanToRegion, resolvePhysicalAssembly } from '@/domain/assembly/physicalAssembly';
 import {
   defaultDialFaceConfig,
   generateDialFace,
@@ -59,6 +61,7 @@ interface DesignEngineState {
   overlay: DesignOverlay;
   collisionWarnings: CollisionWarning[];
   warnings: string[];
+  chapterRingVisible: boolean;
   updateDialFaceConfig: (patch: Partial<DialFaceConfig>) => void;
   updateMarkerConfig: (patch: Partial<MarkerEngineConfig>) => void;
   updateTypographyConfig: (patch: Partial<TypographyConfig>) => void;
@@ -68,6 +71,7 @@ interface DesignEngineState {
   selectMovement: (movementId: string) => void;
   applyTemplate: (templateId: TemplateId) => void;
   setCollisionWarnings: (warnings: CollisionWarning[]) => void;
+  syncFromAssembly: (bands: BandEntity[]) => void;
   hydrateDesignState: (snapshot: {
     templateId: TemplateId;
     markerConfig: MarkerEngineConfig;
@@ -93,7 +97,8 @@ const createOverlay = (
   markerConfig: MarkerEngineConfig,
   typographyConfig: TypographyConfig,
   chapterRingResult: ChapterRingResult,
-  lumeResult: LumeResult
+  lumeResult: LumeResult,
+  chapterRingVisible = true
 ): DesignOverlay => {
   const markers = generateMarkers(markerConfig).map((marker) => ({
     marker,
@@ -111,8 +116,8 @@ const createOverlay = (
     },
     markers,
     typography: generateTypographyLayout(typographyConfig),
-    chapterRingMarkers: chapterRingResult.markers,
-    chapterRingTypography: chapterRingResult.typography
+    chapterRingMarkers: chapterRingVisible ? chapterRingResult.markers : [],
+    chapterRingTypography: chapterRingVisible ? chapterRingResult.typography : []
   };
 };
 
@@ -150,6 +155,7 @@ export const useDesignEngineStore = create<DesignEngineState>((set, get) => ({
   ),
   collisionWarnings: [],
   warnings: collectWarnings(initialDialFace, initialChapter, initialBezel),
+  chapterRingVisible: true,
   updateDialFaceConfig: (patch) => {
     set((state) => ({
       dialFaceConfig: {
@@ -264,6 +270,53 @@ export const useDesignEngineStore = create<DesignEngineState>((set, get) => ({
     get().regenerate();
   },
   setCollisionWarnings: (collisionWarnings) => set({ collisionWarnings }),
+  syncFromAssembly: (bands) => {
+    const state = get();
+    const assembly = resolvePhysicalAssembly(bands);
+    const dialRegion = assembly.regions['dial-face'];
+    const chapterRegion = assembly.regions['chapter-ring'];
+    const chapterRingVisible = Boolean(chapterRegion);
+    const markerLengthMm = state.markerConfig.radiusOuterMm - state.markerConfig.radiusInnerMm;
+    const markerSpan = dialRegion ? fitSpanToRegion(dialRegion, markerLengthMm) : null;
+
+    const geometryChanged = Boolean(
+      (chapterRegion &&
+        (state.chapterRingConfig.radiusInnerMm !== chapterRegion.innerRadiusMm ||
+          state.chapterRingConfig.radiusOuterMm !== chapterRegion.outerRadiusMm)) ||
+      (markerSpan &&
+        (state.markerConfig.radiusInnerMm !== markerSpan.innerRadiusMm ||
+          state.markerConfig.radiusOuterMm !== markerSpan.outerRadiusMm)) ||
+      state.chapterRingVisible !== chapterRingVisible
+    );
+
+    if (!geometryChanged) {
+      return;
+    }
+
+    set({
+      chapterRingVisible,
+      chapterRingConfig: chapterRegion
+        ? {
+            ...state.chapterRingConfig,
+            radiusInnerMm: chapterRegion.innerRadiusMm,
+            radiusOuterMm: chapterRegion.outerRadiusMm,
+            markerConfig: {
+              ...state.chapterRingConfig.markerConfig,
+              radiusInnerMm: chapterRegion.innerRadiusMm,
+              radiusOuterMm: chapterRegion.outerRadiusMm
+            }
+          }
+        : state.chapterRingConfig,
+      markerConfig: markerSpan
+        ? {
+            ...state.markerConfig,
+            radiusInnerMm: markerSpan.innerRadiusMm,
+            radiusOuterMm: markerSpan.outerRadiusMm
+          }
+        : state.markerConfig
+    });
+    get().regenerate();
+  },
   hydrateDesignState: (snapshot) => {
     set((state) => ({
       activeTemplateId: snapshot.templateId,
@@ -290,7 +343,8 @@ export const useDesignEngineStore = create<DesignEngineState>((set, get) => ({
       selectedMovementId: defaultMovementId,
       movementRecommendations: getMovementDesignRecommendations(defaultMovementId),
       suggestedScaleKind: 'circular',
-      collisionWarnings: []
+      collisionWarnings: [],
+      chapterRingVisible: true
     });
     get().regenerate();
   },
@@ -311,7 +365,8 @@ export const useDesignEngineStore = create<DesignEngineState>((set, get) => ({
         state.markerConfig,
         state.typographyConfig,
         chapterRingResult,
-        lumeResult
+        lumeResult,
+        state.chapterRingVisible
       ),
       warnings: collectWarnings(dialFaceResult, chapterRingResult, bezelResult)
     });
