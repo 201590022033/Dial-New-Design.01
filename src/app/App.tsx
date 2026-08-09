@@ -341,7 +341,7 @@ export const App = () => {
             'grid min-h-0 h-full flex-1 gap-3 overflow-hidden',
             presentationMode
               ? 'min-w-0 grid-cols-[minmax(0,1fr)]'
-              : 'min-w-0 grid-cols-[300px_minmax(600px,1fr)_360px]'
+              : 'min-w-[1260px] grid-cols-[300px_minmax(600px,1fr)_360px]'
           ].join(' ')}
           data-layout-columns="3"
         >
