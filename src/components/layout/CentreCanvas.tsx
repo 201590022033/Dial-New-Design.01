@@ -94,17 +94,10 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode }: Cen
     const fitWidthScale = Math.max(1, Math.min(2.6, (Math.max(1, width) * 0.94) / nominalDiameterPx));
 
     return {
-      fitToWatchZoom: 1,
-      fitWidthZoom: Number((fitWidthScale / fitToWatchScale).toFixed(2)),
-      actualSizeZoom: Number((1 / fitToWatchScale).toFixed(2))
+      fitToWatchZoom: Number(fitToWatchScale.toFixed(2)),
+      fitWidthZoom: Number(fitWidthScale.toFixed(2)),
+      actualSizeZoom: 1
     };
-  }, [bands, width, height]);
-
-  const previewFitScale = useMemo(() => {
-    const maxOuterRadiusMm = bands.reduce((current, band) => Math.max(current, band.geometry.outerRadius), 20);
-    const nominalDiameterPx = Math.max(1, mmToPixels(maxOuterRadiusMm * 2));
-    const targetDiameterPx = Math.min(width, height) * 0.9;
-    return Math.max(1, Math.min(2.6, targetDiameterPx / nominalDiameterPx));
   }, [bands, width, height]);
 
   const fitToWatch = () => {
@@ -235,7 +228,7 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode }: Cen
                 centerY: renderContext.centerY,
                 panX: renderContext.panX,
                 panY: renderContext.panY,
-                renderScale: renderContext.zoom * previewFitScale
+                renderScale: renderContext.zoom
               });
 
               const hasCollisionWarnings = scalePreview.validation.structuredWarnings.some(

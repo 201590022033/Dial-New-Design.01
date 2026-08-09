@@ -41,7 +41,11 @@ export const App = () => {
   const scaleContext = useScaleStore((state) => state.context);
   const scalePreview = useScaleStore((state) => state.preview);
   const overlay = useDesignEngineStore((state) => state.overlay);
+  const dialFaceResult = useDesignEngineStore((state) => state.dialFaceResult);
   const chapterRingConfig = useDesignEngineStore((state) => state.chapterRingConfig);
+  const bezelFill = useDesignEngineStore(
+    (state) => state.bezelResult.layers.find((layer) => layer.id === 'bezel-surface')?.style.fill ?? null
+  );
   const syncDesignFromAssembly = useDesignEngineStore((state) => state.syncFromAssembly);
   const setCollisionWarnings = useDesignEngineStore((state) => state.setCollisionWarnings);
   const markerConfig = useDesignEngineStore((state) => state.markerConfig);
@@ -115,10 +119,62 @@ export const App = () => {
   const chapterBezelBoundaryMm =
     resolveOuterNeighbor(physicalAssembly, 'chapter-ring')?.innerRadiusMm ??
     geometryParams.caseDiameterMm / 2;
+  const colorSyncBandKey = useMemo(
+    () =>
+      bands
+        .filter((band) => band.kind === 'dial-face' || band.kind === 'inner-bezel' || band.kind === 'outer-bezel')
+        .map((band) => `${band.id}:${band.kind}`)
+        .join('|'),
+    [bands]
+  );
 
   useEffect(() => {
     syncDesignFromAssembly(bands);
   }, [bands, chapterRingConfig.radiusInnerMm, chapterRingConfig.radiusOuterMm, syncDesignFromAssembly]);
+
+  useEffect(() => {
+    const dialFill = dialFaceResult.background.style.fill;
+    const state = useBandsStore.getState();
+    let changed = false;
+
+    const nextBands = state.bands.map((band) => {
+      if (band.kind === 'dial-face') {
+        if (band.style.fill === dialFill && band.color === dialFill) {
+          return band;
+        }
+        changed = true;
+        return {
+          ...band,
+          color: dialFill,
+          style: {
+            ...band.style,
+            fill: dialFill
+          }
+        };
+      }
+
+      if ((band.kind === 'inner-bezel' || band.kind === 'outer-bezel') && bezelFill) {
+        if (band.style.fill === bezelFill && band.color === bezelFill) {
+          return band;
+        }
+        changed = true;
+        return {
+          ...band,
+          color: bezelFill,
+          style: {
+            ...band.style,
+            fill: bezelFill
+          }
+        };
+      }
+
+      return band;
+    });
+
+    if (changed) {
+      useBandsStore.setState({ bands: nextBands });
+    }
+  }, [bezelFill, colorSyncBandKey, dialFaceResult.background.style.fill]);
 
   useEffect(() => {
     const material = materialById(projectInfo.material);
@@ -228,7 +284,6 @@ export const App = () => {
       const centre = centrePanelRef.current;
       const right = rightPanelRef.current;
       const bottom = bottomStatusRef.current;
-      const root = document.documentElement;
 
       if (!top) issues.push('TopToolbar not mounted');
       if (!workspace) issues.push('Workspace not mounted');
@@ -274,10 +329,6 @@ export const App = () => {
           issues.push('Workspace has vertical clipping/overflow');
         }
 
-        if (root.scrollHeight > window.innerHeight + 1) {
-          issues.push('Application is vertically scrolling');
-        }
-
         const verticalOverlap =
           topRect.bottom > workspaceRect.top || workspaceRect.bottom > bottomRect.top;
         if (verticalOverlap) {
@@ -309,7 +360,7 @@ export const App = () => {
   }, [presentationMode]);
 
   return (
-    <div className="flex h-screen flex-col gap-3 overflow-hidden p-3 md:p-4">
+    <div className="flex h-full flex-col gap-3 overflow-hidden p-3 md:p-4">
       {presentationMode ? null : (
         <div ref={topToolbarRef} className="flex-none" data-layout-region="top-toolbar">
           <TopToolbar

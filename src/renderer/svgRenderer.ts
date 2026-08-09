@@ -12,7 +12,6 @@ export class SvgRenderer implements RendererAdapter {
   private container: HTMLElement | null = null;
   private latestBands: BandEntity[] = [];
   private latestContext: RenderContext | null = null;
-  private latestFitScale = 1;
   private latestRenderKey = '';
 
   mount(container: HTMLElement): void {
@@ -63,17 +62,9 @@ export class SvgRenderer implements RendererAdapter {
       renderGuides(this.root, context.width, context.height);
     }
 
-    const maxOuterRadiusMm = bands.reduce((current, band) => {
-      return Math.max(current, band.geometry.outerRadius);
-    }, 20);
-    const nominalDiameterPx = Math.max(1, mmToPixels(maxOuterRadiusMm * 2));
-    const targetDiameterPx = Math.min(context.width, context.height) * 0.9;
-    const fitScale = Math.max(1, Math.min(2.6, targetDiameterPx / nominalDiameterPx));
-    this.latestFitScale = fitScale;
-
     const layer = this.root.group().id('bands');
     layer.translate(context.panX, context.panY);
-    layer.scale(context.zoom * fitScale);
+    layer.scale(context.zoom);
     const highlightedBandIds = new Set(options.highlightedBandIds);
     const hasFocusSelection = highlightedBandIds.size > 0;
     const physicalAssembly = resolvePhysicalAssembly(bands);
@@ -303,7 +294,7 @@ export class SvgRenderer implements RendererAdapter {
     const rect = this.container.getBoundingClientRect();
     const x = screenX - rect.left - this.latestContext.panX - this.latestContext.centerX;
     const y = screenY - rect.top - this.latestContext.panY - this.latestContext.centerY;
-    const distPx = Math.sqrt(x * x + y * y) / (this.latestContext.zoom * this.latestFitScale);
+    const distPx = Math.sqrt(x * x + y * y) / this.latestContext.zoom;
     const distMm = distPx / 10;
 
     for (const band of [...this.latestBands].sort((a, b) => b.zIndex - a.zIndex)) {
