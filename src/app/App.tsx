@@ -43,7 +43,9 @@ export const App = () => {
   const overlay = useDesignEngineStore((state) => state.overlay);
   const dialFaceResult = useDesignEngineStore((state) => state.dialFaceResult);
   const chapterRingConfig = useDesignEngineStore((state) => state.chapterRingConfig);
-  const bezelResult = useDesignEngineStore((state) => state.bezelResult);
+  const bezelFill = useDesignEngineStore(
+    (state) => state.bezelResult.layers.find((layer) => layer.id === 'bezel-surface')?.style.fill ?? null
+  );
   const syncDesignFromAssembly = useDesignEngineStore((state) => state.syncFromAssembly);
   const setCollisionWarnings = useDesignEngineStore((state) => state.setCollisionWarnings);
   const markerConfig = useDesignEngineStore((state) => state.markerConfig);
@@ -117,6 +119,14 @@ export const App = () => {
   const chapterBezelBoundaryMm =
     resolveOuterNeighbor(physicalAssembly, 'chapter-ring')?.innerRadiusMm ??
     geometryParams.caseDiameterMm / 2;
+  const colorSyncBandKey = useMemo(
+    () =>
+      bands
+        .filter((band) => band.kind === 'dial-face' || band.kind === 'inner-bezel' || band.kind === 'outer-bezel')
+        .map((band) => `${band.id}:${band.kind}`)
+        .join('|'),
+    [bands]
+  );
 
   useEffect(() => {
     syncDesignFromAssembly(bands);
@@ -124,7 +134,6 @@ export const App = () => {
 
   useEffect(() => {
     const dialFill = dialFaceResult.background.style.fill;
-    const bezelFill = bezelResult.layers.find((layer) => layer.id === 'bezel-surface')?.style.fill;
     const state = useBandsStore.getState();
     let changed = false;
 
@@ -165,7 +174,7 @@ export const App = () => {
     if (changed) {
       useBandsStore.setState({ bands: nextBands });
     }
-  }, [bezelResult.layers, dialFaceResult.background.style.fill]);
+  }, [bezelFill, colorSyncBandKey, dialFaceResult.background.style.fill]);
 
   useEffect(() => {
     const material = materialById(projectInfo.material);
