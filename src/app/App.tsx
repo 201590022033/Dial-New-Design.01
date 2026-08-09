@@ -356,7 +356,7 @@ export const App = () => {
           <section
             ref={centrePanelRef}
             data-layout-column="centre-canvas"
-            className="flex min-h-0 min-w-0 items-center justify-center overflow-hidden"
+            className="flex min-h-0 min-w-0 items-center justify-center overflow-auto"
           >
             <CentreCanvas
               presentationMode={presentationMode}
