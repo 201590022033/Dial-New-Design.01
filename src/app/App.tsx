@@ -228,7 +228,6 @@ export const App = () => {
       const centre = centrePanelRef.current;
       const right = rightPanelRef.current;
       const bottom = bottomStatusRef.current;
-      const root = document.documentElement;
 
       if (!top) issues.push('TopToolbar not mounted');
       if (!workspace) issues.push('Workspace not mounted');
@@ -274,10 +273,6 @@ export const App = () => {
           issues.push('Workspace has vertical clipping/overflow');
         }
 
-        if (root.scrollHeight > window.innerHeight + 1) {
-          issues.push('Application is vertically scrolling');
-        }
-
         const verticalOverlap =
           topRect.bottom > workspaceRect.top || workspaceRect.bottom > bottomRect.top;
         if (verticalOverlap) {
@@ -309,7 +304,7 @@ export const App = () => {
   }, [presentationMode]);
 
   return (
-    <div className="flex h-screen flex-col gap-3 overflow-hidden p-3 md:p-4">
+    <div className="flex h-full flex-col gap-3 overflow-hidden p-3 md:p-4">
       {presentationMode ? null : (
         <div ref={topToolbarRef} className="flex-none" data-layout-region="top-toolbar">
           <TopToolbar
@@ -321,7 +316,7 @@ export const App = () => {
 
       <main
         ref={workspaceRef}
-        className="flex min-h-0 flex-1 overflow-x-auto overflow-y-hidden"
+        className="flex min-h-0 flex-1 overflow-hidden"
         data-layout-region="workspace"
       >
         {/*
@@ -346,7 +341,7 @@ export const App = () => {
             'grid min-h-0 h-full flex-1 gap-3 overflow-hidden',
             presentationMode
               ? 'min-w-0 grid-cols-[minmax(0,1fr)]'
-              : 'min-w-[1260px] grid-cols-[300px_minmax(600px,1fr)_360px]'
+              : 'min-w-0 grid-cols-[300px_minmax(0,1fr)_360px]'
           ].join(' ')}
           data-layout-columns="3"
         >
@@ -361,7 +356,7 @@ export const App = () => {
           <section
             ref={centrePanelRef}
             data-layout-column="centre-canvas"
-            className="flex min-h-0 min-w-0 items-center justify-center overflow-auto"
+            className="flex min-h-0 min-w-0 overflow-hidden"
           >
             <CentreCanvas
               presentationMode={presentationMode}

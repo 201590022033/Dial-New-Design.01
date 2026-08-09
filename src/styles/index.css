@@ -40,8 +40,15 @@
   --dd-border: #dbe4ef;
 }
 
+html {
+  height: 100%;
+  overflow: hidden;
+}
+
 body {
-  @apply m-0 min-h-screen bg-engineering-bg text-engineering-text antialiased;
+  @apply m-0 bg-engineering-bg text-engineering-text antialiased;
+  height: 100dvh;
+  overflow: hidden;
   background-image:
     radial-gradient(circle at 18% 18%, rgba(56, 189, 248, 0.08), transparent 38%),
     radial-gradient(circle at 80% 5%, rgba(245, 158, 11, 0.08), transparent 30%),
@@ -49,7 +56,7 @@ body {
 }
 
 #root {
-  @apply min-h-screen;
+  @apply h-full overflow-hidden;
 }
 
 * {
