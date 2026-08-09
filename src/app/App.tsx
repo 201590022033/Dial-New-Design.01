@@ -41,7 +41,9 @@ export const App = () => {
   const scaleContext = useScaleStore((state) => state.context);
   const scalePreview = useScaleStore((state) => state.preview);
   const overlay = useDesignEngineStore((state) => state.overlay);
+  const dialFaceResult = useDesignEngineStore((state) => state.dialFaceResult);
   const chapterRingConfig = useDesignEngineStore((state) => state.chapterRingConfig);
+  const bezelResult = useDesignEngineStore((state) => state.bezelResult);
   const syncDesignFromAssembly = useDesignEngineStore((state) => state.syncFromAssembly);
   const setCollisionWarnings = useDesignEngineStore((state) => state.setCollisionWarnings);
   const markerConfig = useDesignEngineStore((state) => state.markerConfig);
@@ -119,6 +121,51 @@ export const App = () => {
   useEffect(() => {
     syncDesignFromAssembly(bands);
   }, [bands, chapterRingConfig.radiusInnerMm, chapterRingConfig.radiusOuterMm, syncDesignFromAssembly]);
+
+  useEffect(() => {
+    const dialFill = dialFaceResult.background.style.fill;
+    const bezelFill = bezelResult.layers.find((layer) => layer.id === 'bezel-surface')?.style.fill;
+    const state = useBandsStore.getState();
+    let changed = false;
+
+    const nextBands = state.bands.map((band) => {
+      if (band.kind === 'dial-face') {
+        if (band.style.fill === dialFill && band.color === dialFill) {
+          return band;
+        }
+        changed = true;
+        return {
+          ...band,
+          color: dialFill,
+          style: {
+            ...band.style,
+            fill: dialFill
+          }
+        };
+      }
+
+      if ((band.kind === 'inner-bezel' || band.kind === 'outer-bezel') && bezelFill) {
+        if (band.style.fill === bezelFill && band.color === bezelFill) {
+          return band;
+        }
+        changed = true;
+        return {
+          ...band,
+          color: bezelFill,
+          style: {
+            ...band.style,
+            fill: bezelFill
+          }
+        };
+      }
+
+      return band;
+    });
+
+    if (changed) {
+      useBandsStore.setState({ bands: nextBands });
+    }
+  }, [bezelResult.layers, dialFaceResult.background.style.fill]);
 
   useEffect(() => {
     const material = materialById(projectInfo.material);
