@@ -602,7 +602,7 @@ export const LeftBandsPanel = () => {
             <div className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2.5 py-2 text-xs text-engineering-muted">
               <p className="font-semibold text-engineering-text">{getComponentInspectorSchema(selectedComponentId).title}</p>
               <p className="mt-1">No physical band is instantiated yet.</p>
-              <p>Inspector schema placeholder is active for workflow consistency.</p>
+              <p>Inspector sections are available and will apply once a compatible band is added.</p>
             </div>
           ) : (
             <p className="text-xs text-engineering-muted">Select a watch component in Watch Structure to edit it in the inspector.</p>

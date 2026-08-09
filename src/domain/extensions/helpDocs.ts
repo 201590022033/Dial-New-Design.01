@@ -10,109 +10,109 @@ export const helpDocPages: HelpDocPage[] = [
     id: 'slide-rule-math',
     title: 'Slide Rule Mathematics',
     category: 'Mathematics',
-    summary: 'Placeholder documentation for logarithmic ring ratios and pilot timing relationships.'
+    summary: 'Explains logarithmic ring ratios, C/D-style index relationships, and practical aviation timing conversions.'
   },
   {
     id: 'tachymeter-math',
     title: 'Tachymeter Mathematics',
     category: 'Mathematics',
-    summary: 'Placeholder documentation for speed-distance conversion marks and calibration spacing.'
+    summary: 'Covers speed-distance-time conversion assumptions and spacing logic for fixed-duration tachymeter scales.'
   },
   {
     id: 'log-scales',
     title: 'Logarithmic Scales',
     category: 'Mathematics',
-    summary: 'Placeholder documentation for logarithmic tick placement principles.'
+    summary: 'Describes normalized log-domain mapping, major/minor tick selection, and readability limits for dense rings.'
   },
   {
     id: 'compass-scales',
     title: 'Compass Scales',
     category: 'Construction',
-    summary: 'Placeholder documentation for orientation rings and cardinal segmentation.'
+    summary: 'Defines cardinal/intercardinal segmentation, north indexing, and alignment rules for directional bezels and chapter rings.'
   },
   {
     id: 'countdown-rings',
     title: 'Countdown Rings',
     category: 'Construction',
-    summary: 'Placeholder documentation for count-down ring cadence and anti-clockwise standards.'
+    summary: 'Documents anti-clockwise countdown conventions, interval cadence choices, and marker emphasis for timing clarity.'
   },
   {
     id: 'chapter-rings',
     title: 'Chapter Rings',
     category: 'Construction',
-    summary: 'Placeholder documentation for chapter track geometry and offset spacing.'
+    summary: 'Outlines chapter track radial spacing, minute marker grouping, and safe offsets from dial text and applied indices.'
   },
   {
     id: 'bezels',
     title: 'Bezels',
     category: 'Construction',
-    summary: 'Placeholder documentation for fixed and rotating bezel architecture.'
+    summary: 'Summarizes fixed vs rotating bezel architecture, grip profile trade-offs, and insert alignment considerations.'
   },
   {
     id: 'manufacturing',
     title: 'Manufacturing',
     category: 'Manufacturing',
-    summary: 'Placeholder manufacturing guidance for finishing and machining constraints.'
+    summary: 'High-level process guidance for print, machining, finishing, and tolerance stack-up planning during design.'
   },
   {
     id: 'laser-cutting',
     title: 'Laser Cutting',
     category: 'Manufacturing',
-    summary: 'Placeholder specifications for laser tolerances and kerf compensation.'
+    summary: 'Presents kerf compensation strategy, minimum feature constraints, and heat-affected zone caution areas.'
   },
   {
     id: 'cnc',
     title: 'CNC',
     category: 'Manufacturing',
-    summary: 'Placeholder documentation for tool radius constraints and fixture recommendations.'
+    summary: 'Details cutter radius implications, inside-corner limits, fixture stability, and post-process finishing allowances.'
   },
   {
     id: 'uv-printing',
     title: 'UV Printing',
     category: 'Manufacturing',
-    summary: 'Placeholder documentation for ink thickness, curing limits, and adhesion prep.'
+    summary: 'Documents ink film thickness expectations, curing constraints, and substrate preparation for adhesion reliability.'
   },
   {
     id: 'recommended-tolerances',
     title: 'Recommended Tolerances',
     category: 'Guidelines',
-    summary: 'Placeholder ranges for production-safe clearances and alignment allowances.'
+    summary: 'Reference tolerances for clearances, marker spacing, and alignment allowances across common dial processes.'
   },
   {
     id: 'svg-guidelines',
     title: 'SVG Guidelines',
     category: 'Guidelines',
-    summary: 'Placeholder best practices for vector layer naming, units, and export hygiene.'
+    summary: 'Best practices for vector naming conventions, unit discipline, and export hygiene for vendor-ready artwork.'
   },
   {
     id: 'scale-linear',
     title: 'Linear Scale Plugin',
     category: 'Mathematics',
-    summary: 'Purpose/history/math background/use/watch examples/manufacturing notes placeholder for linear scale plugin.'
+    summary: 'Linear spacing plugin for evenly distributed value ranges; use for elapsed tracks and calibrated reference rings.'
   },
   {
     id: 'scale-logarithmic',
     title: 'Logarithmic Scale Plugin',
     category: 'Mathematics',
-    summary: 'Purpose/history/math background/use/watch examples/manufacturing notes placeholder for logarithmic scale plugin.'
+    summary: 'Logarithmic spacing plugin for ratio-based reading; suited to slide-rule behaviors and multiplicative comparisons.'
   },
   {
     id: 'scale-tachymeter',
     title: 'Tachymeter Scale Plugin',
     category: 'Construction',
-    summary: 'Purpose/history/math background/use/watch examples/manufacturing notes placeholder for tachymeter plugin.'
+    summary: 'Tachymeter plugin for fixed-distance speed estimation, with emphasis on legible high-speed compression zones.'
   },
   {
     id: 'scale-compass',
     title: 'Compass Scale Plugin',
     category: 'Construction',
-    summary: 'Purpose/history/math background/use/watch examples/manufacturing notes placeholder for compass plugin.'
+    summary: 'Compass plugin for directional references with configurable cardinal labelling and orientation-safe tick segmentation.'
   },
   {
     id: 'scale-manufacturing',
     title: 'Scale Manufacturing Constraints',
     category: 'Manufacturing',
-    summary: 'Purpose/history/math background/use/watch examples/manufacturing notes placeholder for scale manufacturing checks.'
+    summary: 'Manufacturing checks for minimum printable tick widths, label crowding risk, and process-specific feature thresholds.'
   },
   {
     id: 'dial-face-engine',
@@ -154,7 +154,7 @@ export const helpDocPages: HelpDocPage[] = [
     id: 'lume-engine',
     title: 'Lume Engine',
     category: 'Manufacturing',
-    summary: 'Purpose: define lume mode and visual intensity placeholders. Best practice: coordinate lume geometry with marker style and print/relief constraints.'
+    summary: 'Purpose: define lume mode and visual intensity. Best practice: coordinate lume geometry with marker style and print/relief constraints.'
   },
   {
     id: 'movement-integration',

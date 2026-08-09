@@ -80,56 +80,56 @@ const plugins: TexturePlugin[] = [
     kind: 'clous-de-paris',
     displayName: 'Clous de Paris',
     implemented: false,
-    description: 'Guilloche hobnail texture placeholder.',
+    description: 'Planned hobnail guilloche pattern with crisp pyramidal micro-relief simulation.',
     apply: (base) => base
   },
   {
     kind: 'basketweave',
     displayName: 'Basketweave',
     implemented: false,
-    description: 'Basketweave texture placeholder.',
+    description: 'Planned interlaced weave motif optimized for sport and field-dial visual depth.',
     apply: (base) => base
   },
   {
     kind: 'barleycorn',
     displayName: 'Barleycorn',
     implemented: false,
-    description: 'Barleycorn guilloche placeholder.',
+    description: 'Planned barleycorn guilloche spiral with radial light play for dress dials.',
     apply: (base) => base
   },
   {
     kind: 'rose-engine',
     displayName: 'Rose Engine',
     implemented: false,
-    description: 'Rose engine turning placeholder.',
+    description: 'Planned rose-engine turning wave lattice inspired by traditional engine-turned surfaces.',
     apply: (base) => base
   },
   {
     kind: 'wave',
     displayName: 'Wave',
     implemented: false,
-    description: 'Wave pattern placeholder.',
+    description: 'Planned flowing wave field for maritime and contemporary dial themes.',
     apply: (base) => base
   },
   {
     kind: 'flame',
     displayName: 'Flame',
     implemented: false,
-    description: 'Flame motif placeholder.',
+    description: 'Planned flame motif with directional highlights for high-contrast decorative accents.',
     apply: (base) => base
   },
   {
     kind: 'concentric',
     displayName: 'Concentric',
     implemented: false,
-    description: 'Concentric ring texture placeholder.',
+    description: 'Planned concentric machining rings for instrument-style and regulator-inspired layouts.',
     apply: (base) => base
   },
   {
     kind: 'engine-turning',
     displayName: 'Engine Turning',
     implemented: false,
-    description: 'Generic engine turning texture placeholder.',
+    description: 'Planned generalized engine-turning generator with selectable motif families.',
     apply: (base) => base
   }
 ];
