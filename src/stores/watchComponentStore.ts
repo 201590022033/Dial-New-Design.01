@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { createWatchComponentEntities } from '@/domain/watch-components/factory';
 import type { WatchComponentEntity } from '@/domain/watch-components/types';
+import { assemblyToWatchComponentEntities, type WatchAssembly } from '@/domain/assembly';
 
 export type EngineeringPreviewMode = 'engineering' | 'high-quality' | 'presentation';
 
@@ -39,6 +40,8 @@ interface WatchComponentState {
   setLowPowerMode: (enabled: boolean) => void;
   setPreviewMode: (mode: EngineeringPreviewMode) => void;
   updateMaterialAndTexture: (id: string, material: string, texture: string) => void;
+  setComponents: (components: WatchComponentEntity[]) => void;
+  syncFromAssembly: (assembly: import('@/domain/assembly').WatchAssembly) => void;
 }
 
 const wrapAngle = (angleDeg: number): number => {
@@ -111,5 +114,10 @@ export const useWatchComponentStore = create<WatchComponentState>((set) => ({
       components: state.components.map((component) =>
         component.id === id ? { ...component, material, texture } : component
       )
-    }))
+    })),
+  setComponents: (components) => set({ components }),
+  syncFromAssembly: (assembly: WatchAssembly) => {
+    const legacyEntities = assemblyToWatchComponentEntities(assembly);
+    set({ components: legacyEntities });
+  }
 }));

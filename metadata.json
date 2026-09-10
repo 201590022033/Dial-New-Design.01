@@ -1,0 +1,6 @@
+{
+  "name": "Dial Designer",
+  "description": "Browser-based CAD foundation for custom watch dial design.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

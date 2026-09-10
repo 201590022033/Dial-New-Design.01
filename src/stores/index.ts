@@ -8,3 +8,5 @@ export * from '@/stores/scaleStore';
 export * from '@/stores/designEngineStore';
 export * from '@/stores/projectStore';
 export * from '@/stores/watchComponentStore';
+export * from '@/stores/watchAssemblyStore';
+export * from '@/stores/catalogueStore';

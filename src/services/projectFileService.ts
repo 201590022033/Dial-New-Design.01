@@ -151,3 +151,21 @@ export const addRecentProject = (entry: RecentProjectEntry): RecentProjectEntry[
   saveRecentProjects(deduped);
   return deduped;
 };
+
+export {
+  serializeWatchAssembly,
+  deserializeWatchAssembly,
+  migrateLegacyProjectToAssembly,
+  exportAssemblyToLegacyProject
+} from '@/domain/assembly/assemblySerialization';
+
+export const downloadWatchAssemblyFile = (assemblyJson: string, name: string): void => {
+  const blob = new Blob([assemblyJson], { type: 'application/json;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+  const safeName = name.trim().replace(/\s+/g, '-').toLowerCase() || 'watch-design';
+  anchor.href = url;
+  anchor.download = `${safeName}.watch`;
+  anchor.click();
+  URL.revokeObjectURL(url);
+};
