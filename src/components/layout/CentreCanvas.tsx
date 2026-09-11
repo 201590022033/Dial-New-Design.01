@@ -7,8 +7,6 @@ import { useRenderer } from '@/renderer/useRenderer';
 import { nextZoomValue } from '@/renderer/services/zoomService';
 import { createPanState, resolvePan, type PanState } from '@/renderer/services/panService';
 import { resolveHighlightBandIds } from '@/features/shared/objectInspectorSchemas';
-import { resolveSlideRuleReadout, screenPointToPolarSample } from '@/domain/scales/framework';
-import type { ScaleEngineeringReadout } from '@/domain/scales/types';
 import { useBandsStore, useDesignEngineStore, useScaleStore, useSelectionStore, useViewportStore, useConfiguratorUIStore } from '@/stores';
 import { mmToPixels } from '@/utils/math';
 
@@ -19,7 +17,7 @@ interface CentreCanvasProps {
 
 export const CentreCanvas = ({ presentationMode, onTogglePresentationMode }: CentreCanvasProps) => {
   const [container, setContainer] = useState<HTMLDivElement | null>(null);
-  const [showGrid, setShowGrid] = useState(true);
+  const [showGrid, setShowGrid] = useState(false);
   const bands = useBandsStore((s) => s.bands);
   const zoom = useViewportStore((s) => s.zoom);
   const panX = useViewportStore((s) => s.panX);
@@ -28,10 +26,7 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode }: Cen
   const showSnapping = useViewportStore((s) => s.showSnapping);
   const scalePreview = useScaleStore((s) => s.preview);
   const selectedScaleKind = useScaleStore((s) => s.selectedScaleKind);
-  const scaleConfig = useScaleStore((s) => s.pluginConfig);
-  const scaleContext = useScaleStore((s) => s.context);
   const engineeringReadout = useScaleStore((s) => s.engineeringReadout);
-  const setEngineeringReadout = useScaleStore((s) => s.setEngineeringReadout);
   const designOverlay = useDesignEngineStore((s) => s.overlay);
   const setZoom = useViewportStore((s) => s.setZoom);
   const selectedBandId = useSelectionStore((s) => s.selectedBandId);
@@ -45,6 +40,8 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode }: Cen
   const hoverHit = useSelectionStore((s) => s.hoverHit);
   const setCrystalSelectionMode = useSelectionStore((s) => s.setCrystalSelectionMode);
   const activeAssembly = useConfiguratorUIStore((s) => s.getActiveAssembly());
+  const workMode = useConfiguratorUIStore((s) => s.workMode);
+  const showDiagnostics = workMode === 'advanced' && false;
   const previewStatus = useConfiguratorUIStore((s) => s.previewStatus);
   const previewCandidateItem = useConfiguratorUIStore((s) => s.previewCandidateItem);
   const applyPreview = useConfiguratorUIStore((s) => s.applyPreview);
@@ -52,7 +49,6 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode }: Cen
   const selectPartContext = useConfiguratorUIStore((s) => s.selectPartContext);
   const panBy = useViewportStore((s) => s.panBy);
   const resetPan = useViewportStore((s) => s.resetPan);
-  const setMousePosition = useViewportStore((s) => s.setMousePosition);
   const toggleGuides = useViewportStore((s) => s.toggleGuides);
 
   const renderer = useRenderer(container);
@@ -73,12 +69,6 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode }: Cen
       }
     };
   }, []);
-
-  useEffect(() => {
-    if (!scalePreview) {
-      setEngineeringReadout(null);
-    }
-  }, [scalePreview, setEngineeringReadout]);
 
   const renderContext = useMemo(
     () => ({
@@ -110,13 +100,6 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode }: Cen
       fitWidthZoom: Number((fitWidthScale / fitToWatchScale).toFixed(2)),
       actualSizeZoom: Number((1 / fitToWatchScale).toFixed(2))
     };
-  }, [bands, width, height]);
-
-  const previewFitScale = useMemo(() => {
-    const maxOuterRadiusMm = bands.reduce((current, band) => Math.max(current, band.geometry.outerRadius), 20);
-    const nominalDiameterPx = Math.max(1, mmToPixels(maxOuterRadiusMm * 2));
-    const targetDiameterPx = Math.min(width, height) * 0.9;
-    return Math.max(1, Math.min(2.6, targetDiameterPx / nominalDiameterPx));
   }, [bands, width, height]);
 
   const fitToWatch = () => {
@@ -177,7 +160,7 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode }: Cen
           ref={setContainer}
           className={[
             'h-full w-full cursor-crosshair overflow-hidden',
-            showGrid && !presentationMode ? 'bg-grid bg-[size:62px_62px]' : ''
+            showGrid && workMode === 'advanced' && !presentationMode ? 'bg-grid bg-[size:62px_62px]' : ''
           ].join(' ')}
           onWheel={(event) => {
             event.preventDefault();
@@ -189,14 +172,17 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode }: Cen
             const fromCenterY = relativeY - renderContext.centerY;
 
             const nextZoom = nextZoomValue(zoom, event.deltaY);
-            const currentPan = lastPan.current;
+            const currentZoom = pendingWheelRef.current?.zoom ?? zoom;
+            const currentPan = pendingWheelRef.current
+              ? { x: pendingWheelRef.current.panX, y: pendingWheelRef.current.panY }
+              : lastPan.current;
 
             if (nextZoom === zoom) {
               return;
             }
 
-            const nextPanX = fromCenterX - ((fromCenterX - currentPan.x) / zoom) * nextZoom;
-            const nextPanY = fromCenterY - ((fromCenterY - currentPan.y) / zoom) * nextZoom;
+            const nextPanX = fromCenterX - ((fromCenterX - currentPan.x) / currentZoom) * nextZoom;
+            const nextPanY = fromCenterY - ((fromCenterY - currentPan.y) / currentZoom) * nextZoom;
 
             pendingWheelRef.current = {
               zoom: nextZoom,
@@ -231,11 +217,6 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode }: Cen
             }
           }}
           onMouseMove={(event) => {
-            const targetRect = event.currentTarget.getBoundingClientRect();
-            const relativeX = event.clientX - targetRect.left;
-            const relativeY = event.clientY - targetRect.top;
-            setMousePosition(relativeX, relativeY);
-
             if (panState.current) {
               const next = resolvePan(panState.current, event.clientX, event.clientY);
               const dx = next.x - lastPan.current.x;
@@ -245,132 +226,6 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode }: Cen
                 lastPan.current = next;
               }
               return;
-            }
-
-            if (scalePreview) {
-              const sample = screenPointToPolarSample({
-                screenX: relativeX,
-                screenY: relativeY,
-                centerX: renderContext.centerX,
-                centerY: renderContext.centerY,
-                panX: renderContext.panX,
-                panY: renderContext.panY,
-                renderScale: renderContext.zoom * previewFitScale
-              });
-
-              const hasCollisionWarnings = scalePreview.validation.structuredWarnings.some(
-                (warning) =>
-                  warning.description.toLowerCase().includes('collision') ||
-                  warning.description.toLowerCase().includes('overlap') ||
-                  warning.affectedObject === 'layout-engine'
-              );
-              const hasManufacturingWarnings =
-                scalePreview.validation.structuredWarnings.some(
-                  (warning) => warning.affectedObject === 'manufacturing-engine'
-                ) || (scalePreview.manufacturingMetadata?.ringDensityWarnings?.length ?? 0) > 0;
-
-              const readout: ScaleEngineeringReadout | null =
-                selectedScaleKind === 'slide-rule'
-                  ? (() => {
-                      const rawReadout = resolveSlideRuleReadout(
-                        sample,
-                        scaleConfig,
-                        scaleContext,
-                        scalePreview.ticks,
-                        scalePreview.labels
-                      );
-
-                      if (!rawReadout) {
-                        return null;
-                      }
-
-                      const collisionStatus: ScaleEngineeringReadout['collisionStatus'] = hasCollisionWarnings
-                        ? 'warning'
-                        : 'ok';
-                      const manufacturingStatus: ScaleEngineeringReadout['manufacturingStatus'] =
-                        hasManufacturingWarnings ? 'warning' : 'ok';
-
-                      return {
-                        ...rawReadout,
-                        scaleKind: selectedScaleKind,
-                        pluginName: scalePreview.pluginName,
-                        collisionStatus,
-                        manufacturingStatus,
-                        engineeringScore:
-                          scalePreview.validation.healthReport?.overallEngineeringScore ??
-                          (hasCollisionWarnings || hasManufacturingWarnings ? 70 : 92)
-                      };
-                    })()
-                  : (() => {
-                      const nearestTick = scalePreview.ticks.reduce<typeof scalePreview.ticks[number] | null>(
-                        (closest, tick) => {
-                          if (!closest) {
-                            return tick;
-                          }
-
-                          return Math.abs(tick.angleDeg - sample.angleDeg) <
-                            Math.abs(closest.angleDeg - sample.angleDeg)
-                            ? tick
-                            : closest;
-                        },
-                        null
-                      );
-
-                      const nearestLabel = scalePreview.labels.reduce<typeof scalePreview.labels[number] | null>(
-                        (closest, label) => {
-                          if (!closest) {
-                            return label;
-                          }
-
-                          return Math.abs(label.angleDeg - sample.angleDeg) <
-                            Math.abs(closest.angleDeg - sample.angleDeg)
-                            ? label
-                            : closest;
-                        },
-                        null
-                      );
-
-                      const nearestValue = nearestTick?.value ?? scaleConfig.startValue;
-                      const normalized =
-                        scaleConfig.endValue === scaleConfig.startValue
-                          ? 0
-                          : (nearestValue - scaleConfig.startValue) /
-                            (scaleConfig.endValue - scaleConfig.startValue);
-
-                      const hasErrors = scalePreview.validation.structuredWarnings.some(
-                        (warning) => warning.severity === 'error'
-                      );
-                      const collisionStatus: ScaleEngineeringReadout['collisionStatus'] = hasCollisionWarnings
-                        ? 'warning'
-                        : hasErrors
-                          ? 'error'
-                          : 'ok';
-                      const manufacturingStatus: ScaleEngineeringReadout['manufacturingStatus'] =
-                        hasManufacturingWarnings
-                          ? 'warning'
-                          : hasErrors
-                            ? 'error'
-                            : 'ok';
-
-                      return {
-                        ringId: 'outer' as const,
-                        scaleKind: selectedScaleKind,
-                        pluginName: scalePreview.pluginName,
-                        value: nearestValue,
-                        normalized,
-                        angleDeg: sample.angleDeg,
-                        radiusMm: sample.radiusMm,
-                        nearestTick,
-                        nearestLabel,
-                        collisionStatus,
-                        manufacturingStatus,
-                        engineeringScore:
-                          scalePreview.validation.healthReport?.overallEngineeringScore ??
-                          (hasErrors ? 50 : 90)
-                      };
-                    })();
-
-              setEngineeringReadout(readout);
             }
 
             const semanticHit = renderer.hitTestSemantic
@@ -399,8 +254,6 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode }: Cen
             panState.current = null;
             hoverHit(null);
             hoverBand(null);
-            setMousePosition(0, 0);
-            setEngineeringReadout(null);
           }}
           onDoubleClick={() => {
             fitToWatch();
@@ -447,36 +300,36 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode }: Cen
           </div>
         )}
 
-        {presentationMode ? null : (
+        {workMode === 'advanced' && !presentationMode ? (
           <>
             <div className="pointer-events-none absolute left-1/2 top-1/2 h-[88%] w-[88%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-engineering-amber/8" />
             <div className="pointer-events-none absolute left-1/2 top-1/2 h-[72%] w-[72%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-engineering-teal/8" />
             <div className="pointer-events-none absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-engineering-teal/8" />
             <div className="pointer-events-none absolute left-0 top-1/2 h-px w-full -translate-y-1/2 bg-engineering-teal/8" />
           </>
-        )}
+        ) : null}
 
-        {presentationMode ? null : (
+        {showDiagnostics && engineeringReadout && (
           <div className="pointer-events-none absolute right-3 top-3 rounded-md border border-engineering-border bg-engineering-panel/78 px-2 py-1 font-mono text-xs text-engineering-muted">
             Wheel Zoom to Cursor | Shift+Drag Pan | Double Click Fit to Watch
           </div>
         )}
 
-        {presentationMode ? null : (
+        {showDiagnostics && engineeringReadout && (
           <div className="pointer-events-none absolute left-3 top-3 flex items-center gap-2 rounded-md border border-engineering-border bg-engineering-panel/72 px-2 py-1 text-[11px] text-engineering-muted">
             <Ruler className="ds-icon-sm text-engineering-amber" />
             Construction Guides
           </div>
         )}
 
-        {presentationMode ? null : (
+        {showDiagnostics && (
           <div className="pointer-events-none absolute left-3 bottom-3 flex items-center gap-2 rounded-md border border-engineering-border bg-engineering-panel/72 px-2 py-1 text-[11px] text-engineering-muted">
             <Move className="ds-icon-sm text-engineering-teal" />
             Precision overlays stay subtle by default
           </div>
         )}
 
-        {presentationMode ? null : (
+        {showDiagnostics && (
           <div className="pointer-events-none absolute left-3 bottom-12 flex flex-col gap-1 rounded-md border border-engineering-border bg-engineering-panel/85 px-2.5 py-1.5 text-[11px] font-mono shadow-panel">
             <div className="flex items-center gap-2">
               <span className="text-engineering-muted">Hovered:</span>
@@ -520,7 +373,7 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode }: Cen
           </div>
         )}
 
-        {presentationMode || !engineeringReadout ? null : (
+        {showDiagnostics && engineeringReadout && (
           <div className="pointer-events-none absolute left-3 top-14 w-[280px] rounded-md border border-engineering-border bg-engineering-panel/84 px-2 py-2 text-[11px] text-engineering-muted shadow-panel">
             <p className="font-mono text-engineering-amber">Engineering Readout</p>
             <div className="mt-1 grid grid-cols-2 gap-x-2 gap-y-1 font-mono">
@@ -575,7 +428,7 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode }: Cen
         <Button variant="status" size="sm" onClick={actualSize}>
           1:1
         </Button>
-        {presentationMode ? null : (
+        {workMode === 'advanced' && !presentationMode ? (
           <>
             <Button variant="status" size="sm" active={showGuides} onClick={toggleGuides}>
               Guides
@@ -584,7 +437,7 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode }: Cen
               Grid
             </Button>
           </>
-        )}
+        ) : null}
         <Button variant="status" size="sm" onClick={onTogglePresentationMode}>
           {presentationMode ? <Minimize2 className="ds-icon-sm" /> : <Maximize2 className="ds-icon-sm" />}
           {presentationMode ? 'Exit Presentation' : 'Presentation'}
