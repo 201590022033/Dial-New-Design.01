@@ -29,6 +29,7 @@ const HelpCenter = lazy(() =>
 
 export const App = () => {
   const [presentationMode, setPresentationMode] = useState(false);
+  const [visualMode, setVisualMode] = useState<'engineering' | 'visual'>('engineering');
   const topToolbarRef = useRef<HTMLDivElement | null>(null);
   const workspaceRef = useRef<HTMLElement | null>(null);
   const leftPanelRef = useRef<HTMLElement | null>(null);
@@ -363,6 +364,8 @@ export const App = () => {
               <CentreCanvas
                 presentationMode={presentationMode}
                 onTogglePresentationMode={() => setPresentationMode((value) => !value)}
+                visualMode={visualMode}
+                onToggleVisualMode={() => setVisualMode((value) => value === 'engineering' ? 'visual' : 'engineering')}
               />
             </div>
             <CostBomSummary />

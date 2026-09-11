@@ -147,7 +147,7 @@ export const LeftNavRail: React.FC = () => {
                 {renderStatusIcon(status)}
               </div>
 
-              <item.icon className={cn('h-5 w-5 mb-1 transition-transform', isActive && 'scale-110')} />
+              {React.createElement(item.icon, { className: cn('h-5 w-5 mb-1 transition-transform', isActive && 'scale-110') })}
               <span className="text-[11px] font-medium tracking-tight truncate max-w-full">
                 {item.label}
               </span>

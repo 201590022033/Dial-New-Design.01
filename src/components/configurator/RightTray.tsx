@@ -111,7 +111,7 @@ export const RightTray: React.FC = () => {
               )}
               data-tray-tab={tab.id}
             >
-              <tab.icon className="h-3.5 w-3.5" />
+              {React.createElement(tab.icon, { className: 'h-3.5 w-3.5' })}
               <span>{tab.label}</span>
             </button>
           );

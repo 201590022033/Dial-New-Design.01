@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Focus, Maximize2, Minimize2, Move, Ruler, ScanLine, ZoomIn, ZoomOut } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
@@ -9,13 +9,16 @@ import { createPanState, resolvePan, type PanState } from '@/renderer/services/p
 import { resolveHighlightBandIds } from '@/features/shared/objectInspectorSchemas';
 import { useBandsStore, useDesignEngineStore, useScaleStore, useSelectionStore, useViewportStore, useConfiguratorUIStore } from '@/stores';
 import { mmToPixels } from '@/utils/math';
+const VisualWatchRenderer = lazy(() => import('@/visual3d/VisualWatchRenderer').then((module) => ({ default: module.VisualWatchRenderer })));
 
 interface CentreCanvasProps {
   presentationMode: boolean;
   onTogglePresentationMode: () => void;
+  visualMode: 'engineering' | 'visual';
+  onToggleVisualMode: () => void;
 }
 
-export const CentreCanvas = ({ presentationMode, onTogglePresentationMode }: CentreCanvasProps) => {
+export const CentreCanvas = ({ presentationMode, onTogglePresentationMode, visualMode, onToggleVisualMode }: CentreCanvasProps) => {
   const [container, setContainer] = useState<HTMLDivElement | null>(null);
   const [showGrid, setShowGrid] = useState(false);
   const bands = useBandsStore((s) => s.bands);
@@ -41,7 +44,7 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode }: Cen
   const setCrystalSelectionMode = useSelectionStore((s) => s.setCrystalSelectionMode);
   const activeAssembly = useConfiguratorUIStore((s) => s.getActiveAssembly());
   const workMode = useConfiguratorUIStore((s) => s.workMode);
-  const showDiagnostics = workMode === 'advanced' && false;
+  const showDiagnostics = workMode === 'advanced';
   const previewStatus = useConfiguratorUIStore((s) => s.previewStatus);
   const previewCandidateItem = useConfiguratorUIStore((s) => s.previewCandidateItem);
   const applyPreview = useConfiguratorUIStore((s) => s.applyPreview);
@@ -144,6 +147,10 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode }: Cen
     hoveredHit,
     crystalSelectionMode
   ]);
+
+  if (visualMode === 'visual') {
+    return <section className="relative flex h-full w-full min-h-0 min-w-0 flex-col overflow-hidden rounded-panel border border-engineering-border shadow-panel"><div className="min-h-0 flex-1"><Suspense fallback={<div className="flex h-full items-center justify-center bg-[#d8d3c8] text-sm text-slate-600">Loading visual preview…</div>}><VisualWatchRenderer assembly={activeAssembly} /></Suspense></div><div className="border-t border-engineering-border/70 bg-engineering-panel/75 px-3 py-2 text-center"><Button variant="status" size="sm" onClick={onToggleVisualMode}>Engineering View</Button></div></section>;
+  }
 
   return (
     <motion.section
@@ -442,6 +449,7 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode }: Cen
           {presentationMode ? <Minimize2 className="ds-icon-sm" /> : <Maximize2 className="ds-icon-sm" />}
           {presentationMode ? 'Exit Presentation' : 'Presentation'}
         </Button>
+        <Button variant="status" size="sm" onClick={onToggleVisualMode}>Visual</Button>
         </div>
       </div>
     </motion.section>
