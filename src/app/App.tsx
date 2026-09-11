@@ -1,9 +1,13 @@
 import { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react';
 import { resolveOuterNeighbor, resolvePhysicalAssembly } from '@/domain/assembly/physicalAssembly';
-import { LeftBandsPanel } from '@/components/layout/LeftBandsPanel';
+import { LeftNavRail } from '@/components/configurator/LeftNavRail';
+import { RightTraySwitch } from '@/components/configurator/RightTraySwitch';
+import { CostBomSummary } from '@/components/configurator/CostBomSummary';
+import { DesignVersionsFilmstrip } from '@/components/configurator/DesignVersionsFilmstrip';
+import { GuidedFixOverlay } from '@/components/configurator/GuidedFixOverlay';
+import { FinalReviewModal } from '@/components/configurator/FinalReviewModal';
 import { TopToolbar } from '@/components/layout/TopToolbar';
 import { CentreCanvas } from '@/components/layout/CentreCanvas';
-import { RightInspector } from '@/components/layout/RightInspector';
 import { BottomStatusBar } from '@/components/layout/BottomStatusBar';
 import { evaluateCollisions } from '@/domain/geometry/collisionEngine';
 import { materialById } from '@/domain/materials/materialLibrary';
@@ -16,7 +20,8 @@ import {
   useProjectStore,
   useScaleStore,
   useSelectionStore,
-  useViewportStore
+  useViewportStore,
+  useConfiguratorUIStore
 } from '@/stores';
 
 const HelpCenter = lazy(() =>
@@ -74,6 +79,9 @@ export const App = () => {
   const minimumLineWidthMm = useGlobalSettingsStore((state) => state.minimumLineWidthMm);
   const minimumTextHeightMm = useGlobalSettingsStore((state) => state.minimumTextHeightMm);
   const units = useGlobalSettingsStore((state) => state.units);
+
+  const workMode = useConfiguratorUIStore((state) => state.workMode);
+  const setWorkMode = useConfiguratorUIStore((state) => state.setWorkMode);
 
   const geometryParams = useMemo(
     () => ({
@@ -346,35 +354,39 @@ export const App = () => {
             'grid min-h-0 h-full flex-1 gap-3 overflow-hidden',
             presentationMode
               ? 'min-w-0 grid-cols-[minmax(0,1fr)]'
-              : 'min-w-[1260px] grid-cols-[300px_minmax(600px,1fr)_360px]'
+              : 'min-w-[1260px] grid-cols-[80px_minmax(600px,1fr)_380px]'
           ].join(' ')}
           data-layout-columns="3"
         >
           <aside
             ref={leftPanelRef}
             data-layout-column="left-workflow"
-            className={presentationMode ? 'hidden' : 'min-h-0 overflow-hidden'}
+            className={presentationMode ? 'hidden' : 'min-h-0 overflow-hidden flex flex-col'}
           >
-            <LeftBandsPanel />
+            <LeftNavRail />
           </aside>
 
           <section
             ref={centrePanelRef}
             data-layout-column="centre-canvas"
-            className="flex min-h-0 min-w-0 items-center justify-center overflow-auto"
+            className="flex min-h-0 min-w-0 flex-col overflow-hidden rounded-xl border border-engineering-border bg-engineering-panel/50"
           >
-            <CentreCanvas
-              presentationMode={presentationMode}
-              onTogglePresentationMode={() => setPresentationMode((value) => !value)}
-            />
+            <div className="flex-1 min-h-0 relative flex items-center justify-center overflow-hidden">
+              <CentreCanvas
+                presentationMode={presentationMode}
+                onTogglePresentationMode={() => setPresentationMode((value) => !value)}
+              />
+            </div>
+            <CostBomSummary />
+            <DesignVersionsFilmstrip />
           </section>
 
           <aside
             ref={rightPanelRef}
             data-layout-column="right-inspector"
-            className={presentationMode ? 'hidden' : 'min-h-0 overflow-hidden'}
+            className={presentationMode ? 'hidden' : 'min-h-0 overflow-hidden flex flex-col'}
           >
-            <RightInspector />
+            <RightTraySwitch />
           </aside>
         </div>
       </main>
@@ -384,6 +396,12 @@ export const App = () => {
           <BottomStatusBar />
         </div>
       )}
+
+      <GuidedFixOverlay />
+      <FinalReviewModal
+        isOpen={workMode === 'review'}
+        onClose={() => setWorkMode('parts')}
+      />
 
       <Suspense fallback={null}>
         <HelpCenter />

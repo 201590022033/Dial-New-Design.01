@@ -9,7 +9,7 @@ import { createPanState, resolvePan, type PanState } from '@/renderer/services/p
 import { resolveHighlightBandIds } from '@/features/shared/objectInspectorSchemas';
 import { resolveSlideRuleReadout, screenPointToPolarSample } from '@/domain/scales/framework';
 import type { ScaleEngineeringReadout } from '@/domain/scales/types';
-import { useBandsStore, useDesignEngineStore, useScaleStore, useSelectionStore, useViewportStore, useWatchAssemblyStore } from '@/stores';
+import { useBandsStore, useDesignEngineStore, useScaleStore, useSelectionStore, useViewportStore, useConfiguratorUIStore } from '@/stores';
 import { mmToPixels } from '@/utils/math';
 
 interface CentreCanvasProps {
@@ -44,7 +44,12 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode }: Cen
   const selectHit = useSelectionStore((s) => s.selectHit);
   const hoverHit = useSelectionStore((s) => s.hoverHit);
   const setCrystalSelectionMode = useSelectionStore((s) => s.setCrystalSelectionMode);
-  const assembly = useWatchAssemblyStore((s) => s.assembly);
+  const activeAssembly = useConfiguratorUIStore((s) => s.getActiveAssembly());
+  const previewStatus = useConfiguratorUIStore((s) => s.previewStatus);
+  const previewCandidateItem = useConfiguratorUIStore((s) => s.previewCandidateItem);
+  const applyPreview = useConfiguratorUIStore((s) => s.applyPreview);
+  const cancelPreview = useConfiguratorUIStore((s) => s.cancelPreview);
+  const selectPartContext = useConfiguratorUIStore((s) => s.selectPartContext);
   const panBy = useViewportStore((s) => s.panBy);
   const resetPan = useViewportStore((s) => s.resetPan);
   const setMousePosition = useViewportStore((s) => s.setMousePosition);
@@ -136,7 +141,7 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode }: Cen
       scalePreview,
       designOverlay,
       highlightedBandIds,
-      assembly,
+      assembly: activeAssembly,
       selectedHit,
       hoveredHit,
       crystalSelectionMode
@@ -151,7 +156,7 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode }: Cen
     designOverlay,
     highlightedBandIds,
     presentationMode,
-    assembly,
+    activeAssembly,
     selectedHit,
     hoveredHit,
     crystalSelectionMode
@@ -385,6 +390,9 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode }: Cen
                 : null;
               selectHit(semanticHit);
               selectBand(semanticHit?.bandId ?? semanticHit?.partInstanceId ?? null);
+              if (semanticHit?.partInstanceId) {
+                selectPartContext(semanticHit.partInstanceId, semanticHit.category);
+              }
             }
           }}
           onMouseLeave={() => {
@@ -398,6 +406,46 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode }: Cen
             fitToWatch();
           }}
         />
+
+        {/* Live Temporary Preview Banner */}
+        {previewStatus === 'previewing' && (
+          <div
+            data-testid="live-preview-banner"
+            className="absolute top-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-3 bg-slate-900/95 border border-teal-500/80 rounded-full px-4 py-1.5 shadow-2xl backdrop-blur-md"
+          >
+            <span className="flex h-2 w-2 rounded-full bg-teal-400 animate-ping" />
+            <span className="text-xs font-medium text-slate-100">
+              Previewing: <strong className="text-teal-300 font-semibold">{previewCandidateItem?.displayName}</strong>
+              <span className="text-slate-400 text-[11px] ml-1.5">— not yet applied</span>
+            </span>
+            <div className="flex items-center gap-1.5 ml-2">
+              <button
+                type="button"
+                onClick={cancelPreview}
+                className="px-2.5 py-0.5 rounded-full text-xs text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={applyPreview}
+                className="px-3 py-0.5 rounded-full text-xs font-semibold text-slate-950 bg-teal-400 hover:bg-teal-300 transition-colors shadow-sm"
+              >
+                Apply
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Applied Notification Banner */}
+        {previewStatus === 'applied' && (
+          <div
+            data-testid="applied-banner"
+            className="absolute top-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 bg-emerald-950/90 border border-emerald-500/80 rounded-full px-4 py-1.5 shadow-2xl backdrop-blur-md text-emerald-300 text-xs font-semibold"
+          >
+            Applied ✓
+          </div>
+        )}
 
         {presentationMode ? null : (
           <>
