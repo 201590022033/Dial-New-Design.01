@@ -258,7 +258,7 @@ export class SvgRenderer implements RendererAdapter {
         .rect(dateWidthPx + 2, dateHeightPx + 2)
         .center(dateApertureX, dateApertureY)
         .fill({ color: '#0F172A' })
-        .stroke({ color: '#CBD5E1', width: 1 })
+        .stroke('none')
         .radius(1.5)
         .attr('data-interaction-role', 'rendering-primitive');
 

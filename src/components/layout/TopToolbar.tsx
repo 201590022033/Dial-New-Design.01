@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { CircleHelp, Redo2, Search, Settings, SunMoon, Undo2, Watch } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { CircleHelp, Redo2, Settings, Undo2, Watch } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
 import { ProjectWorkflowDialog } from '@/components/layout/ProjectWorkflowDialog';
@@ -9,21 +9,9 @@ import { deserializeDialProject } from '@/services/projectFileService';
 import { hydrateRuntimeProject } from '@/services/runtimeProjectHydrationService';
 import { useBandsStore, useDesignEngineStore, useGlobalSettingsStore, useHistoryStore, useProjectStore, useScaleStore, useSelectionStore, useViewportStore } from '@/stores';
 
-const workspaceModes = ['Classic', 'Pilot', 'Diver', 'Racing', 'Dress', 'Field'] as const;
-type WorkspaceMode = (typeof workspaceModes)[number];
-type UiTheme = 'light' | 'soft';
 
-interface TopToolbarProps {
-  presentationMode: boolean;
-  onTogglePresentationMode: () => void;
-}
-
-export const TopToolbar = ({ presentationMode, onTogglePresentationMode }: TopToolbarProps) => {
-  const zoom = useViewportStore((state) => state.zoom);
-  const [activeWorkspace, setActiveWorkspace] = useState<WorkspaceMode>('Classic');
+export const TopToolbar = () => {
   const [projectDialogOpen, setProjectDialogOpen] = useState(false);
-  const [uiTheme, setUiTheme] = useState<UiTheme>('light');
-  const [searchQuery, setSearchQuery] = useState('');
 
   const setBandsSnapshot = useBandsStore((state) => state.setBandsSnapshot);
   const selectBand = useSelectionStore((state) => state.selectBand);
@@ -58,8 +46,6 @@ export const TopToolbar = ({ presentationMode, onTogglePresentationMode }: TopTo
     importProjectJson(input);
   };
 
-  const zoomPercent = useMemo(() => `${Math.round(zoom * 100)}%`, [zoom]);
-
   useEffect(() => {
     const openWorkflow = () => setProjectDialogOpen(true);
     window.addEventListener('dial-project:open-workflow', openWorkflow);
@@ -67,10 +53,6 @@ export const TopToolbar = ({ presentationMode, onTogglePresentationMode }: TopTo
       window.removeEventListener('dial-project:open-workflow', openWorkflow);
     };
   }, []);
-
-  useEffect(() => {
-    document.documentElement.setAttribute('data-ui-theme', uiTheme);
-  }, [uiTheme]);
 
   return (
     <>
@@ -90,25 +72,6 @@ export const TopToolbar = ({ presentationMode, onTogglePresentationMode }: TopTo
         <Button variant="toolbar" size="sm" onClick={() => setProjectDialogOpen(true)}>
           Project: {projectInfo.name}
         </Button>
-
-        <label className="hidden items-center gap-1 rounded-md border border-engineering-border bg-engineering-bg/45 px-2 py-1 text-[11px] text-engineering-muted md:flex">
-          Workspace
-          <select
-            className="bg-transparent text-[11px] font-semibold text-engineering-text outline-none"
-            value={activeWorkspace}
-            onChange={(event) => setActiveWorkspace(event.target.value as WorkspaceMode)}
-          >
-            {workspaceModes.map((workspace) => (
-              <option key={workspace} value={workspace}>
-                {workspace}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <span className="hidden rounded-full border border-engineering-teal/40 bg-engineering-teal/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-engineering-teal lg:inline-flex">
-          {activeWorkspace}
-        </span>
 
         <div className="ml-auto flex items-center gap-1.5">
           <Button
@@ -136,41 +99,6 @@ export const TopToolbar = ({ presentationMode, onTogglePresentationMode }: TopTo
           >
             <Redo2 className="ds-icon-sm" /> Redo
           </Button>
-
-          <span className="rounded-md border border-engineering-border bg-engineering-bg/45 px-2 py-1 text-[11px] text-engineering-muted">
-            Zoom <span className="ds-label-dimension">{zoomPercent}</span>
-          </span>
-
-          <Button variant="toolbar" size="sm" active={presentationMode} onClick={onTogglePresentationMode}>
-            {presentationMode ? 'Exit Presentation' : 'Presentation Mode'}
-          </Button>
-
-          <label className="hidden items-center gap-1 rounded-md border border-engineering-border bg-engineering-bg/45 px-2 py-1 text-[11px] text-engineering-muted lg:flex">
-            <SunMoon className="ds-icon-sm" />
-            <select
-              className="bg-transparent text-[11px] font-semibold text-engineering-text outline-none"
-              value={uiTheme}
-              onChange={(event) => setUiTheme(event.target.value as UiTheme)}
-            >
-              <option value="light">Light</option>
-              <option value="soft">Soft</option>
-            </select>
-          </label>
-
-          <label className="hidden items-center gap-1 rounded-md border border-engineering-border bg-engineering-bg/45 px-2 py-1 text-[11px] text-engineering-muted xl:flex">
-            <Search className="ds-icon-sm" />
-            <input
-              className="w-28 bg-transparent text-[11px] text-engineering-text outline-none placeholder:text-engineering-muted"
-              value={searchQuery}
-              placeholder="Search"
-              onChange={(event) => setSearchQuery(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter' && searchQuery.trim().length > 0) {
-                  window.dispatchEvent(new CustomEvent('dial-help:open', { detail: { docId: 'template-library' } }));
-                }
-              }}
-            />
-          </label>
 
           <Button variant="toolbar" size="sm" onClick={() => setProjectDialogOpen(true)}>
             <Settings className="ds-icon-sm" /> Settings

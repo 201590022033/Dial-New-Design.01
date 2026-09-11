@@ -8,7 +8,6 @@ import { GuidedFixOverlay } from '@/components/configurator/GuidedFixOverlay';
 import { FinalReviewModal } from '@/components/configurator/FinalReviewModal';
 import { TopToolbar } from '@/components/layout/TopToolbar';
 import { CentreCanvas } from '@/components/layout/CentreCanvas';
-import { BottomStatusBar } from '@/components/layout/BottomStatusBar';
 import { evaluateCollisions } from '@/domain/geometry/collisionEngine';
 import { materialById } from '@/domain/materials/materialLibrary';
 import { hydrateRuntimeProject } from '@/services/runtimeProjectHydrationService';
@@ -35,7 +34,6 @@ export const App = () => {
   const leftPanelRef = useRef<HTMLElement | null>(null);
   const centrePanelRef = useRef<HTMLElement | null>(null);
   const rightPanelRef = useRef<HTMLElement | null>(null);
-  const bottomStatusRef = useRef<HTMLDivElement | null>(null);
   const syncWithGeometryEngine = useBandsStore((state) => state.syncWithGeometryEngine);
   const bands = useBandsStore((state) => state.bands);
   const selectedBandId = useSelectionStore((state) => state.selectedBandId);
@@ -235,7 +233,6 @@ export const App = () => {
       const left = leftPanelRef.current;
       const centre = centrePanelRef.current;
       const right = rightPanelRef.current;
-      const bottom = bottomStatusRef.current;
       const root = document.documentElement;
 
       if (!top) issues.push('TopToolbar not mounted');
@@ -243,15 +240,13 @@ export const App = () => {
       if (!left) issues.push('Left Workflow panel not mounted');
       if (!centre) issues.push('CentreCanvas not mounted');
       if (!right) issues.push('RightInspector not mounted');
-      if (!bottom) issues.push('BottomStatusBar not mounted');
 
-      if (top && workspace && left && centre && right && bottom) {
+      if (top && workspace && left && centre && right) {
         const topRect = top.getBoundingClientRect();
         const workspaceRect = workspace.getBoundingClientRect();
         const leftRect = left.getBoundingClientRect();
         const centreRect = centre.getBoundingClientRect();
         const rightRect = right.getBoundingClientRect();
-        const bottomRect = bottom.getBoundingClientRect();
 
         if (topRect.height < 56 || topRect.height > 96) {
           issues.push(`TopToolbar height out of compact range: ${topRect.height.toFixed(1)}px`);
@@ -261,9 +256,6 @@ export const App = () => {
           issues.push('Toolbar intersects or pushes into workspace');
         }
 
-        if (workspaceRect.bottom <= bottomRect.top) {
-          issues.push('Workspace does not stay above status bar');
-        }
 
         const columnCount = workspace.querySelectorAll('[data-layout-column]').length;
         if (columnCount !== 3) {
@@ -286,8 +278,7 @@ export const App = () => {
           issues.push('Application is vertically scrolling');
         }
 
-        const verticalOverlap =
-          topRect.bottom > workspaceRect.top || workspaceRect.bottom > bottomRect.top;
+        const verticalOverlap = topRect.bottom > workspaceRect.top;
         if (verticalOverlap) {
           issues.push('Vertical overlap detected between layout regions');
         }
@@ -320,10 +311,7 @@ export const App = () => {
     <div className="flex h-screen flex-col gap-3 overflow-hidden p-3 md:p-4">
       {presentationMode ? null : (
         <div ref={topToolbarRef} className="flex-none" data-layout-region="top-toolbar">
-          <TopToolbar
-            presentationMode={presentationMode}
-            onTogglePresentationMode={() => setPresentationMode((value) => !value)}
-          />
+          <TopToolbar />
         </div>
       )}
 
@@ -390,12 +378,6 @@ export const App = () => {
           </aside>
         </div>
       </main>
-
-      {presentationMode ? null : (
-        <div ref={bottomStatusRef} className="flex-none" data-layout-region="bottom-status-bar">
-          <BottomStatusBar />
-        </div>
-      )}
 
       <GuidedFixOverlay />
       <FinalReviewModal

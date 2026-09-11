@@ -6,11 +6,11 @@ const config: Config = {
     extend: {
       colors: {
         engineering: {
-          bg: '#EDF1F6',
-          panel: '#F8FAFC',
-          border: '#D5DEEA',
-          text: '#0F172A',
-          muted: '#55637F',
+          bg: '#111315',
+          panel: '#202428',
+          border: '#353B40',
+          text: '#E5E7EB',
+          muted: '#9CA3AF',
           teal: '#14B8A6',
           amber: '#F59E0B'
         }
