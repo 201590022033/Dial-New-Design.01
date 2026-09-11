@@ -9,7 +9,7 @@ import { createPanState, resolvePan, type PanState } from '@/renderer/services/p
 import { resolveHighlightBandIds } from '@/features/shared/objectInspectorSchemas';
 import { resolveSlideRuleReadout, screenPointToPolarSample } from '@/domain/scales/framework';
 import type { ScaleEngineeringReadout } from '@/domain/scales/types';
-import { useBandsStore, useDesignEngineStore, useScaleStore, useSelectionStore, useViewportStore } from '@/stores';
+import { useBandsStore, useDesignEngineStore, useScaleStore, useSelectionStore, useViewportStore, useWatchAssemblyStore } from '@/stores';
 import { mmToPixels } from '@/utils/math';
 
 interface CentreCanvasProps {
@@ -38,6 +38,13 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode }: Cen
   const selectedComponentId = useSelectionStore((s) => s.selectedComponentId);
   const selectBand = useSelectionStore((s) => s.selectBand);
   const hoverBand = useSelectionStore((s) => s.hoverBand);
+  const selectedHit = useSelectionStore((s) => s.selectedHit);
+  const hoveredHit = useSelectionStore((s) => s.hoveredHit);
+  const crystalSelectionMode = useSelectionStore((s) => s.crystalSelectionMode);
+  const selectHit = useSelectionStore((s) => s.selectHit);
+  const hoverHit = useSelectionStore((s) => s.hoverHit);
+  const setCrystalSelectionMode = useSelectionStore((s) => s.setCrystalSelectionMode);
+  const assembly = useWatchAssemblyStore((s) => s.assembly);
   const panBy = useViewportStore((s) => s.panBy);
   const resetPan = useViewportStore((s) => s.resetPan);
   const setMousePosition = useViewportStore((s) => s.setMousePosition);
@@ -128,7 +135,11 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode }: Cen
       showSnapping,
       scalePreview,
       designOverlay,
-      highlightedBandIds
+      highlightedBandIds,
+      assembly,
+      selectedHit,
+      hoveredHit,
+      crystalSelectionMode
     });
   }, [
     renderer,
@@ -139,7 +150,11 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode }: Cen
     scalePreview,
     designOverlay,
     highlightedBandIds,
-    presentationMode
+    presentationMode,
+    assembly,
+    selectedHit,
+    hoveredHit,
+    crystalSelectionMode
   ]);
 
   return (
@@ -353,8 +368,11 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode }: Cen
               setEngineeringReadout(readout);
             }
 
-            const hit = renderer.hitTest(event.clientX, event.clientY);
-            hoverBand(hit);
+            const semanticHit = renderer.hitTestSemantic
+              ? renderer.hitTestSemantic(event.clientX, event.clientY, { crystalSelectionMode })
+              : null;
+            hoverHit(semanticHit);
+            hoverBand(semanticHit?.bandId ?? semanticHit?.partInstanceId ?? null);
           }}
           onMouseUp={(event) => {
             if (panState.current) {
@@ -362,12 +380,16 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode }: Cen
               return;
             }
             if (event.button === 0) {
-              const hit = renderer.hitTest(event.clientX, event.clientY);
-              selectBand(hit);
+              const semanticHit = renderer.hitTestSemantic
+                ? renderer.hitTestSemantic(event.clientX, event.clientY, { crystalSelectionMode })
+                : null;
+              selectHit(semanticHit);
+              selectBand(semanticHit?.bandId ?? semanticHit?.partInstanceId ?? null);
             }
           }}
           onMouseLeave={() => {
             panState.current = null;
+            hoverHit(null);
             hoverBand(null);
             setMousePosition(0, 0);
             setEngineeringReadout(null);
@@ -403,6 +425,50 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode }: Cen
           <div className="pointer-events-none absolute left-3 bottom-3 flex items-center gap-2 rounded-md border border-engineering-border bg-engineering-panel/72 px-2 py-1 text-[11px] text-engineering-muted">
             <Move className="ds-icon-sm text-engineering-teal" />
             Precision overlays stay subtle by default
+          </div>
+        )}
+
+        {presentationMode ? null : (
+          <div className="pointer-events-none absolute left-3 bottom-12 flex flex-col gap-1 rounded-md border border-engineering-border bg-engineering-panel/85 px-2.5 py-1.5 text-[11px] font-mono shadow-panel">
+            <div className="flex items-center gap-2">
+              <span className="text-engineering-muted">Hovered:</span>
+              {hoveredHit ? (
+                <span className="font-semibold text-engineering-amber">
+                  {hoveredHit.label ?? hoveredHit.partInstanceId}{' '}
+                  <span className="text-[10px] text-engineering-muted">[{hoveredHit.category}]</span>
+                </span>
+              ) : (
+                <span className="text-engineering-muted/50">—</span>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-engineering-muted">Selected:</span>
+              {selectedHit ? (
+                <span className="font-semibold text-engineering-teal">
+                  {selectedHit.label ?? selectedHit.partInstanceId}{' '}
+                  <span className="text-[10px] text-engineering-muted">[{selectedHit.category}]</span>
+                </span>
+              ) : (
+                <span className="text-engineering-muted/50">—</span>
+              )}
+            </div>
+          </div>
+        )}
+
+        {presentationMode ? null : (
+          <div className="absolute right-3 bottom-3 flex items-center gap-2 rounded-md border border-engineering-border bg-engineering-panel/80 px-2.5 py-1 font-mono text-[11px] shadow-panel">
+            <span className="text-engineering-muted">Crystal:</span>
+            <button
+              type="button"
+              className={`rounded px-2 py-0.5 text-[10px] font-medium transition-colors ${
+                crystalSelectionMode
+                  ? 'bg-engineering-amber text-slate-900 font-semibold'
+                  : 'bg-engineering-panel border border-engineering-border text-engineering-teal hover:bg-white/5'
+              }`}
+              onClick={() => setCrystalSelectionMode(!crystalSelectionMode)}
+            >
+              {crystalSelectionMode ? 'Direct Select' : 'Pass-Through'}
+            </button>
           </div>
         )}
 

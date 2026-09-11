@@ -42,6 +42,7 @@ import {
 import type { ScaleKind } from '@/domain/scales/types';
 import type { DesignOverlay } from '@/renderer/types';
 import type { CollisionWarning } from '@/domain/geometry/collisionEngine';
+import { useWatchAssemblyStore } from '@/stores/watchAssemblyStore';
 
 interface DesignEngineState {
   dialFaceConfig: DialFaceConfig;
@@ -157,35 +158,13 @@ export const useDesignEngineStore = create<DesignEngineState>((set, get) => ({
   warnings: collectWarnings(initialDialFace, initialChapter, initialBezel),
   chapterRingVisible: true,
   updateDialFaceConfig: (patch) => {
-    set((state) => ({
-      dialFaceConfig: {
-        ...state.dialFaceConfig,
-        ...patch
-      }
-    }));
-    get().regenerate();
+    useWatchAssemblyStore.getState().updateDialFaceConfig(patch);
   },
   updateMarkerConfig: (patch) => {
-    set((state) => ({
-      markerConfig: {
-        ...state.markerConfig,
-        ...patch,
-        style: {
-          ...state.markerConfig.style,
-          ...(patch.style ?? {})
-        }
-      }
-    }));
-    get().regenerate();
+    useWatchAssemblyStore.getState().updateMarkerConfig(patch);
   },
   updateTypographyConfig: (patch) => {
-    set((state) => ({
-      typographyConfig: {
-        ...state.typographyConfig,
-        ...patch
-      }
-    }));
-    get().regenerate();
+    useWatchAssemblyStore.getState().updateTypographyConfig(patch);
   },
   updateChapterRingConfig: (patch) => {
     set((state) => ({
@@ -247,6 +226,9 @@ export const useDesignEngineStore = create<DesignEngineState>((set, get) => ({
     get().regenerate();
   },
   applyTemplate: (templateId) => {
+    // Notify authoritative WatchAssembly first
+    useWatchAssemblyStore.getState().applyTemplate(templateId);
+
     const payload = createTemplatePayload(templateId);
     if (!payload) {
       return;

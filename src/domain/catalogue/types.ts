@@ -1,3 +1,5 @@
+import type { ComponentEngineeringSpecs } from '@/domain/compatibility/compatibilityTypes';
+
 export type CatalogueItemCategory =
   | 'hands'
   | 'indices'
@@ -62,7 +64,20 @@ export interface ComponentCatalogueItem {
     revision: string;
     notes: string;
   };
+  engineeringSpecs?: ComponentEngineeringSpecs;
   exportEnabled: boolean;
+}
+
+export type SupplierListingVerificationStatus = 'unverified' | 'verified' | 'disputed';
+export type SupplierListingStatus = 'active' | 'stale' | 'discontinued';
+export type StockStatus = 'in-stock' | 'out-of-stock' | 'backorder' | 'unknown';
+export type SupplierSourceType = 'demo-fixture' | 'manual-entry' | 'supplier-api' | 'web-scrape';
+
+export interface SupplierListingProvenance {
+  dataSource: string;
+  sourceType: SupplierSourceType;
+  isDemonstrationFixture: boolean;
+  retrievedAtIso?: string | null;
 }
 
 /**
@@ -70,18 +85,22 @@ export interface ComponentCatalogueItem {
  * Commercial offer for a component.
  * Multiple listings can point to the same ComponentCatalogueItem.
  * Sourcing/supplier changes must never mutate engineering geometry or compatibility.
+ * Supports partial, unverified, or stale data without fabricating prices or stock.
  */
 export interface SupplierListing {
   id: string; // e.g. "supp-nh35-case-01"
   catalogueItemId: string; // References ComponentCatalogueItem.id
   supplierName: string; // e.g. "NamokiMODS", "AliExpress Seller A"
-  sku: string;
-  productUrl?: string;
-  unitPrice: number;
+  sku?: string | null;
+  productUrl?: string | null;
+  unitPrice: number | null; // Nullable: never invent prices if unverified
   currency: string;
-  inStock: boolean;
-  leadTimeDays?: number;
-  verifiedByStaff: boolean;
+  stockStatus: StockStatus;
+  status: SupplierListingStatus;
+  verificationStatus: SupplierListingVerificationStatus;
+  leadTimeDays?: number | null;
+  lastCheckedIso?: string | null;
+  provenance: SupplierListingProvenance;
   directOrderCapability?: boolean;
   notes?: string;
 }

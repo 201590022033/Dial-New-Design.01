@@ -664,13 +664,180 @@ export const defaultCatalogueItems: ComponentCatalogueItem[] = [
   }
 ];
 
-export const catalogueItemById = new Map<string, ComponentCatalogueItem>(
-  defaultCatalogueItems.map((item) => [item.id, item])
-);
+// Phase 5 Physical Compatibility Candidate Fixtures
+export const compatibilityFixtureCatalogueItems: ComponentCatalogueItem[] = [
+  {
+    id: 'cat-eta2824-seconds-hand',
+    kind: 'seconds-hand-2824',
+    displayName: 'ETA 2824 Sweep Seconds',
+    category: 'hands',
+    defaultMaterial: 'steel',
+    defaultTexture: 'polished',
+    linkedBandKind: 'hands',
+    nominalDimensions: { diameterMm: 13.5, widthMm: 0.25, thicknessMm: 0.15 },
+    manufacturing: defaultManufacturing('laser'),
+    softStyles: ['swiss', 'precision'],
+    status: 'verified',
+    metadata: { tags: ['hands', 'eta-2824', 'seconds'], revision: 'A', notes: 'Seconds hand with 0.25mm collet pipe for ETA 2824' },
+    engineeringSpecs: {
+      hands: {
+        colletDiameterMm: 0.25,
+        lengthMm: 13.5,
+        compatibleCalibres: ['eta-2824', 'eta-2892', 'sw200']
+      }
+    },
+    exportEnabled: true
+  },
+  {
+    id: 'cat-dial-oversized',
+    kind: 'dial-oversized',
+    displayName: 'Oversized Marine Dial (31.0mm)',
+    category: 'dial',
+    defaultMaterial: 'brass',
+    defaultTexture: 'matte',
+    linkedBandKind: 'dial-face',
+    nominalDimensions: { diameterMm: 31.0, widthMm: 31.0, thicknessMm: 0.4 },
+    manufacturing: defaultManufacturing('pad-print'),
+    softStyles: ['marine', 'deck-watch'],
+    status: 'verified',
+    metadata: { tags: ['dial', 'oversized'], revision: 'A', notes: '31.0mm dial for 42mm+ cases' },
+    engineeringSpecs: {
+      dial: {
+        outerDiameterMm: 31.0,
+        thicknessMm: 0.4,
+        compatibleCalibres: ['nh35', 'nh36']
+      }
+    },
+    exportEnabled: true
+  },
+  {
+    id: 'cat-dial-mod-removable-feet',
+    kind: 'dial-removable-feet',
+    displayName: 'Multi-Calibre Dial with Removable Feet',
+    category: 'dial',
+    defaultMaterial: 'brass',
+    defaultTexture: 'sunburst',
+    linkedBandKind: 'dial-face',
+    nominalDimensions: { diameterMm: 28.5, widthMm: 28.5, thicknessMm: 0.4 },
+    manufacturing: defaultManufacturing('pad-print'),
+    softStyles: ['modding', 'custom'],
+    status: 'verified',
+    metadata: { tags: ['dial', 'removable-feet', 'mod'], revision: 'A', notes: 'Dial with removable feet for ETA 2824 / NH35' },
+    engineeringSpecs: {
+      dial: {
+        outerDiameterMm: 28.5,
+        thicknessMm: 0.4,
+        compatibleCalibres: ['eta-2824'],
+        hasRemovableFeet: true
+      }
+    },
+    exportEnabled: true
+  },
+  {
+    id: 'cat-bezel-insert-matched',
+    kind: 'bezel-insert-matched',
+    displayName: 'Ceramic Bezel Insert (38.0 / 31.0)',
+    category: 'rings',
+    defaultMaterial: 'ceramic',
+    defaultTexture: 'gloss',
+    linkedBandKind: 'outer-bezel',
+    nominalDimensions: { diameterMm: 38.0, widthMm: 3.5, thicknessMm: 1.0 },
+    manufacturing: defaultManufacturing('laser'),
+    softStyles: ['diver', 'ceramic'],
+    status: 'verified',
+    metadata: { tags: ['bezel', 'insert', 'ceramic'], revision: 'A', notes: 'Sloped ceramic insert (31.0mm ID, 38.0mm OD)' },
+    engineeringSpecs: {
+      bezelInsert: {
+        innerDiameterMm: 31.0,
+        outerDiameterMm: 38.0,
+        thicknessMm: 1.0
+      }
+    },
+    exportEnabled: true
+  },
+  {
+    id: 'cat-bezel-insert-mismatched',
+    kind: 'bezel-insert-mismatched',
+    displayName: 'Oversized Bezel Insert (40.0 / 32.0)',
+    category: 'rings',
+    defaultMaterial: 'aluminum',
+    defaultTexture: 'matte',
+    linkedBandKind: 'outer-bezel',
+    nominalDimensions: { diameterMm: 40.0, widthMm: 4.0, thicknessMm: 0.8 },
+    manufacturing: defaultManufacturing('pad-print'),
+    softStyles: ['submariner', 'vintage'],
+    status: 'verified',
+    metadata: { tags: ['bezel', 'insert', 'oversized'], revision: 'A', notes: '40.0mm OD insert for large dive watches' },
+    engineeringSpecs: {
+      bezelInsert: {
+        innerDiameterMm: 32.0,
+        outerDiameterMm: 40.0,
+        thicknessMm: 0.8
+      }
+    },
+    exportEnabled: true
+  },
+  {
+    id: 'cat-hand-ai-extracted',
+    kind: 'hour-hand-draft',
+    displayName: 'AI Extracted Cathedral Hour Hand',
+    category: 'hands',
+    defaultMaterial: 'steel',
+    defaultTexture: 'brushed',
+    linkedBandKind: 'hands',
+    nominalDimensions: { diameterMm: 10, widthMm: 1.5, thicknessMm: 0.2 },
+    manufacturing: defaultManufacturing('laser'),
+    softStyles: ['cathedral', 'field'],
+    status: 'ai-extracted',
+    metadata: { tags: ['hands', 'ai-extracted'], revision: 'draft', notes: 'Extracted from supplier web image, unverified dimensions' },
+    engineeringSpecs: {
+      hands: {
+        colletDiameterMm: 1.50,
+        lengthMm: 10
+      }
+    },
+    exportEnabled: false
+  },
+  {
+    id: 'cat-movement-pocket-6497',
+    kind: 'movement-pocket-6497',
+    displayName: 'ETA/Unitas 6497-1 Manual Calibre',
+    category: 'case',
+    defaultMaterial: 'brass',
+    defaultTexture: 'circular-brush',
+    linkedBandKind: 'dial-face',
+    nominalDimensions: { diameterMm: 36.6, widthMm: 36.6, thicknessMm: 4.5 },
+    manufacturing: defaultManufacturing('cnc'),
+    softStyles: ['pocket-watch', 'manual-wind'],
+    status: 'verified',
+    metadata: { tags: ['movement', '6497', 'unitas'], revision: 'A', notes: 'Large 36.6mm manual wind pocket watch calibre' },
+    engineeringSpecs: {
+      movement: {
+        calibreId: 'unitas-6497',
+        diameterMm: 36.6,
+        heightMm: 4.5,
+        stemPosition: '3h',
+        handSizesMm: { hour: 2.0, minute: 1.15, second: 0.27 }
+      }
+    },
+    exportEnabled: true
+  }
+];
 
-export const catalogueItemByKind = new Map<string, ComponentCatalogueItem>(
-  defaultCatalogueItems.map((item) => [item.kind, item])
-);
+export const catalogueItemById = new Map<string, ComponentCatalogueItem>([
+  ...defaultCatalogueItems.map((item) => [item.id, item] as [string, ComponentCatalogueItem]),
+  ...compatibilityFixtureCatalogueItems.map((item) => [item.id, item] as [string, ComponentCatalogueItem])
+]);
+
+export const catalogueItemByKind = new Map<string, ComponentCatalogueItem>([
+  ...defaultCatalogueItems.map((item) => [item.kind, item] as [string, ComponentCatalogueItem]),
+  ...compatibilityFixtureCatalogueItems.map((item) => [item.kind, item] as [string, ComponentCatalogueItem])
+]);
+
+export const registerCatalogueItem = (item: ComponentCatalogueItem): void => {
+  catalogueItemById.set(item.id, item);
+  catalogueItemByKind.set(item.kind, item);
+};
 
 export const getCatalogueItem = (id: string): ComponentCatalogueItem | undefined => {
   return catalogueItemById.get(id);
@@ -681,5 +848,5 @@ export const getCatalogueItemByKind = (kind: string): ComponentCatalogueItem | u
 };
 
 export const listCatalogueItems = (): ComponentCatalogueItem[] => {
-  return [...defaultCatalogueItems];
+  return Array.from(catalogueItemById.values());
 };

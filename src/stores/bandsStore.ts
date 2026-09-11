@@ -8,6 +8,7 @@ import type { ManufacturingWarning } from '@/domain/manufacturing/validationEngi
 import { validateManufacturing } from '@/domain/manufacturing/validationEngine';
 import type { MaterialDefinition } from '@/domain/materials/materialLibrary';
 import type { DonutGeometry } from '@/types/geometry';
+import { useWatchAssemblyStore } from '@/stores/watchAssemblyStore';
 
 interface BandsState {
   bands: BandEntity[];
@@ -40,13 +41,9 @@ export const useBandsStore = create<BandsState>((set) => ({
   warnings: [],
   manufacturingWarnings: [],
   validationResults: [],
-  addBand: (kind, geometry) =>
-    set((state) => ({
-      bands: [
-        ...state.bands,
-        createBand(`band-${kind}-${crypto.randomUUID().slice(0, 8)}`, kind, geometry)
-      ]
-    })),
+  addBand: (kind, geometry) => {
+    useWatchAssemblyStore.getState().addBand(kind, geometry);
+  },
   setBandsSnapshot: (bands) =>
     set(() => ({
       bands,
@@ -54,34 +51,15 @@ export const useBandsStore = create<BandsState>((set) => ({
       validationResults: [],
       manufacturingWarnings: []
     })),
-  updateBand: (id, updater) =>
-    set((state) => ({
-      bands: state.bands.map((band) => (band.id === id ? updater(band) : band))
-    })),
-  removeBand: (id) => set((state) => ({ bands: state.bands.filter((band) => band.id !== id) })),
-  reorderBands: (fromIndex, toIndex) =>
-    set((state) => {
-      if (fromIndex === toIndex) {
-        return state;
-      }
-      if (fromIndex < 0 || toIndex < 0 || fromIndex >= state.bands.length || toIndex >= state.bands.length) {
-        return state;
-      }
-
-      const next = [...state.bands];
-      const [moved] = next.splice(fromIndex, 1);
-      if (!moved) {
-        return state;
-      }
-      next.splice(toIndex, 0, moved);
-
-      return {
-        bands: next.map((band, index) => ({
-          ...band,
-          zIndex: (index + 1) * 10
-        }))
-      };
-    }),
+  updateBand: (id, updater) => {
+    useWatchAssemblyStore.getState().updateBand(id, updater);
+  },
+  removeBand: (id) => {
+    useWatchAssemblyStore.getState().removeBand(id);
+  },
+  reorderBands: (fromIndex, toIndex) => {
+    useWatchAssemblyStore.getState().reorderBands(fromIndex, toIndex);
+  },
   syncWithGeometryEngine: (params, options) =>
     set((state) => {
       const engine = runGeometryEngine(state.bands, params);

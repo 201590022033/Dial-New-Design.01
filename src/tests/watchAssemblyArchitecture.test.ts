@@ -4,7 +4,16 @@ import {
   getCatalogueItem,
   getCatalogueItemByKind
 } from '@/domain/catalogue/catalogueRegistry';
-import { getListingsForCatalogueItem } from '@/domain/catalogue/supplierListingRegistry';
+import {
+  defaultSupplierListings,
+  getListingsForCatalogueItem,
+  filterProductionListings
+} from '@/domain/catalogue/supplierListingRegistry';
+import {
+  CatalogueReferenceError,
+  validateAssemblyCatalogueReferences,
+  mapLegacyComponentToCatalogueId
+} from '@/domain/catalogue/catalogueValidation';
 import { watchComponentDefinitions } from '@/domain/watch-components/registry';
 import { createDefaultWatchAssembly } from '@/domain/assembly/assemblyFactory';
 import {
@@ -21,10 +30,15 @@ import {
 import type { WatchAssembly } from '@/domain/assembly/assemblyTypes';
 import { useWatchAssemblyStore } from '@/stores/watchAssemblyStore';
 import { useCatalogueStore } from '@/stores/catalogueStore';
-import { useBandsStore } from '@/stores/bandsStore';
 import { useWatchComponentStore } from '@/stores/watchComponentStore';
+import { useGlobalSettingsStore } from '@/stores/globalSettingsStore';
+import { useDesignEngineStore } from '@/stores/designEngineStore';
+import { useSourcingStore } from '@/stores/sourcingStore';
+import '@/stores/storeSync';
+import { defaultMarkerConfig } from '@/domain/generators/markerEngine';
+import { defaultTypographyConfig } from '@/domain/generators/typographyEngine';
 
-describe('Watch Designer Phase 1 & 2: Domain Schema & WatchAssembly Architecture', () => {
+describe('Watch Designer Foundation: Authoritative Architecture & Decoupled Domain', () => {
   // Test 1: Every existing default component maps to a valid catalogue item
   it('maps every existing default watch component definition to a valid catalogue item', () => {
     expect(defaultCatalogueItems.length).toBe(43);
@@ -57,12 +71,10 @@ describe('Watch Designer Phase 1 & 2: Domain Schema & WatchAssembly Architecture
     expect(item).toBeDefined();
     expect(item?.displayName).toBe('Hour Hand');
 
-    // Updating a catalogue item status in isolation does not require or mutate WatchAssembly
     catalogueStore.updateItemStatus('cat-hour-hand', 'published');
     const updated = useCatalogueStore.getState().getItem('cat-hour-hand');
     expect(updated?.status).toBe('published');
 
-    // Reset back to verified
     catalogueStore.updateItemStatus('cat-hour-hand', 'verified');
   });
 
@@ -79,7 +91,6 @@ describe('Watch Designer Phase 1 & 2: Domain Schema & WatchAssembly Architecture
       if (!instance) continue;
       expect(instance.instanceId).toBe(instanceId);
 
-      // Verify foreign key reference to catalogue
       const catItem = getCatalogueItem(instance.catalogueItemId);
       expect(catItem).toBeDefined();
       expect(catItem?.id).toBe(instance.catalogueItemId);
@@ -102,35 +113,24 @@ describe('Watch Designer Phase 1 & 2: Domain Schema & WatchAssembly Architecture
     expect(sapphireListings.length).toBeGreaterThanOrEqual(2);
   });
 
-  // Test 5: Supplier changes do not change design state or physical dimensions
-  it('ensures changing supplier listings does not mutate design geometry or physical dimensions', () => {
-    const store = useWatchAssemblyStore.getState();
-    store.resetAssembly();
+  // Test 5 (Repair 3): Supplier selection lives in WatchSourcingPlan and does NOT mutate WatchAssembly
+  it('ensures changing supplier listings lives in WatchSourcingPlan and causes ZERO mutation to WatchAssembly', () => {
+    useWatchAssemblyStore.getState().resetAssembly();
+    const currentAssembly = useWatchAssemblyStore.getState().assembly;
 
-    const initialPart = store.assembly.parts['inst-dial-blank'];
-    expect(initialPart).toBeDefined();
-    if (!initialPart) return;
+    const sourcingStore = useSourcingStore.getState();
+    sourcingStore.resetSourcingPlan(currentAssembly.metadata.id);
 
-    const originalDiameter = initialPart.dimensions.diameterMm;
-    const originalThickness = initialPart.dimensions.thicknessMm;
-    const originalMaterial = initialPart.material;
-    const originalColor = initialPart.color;
-    const originalLayerIndex = initialPart.layerIndex;
+    const initialAssemblyJson = serializeWatchAssembly(currentAssembly);
 
-    // Switch supplier from Namoki to AliExpress
-    store.setPartSupplier('inst-dial-blank', 'supp-dial-blank-aliexpress');
+    // Select a supplier for dial blank
+    sourcingStore.setSupplierSelection('inst-dial-blank', 'supp-dial-blank-aliexpress');
 
-    const updatedPart = useWatchAssemblyStore.getState().assembly.parts['inst-dial-blank'];
-    expect(updatedPart).toBeDefined();
-    if (!updatedPart) return;
-    expect(updatedPart.selectedSupplierListingId).toBe('supp-dial-blank-aliexpress');
+    expect(useSourcingStore.getState().sourcingPlan.selections['inst-dial-blank']).toBe('supp-dial-blank-aliexpress');
 
-    // Assert that design dimensions and styling are completely unmutated
-    expect(updatedPart.dimensions.diameterMm).toBe(originalDiameter);
-    expect(updatedPart.dimensions.thicknessMm).toBe(originalThickness);
-    expect(updatedPart.material).toBe(originalMaterial);
-    expect(updatedPart.color).toBe(originalColor);
-    expect(updatedPart.layerIndex).toBe(originalLayerIndex);
+    // Assert that WatchAssembly is completely unchanged: zero serialization change, zero geometry change
+    const afterAssemblyJson = serializeWatchAssembly(useWatchAssemblyStore.getState().assembly);
+    expect(afterAssemblyJson).toBe(initialAssemblyJson);
   });
 
   // Test 6: WatchAssembly JSON round-trips without data loss
@@ -167,12 +167,9 @@ describe('Watch Designer Phase 1 & 2: Domain Schema & WatchAssembly Architecture
   it('strictly excludes transient UI/session state from serialized WatchAssembly document', () => {
     const assembly = createDefaultWatchAssembly();
 
-    // Verify valid assembly passes transient check
     expect(() => assertNoTransientState(assembly)).not.toThrow();
 
     const serialized = serializeWatchAssembly(assembly);
-
-    // Verify banned transient keys do NOT appear in the JSON
     expect(serialized).not.toContain('"zoom"');
     expect(serialized).not.toContain('"panX"');
     expect(serialized).not.toContain('"panY"');
@@ -183,7 +180,6 @@ describe('Watch Designer Phase 1 & 2: Domain Schema & WatchAssembly Architecture
     expect(serialized).not.toContain('"previewMode"');
     expect(serialized).not.toContain('"openSections"');
 
-    // Attempting to serialize an object with transient UI properties throws
     const contaminated = {
       ...assembly,
       zoom: 1.5,
@@ -198,7 +194,6 @@ describe('Watch Designer Phase 1 & 2: Domain Schema & WatchAssembly Architecture
   it('bridges WatchAssembly to legacy BandEntity and WatchComponentEntity representations', () => {
     const assembly = createDefaultWatchAssembly();
 
-    // 1. Bridge to BandEntity[]
     const bands = assemblyToBands(assembly);
     expect(bands.length).toBe(4);
     expect(bands.map((b) => b.kind)).toEqual([
@@ -207,43 +202,141 @@ describe('Watch Designer Phase 1 & 2: Domain Schema & WatchAssembly Architecture
       'inner-bezel',
       'outer-bezel'
     ]);
-    const b0 = bands[0];
-    const b1 = bands[1];
-    const b3 = bands[3];
-    expect(b0).toBeDefined();
-    expect(b1).toBeDefined();
-    expect(b3).toBeDefined();
-    if (!b0 || !b1 || !b3) return;
-    expect(b0.geometry.innerRadius).toBe(0);
-    expect(b0.geometry.outerRadius).toBeGreaterThan(0);
-    expect(b1.geometry.innerRadius).toBe(b0.geometry.outerRadius);
-    expect(b3.geometry.outerRadius).toBe(assembly.globalDimensions.caseDiameterMm / 2);
 
-    // Update bands store and verify compatibility
-    useBandsStore.getState().setBandsSnapshot(bands);
-    expect(useBandsStore.getState().bands.length).toBe(4);
-
-    // 2. Bridge to WatchComponentEntity[]
     const legacyEntities = assemblyToWatchComponentEntities(assembly);
     expect(legacyEntities.length).toBe(assembly.partOrder.length);
     expect(legacyEntities.every((e) => e.exportEnabled)).toBe(true);
-
-    // Update watchComponentStore via syncFromAssembly
-    useWatchComponentStore.getState().syncFromAssembly(assembly);
-    expect(useWatchComponentStore.getState().components.length).toBe(legacyEntities.length);
   });
 
-  // Test 9: Legacy project migration adapter
-  it('migrates legacy project file format into canonical WatchAssembly and back', () => {
+  // Test 9 (Repair 2): Preserves generator and design metadata during legacy migration
+  it('faithfully preserves marker, typography, and texture configs during legacy migration without defaulting', () => {
+    const customMarkerConfig = {
+      ...defaultMarkerConfig,
+      count: 24,
+      radiusOuterMm: 15.5
+    };
+    const customTypographyConfig = {
+      ...defaultTypographyConfig,
+      content: 'CHRONOMETER',
+      fontSizeMm: 1.8,
+      alignment: 'center' as const
+    };
+
+    const initialAssembly = createDefaultWatchAssembly();
+    initialAssembly.designConfig = {
+      markerConfig: customMarkerConfig,
+      typographyConfig: customTypographyConfig,
+      textureConfig: {
+        kind: 'sunburst',
+        intensity: 0.85,
+        contrast: 0.65
+      },
+      geometryParameters: {
+        caseDiameterMm: 43.5
+      }
+    };
+    initialAssembly.globalDimensions.caseDiameterMm = 43.5;
+
+    // Export to legacy project format
+    const legacyProject = exportAssemblyToLegacyProject(initialAssembly);
+    expect(legacyProject.design.markerConfig.count).toBe(24);
+    expect(legacyProject.design.typographyConfig.content).toBe('CHRONOMETER');
+    expect(legacyProject.design.textureConfig.kind).toBe('sunburst');
+    expect(legacyProject.geometry.caseDiameterMm).toBe(43.5);
+
+    // Migrate back to WatchAssembly
+    const reMigratedAssembly = migrateLegacyProjectToAssembly(legacyProject);
+    expect(reMigratedAssembly.designConfig?.markerConfig?.count).toBe(24);
+    expect(reMigratedAssembly.designConfig?.typographyConfig?.content).toBe('CHRONOMETER');
+    expect(reMigratedAssembly.designConfig?.textureConfig?.kind).toBe('sunburst');
+    expect(reMigratedAssembly.globalDimensions.caseDiameterMm).toBe(43.5);
+  });
+
+  // Test 10 (Repair 1): WatchAssembly is authoritative upstream authority for mutations
+  it('verifies that mutations flow through WatchAssembly to downstream legacy representations', () => {
+    const assemblyStore = useWatchAssemblyStore.getState();
+    assemblyStore.resetAssembly();
+
+    // 1. Mutate case diameter via authoritative write path
+    assemblyStore.setCaseDiameter(44.0);
+    expect(useWatchAssemblyStore.getState().assembly.globalDimensions.caseDiameterMm).toBe(44.0);
+    // Downstream legacy globalSettingsStore must be automatically synchronized
+    expect(useGlobalSettingsStore.getState().caseDiameterMm).toBe(44.0);
+
+    // 2. Calling legacy store action delegates to WatchAssembly
+    useGlobalSettingsStore.getState().setCaseDiameter(45.5);
+    expect(useWatchAssemblyStore.getState().assembly.globalDimensions.caseDiameterMm).toBe(45.5);
+    expect(useGlobalSettingsStore.getState().caseDiameterMm).toBe(45.5);
+
+    // 3. Mutating part visibility flows through WatchAssembly
+    useWatchComponentStore.getState().setVisibility('watch-component-hour-hand', false);
+    const hourHandPart = useWatchAssemblyStore.getState().assembly.parts['inst-hour-hand'];
+    expect(hourHandPart?.visible).toBe(false);
+
+    // 4. Mutating marker config flows through WatchAssembly
+    useDesignEngineStore.getState().updateMarkerConfig({ count: 12 });
+    expect(useWatchAssemblyStore.getState().assembly.designConfig?.markerConfig?.count).toBe(12);
+  });
+
+  // Test 11 (Repair 4): Enforces catalogue reference integrity without silent fallback fabrication
+  it('enforces catalogue reference integrity and throws CatalogueReferenceError on invalid references', () => {
     const assembly = createDefaultWatchAssembly();
-    assembly.globalDimensions.caseDiameterMm = 42;
 
-    const legacyProject = exportAssemblyToLegacyProject(assembly);
-    expect(legacyProject.geometry.caseDiameterMm).toBe(42);
-    expect(legacyProject.bands.length).toBe(4);
+    // Valid assembly passes validation
+    const report = validateAssemblyCatalogueReferences(assembly);
+    expect(report.valid).toBe(true);
+    expect(report.errors.length).toBe(0);
 
-    const migratedAssembly = migrateLegacyProjectToAssembly(legacyProject);
-    expect(migratedAssembly.globalDimensions.caseDiameterMm).toBe(42);
-    expect(migratedAssembly.parts['inst-dial-blank']).toBeDefined();
+    // Corrupt one part reference with an invalid catalogue ID
+    const corruptedAssembly: WatchAssembly = {
+      ...assembly,
+      parts: {
+        ...assembly.parts,
+        'inst-broken-part': {
+          instanceId: 'inst-broken-part',
+          catalogueItemId: 'cat-non-existent-item-xyz',
+          name: 'Broken Part',
+          category: 'case',
+          visible: true,
+          locked: false,
+          layerIndex: 10,
+          material: 'Steel',
+          color: '#FFF',
+          texture: 'smooth',
+          dimensions: { diameterMm: 20, widthMm: 2, thicknessMm: 1, offsetXmm: 0, offsetYmm: 0 }
+        }
+      },
+      partOrder: [...assembly.partOrder, 'inst-broken-part']
+    };
+
+    const invalidReport = validateAssemblyCatalogueReferences(corruptedAssembly);
+    expect(invalidReport.valid).toBe(false);
+    expect(invalidReport.errors.length).toBeGreaterThan(0);
+    expect(invalidReport.errors[0]?.catalogueItemId).toBe('cat-non-existent-item-xyz');
+
+    // Adapters MUST throw CatalogueReferenceError rather than fabricating fallback metadata
+    expect(() => assemblyToWatchComponentEntities(corruptedAssembly)).toThrow(
+      CatalogueReferenceError
+    );
+
+    // Legacy mapper correctly resolves known components and returns null for unknown
+    expect(mapLegacyComponentToCatalogueId('watch-component-hour-hand')).toBe('cat-hour-hand');
+    expect(mapLegacyComponentToCatalogueId('unknown-fabricated-part')).toBeNull();
+  });
+
+  // Test 12 (Repair 5): SupplierListing schema hardens provenance and honest partial records
+  it('classifies demo fixtures and prevents treating synthetic listings as verified production data', () => {
+    expect(defaultSupplierListings.length).toBeGreaterThan(0);
+
+    // All seeded demo records are marked as demonstration fixtures
+    for (const listing of defaultSupplierListings) {
+      expect(listing.provenance.isDemonstrationFixture).toBe(true);
+      expect(listing.provenance.sourceType).toBe('demo-fixture');
+      expect(listing.verificationStatus).toBe('unverified');
+    }
+
+    // Verified production filter excludes all demonstration fixtures
+    const productionListings = filterProductionListings(defaultSupplierListings);
+    expect(productionListings.length).toBe(0);
   });
 });

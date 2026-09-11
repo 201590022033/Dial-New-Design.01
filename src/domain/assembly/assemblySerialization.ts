@@ -1,5 +1,4 @@
 import type { DialProjectFile } from '@/services/projectFileService';
-import { createBand } from '@/domain/bands/bandRegistry';
 import type { BandEntity } from '@/domain/bands/types';
 import { defaultGeometryParameters } from '@/domain/geometry/geometryEngine';
 import { defaultTypographyConfig } from '@/domain/generators/typographyEngine';
@@ -8,6 +7,7 @@ import { defaultDialFaceConfig } from '@/domain/generators/dialFaceGenerator';
 import type { ScaleKind, ScalePluginConfig } from '@/domain/scales/types';
 import type { TemplateId } from '@/domain/generators/templateLibrary';
 import { createDefaultWatchAssembly, WATCH_ASSEMBLY_VERSION } from './assemblyFactory';
+import { assemblyToBands } from './assemblyAdapters';
 import type { WatchAssembly } from './assemblyTypes';
 
 const BANNED_TRANSIENT_KEYS = [
@@ -64,14 +64,15 @@ export const serializeWatchAssembly = (assembly: WatchAssembly): string => {
     version: assembly.version || WATCH_ASSEMBLY_VERSION,
     metadata: {
       ...assembly.metadata,
-      updatedAtIso: new Date().toISOString()
+      updatedAtIso: assembly.metadata?.updatedAtIso ?? new Date().toISOString()
     },
     globalDimensions: { ...assembly.globalDimensions },
     parts: { ...assembly.parts },
     partOrder: [...assembly.partOrder],
     selectedColorPalette: { ...assembly.selectedColorPalette },
     ...(assembly.templateId ? { templateId: assembly.templateId } : {}),
-    ...(assembly.scaleBinding ? { scaleBinding: assembly.scaleBinding } : {})
+    ...(assembly.scaleBinding ? { scaleBinding: assembly.scaleBinding } : {}),
+    ...(assembly.designConfig ? { designConfig: assembly.designConfig } : {})
   };
 
   return JSON.stringify(cleanDocument, null, 2);
@@ -122,6 +123,11 @@ export const deserializeWatchAssembly = (jsonString: string): WatchAssembly => {
 
 /**
  * Migrates a legacy .dial project file into a canonical WatchAssembly.
+ * Faithfully preserves user-authored generator/design metadata:
+ * - marker layout, tick spacing, indices
+ * - custom typography, fonts, tracking
+ * - texture/finish configurations
+ * - intermediate geometry parameters
  */
 export const migrateLegacyProjectToAssembly = (legacy: DialProjectFile): WatchAssembly => {
   const defaultAssembly = createDefaultWatchAssembly();
@@ -157,6 +163,12 @@ export const migrateLegacyProjectToAssembly = (legacy: DialProjectFile): WatchAs
     scaleBinding: {
       scaleKind: legacy.scale.selectedScaleKind,
       config: legacy.scale.pluginConfig as unknown as Record<string, unknown>
+    },
+    designConfig: {
+      markerConfig: legacy.design.markerConfig,
+      typographyConfig: legacy.design.typographyConfig,
+      textureConfig: legacy.design.textureConfig,
+      geometryParameters: { ...legacy.geometry }
     }
   };
 
@@ -183,17 +195,10 @@ export const migrateLegacyProjectToAssembly = (legacy: DialProjectFile): WatchAs
 /**
  * Converts a canonical WatchAssembly back into a legacy DialProjectFile format
  * for backward-compatibility with older systems or file exports.
+ * Faithfully re-projects preserved designConfig so no user customization is lost.
  */
 export const exportAssemblyToLegacyProject = (assembly: WatchAssembly): DialProjectFile => {
-  const dialPart = assembly.parts['inst-dial-blank'];
-  const dialRadius = dialPart ? dialPart.dimensions.diameterMm / 2 : 14;
-
-  const bands: BandEntity[] = [
-    createBand('band-dial-face', 'dial-face', { innerRadius: 0, outerRadius: dialRadius }),
-    createBand('band-chapter-ring', 'chapter-ring', { innerRadius: dialRadius, outerRadius: dialRadius + 2.5 }),
-    createBand('band-inner-bezel', 'inner-bezel', { innerRadius: dialRadius + 2.5, outerRadius: dialRadius + 4 }),
-    createBand('band-outer-bezel', 'outer-bezel', { innerRadius: dialRadius + 4, outerRadius: assembly.globalDimensions.caseDiameterMm / 2 })
-  ];
+  const bands: BandEntity[] = assemblyToBands(assembly);
 
   return {
     version: '1.0.0',
@@ -210,6 +215,7 @@ export const exportAssemblyToLegacyProject = (assembly: WatchAssembly): DialProj
     },
     geometry: {
       ...defaultGeometryParameters,
+      ...(assembly.designConfig?.geometryParameters ?? {}),
       caseDiameterMm: assembly.globalDimensions.caseDiameterMm,
       bandGapMm: assembly.globalDimensions.bandGapMm,
       manufacturingToleranceMm: assembly.globalDimensions.manufacturingToleranceMm,
@@ -250,9 +256,9 @@ export const exportAssemblyToLegacyProject = (assembly: WatchAssembly): DialProj
     },
     design: {
       templateId: (assembly.templateId as TemplateId) || 'classic-dress',
-      markerConfig: defaultMarkerConfig,
-      typographyConfig: defaultTypographyConfig,
-      textureConfig: defaultDialFaceConfig.texture,
+      markerConfig: assembly.designConfig?.markerConfig ?? defaultMarkerConfig,
+      typographyConfig: assembly.designConfig?.typographyConfig ?? defaultTypographyConfig,
+      textureConfig: assembly.designConfig?.textureConfig ?? defaultDialFaceConfig.texture,
       colors: {
         primary: assembly.selectedColorPalette.primary,
         secondary: assembly.selectedColorPalette.secondary,

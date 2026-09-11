@@ -10,3 +10,5 @@ export * from '@/stores/projectStore';
 export * from '@/stores/watchComponentStore';
 export * from '@/stores/watchAssemblyStore';
 export * from '@/stores/catalogueStore';
+export * from '@/stores/sourcingStore';
+export * from '@/stores/storeSync';

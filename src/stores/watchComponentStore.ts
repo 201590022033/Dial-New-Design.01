@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { createWatchComponentEntities } from '@/domain/watch-components/factory';
 import type { WatchComponentEntity } from '@/domain/watch-components/types';
 import { assemblyToWatchComponentEntities, type WatchAssembly } from '@/domain/assembly';
+import { useWatchAssemblyStore } from '@/stores/watchAssemblyStore';
 
 export type EngineeringPreviewMode = 'engineering' | 'high-quality' | 'presentation';
 
@@ -72,18 +73,12 @@ export const useWatchComponentStore = create<WatchComponentState>((set) => ({
   selectComponent: (selectedComponentId) => set({ selectedComponentId }),
   hoverComponent: (hoveredComponentId) => set({ hoveredComponentId }),
   setSelectionFilter: (selectionFilter) => set({ selectionFilter }),
-  setVisibility: (id, visible) =>
-    set((state) => ({
-      components: state.components.map((component) =>
-        component.id === id ? { ...component, visible } : component
-      )
-    })),
-  setLocked: (id, locked) =>
-    set((state) => ({
-      components: state.components.map((component) =>
-        component.id === id ? { ...component, locked } : component
-      )
-    })),
+  setVisibility: (id, visible) => {
+    useWatchAssemblyStore.getState().setPartVisibility(id, visible);
+  },
+  setLocked: (id, locked) => {
+    useWatchAssemblyStore.getState().setPartLocked(id, locked);
+  },
   isolateComponent: (componentIsolationId) =>
     set((state) => ({
       componentIsolationId,
@@ -109,12 +104,9 @@ export const useWatchComponentStore = create<WatchComponentState>((set) => ({
   setManufacturingWarningsVisible: (manufacturingWarningsVisible) => set({ manufacturingWarningsVisible }),
   setLowPowerMode: (lowPowerMode) => set({ lowPowerMode }),
   setPreviewMode: (previewMode) => set({ previewMode }),
-  updateMaterialAndTexture: (id, material, texture) =>
-    set((state) => ({
-      components: state.components.map((component) =>
-        component.id === id ? { ...component, material, texture } : component
-      )
-    })),
+  updateMaterialAndTexture: (id, material, texture) => {
+    useWatchAssemblyStore.getState().updatePartMaterialAndTexture(id, material, texture);
+  },
   setComponents: (components) => set({ components }),
   syncFromAssembly: (assembly: WatchAssembly) => {
     const legacyEntities = assemblyToWatchComponentEntities(assembly);

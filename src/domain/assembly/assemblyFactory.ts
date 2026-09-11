@@ -1,5 +1,8 @@
 import { defaultCatalogueItems } from '@/domain/catalogue/catalogueRegistry';
-import { getListingsForCatalogueItem } from '@/domain/catalogue/supplierListingRegistry';
+import { defaultMarkerConfig } from '@/domain/generators/markerEngine';
+import { defaultTypographyConfig } from '@/domain/generators/typographyEngine';
+import { defaultDialFaceConfig } from '@/domain/generators/dialFaceGenerator';
+import { defaultGeometryParameters } from '@/domain/geometry/geometryEngine';
 import type {
   WatchAssembly,
   WatchAssemblyMetadata,
@@ -42,7 +45,6 @@ export const createDefaultWatchAssembly = (): WatchAssembly => {
   defaultCatalogueItems.forEach((catItem, index) => {
     const instanceId = `inst-${catItem.kind}`;
     const baseZ = categoryZOrder[catItem.category] ?? 50;
-    const listings = getListingsForCatalogueItem(catItem.id);
 
     parts[instanceId] = {
       instanceId,
@@ -67,7 +69,6 @@ export const createDefaultWatchAssembly = (): WatchAssembly => {
         fontSizeMm: catItem.category === 'typography' ? 1.4 : 1.1,
         tracking: 0
       },
-      selectedSupplierListingId: listings[0]?.id ?? null,
       customProperties: {}
     };
 
@@ -94,6 +95,13 @@ export const createDefaultWatchAssembly = (): WatchAssembly => {
       secondary: '#334155',
       accent: '#F59E0B'
     },
-    templateId: 'classic-dress'
+    templateId: 'classic-dress',
+    designConfig: {
+      markerConfig: defaultMarkerConfig,
+      typographyConfig: defaultTypographyConfig,
+      textureConfig: defaultDialFaceConfig.texture,
+      dialFaceConfig: defaultDialFaceConfig,
+      geometryParameters: { ...defaultGeometryParameters }
+    }
   };
 };

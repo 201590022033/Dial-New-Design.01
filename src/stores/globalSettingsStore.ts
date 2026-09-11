@@ -1,6 +1,7 @@
 import { create } from 'zustand';
-import { defaultGeometryParameters, normalizeGeometryParameters, validateGeometryParameters } from '@/domain/geometry/geometryEngine';
+import { defaultGeometryParameters, validateGeometryParameters } from '@/domain/geometry/geometryEngine';
 import type { GlobalGeometryParameters } from '@/domain/geometry/types';
+import { useWatchAssemblyStore } from '@/stores/watchAssemblyStore';
 
 export interface GlobalSettingsState {
   caseDiameterMm: number;
@@ -23,7 +24,7 @@ export interface GlobalSettingsState {
   getGeometryWarnings: () => string[];
 }
 
-export const useGlobalSettingsStore = create<GlobalSettingsState>((set, get) => ({
+export const useGlobalSettingsStore = create<GlobalSettingsState>((_set, get) => ({
   caseDiameterMm: defaultGeometryParameters.caseDiameterMm,
   dialDiameterMm: defaultGeometryParameters.dialDiameterMm,
   movementDiameterMm: defaultGeometryParameters.movementDiameterMm,
@@ -39,42 +40,12 @@ export const useGlobalSettingsStore = create<GlobalSettingsState>((set, get) => 
   minimumTextHeightMm: defaultGeometryParameters.minimumTextHeightMm,
   units: 'mm',
   setCaseDiameter: (caseDiameterMm) => {
-    const nextDiameter = Math.max(20, caseDiameterMm);
-    set((state) => {
-      const dialDiameterMm = Math.min(state.dialDiameterMm, nextDiameter - state.bandClearanceMm * 2);
-      const movementDiameterMm = Math.min(state.movementDiameterMm, dialDiameterMm);
-      return {
-        caseDiameterMm: nextDiameter,
-        dialDiameterMm,
-        movementDiameterMm: Math.max(1, movementDiameterMm)
-      };
-    });
+    // Route directly to authoritative WatchAssembly write path
+    useWatchAssemblyStore.getState().setCaseDiameter(caseDiameterMm);
   },
   updateGeometryParams: (params) => {
-    set((state) => {
-      const merged = normalizeGeometryParameters({
-        caseDiameterMm: state.caseDiameterMm,
-        dialDiameterMm: state.dialDiameterMm,
-        movementDiameterMm: state.movementDiameterMm,
-        movementCentreHoleMm: state.movementCentreHoleMm,
-        bandClearanceMm: state.bandClearanceMm,
-        bandGapMm: state.bandGapMm,
-        chapterRingWidthMm: state.chapterRingWidthMm,
-        innerBezelWidthMm: state.innerBezelWidthMm,
-        outerBezelWidthMm: state.outerBezelWidthMm,
-        manufacturingToleranceMm: state.manufacturingToleranceMm,
-        laserKerfMm: state.laserKerfMm,
-        minimumLineWidthMm: state.minimumLineWidthMm,
-        minimumTextHeightMm: state.minimumTextHeightMm,
-        defaultUnits: 'mm',
-        ...params
-      });
-
-      return {
-        ...merged,
-        units: merged.defaultUnits
-      };
-    });
+    // Route directly to authoritative WatchAssembly write path
+    useWatchAssemblyStore.getState().updateGeometryParams(params);
   },
   getGeometryParams: () => {
     const state = get();
