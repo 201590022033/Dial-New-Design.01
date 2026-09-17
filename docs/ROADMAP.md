@@ -31,12 +31,12 @@ Blender Python/bpy is the canonical reference geometry environment. Browser rend
 
 ## Near-term milestones
 
-- M1: schemas, provenance, unknown-dimension semantics, and compatibility tests.
+- M1: schemas, provenance, unknown-dimension semantics, and compatibility tests. **Complete:** versioned TypeScript contracts and deterministic validation live under `src/domain/geometry/parametric/`.
 - M2: Blender case generator prototype and visual regression fixtures.
 - M3: modular hand generator with initial `NONE/POINT/TRIANGLE/SPEAR` tips and `NONE/NEEDLE/BATON/ARROW/LOLLIPOP/COUNTERWEIGHT` tails.
 - M4: browser integration and controlled GLB export.
 
-Each milestone must preserve existing 2D behavior, run typecheck/lint/tests/build, and avoid claiming unverified geometry or measurements as production ready.
+Each milestone must preserve existing 2D behavior, run typecheck/lint/tests/build, and avoid claiming unverified geometry or measurements as production ready. The next milestone is **BLENDER PARAMETRIC CASE GENERATOR v1**.
 
 ## Deliberate non-goals
 
