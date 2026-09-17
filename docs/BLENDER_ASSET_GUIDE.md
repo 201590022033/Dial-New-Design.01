@@ -26,3 +26,16 @@ Browser visual assets are authored in Blender and exported as optimized `.glb` f
 - Export GLB with selected objects, applied transforms, compressed geometry where available, and embedded or relative textures validated against the public asset path.
 
 The visual registry is the integration point. A routine new part should add a catalogue reference, one registry descriptor, and one file under `public/assets/3d/` without a new React component.
+
+## Parametric case generator v1
+
+The reference generator is [`tools/blender/parametric_case_v1.py`](../tools/blender/parametric_case_v1.py). It consumes the `parametric-case/v1` field names and treats Blender units as millimetres. The named reference values are embedded as an explicit demo preset; unknown required production values fail clearly rather than receiving defaults.
+
+Run in Blender's Scripting workspace, or headlessly:
+
+```text
+blender --background --python tools/blender/parametric_case_v1.py -- --quality normal
+blender --background --python tools/blender/parametric_case_v1.py -- --params case.json --quality high --output public/assets/3d/generated/cases/case.glb
+```
+
+Quality controls radial sampling (`preview`, `normal`, `high`) and is not part of the physical case schema. The generator creates/rebuilds only `DD_PARAMETRIC_CASE`, including a smooth revolved mid-case, four tapered lugs, and embedded crown boss/tube source objects. Re-running is idempotent. GLB export is optional and selection-scoped.

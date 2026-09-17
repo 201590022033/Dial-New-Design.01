@@ -1,0 +1,11 @@
+{
+  "schema": "parametric-case/v1", "caseDiameter": 42.0, "midcaseHeight": 7.0,
+  "lugWidth": 20.0, "lugToLug": 49.0, "dialOpening": 33.5,
+  "crystalSeatDiameter": 34.5, "casebackOpening": 36.0,
+  "upperCaseRadiusReduction": 0.45, "lowerCaseRadiusReduction": 0.65,
+  "middleCaseBulge": 0.2, "bezelLipHeight": 1.1, "casebackLipHeight": 0.8,
+  "lugRootWidth": 5.2, "lugTipWidth": 4.0, "lugCaseOverlap": 2.2,
+  "lugTipDrop": 1.35, "lugThickness": 4.5, "lugTaperStrength": 0.8,
+  "crownTubeRadius": 1.5, "crownTubeLength": 2.3, "crownBossRadius": 2.1,
+  "crownBossLength": 1.5, "crownBossEmbed": 2.2, "crownTubeEmbed": 1.5
+}
