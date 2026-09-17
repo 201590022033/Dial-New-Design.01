@@ -27,6 +27,17 @@ Browser visual assets are authored in Blender and exported as optimized `.glb` f
 
 The visual registry is the integration point. A routine new part should add a catalogue reference, one registry descriptor, and one file under `public/assets/3d/` without a new React component.
 
+## Parametric hand generator v1
+
+[`tools/blender/parametric_hand_v1.py`](../tools/blender/parametric_hand_v1.py) consumes `parametric-hand/v1` or `parametric-hand-set/v1` JSON. It creates separate hub, body, tip, tail, and lume regions in `DD_PARAMETRIC_HANDS`, uses a real boolean pinion bore, and assigns reusable `HAND_METAL`/`HAND_LUME` materials. The demo fixture is `tools/blender/test_hand_set_v1.json`.
+
+```text
+blender --background --python tools/blender/parametric_hand_v1.py -- --params tools/blender/test_hand_set_v1.json --quality normal
+blender --background --python tools/blender/parametric_hand_v1.py -- --params tools/blender/test_hand_set_v1.json --quality high --output public/assets/3d/generated/hands/hand-set.glb
+```
+
+Quality is a presentation setting (`preview`, `normal`, `high`), and Z positions in the hand-set demo are reference placement values rather than movement-specific stack dimensions. Unknown required dimensions fail clearly; no generic bore is substituted.
+
 ## Parametric case generator v1
 
 The reference generator is [`tools/blender/parametric_case_v1.py`](../tools/blender/parametric_case_v1.py). It consumes the `parametric-case/v1` field names and treats Blender units as millimetres. The named reference values are embedded as an explicit demo preset; unknown required production values fail clearly rather than receiving defaults.
