@@ -26,6 +26,16 @@
 - Template presets via template library.
 - Help documentation mappings via engineering help index.
 
+## Parametric 3D boundary
+
+`WatchAssembly` remains the application-level source of truth. The current
+`src/visual3d` layer adapts that assembly to procedural or registry-backed GLB
+visuals; it is not yet a production CAD generator. Future dimensional case and
+hand variation belongs behind versioned parameter schemas and generator
+contracts under `src/domain/geometry/parametric/`. Blender Python/bpy under
+`tools/blender/` is the reference geometry environment. See [Roadmap](ROADMAP.md)
+and [ADR 0001](adr/0001-parametric-3d-geometry.md).
+
 ## Data Flow
 
 1. Inspector/store update.

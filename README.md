@@ -99,6 +99,8 @@ npm run build
 - [Supplier Profile Library](SUPPLIER_PROFILE_LIBRARY.md)
 - [Design Advisor](DESIGN_ADVISOR.md)
 - [Asset Library Architecture](ASSET_LIBRARY_ARCHITECTURE.md)
+- [Parametric 3D Roadmap](docs/ROADMAP.md)
+- [ADR 0001: Parametric 3D Geometry](docs/adr/0001-parametric-3d-geometry.md)
 
 ## Current Status
 

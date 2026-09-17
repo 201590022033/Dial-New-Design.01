@@ -11,6 +11,11 @@ Movement recommendations provide:
 - subdial layout
 - safe clearances
 
+For future parametric hands, movement templates are the only source for verified
+hour, minute, and seconds pinion/arbor specifications. Missing or unverified
+dimensions must remain `unknown`; neither the hand generator nor documentation
+may infer a calibre measurement.
+
 ## Workflow
 
 1. Select movement in inspector.

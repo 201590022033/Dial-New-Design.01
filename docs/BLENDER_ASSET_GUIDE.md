@@ -1,5 +1,10 @@
 # Blender asset guide
 
+Blender is also the canonical reference environment for future parameter-driven
+case and hand generators. Scripts must derive meshes from versioned parameters,
+keep units explicit, and emit validation metadata. A generated GLB is an output
+artifact, not a replacement for the parameter set.
+
 Browser visual assets are authored in Blender and exported as optimized `.glb` files. Blender is not a browser runtime dependency.
 
 ## Coordinate convention
