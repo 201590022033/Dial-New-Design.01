@@ -50,3 +50,100 @@ blender --background --python tools/blender/parametric_case_v1.py -- --params ca
 ```
 
 Quality controls radial sampling (`preview`, `normal`, `high`) and is not part of the physical case schema. The generator creates/rebuilds only `DD_PARAMETRIC_CASE`, including a smooth revolved mid-case, four tapered lugs, and embedded crown boss/tube source objects. Re-running is idempotent. GLB export is optional and selection-scoped.
+
+## Local case render-and-review harness
+
+Prerequisites: Windows PowerShell 5.1 or later, a local Blender installation with
+Eevee rendering support and its bundled glTF importer/exporter, and this repository.
+No Python packages, Blender MCP, API keys, or network services are required.
+Blender **5.2.1 LTS** was verified locally with `blender.exe --version`, followed by
+the full background generation, reimport, and four-view render workflow.
+
+Run this single command from any current directory (adjust the repository path if
+your checkout is elsewhere):
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "C:\Users\Deon\Documents\GitHub\Dial-New-Design.01\tools\blender\review_case_42.ps1"
+```
+
+To supply another executable, append `-BlenderExe`:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "C:\Users\Deon\Documents\GitHub\Dial-New-Design.01\tools\blender\review_case_42.ps1" -BlenderExe "D:\Apps\Blender\blender.exe"
+```
+
+The wrapper derives the checkout root from its own location. Without an override,
+it checks `C:\Program Files\Blender Foundation\Blender 5.2\blender.exe`, then
+`blender.exe` on PATH, then immediate Blender installation directories under
+`Blender Foundation` in Program Files, Program Files (x86), and LocalAppData.
+It does not modify the registry. Other Blender versions are not verified; the
+renderer explicitly requires the installed `BLENDER_EEVEE` engine identifier.
+
+Outputs are overwritten on each run in `.artifacts/blender-review/case-42/`:
+
+| File | Purpose |
+| --- | --- |
+| `case-42.glb` | Temporary export of unchanged `test_case_42.json`, normal quality |
+| `top.png` | View from +Z, dial plane visible |
+| `front.png` | View from -Y, +Z up |
+| `side.png` | View from +X, +Z up |
+| `three-quarter.png` | View from +X/-Y/+Z |
+| `manifest.json` | Blender version, source, label, mesh names/count, vertex count, bounds, engine, resolution, cameras and image paths/sizes |
+| `review.log` | Complete Blender stdout/stderr, commands/arguments, exit codes and final artifact paths |
+
+Each stage runs in a fresh background Blender process with factory settings and
+`--python-exit-code 1`. Generation uses the existing case generator without changing
+its dimensions or algorithms. `validate_glb.py` rejects missing, blank, nonexistent,
+empty, or unimportable GLBs and requires at least one mesh and a positive total
+vertex count in the imported scene. Counts refer to imported mesh objects and their
+vertices, including splits made by glTF export. This is a structural smoke check,
+not a watertightness, normals, dimension-tolerance, or manufacturing certification.
+
+`render_review.py` independently imports and validates the GLB, calculates combined
+world-space bounds and translates scene roots to center the asset in memory. The
+source GLB is never rewritten. Fixed area lights, neutral world, AgX color settings
+and orthographic cameras produce 512 x 512 RGB PNGs. Each camera frames all bounding
+box corners with a 15% margin and scale-relative clipping planes. Bounds are in
+imported Blender units; for this fixture, one unit represents one millimetre.
+Camera and lighting setup is repeatable; pixel-identical output across GPU drivers
+or Blender versions is not guaranteed. A local repeat render produced identical
+image data in all four views, but Blender embeds date/render-duration metadata in
+PNGs, so whole-file hashes can differ even when pixels match.
+The renderer uses Blender 5.2's default `World.node_tree` directly; it does not
+assign the deprecated `World.use_nodes` property.
+
+The wrapper stops on any failed subprocess and exits non-zero. It clears its known
+previous outputs first; a success manifest is written only after all renders finish.
+On failure, use `review.log` to identify the failing stage; partial images may remain.
+Run only one instance per checkout at a time because the output directory is shared.
+Inspect every view before accepting the asset: successful file generation alone does
+not establish visual quality.
+
+Generated review files are ignored only under `.artifacts/blender-review/` and must
+not be treated as selected production assets. Production GLBs deliberately selected
+for `public/assets/3d/` still require review and registry integration; this harness
+does not create or register any production asset. GLB, PNG and Blender files elsewhere
+remain eligible for version control.
+
+### Troubleshooting and helper tests
+
+- **Blender not found:** provide the full executable path with `-BlenderExe`.
+- **Script policy prevents launch:** use the command above; its execution-policy
+  override applies to that PowerShell process only.
+- **Import or generation fails:** check the first failed stage in `review.log` and
+  the versioned fixture. Do not replace missing dimensions with guessed values.
+- **Eevee unavailable or GPU initialization fails:** verify Blender 5.2.1 and that
+  Eevee works on the local graphics driver/session. Headless rendering still needs
+  supported graphics hardware; the harness deliberately does not substitute Cycles.
+- **Images look wrong:** inspect all four views for clipping, shading, overlaps and
+  source geometry defects. Review scripts preserve the existing geometry/materials;
+  fixing generator geometry is a separate task.
+
+Pure framing/bounds tests use the Python standard library and do not import `bpy`:
+
+```powershell
+python -B -m unittest discover -s tools/blender -p test_review_helpers.py
+```
+
+Run that test command from the repository root with a local Python 3 installation.
+Ordinary `npm test` / Vitest runs do not launch or require Blender.
