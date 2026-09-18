@@ -1,0 +1,12 @@
+{
+  "schema": "parametric-crown/v1",
+  "provenance": { "status": "provisional", "source": "P4 visual review fixture only; not measured or manufacturing approved" },
+  "headDiameterMm": 6.5,
+  "headLengthMm": 3.5,
+  "socketDiameterMm": 3.2,
+  "socketDepthMm": 1.8,
+  "gripDepthMm": 0.2,
+  "gripCount": 32,
+  "stemThreadPitchMm": { "status": "unknown", "reason": "Movement/stem thread has not been verified" },
+  "attachment": { "anchor": "crown-interface", "axialGapMm": 0 }
+}

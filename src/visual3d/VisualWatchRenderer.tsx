@@ -6,11 +6,11 @@ import { VisualWatchScene } from './VisualWatchScene';
 export const VisualWatchRenderer = ({ assembly }: { assembly: WatchAssembly }) => {
   const model = useMemo(() => watchAssemblyToVisualModel(assembly), [assembly]);
   const [rotation, setRotation] = useState<[number, number, number]>([0.18, -0.28, 0]);
-  const [cameraDistance, setCameraDistance] = useState(7);
+  const [cameraDistance, setCameraDistance] = useState(9);
   const dragStart = useRef<{ x: number; y: number } | null>(null);
   return <div
     className="relative h-full w-full overflow-hidden rounded-panel bg-[#d8d3c8]"
-    onWheel={(event) => setCameraDistance((value) => Math.max(5, Math.min(10, value + event.deltaY * 0.004)))}
+    onWheel={(event) => setCameraDistance((value) => Math.max(6, Math.min(16, value + event.deltaY * 0.004)))}
     onPointerDown={(event) => { dragStart.current = { x: event.clientX, y: event.clientY }; event.currentTarget.setPointerCapture(event.pointerId); }}
     onPointerMove={(event) => {
       if (!dragStart.current) return;
@@ -20,6 +20,6 @@ export const VisualWatchRenderer = ({ assembly }: { assembly: WatchAssembly }) =
       dragStart.current = { x: event.clientX, y: event.clientY };
     }}
     onPointerUp={() => { dragStart.current = null; }}
-    onDoubleClick={() => { setRotation([0.18, -0.28, 0]); setCameraDistance(7); }}
+    onDoubleClick={() => { setRotation([0.18, -0.28, 0]); setCameraDistance(9); }}
   ><VisualWatchScene model={model} rotation={rotation} cameraDistance={cameraDistance} /></div>;
 };

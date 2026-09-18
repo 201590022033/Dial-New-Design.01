@@ -14,6 +14,7 @@ Canonical future component contracts:
 
 - Case: diameter, height, profiles, dial/crystal/caseback openings, lug width and lug-to-lug, taper/drop, crown boss/tube, and resolution.
 - Hand: hub, body/shaft, independently selected tip, independently selected tail, and region-aware lume for body/tip/tail. Unknown movement dimensions remain unknown.
+- Crown: separate removable head, blind visual socket, grip, provenance and explicit attachment to the case's retained boss/tube interface (`parametric-crown/v1`).
 - Finish: material/appearance profiles are separate from geometry; case finishes and hand metal/lume materials can vary independently.
 
 Movement templates provide verified hour/minute/seconds pinion specifications to hand compatibility and, later, hub generation. The existing compatibility layer is the authority for known versus unknown data.
@@ -34,9 +35,21 @@ Blender Python/bpy is the canonical reference geometry environment. Browser rend
 - M1: schemas, provenance, unknown-dimension semantics, and compatibility tests. **Complete:** versioned TypeScript contracts and deterministic validation live under `src/domain/geometry/parametric/`.
 - M2: Blender case generator prototype and visual regression fixtures. **Complete:** `tools/blender/parametric_case_v1.py` generates the reference case and alternate JSON-driven sizes; Blender smoke validation is recorded with the milestone.
 - M3: modular hand generator with initial tip/tail families. **Complete:** `tools/blender/parametric_hand_v1.py` provides modular hand/hand-set generation.
-- M4: browser integration and controlled GLB export.
+- M4 / P4: **Complete:** componentized browser assembly for case/dial/bezel/crystal/hands/crown; typed frames/transforms, category-safe registry selection, shared GLB loading with procedural fallbacks, independent crown generator and shared deterministic Blender review harness. Case boss/tube remain case-side geometry. No remaining-component library was generated.
 
-Each milestone must preserve existing 2D behavior, run typecheck/lint/tests/build, and avoid claiming unverified geometry or measurements as production ready. The next milestone is **browser integration and controlled GLB export**.
+Each milestone must preserve existing 2D behavior, run typecheck/lint/tests/build, and avoid claiming unverified geometry or measurements as production ready.
+
+### Recommended P5 starting point
+
+Build one reviewed end-to-end case/crown/hand-set configuration: select versioned
+parameters in the application, persist the explicit engineering frames, generate
+and review those components, then deliberately publish/register the approved GLBs.
+First verify the actual stem/tube/socket dimensions and dial/hand/crystal clearances;
+keep absent movement evidence unknown. Audit the inherited case/lug geometry and
+case/crown interference before any fit claim. Add movement-aware compatibility
+checks and a small controlled preset set before expanding the component catalogue.
+P4 does not yet provide live generation, a parameter editor, per-hand GLB slots,
+thread/seal geometry, verified fit, or a production component library.
 
 ## Deliberate non-goals
 

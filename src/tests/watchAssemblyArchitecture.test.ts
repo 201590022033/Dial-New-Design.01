@@ -41,7 +41,7 @@ import { defaultTypographyConfig } from '@/domain/generators/typographyEngine';
 describe('Watch Designer Foundation: Authoritative Architecture & Decoupled Domain', () => {
   // Test 1: Every existing default component maps to a valid catalogue item
   it('maps every existing default watch component definition to a valid catalogue item', () => {
-    expect(defaultCatalogueItems.length).toBe(43);
+    expect(defaultCatalogueItems.length).toBe(44); // Existing 43 components plus independent midcase.
 
     for (const legacyDef of watchComponentDefinitions) {
       const catItem = getCatalogueItemByKind(legacyDef.kind);
@@ -65,7 +65,7 @@ describe('Watch Designer Foundation: Authoritative Architecture & Decoupled Doma
   // Test 2: Catalogue items exist independently from WatchAssembly
   it('ensures catalogue items exist independently from WatchAssembly', () => {
     const catalogueStore = useCatalogueStore.getState();
-    expect(catalogueStore.items.length).toBe(43);
+    expect(catalogueStore.items.length).toBe(44);
 
     const item = catalogueStore.getItem('cat-hour-hand');
     expect(item).toBeDefined();
@@ -205,7 +205,9 @@ describe('Watch Designer Foundation: Authoritative Architecture & Decoupled Doma
 
     const legacyEntities = assemblyToWatchComponentEntities(assembly);
     expect(legacyEntities.length).toBe(assembly.partOrder.length);
-    expect(legacyEntities.every((e) => e.exportEnabled)).toBe(true);
+    expect(legacyEntities.filter((e) => e.exportEnabled)).toHaveLength(43);
+    expect(legacyEntities.find((e) => e.definition.kind === 'midcase')!.exportEnabled).toBe(false);
+    expect(assembly.parts['inst-midcase']!.catalogueItemId).toBe('cat-midcase');
   });
 
   // Test 9 (Repair 2): Preserves generator and design metadata during legacy migration

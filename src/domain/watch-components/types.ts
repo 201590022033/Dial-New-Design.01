@@ -1,4 +1,5 @@
 export type WatchComponentKind =
+  | 'midcase'
   | 'hour-hand'
   | 'minute-hand'
   | 'central-seconds'

@@ -664,6 +664,16 @@ export const defaultCatalogueItems: ComponentCatalogueItem[] = [
   }
 ];
 
+// Append to preserve existing default component order/colours in legacy documents.
+defaultCatalogueItems.push({
+  id: 'cat-midcase', kind: 'midcase', displayName: 'Midcase', category: 'case',
+  defaultMaterial: 'steel', defaultTexture: 'brushed', linkedBandKind: null,
+  nominalDimensions: { diameterMm: 40, widthMm: 40, thicknessMm: 7 },
+  manufacturing: defaultManufacturing('cnc'), softStyles: ['reference'], status: 'draft',
+  metadata: { tags: ['case', 'midcase'], revision: 'P4', notes: 'Provisional visual reference. Case includes boss/tube; removable crown is separate. Dimensions and process limits require verification.' },
+  exportEnabled: false
+});
+
 // Phase 5 Physical Compatibility Candidate Fixtures
 export const compatibilityFixtureCatalogueItems: ComponentCatalogueItem[] = [
   {
