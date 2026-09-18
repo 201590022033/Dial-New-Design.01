@@ -3,6 +3,8 @@ export type Vector3Tuple = [number, number, number];
 export type ComponentCategory = 'case' | 'dial' | 'bezel' | 'crystal' | 'hands' | 'crown';
 export type AnchorId = 'watch-axis' | 'dial-seat' | 'hand-stack' | 'crown-interface';
 export type GeometryProvenance = { status: 'provisional' | 'specified'; source: string };
+export type FitEvidenceKey = 'strapInterface' | 'movementHandBores' | 'crownEngagement' | 'dialSeat' | 'handStack' | 'crystalClearance';
+export type AssemblyFitEvidence = Partial<Record<FitEvidenceKey, GeometryProvenance>>;
 export interface ComponentTransform {
   /** Applied in the anchor's local frame. Euler XYZ angles are radians. */
   offsetMm?: Vector3Tuple;

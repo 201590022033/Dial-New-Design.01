@@ -13,7 +13,7 @@ The three separately generated and reviewed GLBs are published under
 
 | Asset | SHA-256 | Imported meshes / vertices |
 | --- | --- | --- |
-| `case.glb` | `847BC3B3A77A6D8B11A6EC4D877F662E164EAC87AF91501DBBDDC87A3071467D` | 7 / 1696 |
+| `case.glb` | `BBD1231F59D149B1F18DD46D4AC2FDD25C20F356C12A740D90DFC18A4DE56C51` | 7 / 1696 |
 | `crown.glb` | `30AD6E178313C13AC88C94251806514297074EBB9A680334DE97641D44AD1716` | 1 / 1538 |
 | `hands.glb` | `B16A2F7B3C58B820B36987FC09723FF5EAD28BA759B893D48044FB307A7E3952` | 15 / 2940 |
 
@@ -29,10 +29,10 @@ by Git. Use the wrappers in the [Blender asset guide](BLENDER_ASSET_GUIDE.md).
 The first P5 review exposed a case-generator regression: four cardinal wedges
 put one lug on the +X crown axis. That geometry has been corrected before this
 milestone continues. The fixture now generates two tapered lugs at each 12/6
-strap end, with an explicit `lugPairGap` between each pair and no crown-side
-strap lug. The existing case boss and tube remain correctly part of the case;
-the removable crown remains separate. The pair gap is a provisional visual
-fixture value, not a manufacturing measurement.
+strap end, with an explicit 16 mm `lugPairGap` between each pair and no
+crown-side strap lug. The existing case boss and tube remain correctly part of
+the case; the removable crown remains separate. The pair gap is a provisional
+visual strap envelope, not a selected strap or manufacturing measurement.
 
 The fixture hand bores (hour 0.5, minute 0.5, seconds 0.3 mm) differ from the
 repository's NH35 movement template (1.5, 0.9, 0.2 mm). This is a reference
@@ -40,7 +40,7 @@ conflict, not a manufacturing tolerance judgment. The crown rear socket starts
 at the tube end with no specified insertion/engagement; thread pitch remains
 unknown. Dial seat, hand stack, crystal underside, sealing and stem retention
 are unverified. The case has no complete dial/crystal geometry in this fixture.
-The app reports the four known conflicts and three unknown checks in the 3D
+The app reports the three known hand-bore conflicts and unresolved checks in the 3D
 review panel. The 2D compatibility system remains separate. The 3D reference
 view hides the schematic dial and crystal because their provisional placement
 occludes the reviewed hands; no dial/crystal fit is implied. This visual-only
@@ -55,6 +55,8 @@ fixed GLBs are withheld and safe procedural visual fallbacks render instead.
 The review set does not offer live Blender generation or a manufacturing-ready
 parameter editor. Generate a new reviewed asset for changed parameters.
 
-Next, source verified movement/hand bore and axial-stack evidence, and specify
+P6 records an explicit evidence gate for the strap interface, movement/hand
+bores, crown engagement, dial seat, hand stack and crystal clearance. All six
+remain provisional or unknown in this fixture. Next, source verified movement/hand bore and axial-stack evidence, and specify
 measurable stem, socket and tube engagement before fit or production approval.
 Continue with a small controlled set of configurations only after those checks.

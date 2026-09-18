@@ -42,6 +42,7 @@ export const VisualWatchRenderer = ({ assembly }: { assembly: WatchAssembly }) =
         {conflicts.length} known geometry conflict{conflicts.length === 1 ? '' : 's'}; {issues.length - conflicts.length} unverified fit check{issues.length - conflicts.length === 1 ? '' : 's'}. This set is for visual review only.
       </p>}
       {referenceSelected && <p className="mt-1 text-slate-300">Schematic dial and crystal are hidden in this reference view so the unverified hand set stays visible.</p>}
+      {referenceSelected && <p className="mt-1 text-slate-300">P6 evidence gate: {Object.keys(assembly.designConfig?.fitEvidence ?? {}).length} provisional or unverified interfaces recorded.</p>}
       {referenceSelected && <details className="mt-1 max-h-36 overflow-auto text-slate-200">
         <summary className="cursor-pointer">Review fit findings</summary>
         <ul className="mt-1 list-disc space-y-1 pl-4">{issues.map((issue, index) => <li key={`${issue.code}-${index}`}>{issue.detail}</li>)}</ul>

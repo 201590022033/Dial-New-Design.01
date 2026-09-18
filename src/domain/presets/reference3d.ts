@@ -21,6 +21,7 @@ export const matchesReference42Parameters = (assembly: WatchAssembly): boolean =
 
 const previewSource = 'P5 42 mm visual fixture; seat, stack, crown fit and movement clearances unverified';
 const previewProvenance = { status: 'provisional' as const, source: previewSource };
+const unknownEvidence = (source: string) => ({ status: 'provisional' as const, source });
 
 /** An opt-in, fixed-size visual reference; never called by default assembly creation. */
 export const applyReference42Preview = (assembly: WatchAssembly): WatchAssembly => {
@@ -59,6 +60,14 @@ export const applyReference42Preview = (assembly: WatchAssembly): WatchAssembly 
       ...assembly.designConfig,
       geometryParameters: { ...assembly.designConfig?.geometryParameters, caseDiameterMm: diameter },
       visualReferenceId: REFERENCE_42_ID,
+      fitEvidence: {
+        strapInterface: unknownEvidence('16 mm paired-lug gap is a visual strap envelope; strap/bar specification not selected'),
+        movementHandBores: unknownEvidence('Compared against repository movement template; fixture bores are not verified production dimensions'),
+        crownEngagement: unknownEvidence('Stem, thread, gasket and insertion evidence not supplied'),
+        dialSeat: unknownEvidence('Visual frame only; measured dial seating evidence not supplied'),
+        handStack: unknownEvidence('Visual frame only; measured axial stack evidence not supplied'),
+        crystalClearance: unknownEvidence('Crystal underside and hand clearance evidence not supplied')
+      },
       assemblyAnchors: {
         ...assembly.designConfig?.assemblyAnchors,
         'watch-axis': { positionMm: [0, 0, 0], rotationRad: [0, 0, 0], provenance: { status: 'specified', source: 'Engineering coordinate convention' } },

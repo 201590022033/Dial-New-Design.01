@@ -31,8 +31,8 @@ def validate(p):
     if number(p, 'dialOpening') >= number(p, 'caseDiameter') or number(p, 'crystalSeatDiameter') >= number(p, 'caseDiameter'): raise ValueError('openings must be smaller than caseDiameter')
     if number(p, 'lugToLug') < number(p, 'caseDiameter'): raise ValueError('lugToLug must not be smaller than caseDiameter')
     if number(p, 'lugTipWidth') > number(p, 'lugWidth'): raise ValueError('lugTipWidth must not exceed lugWidth')
-    if number(p, 'lugPairGap') + 2 * number(p, 'lugRootWidth') > number(p, 'lugWidth'):
-        raise ValueError('lugPairGap plus two lugRootWidth values must fit inside lugWidth')
+    if number(p, 'lugPairGap') > number(p, 'lugWidth'):
+        raise ValueError('lugPairGap must not exceed the nominal lugWidth/strap envelope')
 def mat(name, color, metallic=0.8, rough=.3):
     m = bpy.data.materials.get(name) or bpy.data.materials.new(name); m.diffuse_color = (*color, 1); m.metallic = metallic; m.roughness = rough; return m
 def mesh(name, verts, faces, collection, material=None):

@@ -61,7 +61,13 @@ movement template audit still finds three hand-bore mismatches. Stem engagement,
 thread/seal geometry and axial clearances remain unknown. The assets are clearly
 labelled preview-only and cannot support a fit claim. See [P5 reference review](P5_REFERENCE_REVIEW.md).
 
-### Recommended P6 starting point
+### P6 evidence gate
+
+The reference now records evidence provenance for the strap interface, movement
+hand bores, crown engagement, dial seat, hand stack and crystal clearance. These
+fields remain provisional or unknown until measured evidence is supplied.
+
+### Recommended P7 starting point
 
 Source verified movement, hand-bore, stem, socket, dial-seat, hand-stack and
 crystal-clearance evidence. Then revise the provisional fixture with those

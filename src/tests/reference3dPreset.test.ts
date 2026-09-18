@@ -18,6 +18,7 @@ describe('P5 reviewed reference configuration', () => {
     expect(selected.parts['inst-crown']!.parametricGeometry?.schema).toBe('parametric-crown/v1');
     expect(selected.parts['inst-hour-hand']!.parametricGeometry?.schema).toBe('parametric-hand-set/v1');
     expect(selected.parts['inst-hour-hand']!.geometryProvenance?.status).toBe('provisional');
+    expect(selected.designConfig?.fitEvidence?.strapInterface?.status).toBe('provisional');
     expect(selected.designConfig?.assemblyAnchors?.['crown-interface']?.positionMm).toEqual([21.8, 0, 0]);
     const visuals = watchAssemblyToVisualModel(selected);
     for (const category of ['case', 'crown', 'hands'] as const) {
