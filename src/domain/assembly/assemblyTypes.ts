@@ -4,7 +4,7 @@ import type { TypographyConfig } from '@/domain/generators/typographyEngine';
 import type { TextureEngineConfig } from '@/domain/generators/textureEngine';
 import type { DialFaceConfig } from '@/domain/generators/dialFaceGenerator';
 import type { GlobalGeometryParameters } from '@/domain/geometry/types';
-import type { AssemblyAnchors, ComponentVisualBinding, ParametricCaseV1, ParametricCrownV1 } from '@/domain/geometry/parametric';
+import type { AssemblyAnchors, ComponentVisualBinding, GeometryProvenance, ParametricCaseV1, ParametricCrownV1, ParametricHandSetV1 } from '@/domain/geometry/parametric';
 
 /**
  * WatchAssemblyPartInstance
@@ -41,7 +41,8 @@ export interface WatchAssemblyPartInstance {
   };
   customProperties?: Record<string, unknown>;
   visual?: ComponentVisualBinding;
-  parametricGeometry?: ParametricCaseV1 | ParametricCrownV1;
+  parametricGeometry?: ParametricCaseV1 | ParametricCrownV1 | ParametricHandSetV1;
+  geometryProvenance?: GeometryProvenance;
 }
 
 export interface WatchAssemblyMetadata {
@@ -80,6 +81,7 @@ export interface WatchAssemblyDesignConfig {
   geometryParameters?: Partial<GlobalGeometryParameters>;
   /** Optional engineering frames; legacy documents use explicitly provisional preview frames. */
   assemblyAnchors?: Partial<AssemblyAnchors>;
+  visualReferenceId?: string;
 }
 
 /**

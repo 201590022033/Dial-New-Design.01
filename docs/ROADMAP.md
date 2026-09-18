@@ -51,6 +51,17 @@ checks and a small controlled preset set before expanding the component catalogu
 P4 does not yet provide live generation, a parameter editor, per-hand GLB slots,
 thread/seal geometry, verified fit, or a production component library.
 
+### P5 visual reference status
+
+An opt-in `reference-42-preview/v1` now selects and persists one 42 mm
+case/crown/hand-set configuration with explicit frames and three separately
+reviewed GLBs. A combined Blender review and movement template audit found a
+real +X lug/crown intersection and three hand-bore mismatches. Stem engagement,
+thread/seal geometry and axial clearances remain unknown. The assets are clearly
+labelled preview-only and cannot support a fit claim. See [P5 reference review](P5_REFERENCE_REVIEW.md).
+The next engineering step is to correct the lug/crown geometry and source
+movement/stack dimensions, then regenerate and approve a fit-capable fixture.
+
 ## Deliberate non-goals
 
 No massive application rewrite, huge style catalogue, fabricated calibre dimensions, or one-GLB-per-variation asset library is planned in this pass.

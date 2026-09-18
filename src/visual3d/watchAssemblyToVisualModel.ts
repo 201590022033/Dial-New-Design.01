@@ -4,6 +4,7 @@ import type { AssemblyAnchors, ComponentTransform, ParametricCrownV1 } from '@/d
 import { validateParametricCrownV1 } from '@/domain/geometry/parametric';
 import { visualAssetRegistry, resolveVisualAssetByCategory, visualCategories, type VisualCategory, type VisualAssetDescriptor } from './visualAssetRegistry';
 import { resolveAssemblyAnchors } from './assemblyAnchors';
+import { matchesReference42Parameters } from '@/domain/presets/reference3d';
 
 export type VisualWatchModel = {
   caseDiameterMm: number;
@@ -59,13 +60,20 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
   const assets = {} as VisualWatchModel['assets'];
   const visible = {} as VisualWatchModel['visible'];
   const transforms: VisualWatchModel['transforms'] = {};
+  const referenceIsCurrent = assembly.globalDimensions.caseDiameterMm === 42 && matchesReference42Parameters(assembly);
   for (const category of visualCategories) {
     const part = find(category);
     const id = part?.visual?.assetId ?? part?.customProperties?.visualAssetId;
     const fallbackId = category === 'hands' ? `visual-hands-${style === 'mercedes' ? 'mercedes' : 'baton'}` : `visual-${category}-default`;
-    assets[category] = resolveVisualAssetByCategory(typeof id === 'string' ? id : undefined, category, visualAssetRegistry[fallbackId]!);
+    const resolved = resolveVisualAssetByCategory(typeof id === 'string' ? id : undefined, category, visualAssetRegistry[fallbackId]!);
+    const diameterMatches = resolved.referenceCaseDiameterMm === undefined ||
+      (assembly.globalDimensions.caseDiameterMm === resolved.referenceCaseDiameterMm && referenceIsCurrent);
+    assets[category] = diameterMatches ? resolved : visualAssetRegistry[fallbackId]!;
     // Legacy documents retain the main schematic; crown requires an actual part.
     visible[category] = part ? part.visible : category !== 'crown';
+    // This reference has no measured dial/crystal stack; the schematic layers
+    // occlude the reviewed hands and imply unchecked axial clearances.
+    if ((category === 'crystal' || category === 'dial') && referenceIsCurrent) visible[category] = false;
     transforms[category] = part?.visual?.transform;
   }
   const candidate = crownPart?.parametricGeometry;

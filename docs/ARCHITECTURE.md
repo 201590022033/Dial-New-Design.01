@@ -82,6 +82,18 @@ catalogue support, parameter editors, verified movement clearances, collision/fi
 checks, live Blender regeneration and the rest of the component library are later
 milestones. Registry GLBs remain opt-in reviewed assets, not automatic generation.
 
+### P5 fixed reference selection
+
+The opt-in 42 mm reference stores the case, crown and hand-set generator
+parameters on independent assembly parts and binds three fixed GLBs by category.
+It writes explicit frame provenance and survives serialization. A fixed asset
+is used only while the complete fixture parameters and 42 mm diameter match;
+changes fall back to procedural visuals. The 3D review panel surfaces known
+lug/crown and movement/hand-bore conflicts and unresolved fit questions. The
+case boss/tube remain part of the case and the removable crown remains a
+separate part. This visual selection does not certify mechanical engagement or
+movement clearance; details are in [P5 reference review](P5_REFERENCE_REVIEW.md).
+
 ## Data Flow
 
 1. Inspector/store update.

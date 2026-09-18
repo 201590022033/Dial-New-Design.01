@@ -154,6 +154,15 @@ open for each run to avoid Windows file-open races. Do not run concurrent review
 with the same asset name. The validator, cameras, lights and renderer are shared;
 no category-specific render pipeline was added.
 
+P5 also provides `review_hand_set.ps1` and `review_reference_42.ps1`. The latter
+uses `reference_42_assembly.json` to combine the case, separate crown head and
+hand set at explicit provisional frames for a four-view interference review.
+Its combined GLB is not registered in the application. Three individual GLBs
+are selected as fixed 42 mm **visual previews** under
+`public/assets/3d/reference-42/`; see [P5 reference review](P5_REFERENCE_REVIEW.md)
+for hashes, known overlap, hand-bore conflicts and unknown fit data. Successful
+structural validation and rendering do not approve mechanical fit.
+
 Each stage runs in a fresh background Blender process with factory settings and
 `--python-exit-code 1`. Generation uses the existing case generator without changing
 its dimensions or algorithms. `validate_glb.py` rejects missing, blank, nonexistent,
@@ -208,6 +217,7 @@ Pure framing/bounds tests use the Python standard library and do not import `bpy
 python -B -m unittest discover -s tools/blender -p test_review_helpers.py
 python -B -m unittest discover -s tools/blender -p test_crown_helpers.py
 blender --background --factory-startup --python-exit-code 1 --python tools/blender/test_component_assembly_blender.py
+blender --background --factory-startup --python-exit-code 1 --python tools/blender/test_reference_42_assembly_blender.py
 ```
 
 Run that test command from the repository root with a local Python 3 installation.

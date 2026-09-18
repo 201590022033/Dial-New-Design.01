@@ -22,9 +22,14 @@ export type VisualAssetDescriptor = {
    */
   units?: 'millimetres' | 'metres';
   upAxis?: 'Y' | 'Z';
+  /** A reviewed, fixed-size preview must fall back when the assembly size changes. */
+  referenceCaseDiameterMm?: number;
 };
 
 export const visualAssetRegistry: Record<string, VisualAssetDescriptor> = {
+  'reference-42-case-preview': { assetId: 'reference-42-case-preview', category: 'case', assetType: 'glb', assetPath: '/assets/3d/reference-42/case.glb', anchor: 'watch-axis', units: 'millimetres', upAxis: 'Y', referenceCaseDiameterMm: 42 },
+  'reference-42-crown-preview': { assetId: 'reference-42-crown-preview', category: 'crown', assetType: 'glb', assetPath: '/assets/3d/reference-42/crown.glb', anchor: 'crown-interface', units: 'millimetres', upAxis: 'Y', referenceCaseDiameterMm: 42 },
+  'reference-42-hands-preview': { assetId: 'reference-42-hands-preview', category: 'hands', assetType: 'glb', assetPath: '/assets/3d/reference-42/hands.glb', anchor: 'hand-stack', units: 'millimetres', upAxis: 'Y', referenceCaseDiameterMm: 42 },
   // Opt-in path only: review fixture output is not automatically published here.
   'crown-reference-v1': { assetId: 'crown-reference-v1', category: 'crown', assetType: 'glb', assetPath: '/assets/3d/generated/crowns/crown-v1.glb', anchor: 'crown-interface', units: 'millimetres', upAxis: 'Y' },
   'visual-crown-default': { assetId: 'visual-crown-default', category: 'crown', assetType: 'procedural', materialProfile: 'polished-steel', anchor: 'crown-interface' },

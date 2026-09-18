@@ -16,6 +16,7 @@ import { getTemplateById, type TemplateId } from '@/domain/generators/templateLi
 import type { BandEntity, BandId, BandKind } from '@/domain/bands/types';
 import type { DonutGeometry } from '@/types/geometry';
 import { createBand } from '@/domain/bands/bandRegistry';
+import { applyReference42Preview, useProceduralReference42 } from '@/domain/presets/reference3d';
 import { resolveAssemblyGeometry, type ResolvedAssemblyGeometry } from '@/domain/geometry/boundaryResolver';
 
 export interface WatchAssemblyStoreState {
@@ -30,6 +31,8 @@ export interface WatchAssemblyStoreState {
   updateMetadata: (patch: Partial<WatchAssemblyMetadata>) => void;
   updateGlobalDimensions: (patch: Partial<WatchAssemblyGlobalDimensions>) => void;
   resetAssembly: () => void;
+  selectReference42Preview: () => void;
+  clearReference42Preview: () => void;
   exportJson: () => string;
   importJson: (json: string) => void;
 
@@ -87,6 +90,13 @@ export const useWatchAssemblyStore = create<WatchAssemblyStoreState>((set, get) 
   setAssembly: (assembly) => {
     set({ assembly, dirty: false });
   },
+
+  selectReference42Preview: () => set((state) => ({
+    assembly: { ...applyReference42Preview(state.assembly), metadata: { ...state.assembly.metadata, updatedAtIso: new Date().toISOString() } }, dirty: true
+  })),
+  clearReference42Preview: () => set((state) => ({
+    assembly: { ...useProceduralReference42(state.assembly), metadata: { ...state.assembly.metadata, updatedAtIso: new Date().toISOString() } }, dirty: true
+  })),
 
   updateMetadata: (patch) => {
     set((state) => ({
