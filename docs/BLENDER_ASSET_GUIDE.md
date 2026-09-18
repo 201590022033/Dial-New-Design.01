@@ -96,7 +96,7 @@ blender --background --python tools/blender/parametric_case_v1.py -- --quality n
 blender --background --python tools/blender/parametric_case_v1.py -- --params case.json --quality high --output public/assets/3d/generated/cases/case.glb
 ```
 
-Quality controls radial sampling (`preview`, `normal`, `high`) and is not part of the physical case schema. The generator creates/rebuilds only `DD_PARAMETRIC_CASE`, including a smooth revolved mid-case, four tapered lugs, and embedded crown boss/tube source objects. Re-running is idempotent. GLB export is optional and selection-scoped.
+Quality controls radial sampling (`preview`, `normal`, `high`) and is not part of the physical case schema. The generator creates/rebuilds only `DD_PARAMETRIC_CASE`, including a smooth revolved mid-case, paired tapered lugs at the 12/6 strap ends, and embedded crown boss/tube source objects. Re-running is idempotent. GLB export is optional and selection-scoped. `lugWidth` is the total pair envelope and `lugPairGap` is the clear strap/spring-bar gap; fixture values remain provisional.
 
 ## Shared local component render-and-review harness
 

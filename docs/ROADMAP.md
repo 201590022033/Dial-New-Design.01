@@ -55,12 +55,18 @@ thread/seal geometry, verified fit, or a production component library.
 
 An opt-in `reference-42-preview/v1` now selects and persists one 42 mm
 case/crown/hand-set configuration with explicit frames and three separately
-reviewed GLBs. A combined Blender review and movement template audit found a
-real +X lug/crown intersection and three hand-bore mismatches. Stem engagement,
+reviewed GLBs. The case fixture has been corrected to paired 12/6 strap lugs
+with a crown-side clearance; the crown boss and tube remain case-owned. The
+movement template audit still finds three hand-bore mismatches. Stem engagement,
 thread/seal geometry and axial clearances remain unknown. The assets are clearly
 labelled preview-only and cannot support a fit claim. See [P5 reference review](P5_REFERENCE_REVIEW.md).
-The next engineering step is to correct the lug/crown geometry and source
-movement/stack dimensions, then regenerate and approve a fit-capable fixture.
+
+### Recommended P6 starting point
+
+Source verified movement, hand-bore, stem, socket, dial-seat, hand-stack and
+crystal-clearance evidence. Then revise the provisional fixture with those
+measurements, regenerate all three components, and add fit checks only where
+the evidence supports them. Continue with a small controlled component set.
 
 ## Deliberate non-goals
 

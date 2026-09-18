@@ -20,6 +20,9 @@ def main():
     original_case = {o.name: o.as_pointer() for o in case_collection.objects}
     assert len(original_case) == 7
     assert "DD_CASE_CROWN_BOSS" in original_case and "DD_CASE_CROWN_TUBE" in original_case
+    assert {name for name in original_case if name.startswith("DD_CASE_LUG_")} == {
+        "DD_CASE_LUG_12_L", "DD_CASE_LUG_12_R", "DD_CASE_LUG_6_L", "DD_CASE_LUG_6_R"
+    }
     crown.build(crown_params)
     head_collection = crown.build(crown_params)  # Idempotent rebuild; case stays untouched.
     assert {o.name: o.as_pointer() for o in case_collection.objects} == original_case

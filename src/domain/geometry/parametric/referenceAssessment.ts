@@ -4,7 +4,7 @@ import type { ParametricCaseV1, ParametricHandSetV1, DimensionMm } from './types
 import type { ParametricCrownV1 } from './crown';
 
 export interface ReferenceFitIssue {
-  code: 'CROWN_LUG_OVERLAP' | 'HAND_BORE_MISMATCH' | 'CROWN_ENGAGEMENT_UNKNOWN' | 'STACK_CLEARANCE_UNKNOWN' | 'STEM_INTERFACE_UNKNOWN';
+  code: 'CROWN_LUG_OVERLAP' | 'LUG_LAYOUT_UNKNOWN' | 'HAND_BORE_MISMATCH' | 'CROWN_ENGAGEMENT_UNKNOWN' | 'STACK_CLEARANCE_UNKNOWN' | 'STEM_INTERFACE_UNKNOWN';
   status: 'conflict' | 'unknown';
   detail: string;
 }
@@ -25,10 +25,8 @@ export const assessReference3dFit = (assembly: WatchAssembly): ReferenceFitIssue
     const diameter = caseSpec.caseDiameter as number;
     const tubeEnd = diameter / 2 - (caseSpec.crownTubeEmbed as number) + (caseSpec.crownTubeLength as number);
     const rear = tubeEnd + (gap as number);
-    const lugRoot = diameter / 2 - (caseSpec.lugCaseOverlap as number);
-    const lugTip = (caseSpec.lugToLug as number) / 2;
-    if (rear < lugTip && rear + (crownSpec.headLengthMm as number) > lugRoot && measured(caseSpec.lugTipWidth) && caseSpec.lugTipWidth > 0) {
-      issues.push({ code: 'CROWN_LUG_OVERLAP', status: 'conflict', detail: `The +X lug occupies X=${lugRoot.toFixed(2)}–${lugTip.toFixed(2)} mm while the crown head occupies X=${rear.toFixed(2)}–${(rear + (crownSpec.headLengthMm as number)).toFixed(2)} mm on the same axis.` });
+    if (!measured(caseSpec.lugPairGap)) {
+      issues.push({ code: 'LUG_LAYOUT_UNKNOWN', status: 'unknown', detail: 'The case does not specify a paired 12/6 lug layout; crown-side strap clearance cannot be established.' });
     }
     if (rear >= tubeEnd) issues.push({ code: 'CROWN_ENGAGEMENT_UNKNOWN', status: 'unknown', detail: 'The crown rear face meets or clears the tube end; no insertion depth or sealed mechanical engagement is specified.' });
   }

@@ -14,6 +14,8 @@ export interface ParametricCaseV1 {
   upperCaseRadiusReduction: DimensionMm; lowerCaseRadiusReduction: DimensionMm; middleCaseBulge: DimensionMm;
   bezelLipHeight: DimensionMm; casebackLipHeight: DimensionMm;
   lugRootWidth: DimensionMm; lugTipWidth: DimensionMm; lugCaseOverlap: DimensionMm; lugTipDrop: DimensionMm;
+  /** Clear distance between the two lugs at each strap end; fixture values may be provisional. */
+  lugPairGap: DimensionMm;
   lugThickness: DimensionMm; lugTaperStrength: DimensionMm;
   crownTubeRadius: DimensionMm; crownTubeLength: DimensionMm; crownBossRadius: DimensionMm;
   crownBossLength: DimensionMm; crownBossEmbed: DimensionMm; crownTubeEmbed: DimensionMm;

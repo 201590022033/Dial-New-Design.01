@@ -61,7 +61,7 @@ describe('P5 reviewed reference configuration', () => {
   it('reports geometric overlap, hand-bore mismatch and unresolved interfaces without a fit claim', () => {
     const selected = applyReference42Preview(createDefaultWatchAssembly());
     const issues = assessReference3dFit(selected);
-    expect(issues.some((issue) => issue.code === 'CROWN_LUG_OVERLAP' && issue.status === 'conflict')).toBe(true);
+    expect(issues.some((issue) => issue.code === 'CROWN_LUG_OVERLAP')).toBe(false);
     expect(issues.filter((issue) => issue.code === 'HAND_BORE_MISMATCH' && issue.status === 'conflict')).toHaveLength(3);
     expect(issues.some((issue) => issue.code === 'CROWN_ENGAGEMENT_UNKNOWN' && issue.status === 'unknown')).toBe(true);
     expect(issues.some((issue) => issue.code === 'STACK_CLEARANCE_UNKNOWN' && issue.status === 'unknown')).toBe(true);

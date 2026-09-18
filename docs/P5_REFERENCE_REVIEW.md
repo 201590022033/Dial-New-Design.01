@@ -13,7 +13,7 @@ The three separately generated and reviewed GLBs are published under
 
 | Asset | SHA-256 | Imported meshes / vertices |
 | --- | --- | --- |
-| `case.glb` | `3ED3482C1F83CBD4416FC68F160A006B782EAE1F8E76F5EFEAF85BBFD7CD8DA2` | 7 / 1696 |
+| `case.glb` | `847BC3B3A77A6D8B11A6EC4D877F662E164EAC87AF91501DBBDDC87A3071467D` | 7 / 1696 |
 | `crown.glb` | `30AD6E178313C13AC88C94251806514297074EBB9A680334DE97641D44AD1716` | 1 / 1538 |
 | `hands.glb` | `B16A2F7B3C58B820B36987FC09723FF5EAD28BA759B893D48044FB307A7E3952` | 15 / 2940 |
 
@@ -26,12 +26,13 @@ the application loads three independent component assets. Logs, manifests and
 PNG views are reproducible under `.artifacts/blender-review/` and are ignored
 by Git. Use the wrappers in the [Blender asset guide](BLENDER_ASSET_GUIDE.md).
 
-The combined views expose a **known crown/lug intersection**. The inherited
-case generator has four cardinal lugs, including one on the +X crown axis.
-For this fixture the +X lug spans X=17.8–23.5 mm and the crown head spans
-X=21.8–25.3 mm. These ranges overlap on the shared axis and the side and
-three-quarter renders visibly show the interference. The existing case boss
-and tube remain correctly part of the case; their ownership is not the defect.
+The first P5 review exposed a case-generator regression: four cardinal wedges
+put one lug on the +X crown axis. That geometry has been corrected before this
+milestone continues. The fixture now generates two tapered lugs at each 12/6
+strap end, with an explicit `lugPairGap` between each pair and no crown-side
+strap lug. The existing case boss and tube remain correctly part of the case;
+the removable crown remains separate. The pair gap is a provisional visual
+fixture value, not a manufacturing measurement.
 
 The fixture hand bores (hour 0.5, minute 0.5, seconds 0.3 mm) differ from the
 repository's NH35 movement template (1.5, 0.9, 0.2 mm). This is a reference
@@ -54,7 +55,6 @@ fixed GLBs are withheld and safe procedural visual fallbacks render instead.
 The review set does not offer live Blender generation or a manufacturing-ready
 parameter editor. Generate a new reviewed asset for changed parameters.
 
-Next, redesign the +X lug/crown interface with a reviewed case fixture, source
-verified movement/hand bore and axial-stack evidence, and specify measurable
-stem, socket and tube engagement before fit or production approval. Continue
-with a small controlled set of configurations only after those checks.
+Next, source verified movement/hand bore and axial-stack evidence, and specify
+measurable stem, socket and tube engagement before fit or production approval.
+Continue with a small controlled set of configurations only after those checks.

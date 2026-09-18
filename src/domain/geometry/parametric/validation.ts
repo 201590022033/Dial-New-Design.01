@@ -18,6 +18,7 @@ export const validateParametricCaseV1 = (c: ParametricCaseV1): ParametricValidat
   if (known(c.caseDiameter) && c.caseDiameter <= 0) r.errors.push('caseDiameter must be greater than zero');
   for (const [a, av, b, bv] of pairs) if (known(av) && known(bv) && av >= bv) r.errors.push(`${a} must be smaller than ${b}`);
   if (known(c.lugWidth) && known(c.lugTipWidth) && c.lugTipWidth > c.lugWidth) r.errors.push('lugTipWidth must not exceed lugWidth');
+  if (known(c.lugPairGap) && known(c.lugRootWidth) && known(c.lugWidth) && c.lugPairGap + 2 * c.lugRootWidth > c.lugWidth) r.errors.push('lugPairGap plus two lugRootWidth values must fit inside lugWidth');
   if (known(c.lugToLug) && known(c.caseDiameter) && c.lugToLug < c.caseDiameter) r.errors.push('lugToLug must not be smaller than caseDiameter');
   return { status: r.errors.length ? 'invalid' : r.unknown.length ? 'unknown' : 'valid', errors: r.errors, unknownDimensions: r.unknown };
 };

@@ -13,7 +13,7 @@ REFERENCE = {
     'schema': SCHEMA, 'caseDiameter': 40.0, 'midcaseHeight': 7.0, 'lugWidth': 20.0, 'lugToLug': 47.0,
     'dialOpening': 31.5, 'crystalSeatDiameter': 32.5, 'casebackOpening': 34.0,
     'upperCaseRadiusReduction': .45, 'lowerCaseRadiusReduction': .65, 'middleCaseBulge': .20,
-    'bezelLipHeight': 1.10, 'casebackLipHeight': .80, 'lugRootWidth': 5.2, 'lugTipWidth': 4.0,
+    'bezelLipHeight': 1.10, 'casebackLipHeight': .80, 'lugRootWidth': 5.2, 'lugTipWidth': 4.0, 'lugPairGap': 6.0,
     'lugCaseOverlap': 2.2, 'lugTipDrop': 1.35, 'lugThickness': 4.5, 'lugTaperStrength': .80,
     'crownTubeRadius': 1.50, 'crownTubeLength': 2.30, 'crownBossRadius': 2.10,
     'crownBossLength': 1.50, 'crownBossEmbed': 2.20, 'crownTubeEmbed': 1.50,
@@ -31,6 +31,8 @@ def validate(p):
     if number(p, 'dialOpening') >= number(p, 'caseDiameter') or number(p, 'crystalSeatDiameter') >= number(p, 'caseDiameter'): raise ValueError('openings must be smaller than caseDiameter')
     if number(p, 'lugToLug') < number(p, 'caseDiameter'): raise ValueError('lugToLug must not be smaller than caseDiameter')
     if number(p, 'lugTipWidth') > number(p, 'lugWidth'): raise ValueError('lugTipWidth must not exceed lugWidth')
+    if number(p, 'lugPairGap') + 2 * number(p, 'lugRootWidth') > number(p, 'lugWidth'):
+        raise ValueError('lugPairGap plus two lugRootWidth values must fit inside lugWidth')
 def mat(name, color, metallic=0.8, rough=.3):
     m = bpy.data.materials.get(name) or bpy.data.materials.new(name); m.diffuse_color = (*color, 1); m.metallic = metallic; m.roughness = rough; return m
 def mesh(name, verts, faces, collection, material=None):
@@ -57,15 +59,18 @@ def build(p, quality='normal'):
     col=bpy.data.collections.new('DD_PARAMETRIC_CASE'); bpy.context.scene.collection.children.link(col)
     steel=mat('DD Brushed Steel', (.32,.36,.4), .9, .28); polished=mat('DD Polished Steel', (.65,.68,.72), .95, .12)
     n=QUALITY[quality]; revolve(p,n,col,steel)
-    r=number(p,'caseDiameter')/2; lug_w=number(p,'lugWidth'); tip=number(p,'lugTipWidth'); span=number(p,'lugToLug')/2
-    # Four tapered prisms, with their root overlapping the case wall and a wrist-facing Z drop.
-    for name, angle in [('12',0),('2',math.pi/2),('4',math.pi),('6',3*math.pi/2)]:
-        ux,uy=math.cos(angle),math.sin(angle); vx,vy=-uy,ux; root=r-number(p,'lugCaseOverlap'); length=span-root
-        z=-number(p,'lugTipDrop')/2 if name in ('12','6') else 0
-        pts=[]
+    r=number(p,'caseDiameter')/2; root_width=number(p,'lugRootWidth'); tip_width=number(p,'lugTipWidth'); pair_gap=number(p,'lugPairGap'); span=number(p,'lugToLug')/2
+    # Two tapered prisms at each strap end. The crown axis (+X) stays clear;
+    # the case retains only its boss and tube on that side.
+    root=r-number(p,'lugCaseOverlap');
+    for end_name, end_sign in [('12',1),('6',-1)]:
+      for side_name, side_sign in [('L',-1),('R',1)]:
+        root_center=side_sign*(pair_gap/2 + root_width/2); tip_center=side_sign*(pair_gap/2 + tip_width/2)
+        z=-number(p,'lugTipDrop')/2; pts=[]
         for zz in (-number(p,'lugThickness')/2+z, number(p,'lugThickness')/2+z):
-            pts += [(ux*root+vx*lug_w/2,uy*root+vy*lug_w/2,zz),(ux*span+vx*tip/2,uy*span+vy*tip/2,zz),(ux*span-vx*tip/2,uy*span-vy*tip/2,zz),(ux*root-vx*lug_w/2,uy*root-vy*lug_w/2,zz)]
-        faces=[(0,1,2,3),(4,7,6,5),(0,4,5,1),(1,5,6,2),(2,6,7,3),(3,7,4,0)]; ob=mesh('DD_CASE_LUG_'+name,pts,faces,col,steel)
+            pts += [(root_center-root_width/2, end_sign*root, zz), (root_center+root_width/2, end_sign*root, zz),
+                    (tip_center+tip_width/2, end_sign*span, zz), (tip_center-tip_width/2, end_sign*span, zz)]
+        faces=[(0,1,2,3),(4,7,6,5),(0,4,5,1),(1,5,6,2),(2,6,7,3),(3,7,4,0)]; ob=mesh('DD_CASE_LUG_'+end_name+'_'+side_name,pts,faces,col,steel)
         bevel=ob.modifiers.new('Conservative edge bevel','BEVEL'); bevel.width=.18; bevel.segments=2
     x=r-number(p,'crownBossEmbed')+number(p,'crownBossLength')/2; cylinder('DD_CASE_CROWN_BOSS',number(p,'crownBossRadius'),number(p,'crownBossLength'),(x,0,0),col,polished)
     x=r-number(p,'crownTubeEmbed')+number(p,'crownTubeLength')/2; cylinder('DD_CASE_CROWN_TUBE',number(p,'crownTubeRadius'),number(p,'crownTubeLength'),(x,0,0),col,polished)
