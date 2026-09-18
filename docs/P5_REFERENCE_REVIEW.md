@@ -13,7 +13,7 @@ The three separately generated and reviewed GLBs are published under
 
 | Asset | SHA-256 | Imported meshes / vertices |
 | --- | --- | --- |
-| `case.glb` | `BBD1231F59D149B1F18DD46D4AC2FDD25C20F356C12A740D90DFC18A4DE56C51` | 7 / 1696 |
+| `case.glb` | `13A3F46B7D58C241F3A841CA5CA90C6760C638CC0748EA8A90AEAE19DF683388` | 7 / 1696 |
 | `crown.glb` | `30AD6E178313C13AC88C94251806514297074EBB9A680334DE97641D44AD1716` | 1 / 1538 |
 | `hands.glb` | `B16A2F7B3C58B820B36987FC09723FF5EAD28BA759B893D48044FB307A7E3952` | 15 / 2940 |
 
@@ -33,6 +33,9 @@ strap end, with an explicit 16 mm `lugPairGap` between each pair and no
 crown-side strap lug. The existing case boss and tube remain correctly part of
 the case; the removable crown remains separate. The pair gap is a provisional
 visual strap envelope, not a selected strap or manufacturing measurement.
+The lug roots are intentionally inset by half their root width so the full
+root intersects the case shoulder; this prevents a floating-looking strap lug
+when the provisional gap is widened.
 
 The fixture hand bores (hour 0.5, minute 0.5, seconds 0.3 mm) differ from the
 repository's NH35 movement template (1.5, 0.9, 0.2 mm). This is a reference

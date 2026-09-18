@@ -5,6 +5,7 @@ import { validateParametricCrownV1 } from '@/domain/geometry/parametric';
 import { visualAssetRegistry, resolveVisualAssetByCategory, visualCategories, type VisualCategory, type VisualAssetDescriptor } from './visualAssetRegistry';
 import { resolveAssemblyAnchors } from './assemblyAnchors';
 import { matchesReference42Parameters } from '@/domain/presets/reference3d';
+import { resolveFinishProfile, type FinishProfile, type FinishProfileId } from './finishProfiles';
 
 export type VisualWatchModel = {
   caseDiameterMm: number;
@@ -15,6 +16,7 @@ export type VisualWatchModel = {
   crystalMaterial: string;
   hands: { style: 'baton' | 'mercedes' | 'needle'; material: string };
   crown: { diameterMm: number; lengthMm: number; material: string; parameters?: ParametricCrownV1; provisional: boolean };
+  finishes: Record<VisualCategory, FinishProfile>;
   anchors: AssemblyAnchors;
   visible: Record<VisualCategory, boolean>;
   transforms: Partial<Record<VisualCategory, ComponentTransform>>;
@@ -60,6 +62,7 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
   const assets = {} as VisualWatchModel['assets'];
   const visible = {} as VisualWatchModel['visible'];
   const transforms: VisualWatchModel['transforms'] = {};
+  const finishes = {} as VisualWatchModel['finishes'];
   const referenceIsCurrent = assembly.globalDimensions.caseDiameterMm === 42 && matchesReference42Parameters(assembly);
   for (const category of visualCategories) {
     const part = find(category);
@@ -69,6 +72,8 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
     const diameterMatches = resolved.referenceCaseDiameterMm === undefined ||
       (assembly.globalDimensions.caseDiameterMm === resolved.referenceCaseDiameterMm && referenceIsCurrent);
     assets[category] = diameterMatches ? resolved : visualAssetRegistry[fallbackId]!;
+    const fallbackFinish: FinishProfileId = category === 'dial' ? 'dial' : category === 'crystal' ? 'sapphire' : category === 'bezel' ? 'polished-steel' : 'brushed-steel';
+    finishes[category] = resolveFinishProfile(resolved.materialProfile ?? materialProfile(part, fallbackFinish), fallbackFinish);
     // Legacy documents retain the main schematic; crown requires an actual part.
     visible[category] = part ? part.visible : category !== 'crown';
     // This reference has no measured dial/crystal stack; the schematic layers
@@ -93,6 +98,6 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
       material: materialProfile(crownPart, 'polished-steel'), parameters: crownParams,
       provisional: !crownParams || crownParams.provenance.status === 'provisional' || validateParametricCrownV1(crownParams).status === 'unknown'
     },
-    anchors: resolveAssemblyAnchors(assembly, caseParams), visible, transforms, assets
+    finishes, anchors: resolveAssemblyAnchors(assembly, caseParams), visible, transforms, assets
   };
 };

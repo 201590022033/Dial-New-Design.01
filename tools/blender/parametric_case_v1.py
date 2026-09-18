@@ -62,7 +62,9 @@ def build(p, quality='normal'):
     r=number(p,'caseDiameter')/2; root_width=number(p,'lugRootWidth'); tip_width=number(p,'lugTipWidth'); pair_gap=number(p,'lugPairGap'); span=number(p,'lugToLug')/2
     # Two tapered prisms at each strap end. The crown axis (+X) stays clear;
     # the case retains only its boss and tube on that side.
-    root=r-number(p,'lugCaseOverlap');
+    # Pull the root plane inward by half its width so the full tapered root
+    # intersects the case shoulder even when the pair gap is widened.
+    root=r-number(p,'lugCaseOverlap')-root_width/2
     for end_name, end_sign in [('12',1),('6',-1)]:
       for side_name, side_sign in [('L',-1),('R',1)]:
         root_center=side_sign*(pair_gap/2 + root_width/2); tip_center=side_sign*(pair_gap/2 + tip_width/2)

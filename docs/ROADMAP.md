@@ -74,6 +74,14 @@ crystal-clearance evidence. Then revise the provisional fixture with those
 measurements, regenerate all three components, and add fit checks only where
 the evidence supports them. Continue with a small controlled component set.
 
+### P7 surface finish status
+
+The visual layer now has registered, independent procedural finish profiles for
+the supported categories. These profiles supply preview color, metalness,
+roughness and provisional provenance while leaving authored GLB materials intact.
+No texture maps or measured surface specifications are claimed yet; those are
+the next texture refinement step after finish references are selected.
+
 ## Deliberate non-goals
 
 No massive application rewrite, huge style catalogue, fabricated calibre dimensions, or one-GLB-per-variation asset library is planned in this pass.

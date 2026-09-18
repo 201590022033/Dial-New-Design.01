@@ -82,6 +82,17 @@ catalogue support, parameter editors, verified movement clearances, collision/fi
 checks, live Blender regeneration and the rest of the component library are later
 milestones. Registry GLBs remain opt-in reviewed assets, not automatic generation.
 
+### P7 surface finishes
+
+`src/visual3d/finishProfiles.ts` registers independent procedural surface
+profiles for case, bezel, crown, hands, dial, crystal, lume and metal variants.
+The visual adapter resolves a category profile from authored asset metadata or
+assembly material/texture hints, with a safe fallback. Procedural previews use
+the same profile values; authored GLBs retain their own materials. P7 establishes
+surface ownership and provisional provenance without inventing texture maps or
+manufacturing surface specifications. Image textures, anisotropic brushing and
+measured finish references remain later work.
+
 ### P5 fixed reference selection
 
 The opt-in 42 mm reference stores the case, crown and hand-set generator
