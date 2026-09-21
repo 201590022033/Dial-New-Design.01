@@ -1,5 +1,6 @@
 import type { WatchAssembly } from '@/domain/assembly/assemblyTypes';
 import { createDefaultWatchAssembly } from '@/domain/assembly/assemblyFactory';
+import { applyArchetypeVisualProfile } from './archetypeProfiles';
 
 export type StarterBuildType = 'diver' | 'pilot' | 'dress' | 'field' | 'chronograph';
 
@@ -18,8 +19,36 @@ export interface StarterBuildDefinition {
   partExplanations: StarterPartExplanation[];
 }
 
-export const createStarterBuild = (buildType: StarterBuildType = 'diver'): StarterBuildDefinition => {
-  const base = createDefaultWatchAssembly();
+export const createStarterBuild = (
+  buildType: StarterBuildType = 'diver',
+  sourceAssembly: WatchAssembly = createDefaultWatchAssembly()
+): StarterBuildDefinition => {
+  const archetypeIds: Record<StarterBuildType, string> = {
+    diver: 'archetype-dive', pilot: 'archetype-pilot', dress: 'archetype-dress-formal',
+    field: 'archetype-field', chronograph: 'archetype-chronograph'
+  };
+  const titles: Record<StarterBuildType, string> = {
+    diver: 'Dive watch baseline', pilot: 'Pilot watch baseline', dress: 'Dress watch baseline',
+    field: 'Field watch baseline', chronograph: 'Chronograph baseline'
+  };
+  const descriptions: Record<StarterBuildType, string> = {
+    diver: 'High-lume dial, rotating dive bezel and high-contrast tool-watch composition.',
+    pilot: 'Large Arabic markers, restrained bezel and high-legibility aviation composition.',
+    dress: 'Light minimal dial, fine markers and polished formal-watch composition.',
+    field: 'Matte utility dial, Arabic markers and subdued outdoor color palette.',
+    chronograph: 'Two-tone timing dial, tachymeter reference and chronograph movement layout.'
+  };
+  let base = applyArchetypeVisualProfile(sourceAssembly, archetypeIds[buildType]);
+  if (buildType === 'chronograph') {
+    const pushers = base.parts['inst-pushers'];
+    base = {
+      ...base,
+      metadata: { ...base.metadata, movement: 'vk63' },
+      parts: pushers
+        ? { ...base.parts, 'inst-pushers': { ...pushers, visible: true } }
+        : base.parts
+    };
+  }
 
   const partExplanations: StarterPartExplanation[] = [
     {
@@ -102,8 +131,8 @@ export const createStarterBuild = (buildType: StarterBuildType = 'diver'): Start
 
   return {
     buildType,
-    title: 'Best-value default build',
-    description: 'Emphasizes broad physical compatibility, verified components, and practical availability.',
+    title: titles[buildType],
+    description: descriptions[buildType],
     assembly: base,
     partExplanations
   };

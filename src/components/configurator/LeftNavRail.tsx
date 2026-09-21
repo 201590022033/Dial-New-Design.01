@@ -72,8 +72,6 @@ export const LeftNavRail: React.FC = () => {
   const hasAnyLock = lockedPartIds.size > 0;
 
   const handleModeClick = (mode: ConfiguratorWorkMode) => {
-    setWorkMode(mode);
-
     // Clicking RED or YELLOW section navigates directly to the first unresolved/conditional item
     const status = modeStatusMap[mode];
     if (status === 'red' || status === 'yellow' || status === 'unknown') {
@@ -88,6 +86,10 @@ export const LeftNavRail: React.FC = () => {
         }
       }
     }
+
+    // Apply the mode last so its intended destination tab cannot be overwritten
+    // by selecting an affected component above.
+    setWorkMode(mode);
   };
 
   const renderStatusIcon = (status: 'green' | 'yellow' | 'red' | 'unknown' | 'grey') => {

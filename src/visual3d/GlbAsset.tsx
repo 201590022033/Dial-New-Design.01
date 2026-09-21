@@ -4,8 +4,13 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { Color, Material, Mesh, MeshStandardMaterial } from 'three';
 import type { VisualAssetDescriptor } from './visualAssetRegistry';
 
-export const LoadedGlbAsset = ({ descriptor }: { descriptor: VisualAssetDescriptor }) => {
+type AssetAppearance = { dialColor: string; strapColor: string; bezelColor: string; accentColor: string };
+
+export const LoadedGlbAsset = ({ descriptor, appearance }: { descriptor: VisualAssetDescriptor; appearance?: AssetAppearance }) => {
   const gltf = useThreeLoader(GLTFLoader, descriptor.assetPath!);
+  const dialColor = appearance?.dialColor;
+  const strapColor = appearance?.strapColor;
+  const bezelColor = appearance?.bezelColor;
   const scene = useMemo(() => {
     let hasMesh = false;
     // Geometry may be shared safely, but presentation material adjustments must
@@ -49,11 +54,16 @@ export const LoadedGlbAsset = ({ descriptor }: { descriptor: VisualAssetDescript
           material.roughness = 0.1;
           material.envMapIntensity = 1.85;
         } else if (name.includes('black ceramic') || objectName.includes('BEZEL_INSERT') || objectName.includes('CHAPTER_RING')) {
-          material.color = new Color('#05080d');
+          material.color = new Color(objectName.includes('BEZEL_INSERT') ? bezelColor ?? '#05080d' : '#05080d');
           material.metalness = 0.32;
           material.roughness = 0.24;
-        } else if (name.includes('navy dial') || objectName === 'DD_REF42_DIAL') {
-          material.color = new Color('#07182d');
+        } else if (
+          name.includes('navy dial') ||
+          name.includes('dial textured surface') ||
+          objectName === 'DD_REF42_DIAL' ||
+          objectName === 'DD_DIAL_FACE'
+        ) {
+          material.color = new Color(dialColor ?? '#07182d');
           material.metalness = 0.12;
           material.roughness = 0.38;
         } else if (objectName.includes('DATE_CARD')) {
@@ -81,7 +91,10 @@ export const LoadedGlbAsset = ({ descriptor }: { descriptor: VisualAssetDescript
           material.metalness = 0;
           material.roughness = 0.3;
         } else if (name.includes('rubber') || objectName.includes('STRAP')) {
-          material.color = new Color(name.includes('relief') || objectName.includes('RAIL') ? '#202833' : '#080b10');
+          const materialStrapColor = new Color(strapColor ?? '#080b10');
+          material.color = name.includes('relief') || objectName.includes('RAIL')
+            ? materialStrapColor.clone().offsetHSL(0, 0, 0.08)
+            : materialStrapColor;
           material.metalness = 0;
         }
         material.needsUpdate = true;
@@ -89,7 +102,7 @@ export const LoadedGlbAsset = ({ descriptor }: { descriptor: VisualAssetDescript
     });
     if (!hasMesh) throw new Error('GLB has no mesh');
     return clone;
-  }, [gltf]);
+  }, [bezelColor, dialColor, gltf, strapColor]);
   return <group position={descriptor.offset} rotation={descriptor.rotation} scale={descriptor.scale}>
     <group rotation={descriptor.upAxis === 'Z' ? [0, 0, 0] : [Math.PI / 2, 0, 0]} scale={descriptor.units === 'metres' ? 1000 : 1}>
       <primitive object={scene} dispose={null} />
@@ -97,11 +110,11 @@ export const LoadedGlbAsset = ({ descriptor }: { descriptor: VisualAssetDescript
   </group>;
 };
 
-export class GlbAsset extends React.Component<{ descriptor: VisualAssetDescriptor; fallback: React.ReactNode }, { failed: boolean }> {
+export class GlbAsset extends React.Component<{ descriptor: VisualAssetDescriptor; fallback: React.ReactNode; appearance?: AssetAppearance }, { failed: boolean }> {
   state = { failed: false };
   static getDerivedStateFromError() { return { failed: true }; }
   componentDidCatch(error: unknown) { console.warn('[visual3d] GLB unavailable; using procedural fallback.', error); }
   render() {
-    return this.state.failed ? this.props.fallback : <Suspense fallback={this.props.fallback}><LoadedGlbAsset descriptor={this.props.descriptor} /></Suspense>;
+    return this.state.failed ? this.props.fallback : <Suspense fallback={this.props.fallback}><LoadedGlbAsset descriptor={this.props.descriptor} appearance={this.props.appearance} /></Suspense>;
   }
 }

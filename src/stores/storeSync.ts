@@ -48,13 +48,25 @@ export const syncAssemblyDownstream = (assembly: WatchAssembly): void => {
 
     // 4. Sync designEngineStore (DERIVED / ADAPTER)
     if (assembly.designConfig) {
-      const { markerConfig, typographyConfig, textureConfig } = assembly.designConfig;
+      const { dialFaceConfig, markerConfig, typographyConfig, textureConfig } = assembly.designConfig;
       useDesignEngineStore.setState((prev) => ({
         markerConfig: markerConfig ? { ...prev.markerConfig, ...markerConfig } : prev.markerConfig,
         typographyConfig: typographyConfig ? { ...prev.typographyConfig, ...typographyConfig } : prev.typographyConfig,
-        dialFaceConfig: textureConfig
-          ? { ...prev.dialFaceConfig, texture: textureConfig }
-          : prev.dialFaceConfig,
+        dialFaceConfig: dialFaceConfig
+          ? {
+              ...prev.dialFaceConfig,
+              ...dialFaceConfig,
+              border: { ...prev.dialFaceConfig.border, ...dialFaceConfig.border },
+              centreHole: { ...prev.dialFaceConfig.centreHole, ...dialFaceConfig.centreHole },
+              texture: {
+                ...prev.dialFaceConfig.texture,
+                ...dialFaceConfig.texture,
+                ...textureConfig
+              }
+            }
+          : textureConfig
+            ? { ...prev.dialFaceConfig, texture: { ...prev.dialFaceConfig.texture, ...textureConfig } }
+            : prev.dialFaceConfig,
         visualReferenceConfig: assembly.designConfig?.visualReferenceConfig ?? prev.visualReferenceConfig,
         activeTemplateId: (assembly.templateId as TemplateId) ?? prev.activeTemplateId,
         colors: { ...assembly.selectedColorPalette }

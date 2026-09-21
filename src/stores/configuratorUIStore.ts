@@ -58,6 +58,7 @@ export interface ConfiguratorUIStoreState {
   previewCandidateItem: ComponentCatalogueItem | null;
   previewPartInstanceId: string | null;
   previewStatus: 'none' | 'previewing' | 'applied';
+  archetypePreviewAssembly: WatchAssembly | null;
 
   // Locks
   lockedPartIds: Set<string>;
@@ -106,6 +107,7 @@ export interface ConfiguratorUIStoreState {
   setPreview: (assembly: WatchAssembly, partInstanceId: string, candidateItem: ComponentCatalogueItem) => void;
   applyPreview: () => boolean;
   cancelPreview: () => void;
+  setArchetypePreview: (assembly: WatchAssembly | null) => void;
 
   // Locking
   togglePartLock: (partInstanceId: string) => void;
@@ -148,6 +150,7 @@ export const useConfiguratorUIStore = create<ConfiguratorUIStoreState>((set, get
   previewCandidateItem: null,
   previewPartInstanceId: null,
   previewStatus: 'none',
+  archetypePreviewAssembly: null,
 
   lockedPartIds: new Set<string>(),
   lockedStyles: {},
@@ -178,13 +181,16 @@ export const useConfiguratorUIStore = create<ConfiguratorUIStoreState>((set, get
   lastCommittedSnapshot: null,
 
   getActiveAssembly: () => {
-    const { previewAssembly, previewingVersionId, savedVersions } = get();
+    const { previewAssembly, archetypePreviewAssembly, previewingVersionId, savedVersions } = get();
     if (previewingVersionId) {
       const ver = savedVersions.find((v) => v.id === previewingVersionId);
       if (ver) return ver.assembly;
     }
     if (previewAssembly) {
       return previewAssembly;
+    }
+    if (archetypePreviewAssembly) {
+      return archetypePreviewAssembly;
     }
     return useWatchAssemblyStore.getState().assembly;
   },
@@ -217,7 +223,14 @@ export const useConfiguratorUIStore = create<ConfiguratorUIStoreState>((set, get
     if (get().previewAssembly) {
       get().cancelPreview();
     }
-    set({ workMode: mode });
+    const trayByMode: Partial<Record<ConfiguratorWorkMode, TrayTab>> = {
+      parts: 'options', style: 'style', research: 'suppliers', manufacture: 'manufacture'
+    };
+    set({
+      workMode: mode,
+      archetypePreviewAssembly: mode === 'build' ? get().archetypePreviewAssembly : null,
+      ...(trayByMode[mode] ? { trayTab: trayByMode[mode] } : {})
+    });
   },
 
   selectPartContext: (partInstanceId, category) => {
@@ -278,6 +291,8 @@ export const useConfiguratorUIStore = create<ConfiguratorUIStoreState>((set, get
       previewStatus: 'previewing'
     });
   },
+
+  setArchetypePreview: (assembly) => set({ archetypePreviewAssembly: assembly }),
 
   applyPreview: () => {
     const { previewAssembly, previewCandidateItem, previewPartInstanceId, lockedPartIds } = get();

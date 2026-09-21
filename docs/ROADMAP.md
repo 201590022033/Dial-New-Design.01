@@ -157,6 +157,20 @@ and polished tang-buckle hardware, plus a camera-preserving 2048 x 2048 PNG
 export. Further visual work should focus on optional user-supplied artwork and
 multiple strap styles rather than adding unverified mechanical detail.
 
+### P9 archetype-driven central preview and dashboard routing
+
+Archetype selection is now connected to the canonical assembly presentation
+state. Dive, pilot, dress, field and chronograph starter choices preview their
+own dial palette, marker language, typography, bezel treatment and strap color
+in the central 2D and 3D views before the user commits the starter build. The
+full reference selector uses the same profile adapter for every listed
+archetype, while retaining the current engineering dimensions and fit evidence.
+
+The left navigation rail now routes each workspace choice to its intended
+right-hand destination: Parts opens Options, Style opens Style, AI Research
+opens Suppliers and Manufacture opens Manufacture. Selecting an affected part
+for a warning no longer overrides that destination tab.
+
 ## Deliberate non-goals
 
 No massive application rewrite, huge style catalogue, fabricated calibre dimensions, or one-GLB-per-variation asset library is planned in this pass.

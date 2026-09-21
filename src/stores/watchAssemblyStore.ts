@@ -18,6 +18,7 @@ import type { DonutGeometry } from '@/types/geometry';
 import { createBand } from '@/domain/bands/bandRegistry';
 import { applyReference42Preview, useProceduralReference42 } from '@/domain/presets/reference3d';
 import { resolveAssemblyGeometry, type ResolvedAssemblyGeometry } from '@/domain/geometry/boundaryResolver';
+import { applyArchetypeVisualProfile } from '@/domain/configurator/archetypeProfiles';
 
 export interface WatchAssemblyStoreState {
   assembly: WatchAssembly;
@@ -353,20 +354,29 @@ export const useWatchAssemblyStore = create<WatchAssemblyStoreState>((set, get) 
   },
 
   updateVisualReferenceConfig: (patch) => {
-    set((state) => ({
-      assembly: {
-        ...state.assembly,
-        designConfig: {
-          ...state.assembly.designConfig,
-          visualReferenceConfig: {
-            ...state.assembly.designConfig?.visualReferenceConfig,
-            ...patch
-          }
+    if (!patch) return;
+    set((state) => {
+      const requestedArchetype = Object.prototype.hasOwnProperty.call(patch, 'archetypeId')
+        ? patch.archetypeId
+        : undefined;
+      const styled = requestedArchetype
+        ? applyArchetypeVisualProfile(state.assembly, requestedArchetype)
+        : state.assembly;
+      return {
+        assembly: {
+          ...styled,
+          designConfig: {
+            ...styled.designConfig,
+            visualReferenceConfig: {
+              ...styled.designConfig?.visualReferenceConfig,
+              ...patch
+            }
+          },
+          metadata: { ...styled.metadata, updatedAtIso: new Date().toISOString() }
         },
-        metadata: { ...state.assembly.metadata, updatedAtIso: new Date().toISOString() }
-      },
-      dirty: true
-    }));
+        dirty: true
+      };
+    });
   },
 
   updateTextureConfig: (patch) => {

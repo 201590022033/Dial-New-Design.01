@@ -11,6 +11,7 @@ import { movementLibrary } from '@/domain/movements/movementLibrary';
 import { defaultDialFaceConfig } from '@/domain/generators/dialFaceGenerator';
 import { defaultTypographyConfig } from '@/domain/generators/typographyEngine';
 import { getArchetypeReferenceById, getBezelReferenceById, getComplicationReferenceById, getLumeReferenceById } from '@/domain/asset-library';
+import { getArchetypeVisualProfile } from '@/domain/configurator/archetypeProfiles';
 
 export type PusherVisualDescriptor = {
   count: number;
@@ -67,6 +68,12 @@ export type VisualWatchModel = {
     bezelId?: string;
     lumeId?: string;
     lumeColor?: string;
+  };
+  archetypeAppearance: {
+    dialColor: string;
+    strapColor: string;
+    bezelColor: string;
+    accentColor: string;
   };
 };
 
@@ -151,6 +158,7 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
   const dialTexture = dialConfig?.texture ?? defaultDialFaceConfig.texture;
   const typography = assembly.designConfig?.typographyConfig ?? defaultTypographyConfig;
   const visualReferences = assembly.designConfig?.visualReferenceConfig ?? {};
+  const archetypeProfile = getArchetypeVisualProfile(visualReferences.archetypeId);
   const lumeReference = getLumeReferenceById(visualReferences.lumeId ?? '');
   const dateWindowParts = parts.filter((part) => {
     const kind = getCatalogueItem(part.catalogueItemId)?.kind;
@@ -219,6 +227,12 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
       bezelId: getBezelReferenceById(visualReferences.bezelId ?? '')?.id,
       lumeId: lumeReference?.id,
       lumeColor: lumeReference?.visualColor
+    },
+    archetypeAppearance: {
+      dialColor: archetypeProfile?.dialColor ?? dialPart?.color ?? assembly.selectedColorPalette.primary,
+      strapColor: archetypeProfile?.strapColor ?? '#080b10',
+      bezelColor: visualReferences.bezelId === 'bezel-gmt-24-hour' ? '#173e77' : visualReferences.bezelId === 'bezel-tachymeter' ? '#16191d' : visualReferences.bezelId === 'bezel-smooth' ? '#7f8791' : '#05080d',
+      accentColor: assembly.selectedColorPalette.accent
     }
   };
 };

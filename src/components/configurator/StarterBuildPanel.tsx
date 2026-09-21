@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Hammer, ChevronDown, ChevronUp, ShieldCheck, ArrowRight } from 'lucide-react';
 import { useConfiguratorUIStore } from '@/stores/configuratorUIStore';
 import { useWatchAssemblyStore } from '@/stores/watchAssemblyStore';
 import { createStarterBuild, type StarterBuildType } from '@/domain/configurator/defaultBuilds';
+import { syncAssemblyDownstream } from '@/stores/storeSync';
 
 export const StarterBuildPanel: React.FC = () => {
   const [selectedType, setSelectedType] = useState<StarterBuildType>('diver');
@@ -10,12 +11,26 @@ export const StarterBuildPanel: React.FC = () => {
 
   const setWorkMode = useConfiguratorUIStore((s) => s.setWorkMode);
   const saveVersion = useConfiguratorUIStore((s) => s.saveVersion);
-  const starter = createStarterBuild(selectedType);
+  const setArchetypePreview = useConfiguratorUIStore((s) => s.setArchetypePreview);
+  const committedAssembly = useWatchAssemblyStore((s) => s.assembly);
+  const starter = useMemo(
+    () => createStarterBuild(selectedType, committedAssembly),
+    [committedAssembly, selectedType]
+  );
+
+  useEffect(() => {
+    setArchetypePreview(starter.assembly);
+    syncAssemblyDownstream(starter.assembly);
+    return () => {
+      syncAssemblyDownstream(useWatchAssemblyStore.getState().assembly);
+    };
+  }, [setArchetypePreview, starter]);
 
   const handleApplyStarter = () => {
     // Snapshot current before loading
     saveVersion(`Pre-starter backup`);
     useWatchAssemblyStore.getState().setAssembly(starter.assembly);
+    setArchetypePreview(null);
     setWorkMode('parts');
   };
 

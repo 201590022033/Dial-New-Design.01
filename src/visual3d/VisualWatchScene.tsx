@@ -27,7 +27,43 @@ export const DialArtwork = ({ model }: { model: VisualWatchModel }) => {
     if (!context) return null;
     const pixelsPerMm = canvas.width / model.dial.outerDiameterMm;
     const centre = canvas.width / 2;
+    const archetype = model.referenceProfiles.archetypeId;
     context.clearRect(0, 0, canvas.width, canvas.height);
+    context.fillStyle = model.archetypeAppearance.accentColor;
+    context.strokeStyle = model.archetypeAppearance.accentColor;
+    context.lineWidth = Math.max(2, pixelsPerMm * 0.08);
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+    if (archetype === 'archetype-field' || archetype === 'archetype-pilot') {
+      const labels = archetype === 'archetype-pilot' ? [12, 3, 6, 9] : Array.from({ length: 12 }, (_, index) => index + 1);
+      context.font = `700 ${(archetype === 'archetype-pilot' ? 1.7 : 1.05) * pixelsPerMm}px "Arial Narrow", Arial, sans-serif`;
+      labels.forEach((label, index) => {
+        const hour = archetype === 'archetype-pilot' ? index * 3 : index + 1;
+        const angle = hour * Math.PI / 6;
+        const radius = centre * (archetype === 'archetype-pilot' ? 0.68 : 0.72);
+        context.fillText(String(label), centre + Math.sin(angle) * radius, centre - Math.cos(angle) * radius);
+      });
+    } else if (archetype === 'archetype-gmt-travel') {
+      context.font = `700 ${0.9 * pixelsPerMm}px Arial, sans-serif`;
+      [24, 6, 12, 18].forEach((label, index) => {
+        const angle = index * Math.PI / 2;
+        const radius = centre * 0.7;
+        context.fillText(String(label), centre + Math.sin(angle) * radius, centre - Math.cos(angle) * radius);
+      });
+    } else if (archetype === 'archetype-chronograph') {
+      ([[-0.22, 0], [0.22, 0], [0, 0.24]] as Array<[number, number]>).forEach(([x, y]) => {
+        context.beginPath();
+        context.arc(centre + centre * x, centre + centre * y, centre * 0.16, 0, Math.PI * 2);
+        context.stroke();
+      });
+    } else if (archetype === 'archetype-dive') {
+      context.beginPath();
+      context.moveTo(centre, centre * 0.14);
+      context.lineTo(centre - centre * 0.055, centre * 0.24);
+      context.lineTo(centre + centre * 0.055, centre * 0.24);
+      context.closePath();
+      context.fill();
+    }
     context.fillStyle = artwork.color;
     context.textAlign = 'center';
     context.textBaseline = 'middle';
@@ -57,7 +93,7 @@ export const DialArtwork = ({ model }: { model: VisualWatchModel }) => {
     result.magFilter = LinearFilter;
     result.needsUpdate = true;
     return result;
-  }, [artwork, model.dial.outerDiameterMm]);
+  }, [artwork, model.archetypeAppearance, model.dial.outerDiameterMm, model.referenceProfiles.archetypeId]);
   useEffect(() => () => texture?.dispose(), [texture]);
   if (!texture) return null;
   return <mesh position={[0, 0, model.dial.thicknessMm / 2 + 0.34]}>
@@ -89,7 +125,9 @@ const ProceduralComponent = ({ category, model }: { category: VisualCategory; mo
     </group>;
     case 'bezel': {
       const bezelReference = model.referenceProfiles.bezelId;
-      const insertColor = bezelReference === 'bezel-gmt-24-hour' ? '#1d4ed8' : bezelReference === 'bezel-tachymeter' ? '#111827' : bezelReference === 'bezel-gem-set' ? '#b08d57' : '#263244';
+      const insertColor = bezelReference === 'bezel-gem-set'
+        ? '#b08d57'
+        : model.archetypeAppearance.bezelColor;
       return <group position={[0, 0, 0.2]}>
       <mesh castShadow>
         <torusGeometry args={[radius * 0.88, radius * 0.045, 24, 128]} /><meshStandardMaterial {...finish(model.finishes.bezel)} />
@@ -169,7 +207,7 @@ export const VisualComponent = ({ category, model }: { category: VisualCategory;
   // The fallback is outside descriptor corrections; those belong to the authored GLB.
   return <group name={category} position={placement.anchor.positionMm} rotation={placement.anchor.rotationRad}>
     <group position={placement.offset} rotation={placement.rotation}>
-      {placement.glb ? <GlbAsset key={descriptor.assetId + ':' + descriptor.assetPath} descriptor={descriptor} fallback={fallback} /> : fallback}
+      {placement.glb ? <GlbAsset key={descriptor.assetId + ':' + descriptor.assetPath} descriptor={descriptor} fallback={fallback} appearance={model.archetypeAppearance} /> : fallback}
       {category === 'dial' && <group position={placement.descriptorOffset}><DialArtwork model={model} /></group>}
     </group>
   </group>;
