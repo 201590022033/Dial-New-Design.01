@@ -19,7 +19,7 @@ def main():
     assert len(case) == 7, len(case)
     assert len(crown) == 1, len(crown)
     assert len(hands) == 15, len(hands)
-    assert len(supplemental) == 146, len(supplemental)
+    assert len(supplemental) == 157, len(supplemental)
     assert abs(crown[0].location.x - 21.8) < 1e-6
     assert abs(next(obj for obj in hands if obj.name == "DD_HAND_HOUR_HUB").location.z - 3.85) < 1e-6
     assert abs(next(obj for obj in hands if obj.name == "DD_HAND_MINUTE_HUB").location.z - 4.30) < 1e-6
@@ -30,6 +30,10 @@ def main():
         "DD_CASE_LUG_12_L", "DD_CASE_LUG_12_R", "DD_CASE_LUG_6_L", "DD_CASE_LUG_6_R"
     }
     assert abs(next(obj for obj in supplemental if obj.name == "DD_REF42_DIAL").location.z - 3.7) < 1e-6
+    supplemental_names = {obj.name for obj in supplemental}
+    assert {"DD_REF42_DATE_FRAME", "DD_REF42_DATE_RECESS", "DD_REF42_DATE_CARD",
+            "DD_REF42_DATE_NUMERAL", "DD_REF42_DIAL_TEXT_AUTOMATIC",
+            "DD_REF42_BEZEL_PIP_FRAME", "DD_REF42_BEZEL_PIP_LUME"} <= supplemental_names
     assert abs(next(obj for obj in supplemental if obj.name == "DD_REF42_CRYSTAL").location.z - 6.25) < 1e-6
     assert abs(next(obj for obj in supplemental if obj.name == "DD_REF42_CASEBACK").location.z + 5.65) < 1e-6
     print("P8 Blender assembly PASS: case, crown, hands and 6 supplemental component groups have independent frames")

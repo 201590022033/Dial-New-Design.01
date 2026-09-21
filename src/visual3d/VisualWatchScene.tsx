@@ -1,11 +1,13 @@
-import { Canvas } from '@react-three/fiber';
+import { Canvas, useThree } from '@react-three/fiber';
+import { useEffect } from 'react';
 import type { VisualWatchModel } from './watchAssemblyToVisualModel';
 import { GlbAsset } from './GlbAsset';
 import { visualCategories, type VisualCategory } from './visualAssetRegistry';
 import { componentPlacement } from './componentPlacement';
 import { MM_TO_SCENE } from './assemblyAnchors';
 import type { FinishProfile } from './finishProfiles';
-import { ACESFilmicToneMapping, SRGBColorSpace } from 'three';
+import { ACESFilmicToneMapping, PMREMGenerator, SRGBColorSpace } from 'three';
+import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 
 const finish = (profile: FinishProfile, color?: string) => ({ color: color ?? profile.color, metalness: profile.metalness, roughness: profile.roughness });
 
@@ -123,18 +125,38 @@ export const VisualComponent = ({ category, model }: { category: VisualCategory;
   </group>;
 };
 
+const StudioEnvironment = () => {
+  const { gl, scene, invalidate } = useThree();
+  useEffect(() => {
+    const pmrem = new PMREMGenerator(gl);
+    const environment = new RoomEnvironment();
+    const target = pmrem.fromScene(environment, 0.04);
+    scene.environment = target.texture;
+    scene.environmentIntensity = 1.15;
+    invalidate();
+    return () => {
+      scene.environment = null;
+      environment.dispose();
+      target.dispose();
+      pmrem.dispose();
+    };
+  }, [gl, invalidate, scene]);
+  return null;
+};
+
 export const VisualWatchScene = ({ model, rotation, cameraDistance }: { model: VisualWatchModel; rotation: [number, number, number]; cameraDistance: number }) => (
-  <Canvas frameloop="demand" shadows camera={{ position: [0, 0, cameraDistance], fov: 32 }} dpr={[1, 2]} gl={{ antialias: true, powerPreference: 'high-performance' }}
-    onCreated={({ gl }) => { gl.toneMapping = ACESFilmicToneMapping; gl.toneMappingExposure = 1.08; gl.outputColorSpace = SRGBColorSpace; }}>
-    <color attach="background" args={['#c9c5bc']} />
-    <hemisphereLight args={['#f5f8ff', '#323844', 1.45]} />
-    <ambientLight intensity={0.48} />
-    <directionalLight castShadow position={[4.5, -3.5, 7]} intensity={4.2} shadow-mapSize={[2048, 2048]} shadow-bias={-0.00015} />
-    <directionalLight position={[-5, -1, 3]} intensity={1.8} color="#b7d4ff" />
-    <directionalLight position={[1, 5, 4]} intensity={2.1} color="#ffe2bf" />
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, -1.1]} receiveShadow>
-      <circleGeometry args={[42, 96]} />
-      <meshStandardMaterial color="#b9b4aa" roughness={0.9} metalness={0.02} />
+  <Canvas frameloop="demand" shadows camera={{ position: [0, 0, cameraDistance], fov: 29 }} dpr={[1, 1.75]} gl={{ antialias: true, powerPreference: 'high-performance' }}
+    onCreated={({ gl }) => { gl.toneMapping = ACESFilmicToneMapping; gl.toneMappingExposure = 1.12; gl.outputColorSpace = SRGBColorSpace; }}>
+    <StudioEnvironment />
+    <color attach="background" args={['#b9b6af']} />
+    <hemisphereLight args={['#f7f9ff', '#252c36', 1.05]} />
+    <ambientLight intensity={0.24} />
+    <directionalLight castShadow position={[5.5, -4, 8]} intensity={3.5} color="#fff7ea" shadow-mapSize={[2048, 2048]} shadow-bias={-0.00015} />
+    <directionalLight position={[-6, -2, 4]} intensity={1.35} color="#a9c9ff" />
+    <directionalLight position={[2, 6, 5]} intensity={1.7} color="#ffd5aa" />
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, -1.18]} receiveShadow>
+      <circleGeometry args={[45, 128]} />
+      <meshStandardMaterial color="#aaa69f" roughness={0.82} metalness={0.04} envMapIntensity={0.35} />
     </mesh>
     <group rotation={rotation} scale={MM_TO_SCENE}>
       {visualCategories.map((category) => <VisualComponent key={category} category={category} model={model} />)}

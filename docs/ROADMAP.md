@@ -140,7 +140,7 @@ inspection but do not change the engineering evidence gate.
 The opt-in NMK901 reference now loads nine independent high-quality GLBs in the
 central view: strap preview, caseback, midcase, dial, chapter ring, bezel and
 insert, hands, crystal, and crown. The complete deterministic Blender review
-contains 169 meshes and 26,510 vertices. Published dial, chapter-ring,
+contains 180 meshes and 30,668 vertices. Published dial, chapter-ring,
 bezel-insert, crystal-diameter, case, crown and hand dimensions remain distinct
 from estimated visual placement and exterior baselines.
 
@@ -148,8 +148,12 @@ Presentation-polish pass 1 adds a tapered, rounded strap with relief rails,
 hierarchical dial/bezel ticks, shadow-enabled imported meshes, ACES filmic tone
 mapping, three-point warm/cool studio lighting, and tighter camera framing. It
 also reduces the strap from 23,088 to 144 vertices while improving its visible
-silhouette. The next polish pass should add authored environment reflections,
-case finishing separation, higher-fidelity dial graphics and adaptive LOD.
+silhouette. Presentation-polish pass 2 adds generated studio-environment
+reflections, separate polished/brushed web finishes, a layered date display,
+brand-neutral dial signature, depth text, a framed luminous bezel pip, tighter
+camera composition, and a bounded 1.75 device-pixel-ratio ceiling. The next
+visual slice should focus on configurable dial artwork, strap hardware and
+export-quality still rendering rather than adding unverified mechanical detail.
 
 ## Deliberate non-goals
 

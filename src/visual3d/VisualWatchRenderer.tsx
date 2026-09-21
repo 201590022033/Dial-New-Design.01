@@ -8,8 +8,8 @@ import { assessReference3dFit } from '@/domain/geometry/parametric';
 
 export const VisualWatchRenderer = ({ assembly }: { assembly: WatchAssembly }) => {
   const model = useMemo(() => watchAssemblyToVisualModel(assembly), [assembly]);
-  const [rotation, setRotation] = useState<[number, number, number]>([0.18, -0.28, 0]);
-  const [cameraDistance, setCameraDistance] = useState(12);
+  const [rotation, setRotation] = useState<[number, number, number]>([0.15, -0.24, -0.02]);
+  const [cameraDistance, setCameraDistance] = useState(11.4);
   const selectReference = useWatchAssemblyStore((state) => state.selectReference42Preview);
   const clearReference = useWatchAssemblyStore((state) => state.clearReference42Preview);
   const referenceSelected = assembly.designConfig?.visualReferenceId === REFERENCE_42_ID;
@@ -28,7 +28,7 @@ export const VisualWatchRenderer = ({ assembly }: { assembly: WatchAssembly }) =
       dragStart.current = { x: event.clientX, y: event.clientY };
     }}
     onPointerUp={() => { dragStart.current = null; }}
-    onDoubleClick={() => { setRotation([0.18, -0.28, 0]); setCameraDistance(12); }}
+    onDoubleClick={() => { setRotation([0.15, -0.24, -0.02]); setCameraDistance(11.4); }}
   >
     <VisualWatchScene model={model} rotation={rotation} cameraDistance={cameraDistance} />
     <div className="absolute left-3 top-3 max-w-[min(340px,70%)] rounded-lg border border-slate-500/40 bg-slate-950/85 p-3 text-xs text-white shadow-lg" onPointerDown={(event) => event.stopPropagation()}>

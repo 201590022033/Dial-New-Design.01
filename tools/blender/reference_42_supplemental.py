@@ -95,6 +95,47 @@ def add_radial_markers(prefix, count, radius, width, length, height, z, mat, maj
     return markers
 
 
+def box(name, size, location, mat, bevel=0.0):
+    bpy.ops.mesh.primitive_cube_add(location=location, scale=tuple(value / 2 for value in size))
+    obj = bpy.context.object
+    obj.name = name
+    return finish(obj, mat, bevel)
+
+
+def text_mesh(name, body, size, location, mat, extrude=0.025):
+    """Create compact presentation typography and convert it for deterministic GLB export."""
+    bpy.ops.object.text_add(location=location)
+    obj = bpy.context.object
+    obj.name = name
+    obj.data.body = body
+    obj.data.align_x = "CENTER"
+    obj.data.align_y = "CENTER"
+    obj.data.size = size
+    obj.data.extrude = extrude
+    obj.data.bevel_depth = min(0.012, extrude / 3)
+    obj.data.materials.append(mat)
+    bpy.context.view_layer.objects.active = obj
+    obj.select_set(True)
+    bpy.ops.object.convert(target="MESH")
+    return obj
+
+
+def triangle(name, radius, width, length, height, z, mat):
+    vertices = [(-width / 2, radius - length / 2, z - height / 2),
+                (width / 2, radius - length / 2, z - height / 2),
+                (0, radius + length / 2, z - height / 2),
+                (-width / 2, radius - length / 2, z + height / 2),
+                (width / 2, radius - length / 2, z + height / 2),
+                (0, radius + length / 2, z + height / 2)]
+    faces = [(0, 1, 2), (3, 5, 4), (0, 3, 4, 1), (1, 4, 5, 2), (2, 5, 3, 0)]
+    mesh = bpy.data.meshes.new(name + "_MESH")
+    mesh.from_pydata(vertices, [], faces)
+    mesh.update()
+    obj = bpy.data.objects.new(name, mesh)
+    bpy.context.collection.objects.link(obj)
+    return finish(obj, mat, 0.04)
+
+
 def tapered_strap(name, near_width, far_width, length, height, sign, mat):
     near_y = sign * 23.0
     far_y = sign * (23.0 + length)
@@ -122,15 +163,39 @@ def build(asset, params, quality):
     black = material("black ceramic", (0.012, 0.018, 0.025), 0.18, 0.2)
     lume = material("reference lume", (0.68, 0.92, 0.62), 0.02, 0.32)
     dial_mat = material("navy dial", (0.012, 0.035, 0.075), 0.2, 0.3)
+    dial_recess = material("date aperture recess", (0.003, 0.004, 0.006), 0.0, 0.48)
+    dial_print = material("silver dial print", (0.72, 0.78, 0.83), 0.35, 0.24)
+    date_card = material("warm white date card", (0.84, 0.82, 0.74), 0.0, 0.58)
+    date_ink = material("date ink", (0.025, 0.03, 0.04), 0.0, 0.4)
     sapphire = material("sapphire", (0.58, 0.82, 1.0), 0.0, 0.06, 0.45, 0.16)
     rubber = material("black rubber strap", (0.012, 0.016, 0.021), 0.0, 0.54)
     rubber_detail = material("rubber strap relief", (0.028, 0.034, 0.043), 0.0, 0.46)
     built = []
     if asset == "dial":
         p = params["dial"]
+        surface_z = p["thicknessMm"] / 2
         built.append(cylinder("DD_REF42_DIAL", p["outerDiameterMm"], p["thicknessMm"], dial_mat, segments, bevel=0.08))
-        built.append(annulus("DD_REF42_DIAL_MINUTE_TRACK", p["outerDiameterMm"] - 0.8, p["outerDiameterMm"] - 1.15, 0.08, polished, segments, p["thicknessMm"] / 2 + 0.05))
-        built.extend(add_radial_markers("DD_REF42_DIAL_MARKER", 12, 11.65, 0.62, 1.45, 0.18, p["thicknessMm"] / 2 + 0.12, lume, 3))
+        built.append(annulus("DD_REF42_DIAL_MINUTE_TRACK", p["outerDiameterMm"] - 0.8, p["outerDiameterMm"] - 1.15, 0.08, polished, segments, surface_z + 0.05))
+        built.extend(add_radial_markers("DD_REF42_DIAL_MARKER", 12, 11.65, 0.62, 1.45, 0.18, surface_z + 0.12, lume, 3))
+        # A restrained, generic dial signature keeps the preview brand-neutral.
+        for index, width in enumerate((3.8, 2.8, 1.8)):
+            built.append(box(f"DD_REF42_DIAL_LOGO_BAR_{index}", (width, 0.18, 0.08),
+                             (0, 5.15 - index * 0.34, surface_z + 0.09), dial_print, 0.04))
+        built.append(text_mesh("DD_REF42_DIAL_TEXT_AUTOMATIC", "AUTOMATIC", 0.82,
+                               (0, -5.35, surface_z + 0.10), dial_print))
+        built.append(text_mesh("DD_REF42_DIAL_TEXT_DEPTH", "200 m", 0.68,
+                               (0, -6.35, surface_z + 0.10), lume))
+        # NH35-style date presentation at three o'clock: frame, recess, card and numeral.
+        date_x = 7.85
+        built.append(box("DD_REF42_DATE_FRAME", (3.35, 2.65, 0.12),
+                         (date_x, 0, surface_z + 0.08), polished, 0.12))
+        built.append(box("DD_REF42_DATE_RECESS", (3.02, 2.32, 0.14),
+                         (date_x, 0, surface_z + 0.15), dial_recess, 0.08))
+        built.append(box("DD_REF42_DATE_CARD", (2.72, 2.02, 0.08),
+                         (date_x, 0, surface_z + 0.23), date_card, 0.05))
+        date_text = text_mesh("DD_REF42_DATE_NUMERAL", "21", 1.18,
+                              (date_x, 0, surface_z + 0.30), date_ink, 0.018)
+        built.append(date_text)
     elif asset == "chapter-ring":
         p = params["chapterRing"]
         built.append(annulus("DD_REF42_CHAPTER_RING", p["outerDiameterMm"], p["innerDiameterMm"], p["heightMm"], black, segments))
@@ -140,6 +205,13 @@ def build(asset, params, quality):
         built.append(annulus("DD_REF42_BEZEL_CARRIER", p["outerDiameterMm"], p["innerDiameterMm"], p["heightMm"], steel, segments))
         built.append(annulus("DD_REF42_BEZEL_INSERT", p["insertOuterDiameterMm"], p["insertInnerDiameterMm"], p["insertThicknessMm"], black, segments, p["heightMm"] / 2 + p["insertThicknessMm"] / 2))
         built.extend(add_radial_markers("DD_REF42_BEZEL_MARKER", 60, (p["insertOuterDiameterMm"] + p["insertInnerDiameterMm"]) / 4, 0.12, 1.25, 0.09, p["heightMm"] / 2 + p["insertThicknessMm"] + 0.05, lume))
+        marker_z = p["heightMm"] / 2 + p["insertThicknessMm"] + 0.12
+        pip_radius = (p["insertOuterDiameterMm"] + p["insertInnerDiameterMm"]) / 4
+        built.append(triangle("DD_REF42_BEZEL_PIP_FRAME", pip_radius, 2.1, 2.35, 0.14, marker_z, polished))
+        pip = cylinder("DD_REF42_BEZEL_PIP_LUME", 0.82, 0.16, lume, 48,
+                       z=marker_z + 0.10, bevel=0.07)
+        pip.location.y = pip_radius + 0.1
+        built.append(pip)
     elif asset == "crystal":
         p = params["crystal"]
         crystal = cylinder("DD_REF42_CRYSTAL", p["outerDiameterMm"], p["thicknessMm"], sapphire, segments, bevel=p["edgeBevelMm"])

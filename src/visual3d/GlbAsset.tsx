@@ -1,7 +1,7 @@
 import React, { Suspense, useMemo } from 'react';
 import { useLoader as useThreeLoader } from '@react-three/fiber';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { Color, Mesh, MeshStandardMaterial } from 'three';
+import { Color, Material, Mesh, MeshStandardMaterial } from 'three';
 import type { VisualAssetDescriptor } from './visualAssetRegistry';
 
 export const LoadedGlbAsset = ({ descriptor }: { descriptor: VisualAssetDescriptor }) => {
@@ -16,8 +16,10 @@ export const LoadedGlbAsset = ({ descriptor }: { descriptor: VisualAssetDescript
       hasMesh = true;
       object.castShadow = true;
       object.receiveShadow = true;
-      object.material = Array.isArray(object.material) ? object.material.map((material) => material.clone()) : object.material.clone();
-      const materials = Array.isArray(object.material) ? object.material : [object.material];
+      const sourceMaterials = (Array.isArray(object.material) ? object.material : [object.material]) as Material[];
+      const clonedMaterials = sourceMaterials.map((material) => material.clone());
+      object.material = Array.isArray(object.material) ? clonedMaterials : clonedMaterials[0];
+      const materials = clonedMaterials;
       for (const material of materials) {
         if (!(material instanceof MeshStandardMaterial)) continue;
         material.envMapIntensity = 1.15;
@@ -29,7 +31,23 @@ export const LoadedGlbAsset = ({ descriptor }: { descriptor: VisualAssetDescript
           material.opacity = 0.08;
           material.depthWrite = false;
           material.roughness = 0.06;
+          material.envMapIntensity = 1.9;
           object.castShadow = false;
+        } else if (objectName.includes('CASE_MIDCASE')) {
+          material.color = new Color('#aeb7c1');
+          material.metalness = 1;
+          material.roughness = 0.16;
+          material.envMapIntensity = 1.65;
+        } else if (objectName.includes('CASE_LUG')) {
+          material.color = new Color('#9da7b1');
+          material.metalness = 0.96;
+          material.roughness = 0.3;
+          material.envMapIntensity = 1.4;
+        } else if (objectName.includes('CROWN') || objectName.includes('BEZEL_CARRIER') || objectName.includes('DATE_FRAME')) {
+          material.color = new Color('#cbd2d9');
+          material.metalness = 1;
+          material.roughness = 0.1;
+          material.envMapIntensity = 1.85;
         } else if (name.includes('black ceramic') || objectName.includes('BEZEL_INSERT') || objectName.includes('CHAPTER_RING')) {
           material.color = new Color('#05080d');
           material.metalness = 0.32;
@@ -38,12 +56,30 @@ export const LoadedGlbAsset = ({ descriptor }: { descriptor: VisualAssetDescript
           material.color = new Color('#07182d');
           material.metalness = 0.12;
           material.roughness = 0.38;
+        } else if (objectName.includes('DATE_CARD')) {
+          material.color = new Color('#e7e1d2');
+          material.metalness = 0;
+          material.roughness = 0.62;
+        } else if (objectName.includes('DATE_RECESS') || objectName.includes('DATE_NUMERAL')) {
+          material.color = new Color('#05070a');
+          material.metalness = 0;
+          material.roughness = 0.48;
         } else if (objectName.includes('DIAL_MARKER') || objectName.includes('CHAPTER_TICK') || objectName.includes('BEZEL_MARKER')) {
           material.color = new Color('#d8f2c7');
           material.emissive = new Color('#779d68');
           material.emissiveIntensity = 0.18;
           material.metalness = 0.05;
           material.roughness = 0.32;
+        } else if (objectName.includes('DIAL_TEXT') || objectName.includes('DIAL_LOGO')) {
+          material.color = new Color('#c7d0d8');
+          material.metalness = 0.42;
+          material.roughness = 0.25;
+        } else if (objectName.includes('HAND_LUME') || objectName.includes('BEZEL_PIP_LUME')) {
+          material.color = new Color('#d8f2c7');
+          material.emissive = new Color('#64895a');
+          material.emissiveIntensity = 0.24;
+          material.metalness = 0;
+          material.roughness = 0.3;
         } else if (name.includes('rubber') || objectName.includes('STRAP')) {
           material.color = new Color(name.includes('relief') || objectName.includes('RAIL') ? '#202833' : '#080b10');
           material.metalness = 0;
