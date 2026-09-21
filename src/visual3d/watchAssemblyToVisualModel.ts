@@ -76,6 +76,11 @@ export type VisualWatchModel = {
     strapColor: string;
     bezelColor: string;
     accentColor: string;
+    strapStyleId: 'rubber' | 'leather' | 'canvas' | 'racing';
+    dialTextureKind: string;
+    dialTextureIntensity: number;
+    lumeEnabled: boolean;
+    lumeColor: string;
   };
 };
 
@@ -146,7 +151,8 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
     const diameterMatches = resolved.referenceCaseDiameterMm === undefined ||
       (assembly.globalDimensions.caseDiameterMm === resolved.referenceCaseDiameterMm && (!referenceOnly || referenceIsCurrent));
     assets[category] = diameterMatches ? resolved : visualAssetRegistry[fallbackId]!;
-    const fallbackFinish: FinishProfileId = category === 'dial' ? 'dial' : category === 'crystal' ? 'sapphire' : category === 'strap' || category === 'chapter-ring' ? 'black-pvd' : category === 'bezel' ? 'polished-steel' : 'brushed-steel';
+    const strapFinish = visualReferences.strapStyleId === 'canvas' ? 'canvas' : visualReferences.strapStyleId === 'leather' || visualReferences.strapStyleId === 'racing' ? 'leather' : 'rubber';
+    const fallbackFinish: FinishProfileId = category === 'dial' ? 'dial' : category === 'crystal' ? 'sapphire' : category === 'strap' ? strapFinish : category === 'chapter-ring' ? 'black-pvd' : category === 'bezel' ? 'polished-steel' : 'brushed-steel';
     finishes[category] = resolveFinishProfile(resolved.materialProfile ?? materialProfile(part, fallbackFinish), fallbackFinish);
     // Legacy documents retain the main schematic; crown requires an actual part.
     visible[category] = part ? part.visible : category !== 'crown';
@@ -246,7 +252,12 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
       dialColor: archetypeProfile?.dialColor ?? dialPart?.color ?? assembly.selectedColorPalette.primary,
       strapColor: archetypeProfile?.strapColor ?? '#080b10',
       bezelColor: visualReferences.bezelId === 'bezel-gmt-24-hour' ? '#173e77' : visualReferences.bezelId === 'bezel-tachymeter' ? '#16191d' : visualReferences.bezelId === 'bezel-smooth' ? '#7f8791' : '#05080d',
-      accentColor: assembly.selectedColorPalette.accent
+      accentColor: assembly.selectedColorPalette.accent,
+      strapStyleId: visualReferences.strapStyleId ?? archetypeProfile?.strapStyleId ?? 'rubber',
+      dialTextureKind: dialTexture.kind,
+      dialTextureIntensity: dialTexture.intensity,
+      lumeEnabled: markerConfig.style.lumed,
+      lumeColor: lumeReference?.visualColor ?? '#dfffd2'
     }
   };
 };

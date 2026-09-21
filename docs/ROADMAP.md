@@ -198,6 +198,15 @@ package contains the 2048 px PNG, canonical watch project and a render-review
 manifest. These checks confirm presentation completeness; they do not promote
 estimated interfaces or the chronograph pusher preview to manufacturing truth.
 
+### P12 production presentation materials
+
+The central model now uses physically based presentation profiles for polished
+and brushed steel, high-transmission sapphire, matte and sunburst-sensitive
+dials, emissive lume, vulcanized rubber, leather and woven canvas. Authored GLB
+materials are cloned before refinement so cached assets remain immutable across
+archetype changes. The material profiles remain explicitly provisional visual
+choices; Golden Sample color, gloss, texture and optical validation is deferred.
+
 ## Deliberate non-goals
 
 No massive application rewrite, huge style catalogue, fabricated calibre dimensions, or one-GLB-per-variation asset library is planned in this pass.

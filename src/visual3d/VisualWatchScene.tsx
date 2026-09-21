@@ -5,16 +5,28 @@ import { GlbAsset } from './GlbAsset';
 import { visualCategories, type VisualCategory } from './visualAssetRegistry';
 import { componentPlacement } from './componentPlacement';
 import { MM_TO_SCENE } from './assemblyAnchors';
-import type { FinishProfile } from './finishProfiles';
+import { finishProfiles, type FinishProfile } from './finishProfiles';
 import { ACESFilmicToneMapping, CanvasTexture, LinearFilter, PerspectiveCamera, PMREMGenerator, SRGBColorSpace, Vector2 } from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 
 const finish = (profile: FinishProfile, color?: string) => ({ color: color ?? profile.color, metalness: profile.metalness, roughness: profile.roughness });
+const physicalFinish = (profile: FinishProfile, color?: string) => ({
+  ...finish(profile, color),
+  clearcoat: profile.clearcoat ?? 0,
+  clearcoatRoughness: profile.clearcoatRoughness ?? 0.2,
+  ior: profile.ior ?? 1.5,
+  transmission: profile.transmission ?? 0,
+  thickness: profile.thickness ?? 0,
+  sheen: profile.sheen ?? 0,
+  sheenRoughness: profile.sheenRoughness ?? 0.5,
+  emissive: profile.emissive ?? '#000000',
+  emissiveIntensity: profile.emissiveIntensity ?? 0
+});
 
 const Cylinder = ({ radius, depth, position = [0, 0, 0], axis = 'Z', material }: {
   radius: number; depth: number; position?: [number, number, number]; axis?: 'X' | 'Z'; material: FinishProfile;
 }) => <mesh position={position} rotation={axis === 'X' ? [0, 0, -Math.PI / 2] : [Math.PI / 2, 0, 0]}>
-  <cylinderGeometry args={[radius, radius, depth, 64]} /><meshStandardMaterial {...finish(material)} />
+  <cylinderGeometry args={[radius, radius, depth, 64]} /><meshPhysicalMaterial {...physicalFinish(material)} />
 </mesh>;
 
 export const DialArtwork = ({ model }: { model: VisualWatchModel }) => {
@@ -127,7 +139,7 @@ const ProceduralComponent = ({ category, model }: { category: VisualCategory; mo
   switch (category) {
     case 'strap': return <group>
       {[1, -1].map((sign) => <mesh key={sign} castShadow position={[0, sign * radius * 1.55, -0.3]}>
-        <boxGeometry args={[radius * 1.02, radius * 1.1, 1.8]} /><meshStandardMaterial {...finish(model.finishes.strap)} />
+        <boxGeometry args={[radius * 1.02, radius * 1.1, 1.8]} /><meshPhysicalMaterial {...physicalFinish(model.finishes.strap)} />
       </mesh>)}
     </group>;
     case 'caseback': return <mesh castShadow position={[0, 0, -model.caseThicknessMm / 2]} rotation={[Math.PI / 2, 0, 0]}>
@@ -135,7 +147,7 @@ const ProceduralComponent = ({ category, model }: { category: VisualCategory; mo
     </mesh>;
     case 'case': return <group>
       <mesh castShadow>
-        <torusGeometry args={[radius * 0.9, radius * 0.1, 24, 128]} /><meshStandardMaterial {...finish(model.finishes.case)} />
+        <torusGeometry args={[radius * 0.9, radius * 0.1, 24, 128]} /><meshPhysicalMaterial {...physicalFinish(model.finishes.case)} />
       </mesh>
       {[1, -1].flatMap((y) => [-1, 1].map((x) => [x * radius * 0.42, y * radius * 0.98, -0.2] as [number, number, number])).map((position, index) =>
         <mesh key={index} castShadow position={position} rotation={[0, 0, position[0] > 0 ? -0.12 : 0.12]}>
@@ -161,13 +173,13 @@ const ProceduralComponent = ({ category, model }: { category: VisualCategory; mo
     </mesh>;
     case 'dial': return <group>
       <mesh rotation={[Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[model.dial.outerDiameterMm / 2, model.dial.outerDiameterMm / 2, model.dial.thicknessMm, 128]} /><meshStandardMaterial {...finish(model.finishes.dial, model.dialColor)} roughness={0.36 + model.dial.textureIntensity * 0.35} />
+        <cylinderGeometry args={[model.dial.outerDiameterMm / 2, model.dial.outerDiameterMm / 2, model.dial.thicknessMm, 128]} /><meshPhysicalMaterial {...physicalFinish(model.finishes.dial, model.dialColor)} roughness={model.dial.textureKind === 'matte' ? 0.58 : Math.max(0.2, 0.45 - model.dial.textureIntensity * 0.2)} />
       </mesh>
       {model.dial.markers.map((marker, index) => {
         const theta = (marker.angleDeg * Math.PI) / 180;
         const markerRadius = (marker.innerRadiusMm + marker.outerRadiusMm) / 2;
         return <mesh key={index} position={[markerRadius * Math.sin(theta), markerRadius * Math.cos(theta), 0.28]} rotation={[0, 0, -theta]}>
-          <boxGeometry args={[marker.widthMm, Math.max(0.35, marker.outerRadiusMm - marker.innerRadiusMm), 0.14]} /><meshStandardMaterial {...finish(model.finishes.hands, marker.lumed && model.referenceProfiles.lumeColor ? model.referenceProfiles.lumeColor : marker.text ? '#f59e0b' : '#e5e7eb')} emissive={marker.lumed && model.referenceProfiles.lumeColor ? model.referenceProfiles.lumeColor : '#000000'} emissiveIntensity={marker.lumed && model.referenceProfiles.lumeColor ? 0.35 : 0} />
+          <boxGeometry args={[marker.widthMm, Math.max(0.35, marker.outerRadiusMm - marker.innerRadiusMm), 0.14]} /><meshPhysicalMaterial {...physicalFinish(marker.lumed ? { ...finishProfiles.lume, color: model.referenceProfiles.lumeColor ?? finishProfiles.lume.color } : model.finishes.hands, marker.lumed ? model.referenceProfiles.lumeColor ?? finishProfiles.lume.color : marker.text ? '#f59e0b' : '#e5e7eb')} />
         </mesh>;
       })}
       {model.dial.subdials.map((subdial, index) => {
@@ -188,7 +200,7 @@ const ProceduralComponent = ({ category, model }: { category: VisualCategory; mo
       })}
     </group>;
     case 'crystal': return <mesh position={[0, 0, 2]} rotation={[Math.PI / 2, 0, 0]}>
-      <cylinderGeometry args={[radius * 0.86, radius * 0.86, 0.5, 96]} /><meshPhysicalMaterial {...finish(model.finishes.crystal)} transparent depthWrite={false} />
+      <cylinderGeometry args={[radius * 0.86, radius * 0.86, 0.5, 96]} /><meshPhysicalMaterial {...physicalFinish(model.finishes.crystal)} transparent opacity={1} depthWrite={false} envMapIntensity={2.25} />
     </mesh>;
     case 'crown': return <Cylinder axis="X" radius={model.crown.diameterMm / 2} depth={model.crown.lengthMm} position={[model.crown.lengthMm / 2, 0, 0]} material={model.finishes.crown} />;
     case 'pushers': return <group>
