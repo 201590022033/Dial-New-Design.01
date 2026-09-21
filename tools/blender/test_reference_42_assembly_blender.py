@@ -19,7 +19,7 @@ def main():
     assert len(case) == 7, len(case)
     assert len(crown) == 1, len(crown)
     assert len(hands) == 15, len(hands)
-    assert len(supplemental) == 148, len(supplemental)
+    assert len(supplemental) == 146, len(supplemental)
     assert abs(crown[0].location.x - 21.8) < 1e-6
     assert abs(next(obj for obj in hands if obj.name == "DD_HAND_HOUR_HUB").location.z - 3.85) < 1e-6
     assert abs(next(obj for obj in hands if obj.name == "DD_HAND_MINUTE_HUB").location.z - 4.30) < 1e-6

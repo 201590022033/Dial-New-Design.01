@@ -50,16 +50,17 @@ original three-part review assembly (23 meshes / 10718 vertices).
 
 The six added GLBs are `dial.glb` (14 meshes / 3168 vertices),
 `chapter-ring.glb` (61 / 3360), `bezel.glb` (62 / 5280), `crystal.glb`
-(1 / 960), `caseback.glb` (2 / 2880), and `strap.glb` (8 / 23088). Their
+(1 / 960), `caseback.glb` (2 / 2880), and `strap.glb` (6 / 144). Their
 SHA-256 hashes are, respectively,
-`FF0F46FA82EF6A95C0BF58F065DDA9FAEDA1B18F14C16D9D44197F53E7E1AA3D`,
-`463B823E01CBB2F90D6F31C3E367CB6AC588959B7908F8FB9C94A8496FA6B004`,
-`B41E583D35A6B6D0E059CCA7D69E24D154096623C6BAD22CA60E0ECE191DE760`,
+`06CC5EE6C2A0BDD1B72E1BF9903E17B03DBF5C362CB43D49B58AF6DB8FBC3D94`,
+`DDEB1DF293AEFA1983C88AA8DDCA63F40FAB5EE0184CAE356EA5C8642F169E39`,
+`7D49F581D201166BCC1427800D7FAAE792709C3E270A2744D850BE74C9139E5F`,
 `7A7288230BD9520F18E15E1FB19B86E67A4AE9512B0147B1055FFF8AB7DC8055`,
 `733B63184F8E80BF5876388A2A62CFC9B9E70A7E9414D2A4D24E978C7278C89B`,
-and `2AB9F4E269E8D913E0F1CD60DF73461BA75233B5C4C73D29136F94F2E4A62AE2`.
-Blender 5.2.1 validated the complete assembly at 171 meshes / 49454 vertices,
-and its top, front, side and three-quarter review renders were inspected.
+and `D22F0D56D020816FACB2A5C17C59B8072638F3FD7DD4A1DB3D73A9149712AAD4`.
+Blender 5.2.1 validated the polished assembly at 169 meshes / 26510 vertices.
+The earlier complete-assembly top, front, side and three-quarter review renders
+remain the visual baseline for this presentation-only refinement.
 
 ## What remains provisional
 

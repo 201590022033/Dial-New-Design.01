@@ -5,6 +5,7 @@ import { visualCategories, type VisualCategory } from './visualAssetRegistry';
 import { componentPlacement } from './componentPlacement';
 import { MM_TO_SCENE } from './assemblyAnchors';
 import type { FinishProfile } from './finishProfiles';
+import { ACESFilmicToneMapping, SRGBColorSpace } from 'three';
 
 const finish = (profile: FinishProfile, color?: string) => ({ color: color ?? profile.color, metalness: profile.metalness, roughness: profile.roughness });
 
@@ -123,14 +124,17 @@ export const VisualComponent = ({ category, model }: { category: VisualCategory;
 };
 
 export const VisualWatchScene = ({ model, rotation, cameraDistance }: { model: VisualWatchModel; rotation: [number, number, number]; cameraDistance: number }) => (
-  <Canvas frameloop="demand" shadows camera={{ position: [0, 0, cameraDistance], fov: 34 }} dpr={[1, 2]} gl={{ antialias: true, powerPreference: 'high-performance' }}>
-    <color attach="background" args={['#d8d3c8']} />
-    <ambientLight intensity={1.25} />
-    <directionalLight castShadow position={[3, 4, 5]} intensity={3.8} shadow-mapSize={[2048, 2048]} />
-    <directionalLight position={[-4, 1, 2]} intensity={1.5} color="#b8d5ff" />
+  <Canvas frameloop="demand" shadows camera={{ position: [0, 0, cameraDistance], fov: 32 }} dpr={[1, 2]} gl={{ antialias: true, powerPreference: 'high-performance' }}
+    onCreated={({ gl }) => { gl.toneMapping = ACESFilmicToneMapping; gl.toneMappingExposure = 1.08; gl.outputColorSpace = SRGBColorSpace; }}>
+    <color attach="background" args={['#c9c5bc']} />
+    <hemisphereLight args={['#f5f8ff', '#323844', 1.45]} />
+    <ambientLight intensity={0.48} />
+    <directionalLight castShadow position={[4.5, -3.5, 7]} intensity={4.2} shadow-mapSize={[2048, 2048]} shadow-bias={-0.00015} />
+    <directionalLight position={[-5, -1, 3]} intensity={1.8} color="#b7d4ff" />
+    <directionalLight position={[1, 5, 4]} intensity={2.1} color="#ffe2bf" />
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, -1.1]} receiveShadow>
       <circleGeometry args={[42, 96]} />
-      <meshStandardMaterial color="#c6c0b5" roughness={0.82} metalness={0.05} />
+      <meshStandardMaterial color="#b9b4aa" roughness={0.9} metalness={0.02} />
     </mesh>
     <group rotation={rotation} scale={MM_TO_SCENE}>
       {visualCategories.map((category) => <VisualComponent key={category} category={category} model={model} />)}
