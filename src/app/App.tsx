@@ -368,8 +368,8 @@ export const App = () => {
                 onToggleVisualMode={() => setVisualMode((value) => value === 'engineering' ? 'visual' : 'engineering')}
               />
             </div>
-            <CostBomSummary />
-            <DesignVersionsFilmstrip />
+            {presentationMode ? null : <CostBomSummary />}
+            {presentationMode ? null : <DesignVersionsFilmstrip />}
           </section>
 
           <aside

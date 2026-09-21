@@ -184,6 +184,20 @@ the existing 2048 px export. The Style workspace now supports live strap
 selection and optional PNG/JPEG/WebP dial artwork up to 2 MB. Imported artwork
 is a preview layer only and is never treated as manufacturing geometry.
 
+### P11 saved HD presentation and review package
+
+The central 3D viewer now opens into a distraction-free full-screen HD mode.
+Studio, Face and Detail views store their exact camera rotation and distance in
+the canonical project, so reopening or exporting a project restores the same
+composition. A five-watch render gallery switches directly among Dress, Field,
+Diver, Pilot and Chronograph presentations while retaining the NMK901 basis.
+
+An in-view alignment review checks archetype binding, required render assets,
+saved camera state and the active 42 mm reference assembly. A one-click ZIP
+package contains the 2048 px PNG, canonical watch project and a render-review
+manifest. These checks confirm presentation completeness; they do not promote
+estimated interfaces or the chronograph pusher preview to manufacturing truth.
+
 ## Deliberate non-goals
 
 No massive application rewrite, huge style catalogue, fabricated calibre dimensions, or one-GLB-per-variation asset library is planned in this pass.

@@ -90,6 +90,10 @@ export interface WatchAssemblyDesignConfig {
     strapStyleId?: 'rubber' | 'leather' | 'canvas' | 'racing';
     artworkDataUrl?: string;
     artworkName?: string;
+    /** Saved presentation choices. These are authored render settings, not viewport session state. */
+    renderPreset?: 'studio' | 'face' | 'detail';
+    renderRotation?: [number, number, number];
+    renderDistance?: number;
   };
   visualReferenceId?: string;
   /** Optional deterministic procurement preset bound to a reviewed fixture. */

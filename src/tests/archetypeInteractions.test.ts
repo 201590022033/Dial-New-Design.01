@@ -5,6 +5,8 @@ import { useConfiguratorUIStore } from '@/stores/configuratorUIStore';
 import { useWatchAssemblyStore } from '@/stores/watchAssemblyStore';
 import { watchAssemblyToVisualModel } from '@/visual3d/watchAssemblyToVisualModel';
 import { applyReference42Preview } from '@/domain/presets/reference3d';
+import { assessRenderAlignment, createStoredZip } from '@/visual3d/renderQuality';
+import { deserializeWatchAssembly } from '@/domain/assembly/assemblySerialization';
 
 const originalAssembly = structuredClone(useWatchAssemblyStore.getState().assembly);
 
@@ -55,6 +57,28 @@ describe('archetype rendering and dashboard routing', () => {
     expect(assembly.designConfig?.visualReferenceConfig).toMatchObject({ archetypeId: 'archetype-field', bezelId: 'bezel-smooth' });
     expect(assembly.designConfig?.markerConfig?.kind).toBe('arabic-numeral');
     expect(assembly.parts['inst-dial-blank']?.color).toBe('#263329');
+  });
+
+  it('persists repeatable render settings in the canonical project', () => {
+    useWatchAssemblyStore.setState({ assembly: createDefaultWatchAssembly(), dirty: false });
+    useWatchAssemblyStore.getState().updateVisualReferenceConfig({
+      archetypeId: 'archetype-dive',
+      renderPreset: 'detail',
+      renderRotation: [0.08, -0.12, 0],
+      renderDistance: 8.2
+    });
+    const exported = deserializeWatchAssembly(useWatchAssemblyStore.getState().exportJson());
+    expect(exported.designConfig?.visualReferenceConfig).toMatchObject({
+      archetypeId: 'archetype-dive', renderPreset: 'detail', renderDistance: 8.2
+    });
+    expect(assessRenderAlignment(exported).find((check) => check.label === 'Saved camera')?.status).toBe('pass');
+  });
+
+  it('builds a valid one-click render package archive', async () => {
+    const archive = createStoredZip([{ name: 'manifest.json', bytes: new TextEncoder().encode('{"ok":true}') }]);
+    const bytes = new Uint8Array(await archive.arrayBuffer());
+    expect([...bytes.slice(0, 4)]).toEqual([0x50, 0x4b, 0x03, 0x04]);
+    expect([...bytes.slice(-22, -18)]).toEqual([0x50, 0x4b, 0x05, 0x06]);
   });
 
   it('previews archetypes without committing and routes left modes to their next-panel tab', () => {

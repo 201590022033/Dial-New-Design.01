@@ -7,7 +7,7 @@ import { useRenderer } from '@/renderer/useRenderer';
 import { nextZoomValue } from '@/renderer/services/zoomService';
 import { createPanState, resolvePan, type PanState } from '@/renderer/services/panService';
 import { resolveHighlightBandIds } from '@/features/shared/objectInspectorSchemas';
-import { useBandsStore, useDesignEngineStore, useScaleStore, useSelectionStore, useViewportStore, useConfiguratorUIStore } from '@/stores';
+import { useBandsStore, useDesignEngineStore, useScaleStore, useSelectionStore, useViewportStore, useConfiguratorUIStore, useWatchAssemblyStore } from '@/stores';
 import { mmToPixels } from '@/utils/math';
 const VisualWatchRenderer = lazy(() => import('@/visual3d/VisualWatchRenderer').then((module) => ({ default: module.VisualWatchRenderer })));
 
@@ -42,6 +42,8 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode, visua
   const selectHit = useSelectionStore((s) => s.selectHit);
   const hoverHit = useSelectionStore((s) => s.hoverHit);
   const setCrystalSelectionMode = useSelectionStore((s) => s.setCrystalSelectionMode);
+  // Subscribe to canonical changes so visual-only settings refresh immediately.
+  useWatchAssemblyStore((s) => s.assembly);
   const activeAssembly = useConfiguratorUIStore((s) => s.getActiveAssembly());
   const workMode = useConfiguratorUIStore((s) => s.workMode);
   const showDiagnostics = workMode === 'advanced';
@@ -149,7 +151,7 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode, visua
   ]);
 
   if (visualMode === 'visual') {
-    return <section className="relative flex h-full w-full min-h-0 min-w-0 flex-col overflow-hidden rounded-panel border border-engineering-border shadow-panel"><div className="min-h-0 flex-1"><Suspense fallback={<div className="flex h-full items-center justify-center bg-[#d8d3c8] text-sm text-slate-600">Loading visual preview…</div>}><VisualWatchRenderer assembly={activeAssembly} /></Suspense></div><div className="border-t border-engineering-border/70 bg-engineering-panel/75 px-3 py-2 text-center"><Button variant="status" size="sm" onClick={onToggleVisualMode}>Engineering View</Button></div></section>;
+    return <section className="relative flex h-full w-full min-h-0 min-w-0 flex-col overflow-hidden rounded-panel border border-engineering-border shadow-panel"><div className="min-h-0 flex-1"><Suspense fallback={<div className="flex h-full items-center justify-center bg-[#d8d3c8] text-sm text-slate-600">Loading visual preview…</div>}><VisualWatchRenderer assembly={activeAssembly} presentationMode={presentationMode} onTogglePresentationMode={onTogglePresentationMode} /></Suspense></div>{presentationMode ? null : <div className="border-t border-engineering-border/70 bg-engineering-panel/75 px-3 py-2 text-center"><Button variant="status" size="sm" onClick={onToggleVisualMode}>Engineering View</Button></div>}</section>;
   }
 
   return (

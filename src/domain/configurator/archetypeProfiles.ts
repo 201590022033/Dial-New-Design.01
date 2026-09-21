@@ -27,6 +27,14 @@ const PROFILE_BY_ID: Record<string, ArchetypeVisualProfile> = {
   'archetype-casual': { archetypeId: 'archetype-casual', templateId: 'explorer', dialColor: '#224a58', strapColor: '#b86f45', bezelId: 'bezel-smooth', typographyContent: 'WEEKEND', dialAssetId: 'archetype-dial-field', bezelAssetId: 'archetype-bezel-field', handsAssetId: 'archetype-hands-field', strapStyleId: 'canvas' }
 };
 
+export const RENDER_GALLERY_ARCHETYPES = [
+  { id: 'archetype-dress-formal', label: 'Dress' },
+  { id: 'archetype-field', label: 'Field' },
+  { id: 'archetype-dive', label: 'Diver' },
+  { id: 'archetype-pilot', label: 'Pilot' },
+  { id: 'archetype-chronograph', label: 'Chronograph' }
+] as const;
+
 export const getArchetypeVisualProfile = (archetypeId: string | undefined): ArchetypeVisualProfile | undefined =>
   archetypeId ? PROFILE_BY_ID[archetypeId] : undefined;
 
