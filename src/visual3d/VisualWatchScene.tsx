@@ -1,12 +1,12 @@
 import { Canvas, useThree } from '@react-three/fiber';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import type { VisualWatchModel } from './watchAssemblyToVisualModel';
 import { GlbAsset } from './GlbAsset';
 import { visualCategories, type VisualCategory } from './visualAssetRegistry';
 import { componentPlacement } from './componentPlacement';
 import { MM_TO_SCENE } from './assemblyAnchors';
 import type { FinishProfile } from './finishProfiles';
-import { ACESFilmicToneMapping, PMREMGenerator, SRGBColorSpace } from 'three';
+import { ACESFilmicToneMapping, CanvasTexture, LinearFilter, PerspectiveCamera, PMREMGenerator, SRGBColorSpace, Vector2 } from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 
 const finish = (profile: FinishProfile, color?: string) => ({ color: color ?? profile.color, metalness: profile.metalness, roughness: profile.roughness });
@@ -16,6 +16,55 @@ const Cylinder = ({ radius, depth, position = [0, 0, 0], axis = 'Z', material }:
 }) => <mesh position={position} rotation={axis === 'X' ? [0, 0, -Math.PI / 2] : [Math.PI / 2, 0, 0]}>
   <cylinderGeometry args={[radius, radius, depth, 64]} /><meshStandardMaterial {...finish(material)} />
 </mesh>;
+
+export const DialArtwork = ({ model }: { model: VisualWatchModel }) => {
+  const artwork = model.dial.artwork;
+  const texture = useMemo(() => {
+    if (typeof document === 'undefined' || !artwork.content) return null;
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = 1024;
+    const context = canvas.getContext('2d');
+    if (!context) return null;
+    const pixelsPerMm = canvas.width / model.dial.outerDiameterMm;
+    const centre = canvas.width / 2;
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.fillStyle = artwork.color;
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+    context.font = `600 ${Math.max(18, artwork.fontSizeMm * pixelsPerMm)}px "Arial Narrow", Arial, sans-serif`;
+    if (artwork.layout === 'arc' || artwork.layout === 'circular' || artwork.layout === 'inside-circle' || artwork.layout === 'outside-circle') {
+      const characters = [...artwork.content];
+      const step = characters.length > 1 ? artwork.angleSpanDeg / (characters.length - 1) : 0;
+      const radius = artwork.radiusMm * pixelsPerMm;
+      characters.forEach((character, index) => {
+        const angle = (artwork.angleStartDeg + step * index) * Math.PI / 180;
+        context.save();
+        context.translate(centre + Math.sin(angle) * radius, centre - Math.cos(angle) * radius);
+        context.rotate(angle);
+        context.fillText(character, 0, 0);
+        context.restore();
+      });
+    } else {
+      context.save();
+      context.translate(centre, centre - artwork.radiusMm * pixelsPerMm * 0.45);
+      if (artwork.layout === 'vertical') context.rotate(-Math.PI / 2);
+      context.fillText(artwork.content, 0, 0);
+      context.restore();
+    }
+    const result = new CanvasTexture(canvas);
+    result.colorSpace = SRGBColorSpace;
+    result.minFilter = LinearFilter;
+    result.magFilter = LinearFilter;
+    result.needsUpdate = true;
+    return result;
+  }, [artwork, model.dial.outerDiameterMm]);
+  useEffect(() => () => texture?.dispose(), [texture]);
+  if (!texture) return null;
+  return <mesh position={[0, 0, model.dial.thicknessMm / 2 + 0.34]}>
+    <circleGeometry args={[model.dial.outerDiameterMm / 2 - 0.7, 128]} />
+    <meshBasicMaterial map={texture} transparent depthWrite={false} toneMapped={false} />
+  </mesh>;
+};
 
 /** Schematic shapes in engineering mm. These are explicitly provisional previews. */
 const ProceduralComponent = ({ category, model }: { category: VisualCategory; model: VisualWatchModel }) => {
@@ -121,6 +170,7 @@ export const VisualComponent = ({ category, model }: { category: VisualCategory;
   return <group name={category} position={placement.anchor.positionMm} rotation={placement.anchor.rotationRad}>
     <group position={placement.offset} rotation={placement.rotation}>
       {placement.glb ? <GlbAsset key={descriptor.assetId + ':' + descriptor.assetPath} descriptor={descriptor} fallback={fallback} /> : fallback}
+      {category === 'dial' && <group position={placement.descriptorOffset}><DialArtwork model={model} /></group>}
     </group>
   </group>;
 };
@@ -144,10 +194,45 @@ const StudioEnvironment = () => {
   return null;
 };
 
-export const VisualWatchScene = ({ model, rotation, cameraDistance }: { model: VisualWatchModel; rotation: [number, number, number]; cameraDistance: number }) => (
-  <Canvas frameloop="demand" shadows camera={{ position: [0, 0, cameraDistance], fov: 29 }} dpr={[1, 1.75]} gl={{ antialias: true, powerPreference: 'high-performance' }}
+export type StillExporter = () => string;
+
+const StillExporterBridge = ({ onReady }: { onReady?: (exporter: StillExporter | null) => void }) => {
+  const { gl, scene, camera, invalidate } = useThree();
+  useEffect(() => {
+    if (!onReady) return;
+    const exporter: StillExporter = () => {
+      const size = gl.getSize(new Vector2());
+      const pixelRatio = gl.getPixelRatio();
+      const perspective = camera instanceof PerspectiveCamera ? camera : null;
+      const aspect = perspective?.aspect;
+      gl.setPixelRatio(1);
+      gl.setSize(2048, 2048, false);
+      if (perspective) {
+        perspective.aspect = 1;
+        perspective.updateProjectionMatrix();
+      }
+      gl.render(scene, camera);
+      const png = gl.domElement.toDataURL('image/png');
+      gl.setPixelRatio(pixelRatio);
+      gl.setSize(size.x, size.y, false);
+      if (perspective && aspect !== undefined) {
+        perspective.aspect = aspect;
+        perspective.updateProjectionMatrix();
+      }
+      invalidate();
+      return png;
+    };
+    onReady(exporter);
+    return () => onReady(null);
+  }, [camera, gl, invalidate, onReady, scene]);
+  return null;
+};
+
+export const VisualWatchScene = ({ model, rotation, cameraDistance, onExporterReady }: { model: VisualWatchModel; rotation: [number, number, number]; cameraDistance: number; onExporterReady?: (exporter: StillExporter | null) => void }) => (
+  <Canvas frameloop="demand" shadows camera={{ position: [0, 0, cameraDistance], fov: 29 }} dpr={[1, 1.75]} gl={{ antialias: true, powerPreference: 'high-performance', preserveDrawingBuffer: true }}
     onCreated={({ gl }) => { gl.toneMapping = ACESFilmicToneMapping; gl.toneMappingExposure = 1.12; gl.outputColorSpace = SRGBColorSpace; }}>
     <StudioEnvironment />
+    <StillExporterBridge onReady={onExporterReady} />
     <color attach="background" args={['#b9b6af']} />
     <hemisphereLight args={['#f7f9ff', '#252c36', 1.05]} />
     <ambientLight intensity={0.24} />

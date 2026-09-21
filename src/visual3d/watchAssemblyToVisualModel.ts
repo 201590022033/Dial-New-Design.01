@@ -9,6 +9,7 @@ import { resolveFinishProfile, type FinishProfile, type FinishProfileId } from '
 import { defaultMarkerConfig, generateMarkers, type MarkerEngineConfig } from '@/domain/generators/markerEngine';
 import { movementLibrary } from '@/domain/movements/movementLibrary';
 import { defaultDialFaceConfig } from '@/domain/generators/dialFaceGenerator';
+import { defaultTypographyConfig } from '@/domain/generators/typographyEngine';
 import { getArchetypeReferenceById, getBezelReferenceById, getComplicationReferenceById, getLumeReferenceById } from '@/domain/asset-library';
 
 export type PusherVisualDescriptor = {
@@ -33,6 +34,15 @@ export type DialVisualDescriptor = {
   textureKind: string;
   textureIntensity: number;
   textureContrast: number;
+  artwork: {
+    content: string;
+    layout: 'straight' | 'arc' | 'circular' | 'radial' | 'vertical' | 'horizontal' | 'inside-circle' | 'outside-circle' | 'future-path';
+    color: string;
+    fontSizeMm: number;
+    radiusMm: number;
+    angleStartDeg: number;
+    angleSpanDeg: number;
+  };
 };
 
 export type VisualWatchModel = {
@@ -139,6 +149,7 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
   const markerConfig: MarkerEngineConfig = assembly.designConfig?.markerConfig ?? defaultMarkerConfig;
   const dialConfig = assembly.designConfig?.dialFaceConfig;
   const dialTexture = dialConfig?.texture ?? defaultDialFaceConfig.texture;
+  const typography = assembly.designConfig?.typographyConfig ?? defaultTypographyConfig;
   const visualReferences = assembly.designConfig?.visualReferenceConfig ?? {};
   const lumeReference = getLumeReferenceById(visualReferences.lumeId ?? '');
   const dateWindowParts = parts.filter((part) => {
@@ -170,7 +181,16 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
       windows,
       textureKind: dialTexture.kind,
       textureIntensity: dialTexture.intensity,
-      textureContrast: dialTexture.contrast
+      textureContrast: dialTexture.contrast,
+      artwork: {
+        content: typography.content.trim(),
+        layout: typography.layout,
+        color: typography.color,
+        fontSizeMm: positive(typography.fontSizeMm, defaultTypographyConfig.fontSizeMm),
+        radiusMm: positive(typography.radiusMm, defaultTypographyConfig.radiusMm),
+        angleStartDeg: typography.angleStartDeg,
+        angleSpanDeg: typography.angleSpanDeg
+      }
     },
     bezelMaterial: materialProfile(bezelPart, 'polished-steel'),
     crystalMaterial: 'sapphire',

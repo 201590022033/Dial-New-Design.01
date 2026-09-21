@@ -32,6 +32,24 @@ describe('WatchAssembly visual adapter', () => {
     expect(model.dial.windows.some((window) => window.kind === 'date')).toBe(true);
   });
 
+  it('maps configurable typography into the 3D dial artwork layer', () => {
+    const assembly = createDefaultWatchAssembly();
+    assembly.designConfig!.typographyConfig = {
+      ...assembly.designConfig!.typographyConfig!,
+      content: 'CUSTOM 42',
+      layout: 'arc',
+      color: '#d8f2c7',
+      fontSizeMm: 1.25,
+      radiusMm: 9.5,
+      angleStartDeg: -42,
+      angleSpanDeg: 84
+    };
+    expect(watchAssemblyToVisualModel(assembly).dial.artwork).toMatchObject({
+      content: 'CUSTOM 42', layout: 'arc', color: '#d8f2c7', fontSizeMm: 1.25,
+      radiusMm: 9.5, angleStartDeg: -42, angleSpanDeg: 84
+    });
+  });
+
   it('binds the default dial GLB and exposes movement pushers for chronograph previews', () => {
     const assembly = createDefaultWatchAssembly();
     expect(watchAssemblyToVisualModel(assembly).assets.dial.assetId).toBe('dial-face-40mm-layout-v1');

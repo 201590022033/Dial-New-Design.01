@@ -43,7 +43,7 @@ export const LoadedGlbAsset = ({ descriptor }: { descriptor: VisualAssetDescript
           material.metalness = 0.96;
           material.roughness = 0.3;
           material.envMapIntensity = 1.4;
-        } else if (objectName.includes('CROWN') || objectName.includes('BEZEL_CARRIER') || objectName.includes('DATE_FRAME')) {
+        } else if (objectName.includes('CROWN') || objectName.includes('BEZEL_CARRIER') || objectName.includes('DATE_FRAME') || objectName.includes('BUCKLE')) {
           material.color = new Color('#cbd2d9');
           material.metalness = 1;
           material.roughness = 0.1;

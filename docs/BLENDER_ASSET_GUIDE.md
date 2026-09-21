@@ -116,6 +116,11 @@ published `public/assets/3d/reference-42/` assets. The caseback exterior, bezel
 carrier envelope, crystal thickness and strap profile are presentation-only
 estimated nominal values pending Golden Sample #1 validation.
 
+The reference strap preview also includes presentation-only keeper loops and a
+separate polished tang buckle. In the browser, the authored GLBs are combined
+with the current typography configuration as a transparent dial-artwork layer;
+the central-view export control renders the active camera to a 2048 x 2048 PNG.
+
 The presentation-only library generator is [`tools/blender/generate_visual_library.py`](../tools/blender/generate_visual_library.py). It creates the registered 40 mm case, bezel, domed crystal and hand-set GLBs under `public/assets/3d/`; these assets are fixed-size visual aids and are not manufacturing evidence.
 
 ```powershell

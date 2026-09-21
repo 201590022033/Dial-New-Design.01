@@ -136,6 +136,36 @@ def triangle(name, radius, width, length, height, z, mat):
     return finish(obj, mat, 0.04)
 
 
+def rectangular_frame(name, outer_width, outer_height, depth, wall, location, plane, mat):
+    """Create one watertight rectangular ring in XY or XZ for buckle/keeper hardware."""
+    inner_width = outer_width - 2 * wall
+    inner_height = outer_height - 2 * wall
+    if inner_width <= 0 or inner_height <= 0:
+        raise ValueError(f"Invalid rectangular frame dimensions for {name}")
+    outer = [(-outer_width / 2, -outer_height / 2), (outer_width / 2, -outer_height / 2),
+             (outer_width / 2, outer_height / 2), (-outer_width / 2, outer_height / 2)]
+    inner = [(-inner_width / 2, -inner_height / 2), (inner_width / 2, -inner_height / 2),
+             (inner_width / 2, inner_height / 2), (-inner_width / 2, inner_height / 2)]
+    vertices = []
+    for level in (-depth / 2, depth / 2):
+        for a, b in outer + inner:
+            vertices.append((a, b, level) if plane == "XY" else (a, level, b))
+    faces = []
+    for index in range(4):
+        nxt = (index + 1) % 4
+        faces.extend([(index, nxt, 8 + nxt, 8 + index),
+                      (4 + nxt, 4 + index, 12 + index, 12 + nxt),
+                      (index, 4 + index, 4 + nxt, nxt),
+                      (8 + nxt, 12 + nxt, 12 + index, 8 + index)])
+    mesh = bpy.data.meshes.new(name + "_MESH")
+    mesh.from_pydata(vertices, [], faces)
+    mesh.update()
+    obj = bpy.data.objects.new(name, mesh)
+    bpy.context.collection.objects.link(obj)
+    obj.location = location
+    return finish(obj, mat, min(0.18, wall * 0.28))
+
+
 def tapered_strap(name, near_width, far_width, length, height, sign, mat):
     near_y = sign * 23.0
     far_y = sign * (23.0 + length)
@@ -235,6 +265,26 @@ def build(asset, params, quality):
                 rail.name = f"DD_REF42_STRAP_RAIL_{label}_{'L' if side < 0 else 'R'}"
                 finish(rail, rubber_detail, 0.18)
                 built.append(rail)
+        # Presentation hardware on the 12 o'clock tail: two rubber keepers and
+        # a polished tang buckle. Dimensions are visual baselines, not fit data.
+        strap_end_y = 23.0 + length
+        for index, y in enumerate((strap_end_y - 5.4, strap_end_y - 2.9)):
+            built.append(rectangular_frame(f"DD_REF42_STRAP_KEEPER_{index + 1}",
+                                           p["taperEndWidthMm"] + 1.5, p["thicknessMm"] + 1.0,
+                                           1.35, 0.42, (0, y, 0), "XZ", rubber_detail))
+        buckle_y = strap_end_y + 5.0
+        built.append(rectangular_frame("DD_REF42_BUCKLE_FRAME", p["taperEndWidthMm"] + 2.5,
+                                       9.0, 2.2, 1.35, (0, buckle_y, 0.15), "XY", polished))
+        bpy.ops.mesh.primitive_cylinder_add(vertices=64, radius=0.8, depth=p["taperEndWidthMm"] + 0.8,
+                                            location=(0, strap_end_y + 0.9, 0.15), rotation=(0, math.pi / 2, 0))
+        buckle_pin = bpy.context.object
+        buckle_pin.name = "DD_REF42_BUCKLE_PIN"
+        finish(buckle_pin, polished, 0.08)
+        built.append(buckle_pin)
+        tang = box("DD_REF42_BUCKLE_TANG", (1.1, 8.2, 0.55),
+                   (0, buckle_y - 0.2, 1.1), polished, 0.16)
+        tang.rotation_euler[2] = -0.035
+        built.append(tang)
     for obj in built:
         obj["DD_PROVENANCE_STATUS"] = params["provenance"]["status"]
         obj["DD_PROVENANCE_SOURCE"] = params["provenance"]["source"]

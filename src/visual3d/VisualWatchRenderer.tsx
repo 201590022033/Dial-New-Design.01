@@ -1,7 +1,7 @@
-import { useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import type { WatchAssembly } from '@/domain/assembly/assemblyTypes';
 import { watchAssemblyToVisualModel } from './watchAssemblyToVisualModel';
-import { VisualWatchScene } from './VisualWatchScene';
+import { VisualWatchScene, type StillExporter } from './VisualWatchScene';
 import { useWatchAssemblyStore } from '@/stores/watchAssemblyStore';
 import { REFERENCE_42_ID } from '@/domain/presets/reference3d';
 import { assessReference3dFit } from '@/domain/geometry/parametric';
@@ -16,6 +16,19 @@ export const VisualWatchRenderer = ({ assembly }: { assembly: WatchAssembly }) =
   const issues = useMemo(() => assessReference3dFit(assembly), [assembly]);
   const conflicts = issues.filter((issue) => issue.status === 'conflict');
   const dragStart = useRef<{ x: number; y: number } | null>(null);
+  const exporter = useRef<StillExporter | null>(null);
+  const [exportReady, setExportReady] = useState(false);
+  const registerExporter = useCallback((next: StillExporter | null) => {
+    exporter.current = next;
+    setExportReady(Boolean(next));
+  }, []);
+  const exportStill = () => {
+    if (!exporter.current) return;
+    const link = document.createElement('a');
+    link.download = `NMK901-${new Date().toISOString().slice(0, 10)}-2048.png`;
+    link.href = exporter.current();
+    link.click();
+  };
   return <div
     className="relative h-full w-full overflow-hidden rounded-panel bg-[#d8d3c8]"
     onWheel={(event) => setCameraDistance((value) => Math.max(7, Math.min(22, value + event.deltaY * 0.004)))}
@@ -30,13 +43,16 @@ export const VisualWatchRenderer = ({ assembly }: { assembly: WatchAssembly }) =
     onPointerUp={() => { dragStart.current = null; }}
     onDoubleClick={() => { setRotation([0.15, -0.24, -0.02]); setCameraDistance(11.4); }}
   >
-    <VisualWatchScene model={model} rotation={rotation} cameraDistance={cameraDistance} />
+    <VisualWatchScene model={model} rotation={rotation} cameraDistance={cameraDistance} onExporterReady={registerExporter} />
     <div className="absolute left-3 top-3 max-w-[min(340px,70%)] rounded-lg border border-slate-500/40 bg-slate-950/85 p-3 text-xs text-white shadow-lg" onPointerDown={(event) => event.stopPropagation()}>
       <p className="font-semibold">3D reference preview</p>
       <p className="mt-1 text-slate-300">42 mm case · complete visual assembly. Provisional geometry.</p>
       {!referenceSelected && <p className="mt-1 text-slate-300">Loading applies the 42 mm case, face stack, crown, hand set, caseback and strap preview.</p>}
       <button type="button" className="mt-2 rounded border border-slate-400/50 px-2 py-1 hover:bg-slate-700" onClick={referenceSelected ? clearReference : selectReference}>
         {referenceSelected ? 'Use procedural preview' : 'Load 42 mm reference set'}
+      </button>
+      <button type="button" disabled={!exportReady} className="ml-2 mt-2 rounded border border-slate-400/50 px-2 py-1 hover:bg-slate-700 disabled:cursor-wait disabled:opacity-50" onClick={exportStill}>
+        Export 2048 PNG
       </button>
       {referenceSelected && <p role="status" className="mt-2 text-amber-200">
         {conflicts.length} known geometry conflict{conflicts.length === 1 ? '' : 's'}; {issues.length - conflicts.length} unverified fit check{issues.length - conflicts.length === 1 ? '' : 's'}. This set is for visual review only.

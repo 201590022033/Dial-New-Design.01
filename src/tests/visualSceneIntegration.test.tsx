@@ -13,6 +13,10 @@ const loader = vi.hoisted(() => ({ load: vi.fn() }));
 vi.mock('@react-three/fiber', () => ({ Canvas: () => null, useLoader: loader.load }));
 
 const child = (element: ReactElement) => (element.props as { children: ReactElement }).children;
+const glbChild = (element: ReactElement) => {
+  const children = child(child(element)) as ReactElement | ReactElement[];
+  return (Array.isArray(children) ? children : [children]).find((candidate) => candidate?.type === GlbAsset)!;
+};
 const descriptor: VisualAssetDescriptor = { assetId: 'test', category: 'crown', assetType: 'glb', assetPath: '/test.glb' };
 
 describe('P4 scene integration and GLB failure boundaries', () => {
@@ -21,9 +25,10 @@ describe('P4 scene integration and GLB failure boundaries', () => {
 
   it('keeps exactly one demand-driven canvas with all supported categories', () => {
     const model = watchAssemblyToVisualModel(createDefaultWatchAssembly());
-    const scene = VisualWatchScene({ model, rotation: [0, 0, 0], cameraDistance: 7 }) as ReactElement<{ frameloop: string; children: ReactElement[] }>;
+    const scene = VisualWatchScene({ model, rotation: [0, 0, 0], cameraDistance: 7 }) as ReactElement<{ frameloop: string; gl: { preserveDrawingBuffer: boolean }; children: ReactElement[] }>;
     expect(scene.type).toBe(Canvas);
     expect(scene.props.frameloop).toBe('demand');
+    expect(scene.props.gl.preserveDrawingBuffer).toBe(true);
     const watch = scene.props.children.at(-1)! as ReactElement<{ scale: number; children: ReactElement<{ category: string }>[] }>;
     expect(watch.props.scale).toBe(0.1);
     expect(watch.props.children.map((e: ReactElement<{ category: string }>) => e.props.category)).toEqual(visualCategories);
@@ -35,7 +40,7 @@ describe('P4 scene integration and GLB failure boundaries', () => {
     model.visible[category] = true;
     const node = VisualComponent({ category, model })! as ReactElement<{ name: string }>;
     expect(node.props.name).toBe(category);
-    const asset = child(child(node)) as ReactElement<React.ComponentProps<typeof GlbAsset>>;
+    const asset = glbChild(node) as ReactElement<React.ComponentProps<typeof GlbAsset>>;
     expect(asset.type).toBe(GlbAsset);
     expect(asset.props.descriptor.category).toBe(category);
     expect(asset.props.fallback).toBeTruthy();
@@ -56,9 +61,9 @@ describe('P4 scene integration and GLB failure boundaries', () => {
   it('remounts a failed boundary when the selected asset path changes', () => {
     const model = watchAssemblyToVisualModel(createDefaultWatchAssembly());
     model.assets.crown = descriptor;
-    const first = child(child(VisualComponent({ category: 'crown', model })!));
+    const first = glbChild(VisualComponent({ category: 'crown', model })!);
     model.assets.crown = { ...descriptor, assetPath: '/replacement.glb' };
-    const next = child(child(VisualComponent({ category: 'crown', model })!));
+    const next = glbChild(VisualComponent({ category: 'crown', model })!);
     expect(next.key).not.toBe(first.key);
   });
 
