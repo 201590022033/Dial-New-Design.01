@@ -72,8 +72,8 @@ namokiMODS NMK901 as a matched SKX007/SRPD case, bezel and crown bundle.
 
 These values are promoted to specified preview inputs, not manufacturing
 approval. The PDFs are retailer/manufacturer-reference compilations rather than
-toleranced NMK901 CAD, and the source package itself keeps the unmeasured
-interfaces on hold.
+toleranced NMK901 CAD. Remaining interfaces now also carry temporary nominal
+baselines for ordering and preview, explicitly tagged `ESTIMATED_NOMINAL`.
 
 | Measurement | Controlled value | Evidence status |
 | --- | ---: | --- |
@@ -95,10 +95,28 @@ ID, 2.3 mm height, 1.5 mm radial body), a 28.5 mm dial, SKX hand lengths of
 0.20 mm. These hand values are nominal family-fit evidence; broach tolerances
 are not manufacturing dimensions.
 
-Still provisional or unknown: spring-bar hole center/diameter, dial-seat depth
-and shoulder, chapter-ring seat depth, crystal gasket groove and axial seat,
-caseback thread/gasket, crown tube thread/bore, stem engagement, and top-hand to
-crystal clearance. The case remains a visual engineering reference.
+### Estimated nominal interface baselines
+
+These values use source `AI Nominal Baseline Estimation (SKX007/NH35 standard)`
+and are temporary baselines awaiting physical micrometer validation on Golden
+Sample #1. They produce engineering soft warnings, not hard manufacturing-fit
+approval.
+
+| Interface | Estimated nominal | Uncertainty | Status |
+| --- | ---: | ---: | --- |
+| Spring-bar hole diameter | 2.00 mm | ±0.10 mm | `ESTIMATED_NOMINAL` |
+| Spring-bar hole center | 2.80 mm from lug tip / 1.20 mm from lower lug edge | ±0.10 mm | `ESTIMATED_NOMINAL` |
+| Dial seat depth | 1.20 mm | ±0.08 mm | `ESTIMATED_NOMINAL` |
+| Chapter-ring seat depth | 1.50 mm | ±0.08 mm | `ESTIMATED_NOMINAL` |
+| Crown tube thread | M3.5 x 0.35 mm pitch | ±0.05 mm | `ESTIMATED_NOMINAL` |
+| Crown tube bore | 2.10 mm | ±0.05 mm | `ESTIMATED_NOMINAL` |
+| Stem engagement | 1.80 mm | ±0.05 mm | `ESTIMATED_NOMINAL` |
+| Crystal axial gasket seat | 1.80 mm | ±0.10 mm | `ESTIMATED_NOMINAL` |
+| Hand-to-crystal axial clearance | 0.65 mm | ±0.12 mm | `ESTIMATED_NOMINAL` |
+
+Still unmeasured: crystal gasket groove, caseback thread/gasket groove, and the
+physical confirmation of all estimated interfaces above. The case remains a
+visual engineering reference; estimated nominal values are not toleranced CAD.
 
 ## Historical mixed-case research (not used by NMK901 fixture)
 
@@ -150,4 +168,11 @@ spring-bar hole center and diameter, dial/chapter-ring seat depths, crystal
 gasket groove and axial seat, caseback thread/gasket, crown tube thread/bore and
 stem engagement, and the assembled top-hand-to-crystal clearance. Until those
 values are measured or supplied from a toleranced drawing, the application must
-keep the corresponding checks provisional and must not claim production fit.
+keep the corresponding `ESTIMATED_NOMINAL` checks as soft warnings and must not
+claim production fit.
+
+The controlled ordering record is implemented in
+`src/domain/ordering/controlledNmk901Order.ts`. It carries the temporary nominal
+baselines with source, uncertainty, and warning status, and generates only the
+one fixed NMK901 BOM. The physical measurement list is maintained in
+[NMK901_GOLDEN_SAMPLE_BACKLOG.md](NMK901_GOLDEN_SAMPLE_BACKLOG.md).

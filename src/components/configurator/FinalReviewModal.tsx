@@ -10,6 +10,8 @@ import {
 } from 'lucide-react';
 import { useConfiguratorUIStore } from '@/stores/configuratorUIStore';
 import { useWatchAssemblyStore } from '@/stores/watchAssemblyStore';
+import { CONTROLLED_ORDER_ID, generateControlledBom } from '@/domain/ordering/controlledNmk901Order';
+import { cn } from '@/utils/cn';
 
 interface FinalReviewModalProps {
   isOpen: boolean;
@@ -31,19 +33,36 @@ export const FinalReviewModal: React.FC<FinalReviewModalProps> = ({ isOpen, onCl
   if (!isOpen) return null;
 
   const parts = Object.values(assembly.parts);
+  const controlledBom = assembly.designConfig?.controlledOrderId === CONTROLLED_ORDER_ID
+    ? generateControlledBom()
+    : null;
 
   const handleExportBom = () => {
-    const csvRows = [
-      ['Instance ID', 'Component Name', 'Catalogue ID', 'Category', 'Diameter (mm)', 'Locked'],
-      ...parts.map((p) => [
-        p.instanceId,
-        `"${p.name}"`,
-        p.catalogueItemId,
-        p.category,
-        p.dimensions.diameterMm,
-        lockedPartIds.has(p.instanceId) ? 'YES' : 'NO'
-      ])
-    ];
+    const csvRows = controlledBom
+      ? [
+          ['Component Type', 'Selected Component', 'SKU', 'Quantity', 'Compatibility', 'Provenance', 'Validation', 'Critical Dimensions'],
+          ...controlledBom.lines.map((line) => [
+            line.componentType,
+            `"${line.selectedComponent}"`,
+            line.sku,
+            line.quantity,
+            line.compatibilityStatus,
+            line.provenance,
+            line.validationStatus,
+            `"${Object.entries(line.criticalDimensions).map(([key, value]) => `${key}: ${value}`).join('; ')}"`
+          ])
+        ]
+      : [
+          ['Instance ID', 'Component Name', 'Catalogue ID', 'Category', 'Diameter (mm)', 'Locked'],
+          ...parts.map((p) => [
+            p.instanceId,
+            `"${p.name}"`,
+            p.catalogueItemId,
+            p.category,
+            p.dimensions.diameterMm,
+            lockedPartIds.has(p.instanceId) ? 'YES' : 'NO'
+          ])
+        ];
     const csvContent = 'data:text/csv;charset=utf-8,' + csvRows.map((e) => e.join(',')).join('\n');
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
@@ -69,8 +88,8 @@ export const FinalReviewModal: React.FC<FinalReviewModalProps> = ({ isOpen, onCl
         {/* Header */}
         <div className="flex items-start justify-between border-b border-slate-800 pb-3">
           <div>
-            <span className="text-[10px] font-mono uppercase text-teal-400">Production Blueprint</span>
-            <h2 className="text-lg font-bold text-slate-100">Final Build Review & Procurement</h2>
+            <span className="text-[10px] font-mono uppercase text-teal-400">{controlledBom ? 'Controlled Order Blueprint' : 'Production Blueprint'}</span>
+            <h2 className="text-lg font-bold text-slate-100">{controlledBom ? 'NMK901 Build Review & Procurement' : 'Final Build Review & Procurement'}</h2>
           </div>
           <button
             type="button"
@@ -105,7 +124,7 @@ export const FinalReviewModal: React.FC<FinalReviewModalProps> = ({ isOpen, onCl
         {/* Bill of Materials Table */}
         <div className="space-y-2">
           <h3 className="font-semibold text-slate-200 flex items-center justify-between">
-            <span>Configured Components ({parts.length})</span>
+            <span>{controlledBom ? `Controlled BOM (${controlledBom.lines.length} lines)` : `Configured Components (${parts.length})`}</span>
             <span className="text-[11px] text-slate-400 font-mono">
               {lockedPartIds.size} locked parts
             </span>
@@ -123,7 +142,22 @@ export const FinalReviewModal: React.FC<FinalReviewModalProps> = ({ isOpen, onCl
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60 font-mono text-[11px]">
-                {parts.map((p) => {
+                {controlledBom
+                  ? controlledBom.lines.map((line) => (
+                    <tr key={line.sku} className="hover:bg-slate-800/30">
+                      <td className="p-2.5 font-sans font-medium text-slate-200">
+                        {line.quantity}x {line.selectedComponent}
+                        <span className="block text-[10px] text-slate-400 font-mono">{line.sku}</span>
+                      </td>
+                      <td className="p-2.5 text-slate-300 capitalize">{line.componentType}</td>
+                      <td className="p-2.5 text-slate-400">{Object.values(line.criticalDimensions).join(' · ')}</td>
+                      <td className="p-2.5 text-slate-400">{line.provenance.replaceAll('_', ' ')}</td>
+                      <td className={cn('p-2.5 text-right font-semibold', line.validationStatus === 'supported' ? 'text-emerald-400' : line.validationStatus === 'soft-warning' ? 'text-amber-300' : 'text-orange-300')}>
+                        {line.validationStatus === 'supported' ? 'Supported' : line.validationStatus === 'soft-warning' ? 'Estimated warning' : 'Manual validation'}
+                      </td>
+                    </tr>
+                  ))
+                  : parts.map((p) => {
                   const isLocked = lockedPartIds.has(p.instanceId);
                   return (
                     <tr key={p.instanceId} className="hover:bg-slate-800/30">

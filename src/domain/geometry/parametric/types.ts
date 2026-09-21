@@ -29,6 +29,18 @@ export interface ParametricCaseV1 {
   pusherAngularOffsetDeg: number;
   pusherTubeRadius: DimensionMm; pusherTubeLength: DimensionMm; pusherTubeEmbed: DimensionMm;
   pusherBossRadius: DimensionMm; pusherBossLength: DimensionMm; pusherBossEmbed: DimensionMm;
+  /** Estimated nominal interface values used for preview/order plumbing only. */
+  springBarHoleDiameter?: DimensionMm;
+  springBarHoleFromLugTip?: DimensionMm;
+  springBarHoleFromLowerLugEdge?: DimensionMm;
+  dialSeatDepth?: DimensionMm;
+  chapterRingSeatDepth?: DimensionMm;
+  crownTubeThreadOuterDiameter?: DimensionMm;
+  crownTubeThreadPitch?: DimensionMm;
+  crownTubeBoreDiameter?: DimensionMm;
+  stemEngagementLength?: DimensionMm;
+  crystalAxialSeatDepth?: DimensionMm;
+  handCrystalClearance?: DimensionMm;
 }
 
 export interface ParametricPusherV1 {

@@ -87,7 +87,7 @@ Quality is a presentation setting (`preview`, `normal`, `high`), and Z positions
 
 ## Parametric case generator v1
 
-The reference generator is [`tools/blender/parametric_case_v1.py`](../tools/blender/parametric_case_v1.py). It consumes the `parametric-case/v1` field names and treats Blender units as millimetres. The named reference values are embedded as an explicit demo preset; unknown required production values fail clearly rather than receiving defaults.
+The reference generator is [`tools/blender/parametric_case_v1.py`](../tools/blender/parametric_case_v1.py). It consumes the `parametric-case/v1` field names and treats Blender units as millimetres. The NMK901 fixture carries explicit `ESTIMATED_NOMINAL` spring-bar holes, seat steps, crown-tube bore/thread references, and axial clearance values for preview generation; these remain soft-warning engineering estimates, not manufacturing defaults.
 
 Run in Blender's Scripting workspace, or headlessly:
 
@@ -181,7 +181,7 @@ hand set at explicit provisional frames for a four-view interference review.
 Its combined GLB is not registered in the application. Three individual GLBs
 are selected as fixed 42 mm **visual previews** under
 `public/assets/3d/reference-42/`; see [P7 NMK901 reference review](P7_NMK901_REFERENCE_REVIEW.md)
-for controlled dimensions, nominal hand-fit evidence and unknown interfaces. Successful
+for controlled dimensions, nominal hand-fit evidence and provisional/estimated interfaces. Successful
 structural validation and rendering do not approve mechanical fit.
 
 Each stage runs in a fresh background Blender process with factory settings and

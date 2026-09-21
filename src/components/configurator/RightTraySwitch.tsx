@@ -5,6 +5,7 @@ import { AdvancedModePanel } from './AdvancedModePanel';
 import { StarterBuildPanel } from './StarterBuildPanel';
 import { RightInspector } from '@/components/layout/RightInspector';
 import { Sliders, Layers } from 'lucide-react';
+import { ControlledBomPanel } from './ControlledBomPanel';
 
 export const RightTraySwitch: React.FC = () => {
   const workMode = useConfiguratorUIStore((s) => s.workMode);
@@ -41,6 +42,10 @@ export const RightTraySwitch: React.FC = () => {
         </div>
       </div>
     );
+  }
+
+  if (workMode === 'bom') {
+    return <ControlledBomPanel />;
   }
 
   // For 'parts', 'style', 'research', 'bom', 'manufacture', 'review'

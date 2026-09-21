@@ -4,6 +4,7 @@ import type { ParametricCaseV1, ParametricCrownV1, ParametricHandSetV1 } from '@
 import caseFixture from '../../../tools/blender/test_case_42.json';
 import crownFixture from '../../../tools/blender/test_crown_v1.json';
 import handsFixture from '../../../tools/blender/test_hand_set_v1.json';
+import { CONTROLLED_NMK901_FIXTURE, CONTROLLED_ORDER_ID } from '@/domain/ordering/controlledNmk901Order';
 
 export const REFERENCE_42_ID = 'reference-42-preview/v1';
 export const reference42Parameters = {
@@ -19,10 +20,25 @@ export const matchesReference42Parameters = (assembly: WatchAssembly): boolean =
   JSON.stringify(assembly.parts['inst-crown']?.parametricGeometry) === JSON.stringify(reference42Parameters.crown) &&
   JSON.stringify(assembly.parts['inst-hour-hand']?.parametricGeometry) === JSON.stringify(reference42Parameters.hands);
 
-const previewSource = 'P7 NMK901 controlled reference; supplied case-set and expanded engineering PDFs; preview geometry, not production approval';
+const previewSource = 'P7 NMK901 controlled reference; supplied PDFs plus ESTIMATED_NOMINAL interface baselines; preview geometry, not production approval';
 const previewProvenance = { status: 'provisional' as const, source: previewSource };
 const unknownEvidence = (source: string) => ({ status: 'provisional' as const, source });
 const specifiedEvidence = (source: string) => ({ status: 'specified' as const, source });
+const nominal = CONTROLLED_NMK901_FIXTURE.fields;
+
+export const reference42NominalInterfaces = {
+  springBarHoleDiameterMm: nominal.springHoleDiameter.value,
+  springBarHoleFromLugTipMm: nominal.springHoleXy.value.fromLugTipMm,
+  springBarHoleFromLowerLugEdgeMm: nominal.springHoleXy.value.fromLowerLugEdgeMm,
+  dialSeatDepthMm: nominal.dialSeatZ.value,
+  chapterRingSeatDepthMm: nominal.chapterSeatZ.value,
+  crownTubeThreadOuterDiameterMm: nominal.crownTubeThreadOuterDiameter.value,
+  crownTubeThreadPitchMm: nominal.crownTubeThreadPitch.value,
+  crownTubeBoreMm: nominal.crownTubeBore.value,
+  stemEngagementMm: nominal.stemEngagementLength.value,
+  crystalAxialSeatDepthMm: nominal.crystalAxialSeatZ.value,
+  handCrystalClearanceMm: nominal.handCrystalClearance.value
+} as const;
 
 /** An opt-in, fixed-size visual reference; never called by default assembly creation. */
 export const applyReference42Preview = (assembly: WatchAssembly): WatchAssembly => {
@@ -62,13 +78,14 @@ export const applyReference42Preview = (assembly: WatchAssembly): WatchAssembly 
       ...assembly.designConfig,
       geometryParameters: { ...assembly.designConfig?.geometryParameters, caseDiameterMm: diameter },
       visualReferenceId: REFERENCE_42_ID,
+      controlledOrderId: CONTROLLED_ORDER_ID,
       fitEvidence: {
-        strapInterface: unknownEvidence('NMK901 publishes 22 mm lug width and 46 mm lug-to-lug; spring-bar hole center/diameter remain unpublished'),
+        strapInterface: unknownEvidence(`NMK901 publishes 22 mm lug width and 46 mm lug-to-lug; spring-bar hole baseline ${reference42NominalInterfaces.springBarHoleDiameterMm} mm / ${reference42NominalInterfaces.springBarHoleFromLugTipMm} mm from lug tip is ESTIMATED_NOMINAL ±${nominal.springHoleDiameter.uncertaintyMm} mm`),
         movementHandBores: specifiedEvidence('TMI NH35A post geometry and nominal NH35-compatible hand bores 1.50 / 0.90 / 0.20 mm are recorded; broach tolerances remain unverified'),
-        crownEngagement: unknownEvidence('CT208-class crown head is published at 7.0 x 4.9 mm; stem, tube thread/bore, gasket and insertion evidence remain unpublished'),
-        dialSeat: unknownEvidence('28.5 mm dial and CT252 chapter-ring geometry are published; case dial-seat depth and shoulder remain unpublished'),
+        crownEngagement: unknownEvidence(`CT208-class crown head is published at 7.0 x 4.9 mm; ESTIMATED_NOMINAL tube M3.5 x ${reference42NominalInterfaces.crownTubeThreadPitchMm} mm, bore ${reference42NominalInterfaces.crownTubeBoreMm} mm and stem engagement ${reference42NominalInterfaces.stemEngagementMm} mm remain to be measured`),
+        dialSeat: unknownEvidence(`28.5 mm dial and CT252 chapter-ring geometry are published; ESTIMATED_NOMINAL dial/chapter seat depths are ${reference42NominalInterfaces.dialSeatDepthMm} / ${reference42NominalInterfaces.chapterRingSeatDepthMm} mm`),
         handStack: unknownEvidence('Visual frame only; measured axial stack evidence not supplied'),
-        crystalClearance: unknownEvidence('31.5 mm crystal diameter and 5.1 mm middle thickness are published; axial seat/gasket/hand clearance remains unpublished'),
+        crystalClearance: unknownEvidence(`31.5 mm crystal diameter and 5.1 mm middle thickness are published; ESTIMATED_NOMINAL axial seat ${reference42NominalInterfaces.crystalAxialSeatDepthMm} mm and hand clearance ${reference42NominalInterfaces.handCrystalClearanceMm} mm remain to be measured`),
         pusherEngagement: specifiedEvidence('NMK901 is a non-chronograph case with no pusher interfaces; pusher engagement is not applicable'),
         pusherClearance: specifiedEvidence('NMK901 is a non-chronograph case with no pusher interfaces; pusher clearance is not applicable')
       },
@@ -95,5 +112,5 @@ export const useProceduralReference42 = (assembly: WatchAssembly): WatchAssembly
       parts[instanceId] = { ...part, visual: { ...part.visual, assetId: undefined } };
     }
   }
-  return { ...assembly, parts, designConfig: { ...assembly.designConfig, visualReferenceId: undefined } };
+  return { ...assembly, parts, designConfig: { ...assembly.designConfig, visualReferenceId: undefined, controlledOrderId: undefined } };
 };

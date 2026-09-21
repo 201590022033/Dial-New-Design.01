@@ -26,4 +26,17 @@ describe('Blender parametric case generator', () => {
     expect(typeof fixture.pusherTubeRadius).toBe('number');
     expect(typeof fixture.pusherBossRadius).toBe('number');
   });
+
+  it('includes estimated nominal interface parameters for the controlled preview', () => {
+    expect(fixture.springBarHoleDiameter).toBe(2);
+    expect(fixture.springBarHoleFromLugTip).toBe(2.8);
+    expect(fixture.springBarHoleFromLowerLugEdge).toBe(1.2);
+    expect(fixture.dialSeatDepth).toBe(1.2);
+    expect(fixture.chapterRingSeatDepth).toBe(1.5);
+    expect(fixture.crownTubeThreadOuterDiameter).toBe(3.5);
+    expect(fixture.crownTubeBoreDiameter).toBe(2.1);
+    expect(fixture.estimatedInterfaceProvenance).toMatchObject({ status: 'ESTIMATED_NOMINAL' });
+    expect(py).toContain("cut_spring_bar_hole");
+    expect(py).toContain("number(p,'crownTubeBoreDiameter')");
+  });
 });

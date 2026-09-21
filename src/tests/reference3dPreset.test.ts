@@ -5,6 +5,7 @@ import { applyReference42Preview, REFERENCE_42_ID, useProceduralReference42 } fr
 import { assessReference3dFit } from '@/domain/geometry/parametric';
 import { watchAssemblyToVisualModel } from '@/visual3d/watchAssemblyToVisualModel';
 import { useWatchAssemblyStore } from '@/stores/watchAssemblyStore';
+import { CONTROLLED_ORDER_ID } from '@/domain/ordering/controlledNmk901Order';
 
 describe('P5 reviewed reference configuration', () => {
   it('selects one fixture-backed case/crown/hand set without mutating the source assembly', () => {
@@ -13,6 +14,7 @@ describe('P5 reviewed reference configuration', () => {
     const selected = applyReference42Preview(original);
     expect(original).toEqual(snapshot);
     expect(selected.designConfig?.visualReferenceId).toBe(REFERENCE_42_ID);
+    expect(selected.designConfig?.controlledOrderId).toBe(CONTROLLED_ORDER_ID);
     expect(selected.globalDimensions.caseDiameterMm).toBe(42);
     expect(selected.parts['inst-midcase']!.parametricGeometry?.schema).toBe('parametric-case/v1');
     expect(selected.parts['inst-crown']!.parametricGeometry?.schema).toBe('parametric-crown/v1');

@@ -10,5 +10,24 @@
   "crownBossLength": 1.5, "crownBossEmbed": 2.2, "crownTubeEmbed": 1.5,
   "pusherCount": 0, "pusherLayout": "none", "pusherAngularOffsetDeg": 0,
   "pusherTubeRadius": 0.9, "pusherTubeLength": 1.8, "pusherTubeEmbed": 1.2,
-  "pusherBossRadius": 1.4, "pusherBossLength": 1.0, "pusherBossEmbed": 1.2
+  "pusherBossRadius": 1.4, "pusherBossLength": 1.0, "pusherBossEmbed": 1.2,
+  "springBarHoleDiameter": 2.0, "springBarHoleFromLugTip": 2.8,
+  "springBarHoleFromLowerLugEdge": 1.2, "dialSeatDepth": 1.2,
+  "chapterRingSeatDepth": 1.5, "crownTubeThreadOuterDiameter": 3.5,
+  "crownTubeThreadPitch": 0.35, "crownTubeBoreDiameter": 2.1,
+  "stemEngagementLength": 1.8, "crystalAxialSeatDepth": 1.8,
+  "handCrystalClearance": 0.65,
+  "estimatedInterfaceProvenance": {
+    "status": "ESTIMATED_NOMINAL",
+    "source": "AI Nominal Baseline Estimation (SKX007/NH35 standard)",
+    "uncertaintyMm": {
+      "springBarHoleDiameter": 0.1,
+      "springBarHolePosition": 0.1,
+      "dialSeatDepth": 0.08,
+      "chapterRingSeatDepth": 0.08,
+      "crownTube": 0.05,
+      "crystalAxialSeatDepth": 0.1,
+      "handCrystalClearance": 0.12
+    }
+  }
 }

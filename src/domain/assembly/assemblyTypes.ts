@@ -89,6 +89,8 @@ export interface WatchAssemblyDesignConfig {
     lumeId?: string;
   };
   visualReferenceId?: string;
+  /** Optional deterministic procurement preset bound to a reviewed fixture. */
+  controlledOrderId?: string;
   /** P6 evidence gate; absent or provisional evidence cannot support fit approval. */
   fitEvidence?: AssemblyFitEvidence;
 }

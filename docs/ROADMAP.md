@@ -102,6 +102,28 @@ The new values are specified for preview, not promoted to a production release:
 the remaining work is direct measurement or toleranced drawing evidence for the
 unresolved internal interfaces.
 
+### Controlled ordering block
+
+The single NMK901 / SKX007-SRPD / 42 mm / NH35 Type-M configuration is now
+captured as a deterministic controlled-order preset. It validates the supported
+case envelope, 22 mm strap and spring-bar envelope, NH35 Type-M movement, 28.5
+mm dial, CT252 chapter ring, matched 31.5 mm crystal/bezel insert, and SKX hand
+radial clearance. The BOM contains the case, movement, dial, chapter ring, flat
+insert, crystal, hand set, matched crown/tube, trim-to-fit stem, two spring bars,
+caseback gasket and crystal gasket.
+
+Every controlled engineering field retains one of the explicit provenance
+statuses `PUBLISHED`, `DERIVED`, `DESIGN_TARGET`, `SUPPLIER_CONTROLLED`,
+`VERIFY_GOLDEN_SAMPLE`, or `COMPATIBILITY_ONLY`. Unknown machining values remain
+non-numeric holds. The BOM is orderable with assembly validation where a matched
+supplier assembly supplies the hidden interface; it does not claim production fit.
+See [NMK901 golden-sample backlog](NMK901_GOLDEN_SAMPLE_BACKLOG.md).
+
+Temporary `ESTIMATED_NOMINAL` baselines now unblock preview geometry and ordering
+for the spring-bar holes, seats, crown tube/stem, crystal axial seat, and hand
+clearance. They surface as engineering soft warnings and remain pending Golden
+Sample #1 micrometer validation.
+
 ### P7 visual library status
 
 Presentation-only GLBs now exist for a 40 mm case, diver bezel, domed crystal and

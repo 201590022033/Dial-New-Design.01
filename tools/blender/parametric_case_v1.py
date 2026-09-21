@@ -20,6 +20,12 @@ REFERENCE = {
     'pusherCount': 0, 'pusherLayout': 'none', 'pusherAngularOffsetDeg': 0,
     'pusherTubeRadius': 0.90, 'pusherTubeLength': 1.80, 'pusherTubeEmbed': 1.20,
     'pusherBossRadius': 1.40, 'pusherBossLength': 1.00, 'pusherBossEmbed': 1.20,
+    'springBarHoleDiameter': 2.00, 'springBarHoleFromLugTip': 2.80,
+    'springBarHoleFromLowerLugEdge': 1.20, 'dialSeatDepth': 1.20,
+    'chapterRingSeatDepth': 1.50, 'crownTubeThreadOuterDiameter': 3.50,
+    'crownTubeThreadPitch': 0.35, 'crownTubeBoreDiameter': 2.10,
+    'stemEngagementLength': 1.80, 'crystalAxialSeatDepth': 1.80,
+    'handCrystalClearance': 0.65,
 }
 def number(p, name):
     v = p.get(name)
@@ -36,6 +42,10 @@ def validate(p):
     if number(p, 'lugTipWidth') > number(p, 'lugWidth'): raise ValueError('lugTipWidth must not exceed lugWidth')
     if number(p, 'lugPairGap') > number(p, 'lugWidth'):
         raise ValueError('lugPairGap must not exceed the nominal lugWidth/strap envelope')
+    if number(p, 'crownTubeBoreDiameter') >= number(p, 'crownTubeThreadOuterDiameter'):
+        raise ValueError('crownTubeBoreDiameter must be smaller than crownTubeThreadOuterDiameter')
+    if number(p, 'springBarHoleFromLugTip') > number(p, 'lugToLug') / 2:
+        raise ValueError('springBarHoleFromLugTip must remain inside the lug length')
     pc = int(number(p, 'pusherCount'))
     if pc not in (0, 1, 2): raise ValueError('pusherCount must be 0, 1, or 2')
     if pc > 0:
@@ -53,7 +63,16 @@ def mesh(name, verts, faces, collection, material=None):
 def revolve(p, n, collection, material):
     r = number(p, 'caseDiameter') / 2; h = number(p, 'midcaseHeight'); inner = number(p, 'dialOpening') / 2
     # Dense, smooth cross-section: inner lower opening -> rounded lower shoulder -> belly -> upper shoulder -> inner seat.
-    profile = [(inner, -h/2+.8), (r-.8, -h/2+.2), (r, -h*.25), (r+number(p,'middleCaseBulge'), 0), (r, h*.25), (r-.55, h/2-.35), (number(p,'crystalSeatDiameter')/2, h/2)]
+    chapter_z = h / 2 - number(p, 'chapterRingSeatDepth')
+    dial_z = h / 2 - number(p, 'dialSeatDepth')
+    crystal_radius = number(p, 'crystalSeatDiameter') / 2
+    profile = [
+        (inner, -h/2+.8), (r-.8, -h/2+.2), (r, -h*.25),
+        (r+number(p,'middleCaseBulge'), 0), (r, h*.25),
+        (r-.55, h/2-.35), (crystal_radius, h/2),
+        (crystal_radius-.45, h/2), (crystal_radius-.45, chapter_z),
+        (inner+.35, chapter_z), (inner+.35, dial_z), (inner, dial_z)
+    ]
     rings = [[(rad*math.cos(2*math.pi*i/n), rad*math.sin(2*math.pi*i/n), z) for i in range(n)] for rad,z in profile]
     verts = [v for ring in rings for v in ring]; faces=[]
     for j in range(len(rings)-1):
@@ -61,6 +80,28 @@ def revolve(p, n, collection, material):
     return mesh('DD_CASE_MIDCASE', verts, faces, collection, material)
 def cylinder(name, radius, depth, loc, collection, material):
     bpy.ops.mesh.primitive_cylinder_add(vertices=64, radius=radius, depth=depth, location=loc, rotation=(0, math.pi/2, 0)); ob=bpy.context.object; ob.name=name; collection.objects.link(ob); [c.objects.unlink(ob) for c in list(ob.users_collection) if c != collection]; ob.data.materials.append(material); return ob
+def tube(name, outer_radius, inner_radius, depth, loc, collection, material):
+    n = 64; x0 = loc[0] - depth / 2; x1 = loc[0] + depth / 2
+    verts = []
+    for x in (x0, x1):
+        verts += [(x, outer_radius * math.cos(2*math.pi*i/n), outer_radius * math.sin(2*math.pi*i/n)) for i in range(n)]
+        verts += [(x, inner_radius * math.cos(2*math.pi*i/n), inner_radius * math.sin(2*math.pi*i/n)) for i in range(n)]
+    faces = []
+    for i in range(n):
+        j = (i + 1) % n
+        faces += [(i, j, n+j, n+i), (2*n+i, 3*n+i, 3*n+j, 2*n+j)]
+        faces += [(i, 2*n+i, 2*n+j, j), (n+i, n+j, 3*n+j, 3*n+i)]
+    return mesh(name, verts, faces, collection, material)
+def cut_spring_bar_hole(lug, p, center_x, center_y, center_z, width):
+    bpy.ops.mesh.primitive_cylinder_add(vertices=48, radius=number(p, 'springBarHoleDiameter') / 2, depth=width + 0.8, location=(center_x, center_y, center_z), rotation=(0, math.pi/2, 0))
+    cutter = bpy.context.object
+    try:
+        modifier = lug.modifiers.new('Estimated nominal spring-bar hole', 'BOOLEAN')
+        modifier.operation = 'DIFFERENCE'; modifier.solver = 'EXACT'; modifier.object = cutter
+        bpy.context.view_layer.objects.active = lug
+        bpy.ops.object.modifier_apply(modifier=modifier.name)
+    finally:
+        bpy.data.objects.remove(cutter, do_unlink=True)
 def build(p, quality='normal'):
     validate(p); old=bpy.data.collections.get('DD_PARAMETRIC_CASE')
     if old:
@@ -87,9 +128,13 @@ def build(p, quality='normal'):
             pts += [(root_x0, root_y0, zz), (root_x1, root_y1, zz),
                     (tip_center+tip_width/2, end_sign*span, zz), (tip_center-tip_width/2, end_sign*span, zz)]
         faces=[(0,1,2,3),(4,7,6,5),(0,4,5,1),(1,5,6,2),(2,6,7,3),(3,7,4,0)]; ob=mesh('DD_CASE_LUG_'+end_name+'_'+side_name,pts,faces,col,steel)
+        hole_y=end_sign*(span-number(p,'springBarHoleFromLugTip'))
+        hole_z=(-number(p,'lugThickness')/2+z)+number(p,'springBarHoleFromLowerLugEdge')
+        cut_spring_bar_hole(ob,p,root_center,hole_y,hole_z,root_width)
         bevel=ob.modifiers.new('Conservative edge bevel','BEVEL'); bevel.width=.18; bevel.segments=2
     x=r-number(p,'crownBossEmbed')+number(p,'crownBossLength')/2; cylinder('DD_CASE_CROWN_BOSS',number(p,'crownBossRadius'),number(p,'crownBossLength'),(x,0,0),col,polished)
-    x=r-number(p,'crownTubeEmbed')+number(p,'crownTubeLength')/2; cylinder('DD_CASE_CROWN_TUBE',number(p,'crownTubeRadius'),number(p,'crownTubeLength'),(x,0,0),col,polished)
+    x=r-number(p,'crownTubeEmbed')+number(p,'crownTubeLength')/2
+    tube('DD_CASE_CROWN_TUBE',number(p,'crownTubeThreadOuterDiameter')/2,number(p,'crownTubeBoreDiameter')/2,number(p,'crownTubeLength'),(x,0,0),col,polished)
     # Chronograph pushers at 2h (+60°) and 4h (-60°) around the +X crown axis.
     pc=int(number(p,'pusherCount'))
     if pc > 0 and p.get('pusherLayout') in ('2h-4h','custom'):
