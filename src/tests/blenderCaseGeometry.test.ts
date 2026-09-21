@@ -10,8 +10,8 @@ describe('Blender parametric case generator', () => {
   const fixture = JSON.parse(readFileSync(caseFixturePath, 'utf8')) as Record<string, unknown>;
 
   it('overlaps lug roots with the case shoulder instead of burying them', () => {
-    expect(py).toContain('root=r+number(p,\'lugCaseOverlap\')-root_width/2');
-    expect(py).not.toContain('root=r-number(p,\'lugCaseOverlap\')-root_width/2');
+    expect(py).toContain("root_radius=r-number(p,'lugCaseOverlap')");
+    expect(py).not.toContain("root=r+number(p,'lugCaseOverlap')");
   });
 
   it('generates chronograph pusher bosses and tubes at 2h and 4h', () => {
@@ -21,8 +21,8 @@ describe('Blender parametric case generator', () => {
   });
 
   it('includes pusher fields in the 42 mm fixture', () => {
-    expect(fixture.pusherCount).toBe(2);
-    expect(fixture.pusherLayout).toBe('2h-4h');
+    expect(fixture.pusherCount).toBe(0);
+    expect(fixture.pusherLayout).toBe('none');
     expect(typeof fixture.pusherTubeRadius).toBe('number');
     expect(typeof fixture.pusherBossRadius).toBe('number');
   });

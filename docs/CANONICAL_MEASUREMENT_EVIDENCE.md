@@ -62,29 +62,45 @@ Sources checked:
 5. [TMI VK63 operation manual](https://www.timemodule.com/upload/category/33/operation_manual/VK63_OM.pdf)
 6. [TMI VK63 parts list](https://www.timemodule.com/upload/category/33/parts_list/VK63_PL.pdf)
 
-## Canonical 42 mm case set
+## Controlled 42 mm case set: NMK901
 
-The current 42 mm fixture (`tools/blender/test_case_42.json`) is a visual
-reference, not a supplier-specific case set. One real vendor listing reports a
-42 mm diameter, 49 mm lug-to-lug, 20 mm lug width, 14 mm thickness, and 32 mm
-dial for a particular NH35 case, but comparable cases from other vendors use
-different dimensions. They cannot be merged into one canonical case without a
-matching SKU and drawing.
+The current fixture (`tools/blender/test_case_42.json`) is now aligned to the
+single controlled case set selected in the supplied evidence package:
+`SKX007_SRPD_42mm_Case_Set_Reference.pdf` and
+`SKX007_SRPD_42mm_Expanded_Engineering_Reference (1).pdf`. The package identifies
+namokiMODS NMK901 as a matched SKX007/SRPD case, bezel and crown bundle.
 
-| Measurement | Candidate value | Confirmations | Status |
-| --- | ---: | ---: | --- |
-| Case diameter | 42 mm | 1 vendor listing | unknown |
-| Lug-to-lug | 49 mm | 1 vendor listing | unknown |
-| Lug width | 20 mm | 3 unrelated case listings | unknown |
-| Case thickness | 14 mm | 1 vendor listing | unknown |
-| Dial diameter | 32 mm | 1 vendor listing | unknown |
-| Crown tube, stem, gasket, pusher engagement | not published | 0 | unknown |
+These values are promoted to specified preview inputs, not manufacturing
+approval. The PDFs are retailer/manufacturer-reference compilations rather than
+toleranced NMK901 CAD, and the source package itself keeps the unmeasured
+interfaces on hold.
 
-Case listing checked: [Tandorio 42 mm NH35 case set](https://tandoriowatch.com/products/42mm-nh35-stainless-steel-seamaster-watch-case).
-The differing case listings are useful sourcing leads only; they are not
-evidence for the current Blender fixture.
+| Measurement | Controlled value | Evidence status |
+| --- | ---: | --- |
+| Case diameter | 42 mm | specified for preview |
+| Lug-to-lug | 46 mm | specified for preview |
+| Case-only thickness | 10.2 mm | specified for preview |
+| Inside lug / strap width | 22 mm | specified for preview |
+| Case material | 316L stainless steel | published |
+| Crystal diameter | 31.5 mm | published, family match |
+| Crystal middle thickness | 5.1 mm | published, family match |
+| NH35 movement envelope | 27.40 mm diameter / 5.32 mm height | specified |
+| Crown head | 7.0 mm diameter x 4.9 mm depth | specified, CT208 class |
+| Pusher interfaces | none | specified for NMK901 |
 
-## Second-pass supplier and component research
+The controlled configuration is NH35 + 28.5 mm dial + SKX007/SRPD chapter ring.
+The expanded reference records CT252 chapter-ring geometry (30.5 mm OD, 27.5 mm
+ID, 2.3 mm height, 1.5 mm radial body), a 28.5 mm dial, SKX hand lengths of
+8.5 / 13 / 13 mm, and nominal NH35-compatible hand bores of 1.50 / 0.90 /
+0.20 mm. These hand values are nominal family-fit evidence; broach tolerances
+are not manufacturing dimensions.
+
+Still provisional or unknown: spring-bar hole center/diameter, dial-seat depth
+and shoulder, chapter-ring seat depth, crystal gasket groove and axial seat,
+caseback thread/gasket, crown tube thread/bore, stem engagement, and top-hand to
+crystal clearance. The case remains a visual engineering reference.
+
+## Historical mixed-case research (not used by NMK901 fixture)
 
 The second pass added useful wiring candidates without promoting a mixed case
 set to canonical:
@@ -107,16 +123,15 @@ chronograph pusher counts into the visual/debug model; it must not infer case
 seat, stem, crown, crystal or pusher-engagement geometry from these mixed
 listings.
 
-## Exact SKU resolution attempt
+## Prior exact-SKU resolution attempt (superseded by supplied NMK901 package)
 
-The strongest case candidate is Tandorio `SMC39815-G01`, the 42 mm Seamaster
-case listing. Its page reports 42 mm case diameter, 49 mm lug-to-lug, 20 mm
-lug width, 14 mm thickness, 32 mm dial, 39.8 x 31.5 mm bezel insert, and
-50 m water resistance. The page also lists neighboring variant SKUs; those
-are not treated as confirmations of `SMC39815-G01`.
+Before the supplied NMK901 package was available, the strongest case candidate
+was Tandorio `SMC39815-G01`. Its conflicting 42 mm / 49 mm / 20 mm / 14 mm
+values are retained here as historical sourcing research only and are not used
+by the current fixture.
 
-The search found no manufacturer drawing, second retailer record, or independent
-measurement for that exact SKU. Similar NH35 cases report conflicting values:
+The earlier search found no manufacturer drawing, second retailer record, or
+independent measurement for that exact SKU. Similar NH35 cases report conflicting values:
 22 mm rather than 20 mm lugs, 45.6 mm lug-to-lug, 13.5 mm thickness, or
 15.5 mm thickness. Those conflicts establish that the values cannot be merged
 into the selected SKU. The exact-SKU evidence count therefore remains 1, and
@@ -124,16 +139,15 @@ the case set stays provisional.
 
 The Tandorio product page was also checked for linked PDFs or drawing references;
 it exposes the SKU variants and descriptive dimensions but no engineering-drawing
-download. The public NH35 PDFs found in the search are movement drawings, not
-drawings of the Tandorio case.
+download. This historical result no longer blocks the NMK901 controlled preview,
+but it remains relevant to the distinction between published dimensions and
+manufacturer CAD.
 
 ## Next evidence action
 
-To make the fixture connectable, obtain the exact case-set SKU and its technical
-drawing, then collect two additional confirmations for the same SKU or perform
-two repeat measurements on the same physical reference using calibrated tools.
-Until then, the evidence gate must remain provisional and compatibility must
-continue to report unknown or conflict rather than green fit approval. The
-three-confirmation threshold applies only when the confirmations refer to the
-same SKU or the same manufacturer specification; unrelated case listings are
-not interchangeable confirmations.
+The next measurement pass is now limited to the remaining NMK901 interfaces:
+spring-bar hole center and diameter, dial/chapter-ring seat depths, crystal
+gasket groove and axial seat, caseback thread/gasket, crown tube thread/bore and
+stem engagement, and the assembled top-hand-to-crystal clearance. Until those
+values are measured or supplied from a toleranced drawing, the application must
+keep the corresponding checks provisional and must not claim production fit.

@@ -53,26 +53,30 @@ thread/seal geometry, verified fit, or a production component library.
 
 ### P5 visual reference status
 
-An opt-in `reference-42-preview/v1` now selects and persists one 42 mm
-case/crown/hand-set configuration with explicit frames and three separately
-reviewed GLBs. The case fixture has been corrected to paired 12/6 strap lugs
-with a crown-side clearance; the crown boss and tube remain case-owned. The
-movement template audit still finds three hand-bore mismatches. Stem engagement,
-thread/seal geometry and axial clearances remain unknown. The assets are clearly
-labelled preview-only and cannot support a fit claim. See [P5 reference review](P5_REFERENCE_REVIEW.md).
+The opt-in `reference-42-preview/v1` remains the stable entry point for the
+42 mm review, with explicit frames and three independently registered GLBs. The
+fixture now carries the supplied NMK901 case-set envelope: 42 mm diameter,
+46 mm lug-to-lug, 10.2 mm case-only thickness, 22 mm inside-lug width and no
+chronograph pushers. The crown is updated to the published 7.0 x 4.9 mm CT208
+class, and the hand fixture uses the supplied nominal NH35-compatible lengths
+and bores. These are controlled preview inputs; unknown seat, thread, gasket,
+spring-bar and axial-clearance dimensions still prevent production-fit approval.
+See [canonical measurement evidence](CANONICAL_MEASUREMENT_EVIDENCE.md).
 
 ### P6 evidence gate
 
-The reference now records evidence provenance for the strap interface, movement
-hand bores, crown engagement, dial seat, hand stack and crystal clearance. These
-fields remain provisional or unknown until measured evidence is supplied.
+Evidence provenance now distinguishes specified nominal interfaces from unknown
+mechanical interfaces. Published case, movement, nominal hand-fit, dial/chapter,
+crystal-diameter and crown-head dimensions are recorded, while spring-bar holes,
+seat depths, crown tube/thread, gaskets and axial hand/crystal clearance remain
+provisional.
 
 ### Recommended P7 starting point
 
-Source verified movement, hand-bore, stem, socket, dial-seat, hand-stack and
-crystal-clearance evidence. Then revise the provisional fixture with those
-measurements, regenerate all three components, and add fit checks only where
-the evidence supports them. Continue with a small controlled component set.
+Complete the NMK901 measurement pass for spring-bar holes, dial/chapter seats,
+crystal gasket/axial seat, caseback sealing, crown tube/thread and stem
+engagement. Then add only the corresponding fit checks and regenerate assets
+again when the remaining dimensions are actually available.
 
 ### P7 surface finish status
 
@@ -85,24 +89,18 @@ the next texture refinement step after finish references are selected.
 ### P7 chronograph pusher status
 
 The case schema, Blender generator, browser procedural preview, movement
-templates and template archetypes now support two chronograph pushers at 2 h and
-4 h. The `chronograph` and `navitimer-style` templates require `pushers` as a
-required component kind, and VK mecha-quartz movements declare `pusherCount: 2`
-and positions `[60, -60]`. Compatibility rules flag mismatches and missing
-components. Pusher engagement and clearance evidence are tracked as provisional;
-verified measurements are needed before any fit claim.
+templates and template archetypes still support two chronograph pushers at 2 h
+and 4 h. The controlled NMK901 reference is explicitly non-chronograph, so its
+pusher interfaces are marked not applicable; chronograph pusher engagement and
+clearance evidence remains provisional in separate VK fixtures.
 
 ### P7 measurement research status
 
-The first online evidence pass is recorded in [canonical measurement evidence](CANONICAL_MEASUREMENT_EVIDENCE.md).
-Official TMI, ETA and Miyota documentation and real supplier pages were checked,
-but the repository's existing AliExpress/supplier records are synthetic demo
-fixtures and cannot count as confirmations. No case-set, stem, crown, pusher,
-dial-seat, hand-stack or crystal-clearance value has been promoted to verified
-fit data. The next evidence step is to select one exact case-set SKU and obtain
-three matching confirmations or repeat measurements for that same SKU. The
-lower threshold does not allow unrelated case listings to be merged into one
-canonical case set.
+The supplied NMK901 case-set and expanded engineering references now define one
+controlled preview configuration and are recorded in [canonical measurement evidence](CANONICAL_MEASUREMENT_EVIDENCE.md).
+The new values are specified for preview, not promoted to a production release:
+the remaining work is direct measurement or toleranced drawing evidence for the
+unresolved internal interfaces.
 
 ### P7 visual library status
 

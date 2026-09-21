@@ -1,4 +1,8 @@
-# P5: 42 mm visual reference review
+# Archived P5: provisional 42 mm visual reference review
+
+This document records the superseded pre-NMK901 fixture. The active controlled
+reference is documented in [P7_NMK901_REFERENCE_REVIEW.md](P7_NMK901_REFERENCE_REVIEW.md)
+and [CANONICAL_MEASUREMENT_EVIDENCE.md](CANONICAL_MEASUREMENT_EVIDENCE.md).
 
 The opt-in `reference-42-preview/v1` configuration is a **visual review fixture**.
 Its inputs are `tools/blender/test_case_42.json`, `test_crown_v1.json` and
@@ -19,7 +23,7 @@ The three separately generated and reviewed GLBs are published under
 
 | Asset | SHA-256 | Imported meshes / vertices |
 | --- | --- | --- |
-| `case.glb` | `069D2C32AF6CFE228D098039231E311BB481DF39A617A487D582163CFB631239` | 11 / 3232 |
+| `case.glb` | `82166E1EA7F96E812AD2F08AE9FAC8A2AF861923ACA60D1C0D0A2BB214BD6C63` | 11 / 3232 |
 | `crown.glb` | `30AD6E178313C13AC88C94251806514297074EBB9A680334DE97641D44AD1716` | 1 / 1538 |
 | `hands.glb` | `B16A2F7B3C58B820B36987FC09723FF5EAD28BA759B893D48044FB307A7E3952` | 15 / 2940 |
 

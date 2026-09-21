@@ -19,9 +19,10 @@ export const matchesReference42Parameters = (assembly: WatchAssembly): boolean =
   JSON.stringify(assembly.parts['inst-crown']?.parametricGeometry) === JSON.stringify(reference42Parameters.crown) &&
   JSON.stringify(assembly.parts['inst-hour-hand']?.parametricGeometry) === JSON.stringify(reference42Parameters.hands);
 
-const previewSource = 'P5 42 mm visual fixture; seat, stack, crown fit and movement clearances unverified';
+const previewSource = 'P7 NMK901 controlled reference; supplied case-set and expanded engineering PDFs; preview geometry, not production approval';
 const previewProvenance = { status: 'provisional' as const, source: previewSource };
 const unknownEvidence = (source: string) => ({ status: 'provisional' as const, source });
+const specifiedEvidence = (source: string) => ({ status: 'specified' as const, source });
 
 /** An opt-in, fixed-size visual reference; never called by default assembly creation. */
 export const applyReference42Preview = (assembly: WatchAssembly): WatchAssembly => {
@@ -32,12 +33,13 @@ export const applyReference42Preview = (assembly: WatchAssembly): WatchAssembly 
   const selected: Record<string, WatchAssemblyPartInstance> = {
     'inst-midcase': {
       ...existingCase, visible: true,
-      dimensions: { ...existingCase.dimensions, diameterMm: 42 },
+      dimensions: { ...existingCase.dimensions, diameterMm: 42, widthMm: 22, thicknessMm: 10.2 },
       parametricGeometry: structuredClone(reference42Parameters.case), geometryProvenance: previewProvenance,
       visual: { category: 'case', assetId: 'reference-42-case-preview' }
     },
     'inst-crown': {
       ...crown, visible: true,
+      dimensions: { ...crown.dimensions, diameterMm: 7, widthMm: 7, thicknessMm: 4.9 },
       parametricGeometry: structuredClone(reference42Parameters.crown), geometryProvenance: previewProvenance,
       visual: { category: 'crown', assetId: 'reference-42-crown-preview' }
     },
@@ -61,14 +63,14 @@ export const applyReference42Preview = (assembly: WatchAssembly): WatchAssembly 
       geometryParameters: { ...assembly.designConfig?.geometryParameters, caseDiameterMm: diameter },
       visualReferenceId: REFERENCE_42_ID,
       fitEvidence: {
-        strapInterface: unknownEvidence('16 mm paired-lug gap is a visual strap envelope; strap/bar specification not selected'),
-        movementHandBores: unknownEvidence('Compared against repository movement template; fixture bores are not verified production dimensions'),
-        crownEngagement: unknownEvidence('Stem, thread, gasket and insertion evidence not supplied'),
-        dialSeat: unknownEvidence('Visual frame only; measured dial seating evidence not supplied'),
+        strapInterface: unknownEvidence('NMK901 publishes 22 mm lug width and 46 mm lug-to-lug; spring-bar hole center/diameter remain unpublished'),
+        movementHandBores: specifiedEvidence('TMI NH35A post geometry and nominal NH35-compatible hand bores 1.50 / 0.90 / 0.20 mm are recorded; broach tolerances remain unverified'),
+        crownEngagement: unknownEvidence('CT208-class crown head is published at 7.0 x 4.9 mm; stem, tube thread/bore, gasket and insertion evidence remain unpublished'),
+        dialSeat: unknownEvidence('28.5 mm dial and CT252 chapter-ring geometry are published; case dial-seat depth and shoulder remain unpublished'),
         handStack: unknownEvidence('Visual frame only; measured axial stack evidence not supplied'),
-        crystalClearance: unknownEvidence('Crystal underside and hand clearance evidence not supplied'),
-        pusherEngagement: unknownEvidence('Pusher stem, return spring, gasket and insertion evidence not supplied'),
-        pusherClearance: unknownEvidence('Pusher boss/tube clearance against crown, lugs and case shoulder not verified')
+        crystalClearance: unknownEvidence('31.5 mm crystal diameter and 5.1 mm middle thickness are published; axial seat/gasket/hand clearance remains unpublished'),
+        pusherEngagement: specifiedEvidence('NMK901 is a non-chronograph case with no pusher interfaces; pusher engagement is not applicable'),
+        pusherClearance: specifiedEvidence('NMK901 is a non-chronograph case with no pusher interfaces; pusher clearance is not applicable')
       },
       assemblyAnchors: {
         ...assembly.designConfig?.assemblyAnchors,

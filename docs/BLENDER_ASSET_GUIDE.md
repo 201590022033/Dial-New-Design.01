@@ -100,7 +100,7 @@ Quality controls radial sampling (`preview`, `normal`, `high`) and is not part o
 
 ### Lug attachment
 
-The lug root is positioned so that it overlaps the case shoulder by `lugCaseOverlap`. This keeps the tapered lug visibly connected to the case surface across the full allowed `lugToLug` range. The default `lugCaseOverlap` in the embedded reference preset is 0.8 mm; older fixtures that used 2.2 mm were burying the root too deep and should be regenerated.
+The lug root follows the case shoulder at each root corner and is inset by `lugCaseOverlap`. This keeps paired tapered lugs visibly connected when the inside-lug width is widened; the 42 mm review fixture uses a provisional 2.2 mm overlap and must be regenerated if its parameters change.
 
 ### Chronograph pushers
 
@@ -175,13 +175,13 @@ open for each run to avoid Windows file-open races. Do not run concurrent review
 with the same asset name. The validator, cameras, lights and renderer are shared;
 no category-specific render pipeline was added.
 
-P5 also provides `review_hand_set.ps1` and `review_reference_42.ps1`. The latter
+The reference review also provides `review_hand_set.ps1` and `review_reference_42.ps1`. The latter
 uses `reference_42_assembly.json` to combine the case, separate crown head and
 hand set at explicit provisional frames for a four-view interference review.
 Its combined GLB is not registered in the application. Three individual GLBs
 are selected as fixed 42 mm **visual previews** under
-`public/assets/3d/reference-42/`; see [P5 reference review](P5_REFERENCE_REVIEW.md)
-for hashes, known overlap, hand-bore conflicts and unknown fit data. Successful
+`public/assets/3d/reference-42/`; see [P7 NMK901 reference review](P7_NMK901_REFERENCE_REVIEW.md)
+for controlled dimensions, nominal hand-fit evidence and unknown interfaces. Successful
 structural validation and rendering do not approve mechanical fit.
 
 Each stage runs in a fresh background Blender process with factory settings and

@@ -1,8 +1,8 @@
 {
   "schema": "parametric-crown/v1",
   "provenance": { "status": "provisional", "source": "P4 visual review fixture only; not measured or manufacturing approved" },
-  "headDiameterMm": 6.5,
-  "headLengthMm": 3.5,
+  "headDiameterMm": 7.0,
+  "headLengthMm": 4.9,
   "socketDiameterMm": 3.2,
   "socketDepthMm": 1.8,
   "gripDepthMm": 0.2,

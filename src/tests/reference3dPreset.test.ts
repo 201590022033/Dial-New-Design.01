@@ -17,8 +17,12 @@ describe('P5 reviewed reference configuration', () => {
     expect(selected.parts['inst-midcase']!.parametricGeometry?.schema).toBe('parametric-case/v1');
     expect(selected.parts['inst-crown']!.parametricGeometry?.schema).toBe('parametric-crown/v1');
     expect(selected.parts['inst-hour-hand']!.parametricGeometry?.schema).toBe('parametric-hand-set/v1');
+    expect(selected.parts['inst-midcase']!.parametricGeometry).toMatchObject({ midcaseHeight: 10.2, lugWidth: 22, lugToLug: 46, pusherCount: 0 });
+    expect(selected.parts['inst-crown']!.parametricGeometry).toMatchObject({ headDiameterMm: 7, headLengthMm: 4.9 });
+    expect(selected.parts['inst-hour-hand']!.parametricGeometry).toMatchObject({ hour: { hub: { pinionHoleDiameter: 1.5 } }, minute: { hub: { pinionHoleDiameter: 0.9 } }, seconds: { hub: { pinionHoleDiameter: 0.2 } } });
     expect(selected.parts['inst-hour-hand']!.geometryProvenance?.status).toBe('provisional');
     expect(selected.designConfig?.fitEvidence?.strapInterface?.status).toBe('provisional');
+    expect(selected.designConfig?.fitEvidence?.movementHandBores?.status).toBe('specified');
     expect(selected.designConfig?.assemblyAnchors?.['crown-interface']?.positionMm).toEqual([21.8, 0, 0]);
     const visuals = watchAssemblyToVisualModel(selected);
     for (const category of ['case', 'crown', 'hands'] as const) {
@@ -59,12 +63,12 @@ describe('P5 reviewed reference configuration', () => {
     expect(selected.parts['inst-crown']!.visual?.assetId).toBe('reference-42-crown-preview');
   });
 
-  it('reports geometric overlap, hand-bore mismatch and unresolved interfaces without a fit claim', () => {
+  it('reports published nominal fit alignment and unresolved interfaces without a fit claim', () => {
     const selected = applyReference42Preview(createDefaultWatchAssembly());
     const issues = assessReference3dFit(selected);
     expect(issues.some((issue) => issue.code === 'CROWN_LUG_OVERLAP')).toBe(false);
-    expect(issues.filter((issue) => issue.code === 'HAND_BORE_MISMATCH' && issue.status === 'conflict')).toHaveLength(3);
-    expect(issues.some((issue) => issue.code === 'PUSHER_COUNT_MISMATCH' && issue.status === 'conflict')).toBe(true);
+    expect(issues.filter((issue) => issue.code === 'HAND_BORE_MISMATCH' && issue.status === 'conflict')).toHaveLength(0);
+    expect(issues.some((issue) => issue.code === 'PUSHER_COUNT_MISMATCH' && issue.status === 'conflict')).toBe(false);
     expect(issues.some((issue) => issue.code === 'CROWN_ENGAGEMENT_UNKNOWN' && issue.status === 'unknown')).toBe(true);
     expect(issues.some((issue) => issue.code === 'STACK_CLEARANCE_UNKNOWN' && issue.status === 'unknown')).toBe(true);
     expect(issues.some((issue) => issue.code === 'STEM_INTERFACE_UNKNOWN' && issue.status === 'unknown')).toBe(true);

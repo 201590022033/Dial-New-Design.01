@@ -72,15 +72,19 @@ def build(p, quality='normal'):
     r=number(p,'caseDiameter')/2; root_width=number(p,'lugRootWidth'); tip_width=number(p,'lugTipWidth'); pair_gap=number(p,'lugPairGap'); span=number(p,'lugToLug')/2
     # Two tapered prisms at each strap end. The crown axis (+X) stays clear;
     # the case retains only its boss and tube on that side.
-    # Overlap the lug root with the case shoulder by lugCaseOverlap so the taper
-    # starts at the case surface and remains visible even when the pair gap is widened.
-    root=r+number(p,'lugCaseOverlap')-root_width/2
+    # Follow the circular case shoulder at each root corner, inset by
+    # lugCaseOverlap. A single flat radial root plane floats when a wide paired
+    # lug is moved outward to match a published inside-lug width.
+    root_radius=r-number(p,'lugCaseOverlap')
     for end_name, end_sign in [('12',1),('6',-1)]:
       for side_name, side_sign in [('L',-1),('R',1)]:
         root_center=side_sign*(pair_gap/2 + root_width/2); tip_center=side_sign*(pair_gap/2 + tip_width/2)
+        root_x0=root_center-root_width/2; root_x1=root_center+root_width/2
+        root_y0=end_sign*math.sqrt(max(0, root_radius*root_radius-root_x0*root_x0))
+        root_y1=end_sign*math.sqrt(max(0, root_radius*root_radius-root_x1*root_x1))
         z=-number(p,'lugTipDrop')/2; pts=[]
         for zz in (-number(p,'lugThickness')/2+z, number(p,'lugThickness')/2+z):
-            pts += [(root_center-root_width/2, end_sign*root, zz), (root_center+root_width/2, end_sign*root, zz),
+            pts += [(root_x0, root_y0, zz), (root_x1, root_y1, zz),
                     (tip_center+tip_width/2, end_sign*span, zz), (tip_center-tip_width/2, end_sign*span, zz)]
         faces=[(0,1,2,3),(4,7,6,5),(0,4,5,1),(1,5,6,2),(2,6,7,3),(3,7,4,0)]; ob=mesh('DD_CASE_LUG_'+end_name+'_'+side_name,pts,faces,col,steel)
         bevel=ob.modifiers.new('Conservative edge bevel','BEVEL'); bevel.width=.18; bevel.segments=2
