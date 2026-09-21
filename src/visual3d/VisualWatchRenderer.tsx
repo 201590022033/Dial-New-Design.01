@@ -18,6 +18,7 @@ export const VisualWatchRenderer = ({ assembly }: { assembly: WatchAssembly }) =
   const dragStart = useRef<{ x: number; y: number } | null>(null);
   const exporter = useRef<StillExporter | null>(null);
   const [exportReady, setExportReady] = useState(false);
+  const [exportStatus, setExportStatus] = useState('');
   const registerExporter = useCallback((next: StillExporter | null) => {
     exporter.current = next;
     setExportReady(Boolean(next));
@@ -28,6 +29,7 @@ export const VisualWatchRenderer = ({ assembly }: { assembly: WatchAssembly }) =
     link.download = `NMK901-${new Date().toISOString().slice(0, 10)}-2048.png`;
     link.href = exporter.current();
     link.click();
+    setExportStatus('Exported 2048 × 2048 PNG');
   };
   return <div
     className="relative h-full w-full overflow-hidden rounded-panel bg-[#d8d3c8]"
@@ -54,6 +56,7 @@ export const VisualWatchRenderer = ({ assembly }: { assembly: WatchAssembly }) =
       <button type="button" disabled={!exportReady} className="ml-2 mt-2 rounded border border-slate-400/50 px-2 py-1 hover:bg-slate-700 disabled:cursor-wait disabled:opacity-50" onClick={exportStill}>
         Export 2048 PNG
       </button>
+      {exportStatus && <p role="status" className="mt-1 text-emerald-200">{exportStatus}</p>}
       {referenceSelected && <p role="status" className="mt-2 text-amber-200">
         {conflicts.length} known geometry conflict{conflicts.length === 1 ? '' : 's'}; {issues.length - conflicts.length} unverified fit check{issues.length - conflicts.length === 1 ? '' : 's'}. This set is for visual review only.
       </p>}
