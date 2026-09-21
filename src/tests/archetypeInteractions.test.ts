@@ -4,6 +4,7 @@ import { createStarterBuild, type StarterBuildType } from '@/domain/configurator
 import { useConfiguratorUIStore } from '@/stores/configuratorUIStore';
 import { useWatchAssemblyStore } from '@/stores/watchAssemblyStore';
 import { watchAssemblyToVisualModel } from '@/visual3d/watchAssemblyToVisualModel';
+import { applyReference42Preview } from '@/domain/presets/reference3d';
 
 const originalAssembly = structuredClone(useWatchAssemblyStore.getState().assembly);
 
@@ -28,15 +29,23 @@ describe('archetype rendering and dashboard routing', () => {
   });
 
   it('restyles the current high-detail assembly without discarding its visual asset bindings', () => {
-    const source = createDefaultWatchAssembly();
-    source.designConfig = { ...source.designConfig, visualReferenceId: 'reference-42-complete-v1' };
+    const source = applyReference42Preview(createDefaultWatchAssembly());
     const originalDialColor = source.parts['inst-dial-blank']?.color;
     const pilot = createStarterBuild('pilot', source).assembly;
     const model = watchAssemblyToVisualModel(pilot);
-    expect(pilot.designConfig?.visualReferenceId).toBe('reference-42-complete-v1');
+    expect(pilot.designConfig?.visualReferenceId).toBe(source.designConfig?.visualReferenceId);
     expect(pilot.parts['inst-dial-blank']?.visual).toEqual(source.parts['inst-dial-blank']?.visual);
     expect(model.archetypeAppearance).toMatchObject({ dialColor: '#111317', strapColor: '#4b2d1c' });
+    expect(model.assets).toMatchObject({
+      dial: { assetId: 'archetype-dial-pilot' },
+      bezel: { assetId: 'archetype-bezel-pilot' },
+      hands: { assetId: 'archetype-hands-pilot' },
+      strap: { assetId: 'archetype-strap-leather' }
+    });
     expect(source.parts['inst-dial-blank']?.color).toBe(originalDialColor);
+    const chronographModel = watchAssemblyToVisualModel(createStarterBuild('chronograph', source).assembly);
+    expect(chronographModel.assets.pushers.assetId).toBe('archetype-pushers-chronograph');
+    expect(chronographModel.visible.pushers).toBe(true);
   });
 
   it('applies an inspector archetype choice to canonical visual state', () => {

@@ -1,5 +1,5 @@
 import { Canvas, useThree } from '@react-three/fiber';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { VisualWatchModel } from './watchAssemblyToVisualModel';
 import { GlbAsset } from './GlbAsset';
 import { visualCategories, type VisualCategory } from './visualAssetRegistry';
@@ -19,6 +19,18 @@ const Cylinder = ({ radius, depth, position = [0, 0, 0], axis = 'Z', material }:
 
 export const DialArtwork = ({ model }: { model: VisualWatchModel }) => {
   const artwork = model.dial.artwork;
+  const [customImage, setCustomImage] = useState<HTMLImageElement | null>(null);
+  useEffect(() => {
+    if (!artwork.customImageDataUrl || typeof Image === 'undefined') {
+      setCustomImage(null);
+      return;
+    }
+    const image = new Image();
+    image.onload = () => setCustomImage(image);
+    image.onerror = () => setCustomImage(null);
+    image.src = artwork.customImageDataUrl;
+    return () => { image.onload = null; image.onerror = null; };
+  }, [artwork.customImageDataUrl]);
   const texture = useMemo(() => {
     if (typeof document === 'undefined' || !artwork.content) return null;
     const canvas = document.createElement('canvas');
@@ -28,13 +40,14 @@ export const DialArtwork = ({ model }: { model: VisualWatchModel }) => {
     const pixelsPerMm = canvas.width / model.dial.outerDiameterMm;
     const centre = canvas.width / 2;
     const archetype = model.referenceProfiles.archetypeId;
+    const usesArchetypeDial = model.assets.dial.assetId.startsWith('archetype-dial-');
     context.clearRect(0, 0, canvas.width, canvas.height);
     context.fillStyle = model.archetypeAppearance.accentColor;
     context.strokeStyle = model.archetypeAppearance.accentColor;
     context.lineWidth = Math.max(2, pixelsPerMm * 0.08);
     context.textAlign = 'center';
     context.textBaseline = 'middle';
-    if (archetype === 'archetype-field' || archetype === 'archetype-pilot') {
+    if (!usesArchetypeDial && (archetype === 'archetype-field' || archetype === 'archetype-pilot')) {
       const labels = archetype === 'archetype-pilot' ? [12, 3, 6, 9] : Array.from({ length: 12 }, (_, index) => index + 1);
       context.font = `700 ${(archetype === 'archetype-pilot' ? 1.7 : 1.05) * pixelsPerMm}px "Arial Narrow", Arial, sans-serif`;
       labels.forEach((label, index) => {
@@ -43,26 +56,32 @@ export const DialArtwork = ({ model }: { model: VisualWatchModel }) => {
         const radius = centre * (archetype === 'archetype-pilot' ? 0.68 : 0.72);
         context.fillText(String(label), centre + Math.sin(angle) * radius, centre - Math.cos(angle) * radius);
       });
-    } else if (archetype === 'archetype-gmt-travel') {
+    } else if (!usesArchetypeDial && archetype === 'archetype-gmt-travel') {
       context.font = `700 ${0.9 * pixelsPerMm}px Arial, sans-serif`;
       [24, 6, 12, 18].forEach((label, index) => {
         const angle = index * Math.PI / 2;
         const radius = centre * 0.7;
         context.fillText(String(label), centre + Math.sin(angle) * radius, centre - Math.cos(angle) * radius);
       });
-    } else if (archetype === 'archetype-chronograph') {
+    } else if (!usesArchetypeDial && archetype === 'archetype-chronograph') {
       ([[-0.22, 0], [0.22, 0], [0, 0.24]] as Array<[number, number]>).forEach(([x, y]) => {
         context.beginPath();
         context.arc(centre + centre * x, centre + centre * y, centre * 0.16, 0, Math.PI * 2);
         context.stroke();
       });
-    } else if (archetype === 'archetype-dive') {
+    } else if (!usesArchetypeDial && archetype === 'archetype-dive') {
       context.beginPath();
       context.moveTo(centre, centre * 0.14);
       context.lineTo(centre - centre * 0.055, centre * 0.24);
       context.lineTo(centre + centre * 0.055, centre * 0.24);
       context.closePath();
       context.fill();
+    }
+    if (customImage) {
+      const scale = Math.min((centre * 0.46) / customImage.width, (centre * 0.22) / customImage.height);
+      const width = customImage.width * scale;
+      const height = customImage.height * scale;
+      context.drawImage(customImage, centre - width / 2, centre * 0.42 - height / 2, width, height);
     }
     context.fillStyle = artwork.color;
     context.textAlign = 'center';
@@ -93,7 +112,7 @@ export const DialArtwork = ({ model }: { model: VisualWatchModel }) => {
     result.magFilter = LinearFilter;
     result.needsUpdate = true;
     return result;
-  }, [artwork, model.archetypeAppearance, model.dial.outerDiameterMm, model.referenceProfiles.archetypeId]);
+  }, [artwork, customImage, model.archetypeAppearance, model.assets.dial.assetId, model.dial.outerDiameterMm, model.referenceProfiles.archetypeId]);
   useEffect(() => () => texture?.dispose(), [texture]);
   if (!texture) return null;
   return <mesh position={[0, 0, model.dial.thicknessMm / 2 + 0.34]}>

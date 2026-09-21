@@ -171,6 +171,19 @@ right-hand destination: Parts opens Options, Style opens Style, AI Research
 opens Suppliers and Manufacture opens Manufacture. Selecting an affected part
 for a warning no longer overrides that destination tab.
 
+### P10 high-definition archetype component library
+
+The five starter archetypes now select dedicated 42 mm presentation GLBs for
+dials, bezels and hand sets, plus rubber, leather, canvas and perforated racing
+straps. The chronograph preview also carries separate external pushers. Twenty
+generated assets are registered with explicit provisional-presentation
+provenance and retain the NMK901 case envelope without changing fit evidence.
+
+The central viewer adds Studio, Face and Detail camera presets while preserving
+the existing 2048 px export. The Style workspace now supports live strap
+selection and optional PNG/JPEG/WebP dial artwork up to 2 MB. Imported artwork
+is a preview layer only and is never treated as manufacturing geometry.
+
 ## Deliberate non-goals
 
 No massive application rewrite, huge style catalogue, fabricated calibre dimensions, or one-GLB-per-variation asset library is planned in this pass.

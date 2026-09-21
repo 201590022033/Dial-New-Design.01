@@ -43,6 +43,8 @@ export type DialVisualDescriptor = {
     radiusMm: number;
     angleStartDeg: number;
     angleSpanDeg: number;
+    customImageDataUrl?: string;
+    customImageName?: string;
   };
 };
 
@@ -118,6 +120,18 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
   const declaredStyle = handsPart?.customProperties?.visualHandStyle;
   const style = declaredStyle === 'mercedes' || handValue.includes('mercedes') ? 'mercedes' : declaredStyle === 'needle' || handValue.includes('needle') ? 'needle' : 'baton';
   const movement = movementLibrary.find((item) => item.id === assembly.metadata.movement);
+  const visualReferences = assembly.designConfig?.visualReferenceConfig ?? {};
+  const archetypeProfile = getArchetypeVisualProfile(visualReferences.archetypeId);
+  const archetypeAssets: Partial<Record<VisualCategory, string>> = archetypeProfile ? {
+    dial: archetypeProfile.dialAssetId,
+    bezel: archetypeProfile.bezelAssetId,
+    hands: archetypeProfile.handsAssetId,
+    pushers: archetypeProfile.pusherAssetId,
+    strap: `archetype-strap-${visualReferences.strapStyleId ?? archetypeProfile.strapStyleId}`
+  } : {};
+  if (visualReferences.strapStyleId) {
+    archetypeAssets.strap = `archetype-strap-${visualReferences.strapStyleId}`;
+  }
   const assets = {} as VisualWatchModel['assets'];
   const visible = {} as VisualWatchModel['visible'];
   const transforms: VisualWatchModel['transforms'] = {};
@@ -125,7 +139,7 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
   const referenceIsCurrent = assembly.globalDimensions.caseDiameterMm === 42 && matchesReference42Parameters(assembly);
   for (const category of visualCategories) {
     const part = find(category);
-    const id = part?.visual?.assetId ?? part?.customProperties?.visualAssetId;
+    const id = archetypeAssets[category] ?? part?.visual?.assetId ?? part?.customProperties?.visualAssetId;
     const fallbackId = category === 'hands' ? `visual-hands-${style === 'mercedes' ? 'mercedes' : 'baton'}` : `visual-${category}-default`;
     const resolved = resolveVisualAssetByCategory(typeof id === 'string' ? id : undefined, category, visualAssetRegistry[fallbackId]!);
     const referenceOnly = resolved.assetId.startsWith('reference-42-');
@@ -157,8 +171,6 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
   const dialConfig = assembly.designConfig?.dialFaceConfig;
   const dialTexture = dialConfig?.texture ?? defaultDialFaceConfig.texture;
   const typography = assembly.designConfig?.typographyConfig ?? defaultTypographyConfig;
-  const visualReferences = assembly.designConfig?.visualReferenceConfig ?? {};
-  const archetypeProfile = getArchetypeVisualProfile(visualReferences.archetypeId);
   const lumeReference = getLumeReferenceById(visualReferences.lumeId ?? '');
   const dateWindowParts = parts.filter((part) => {
     const kind = getCatalogueItem(part.catalogueItemId)?.kind;
@@ -197,7 +209,9 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
         fontSizeMm: positive(typography.fontSizeMm, defaultTypographyConfig.fontSizeMm),
         radiusMm: positive(typography.radiusMm, defaultTypographyConfig.radiusMm),
         angleStartDeg: typography.angleStartDeg,
-        angleSpanDeg: typography.angleSpanDeg
+        angleSpanDeg: typography.angleSpanDeg,
+        customImageDataUrl: visualReferences.artworkDataUrl,
+        customImageName: visualReferences.artworkName
       }
     },
     bezelMaterial: materialProfile(bezelPart, 'polished-steel'),

@@ -6,6 +6,12 @@ import { useWatchAssemblyStore } from '@/stores/watchAssemblyStore';
 import { REFERENCE_42_ID } from '@/domain/presets/reference3d';
 import { assessReference3dFit } from '@/domain/geometry/parametric';
 
+const CAMERA_PRESETS = {
+  studio: { label: 'Studio', rotation: [0.15, -0.24, -0.02] as [number, number, number], distance: 11.4 },
+  face: { label: 'Face', rotation: [0, 0, 0] as [number, number, number], distance: 10.2 },
+  detail: { label: 'Detail', rotation: [0.08, -0.12, 0] as [number, number, number], distance: 8.2 }
+};
+
 export const VisualWatchRenderer = ({ assembly }: { assembly: WatchAssembly }) => {
   const model = useMemo(() => watchAssemblyToVisualModel(assembly), [assembly]);
   const [rotation, setRotation] = useState<[number, number, number]>([0.15, -0.24, -0.02]);
@@ -56,6 +62,13 @@ export const VisualWatchRenderer = ({ assembly }: { assembly: WatchAssembly }) =
       <button type="button" disabled={!exportReady} className="ml-2 mt-2 rounded border border-slate-400/50 px-2 py-1 hover:bg-slate-700 disabled:cursor-wait disabled:opacity-50" onClick={exportStill}>
         Export 2048 PNG
       </button>
+      <div className="mt-2 flex gap-1" aria-label="Studio camera presets">
+        {Object.entries(CAMERA_PRESETS).map(([id, preset]) => <button key={id} type="button"
+          className="rounded border border-slate-500/40 px-2 py-1 text-[10px] hover:bg-slate-700"
+          onClick={() => { setRotation(preset.rotation); setCameraDistance(preset.distance); }}>
+          {preset.label}
+        </button>)}
+      </div>
       {exportStatus && <p role="status" className="mt-1 text-emerald-200">{exportStatus}</p>}
       {referenceSelected && <p role="status" className="mt-2 text-amber-200">
         {conflicts.length} known geometry conflict{conflicts.length === 1 ? '' : 's'}; {issues.length - conflicts.length} unverified fit check{issues.length - conflicts.length === 1 ? '' : 's'}. This set is for visual review only.

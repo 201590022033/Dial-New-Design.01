@@ -8,18 +8,23 @@ export interface ArchetypeVisualProfile {
   strapColor: string;
   bezelId: string;
   typographyContent: string;
+  dialAssetId: string;
+  bezelAssetId: string;
+  handsAssetId: string;
+  pusherAssetId?: string;
+  strapStyleId: 'rubber' | 'leather' | 'canvas' | 'racing';
 }
 
 const PROFILE_BY_ID: Record<string, ArchetypeVisualProfile> = {
-  'archetype-dress-formal': { archetypeId: 'archetype-dress-formal', templateId: 'classic-dress', dialColor: '#e7e1d3', strapColor: '#352219', bezelId: 'bezel-smooth', typographyContent: 'AUTOMATIC' },
-  'archetype-business': { archetypeId: 'archetype-business', templateId: 'classic-dress', dialColor: '#d9dde2', strapColor: '#1f2933', bezelId: 'bezel-fluted', typographyContent: 'AUTOMATIC' },
-  'archetype-field': { archetypeId: 'archetype-field', templateId: 'field', dialColor: '#263329', strapColor: '#4a4a32', bezelId: 'bezel-smooth', typographyContent: 'FIELD' },
-  'archetype-dive': { archetypeId: 'archetype-dive', templateId: 'diver', dialColor: '#07182d', strapColor: '#080b10', bezelId: 'bezel-dive', typographyContent: 'DIVER 200 m' },
-  'archetype-pilot': { archetypeId: 'archetype-pilot', templateId: 'pilot', dialColor: '#111317', strapColor: '#4b2d1c', bezelId: 'bezel-coin-edge', typographyContent: 'FLIEGER' },
-  'archetype-gmt-travel': { archetypeId: 'archetype-gmt-travel', templateId: 'pilot', dialColor: '#10233f', strapColor: '#17202c', bezelId: 'bezel-gmt-24-hour', typographyContent: 'GMT' },
-  'archetype-chronograph': { archetypeId: 'archetype-chronograph', templateId: 'chronograph', dialColor: '#e5e2da', strapColor: '#16191d', bezelId: 'bezel-tachymeter', typographyContent: 'CHRONOGRAPH' },
-  'archetype-digital-sport': { archetypeId: 'archetype-digital-sport', templateId: 'field', dialColor: '#111827', strapColor: '#111827', bezelId: 'bezel-smooth', typographyContent: 'SPORT' },
-  'archetype-casual': { archetypeId: 'archetype-casual', templateId: 'explorer', dialColor: '#224a58', strapColor: '#b86f45', bezelId: 'bezel-smooth', typographyContent: 'WEEKEND' }
+  'archetype-dress-formal': { archetypeId: 'archetype-dress-formal', templateId: 'classic-dress', dialColor: '#e7e1d3', strapColor: '#352219', bezelId: 'bezel-smooth', typographyContent: 'AUTOMATIC', dialAssetId: 'archetype-dial-dress', bezelAssetId: 'archetype-bezel-dress', handsAssetId: 'archetype-hands-dress', strapStyleId: 'leather' },
+  'archetype-business': { archetypeId: 'archetype-business', templateId: 'classic-dress', dialColor: '#d9dde2', strapColor: '#1f2933', bezelId: 'bezel-fluted', typographyContent: 'AUTOMATIC', dialAssetId: 'archetype-dial-dress', bezelAssetId: 'archetype-bezel-dress', handsAssetId: 'archetype-hands-dress', strapStyleId: 'leather' },
+  'archetype-field': { archetypeId: 'archetype-field', templateId: 'field', dialColor: '#263329', strapColor: '#4a4a32', bezelId: 'bezel-smooth', typographyContent: 'FIELD', dialAssetId: 'archetype-dial-field', bezelAssetId: 'archetype-bezel-field', handsAssetId: 'archetype-hands-field', strapStyleId: 'canvas' },
+  'archetype-dive': { archetypeId: 'archetype-dive', templateId: 'diver', dialColor: '#07182d', strapColor: '#080b10', bezelId: 'bezel-dive', typographyContent: 'DIVER 200 m', dialAssetId: 'archetype-dial-diver', bezelAssetId: 'archetype-bezel-diver', handsAssetId: 'archetype-hands-diver', strapStyleId: 'rubber' },
+  'archetype-pilot': { archetypeId: 'archetype-pilot', templateId: 'pilot', dialColor: '#111317', strapColor: '#4b2d1c', bezelId: 'bezel-coin-edge', typographyContent: 'FLIEGER', dialAssetId: 'archetype-dial-pilot', bezelAssetId: 'archetype-bezel-pilot', handsAssetId: 'archetype-hands-pilot', strapStyleId: 'leather' },
+  'archetype-gmt-travel': { archetypeId: 'archetype-gmt-travel', templateId: 'pilot', dialColor: '#10233f', strapColor: '#17202c', bezelId: 'bezel-gmt-24-hour', typographyContent: 'GMT', dialAssetId: 'archetype-dial-pilot', bezelAssetId: 'archetype-bezel-pilot', handsAssetId: 'archetype-hands-pilot', strapStyleId: 'leather' },
+  'archetype-chronograph': { archetypeId: 'archetype-chronograph', templateId: 'chronograph', dialColor: '#e5e2da', strapColor: '#16191d', bezelId: 'bezel-tachymeter', typographyContent: 'CHRONOGRAPH', dialAssetId: 'archetype-dial-chronograph', bezelAssetId: 'archetype-bezel-chronograph', handsAssetId: 'archetype-hands-chronograph', pusherAssetId: 'archetype-pushers-chronograph', strapStyleId: 'racing' },
+  'archetype-digital-sport': { archetypeId: 'archetype-digital-sport', templateId: 'field', dialColor: '#111827', strapColor: '#111827', bezelId: 'bezel-smooth', typographyContent: 'SPORT', dialAssetId: 'archetype-dial-field', bezelAssetId: 'archetype-bezel-field', handsAssetId: 'archetype-hands-field', strapStyleId: 'rubber' },
+  'archetype-casual': { archetypeId: 'archetype-casual', templateId: 'explorer', dialColor: '#224a58', strapColor: '#b86f45', bezelId: 'bezel-smooth', typographyContent: 'WEEKEND', dialAssetId: 'archetype-dial-field', bezelAssetId: 'archetype-bezel-field', handsAssetId: 'archetype-hands-field', strapStyleId: 'canvas' }
 };
 
 export const getArchetypeVisualProfile = (archetypeId: string | undefined): ArchetypeVisualProfile | undefined =>
@@ -35,8 +40,10 @@ export const applyArchetypeVisualProfile = (assembly: WatchAssembly, archetypeId
   const parts = { ...assembly.parts };
   const dial = parts['inst-dial-blank'];
   const strap = parts['inst-strap-integration'];
+  const pushers = parts['inst-pushers'];
   if (dial) parts['inst-dial-blank'] = { ...dial, color: profile.dialColor, texture: payload.dialFace.finish };
   if (strap) parts['inst-strap-integration'] = { ...strap, color: profile.strapColor };
+  if (pushers) parts['inst-pushers'] = { ...pushers, visible: Boolean(profile.pusherAssetId) };
   const dialRadius = Math.max(8, (dial?.dimensions.diameterMm ?? 28.5) / 2);
   return {
     ...assembly,
@@ -65,7 +72,8 @@ export const applyArchetypeVisualProfile = (assembly: WatchAssembly, archetypeId
       visualReferenceConfig: {
         ...assembly.designConfig?.visualReferenceConfig,
         archetypeId,
-        bezelId: profile.bezelId
+        bezelId: profile.bezelId,
+        strapStyleId: profile.strapStyleId
       }
     }
   };

@@ -21,11 +21,20 @@ const COLOR_PALETTES = [
   { name: 'Vintage Gilt', primary: '#1c1917', secondary: '#292524', accent: '#d97706' }
 ];
 
+const STRAP_STYLES = [
+  { id: 'rubber', label: 'Rubber', note: 'Dive-ready raised rails' },
+  { id: 'leather', label: 'Leather', note: 'Tapered stitched profile' },
+  { id: 'canvas', label: 'Canvas', note: 'Field weave and reinforced edges' },
+  { id: 'racing', label: 'Racing', note: 'Perforated chronograph strap' }
+] as const;
+
 export const StyleTab: React.FC = () => {
   const activePartInstanceId = useConfiguratorUIStore((s) => s.activePartInstanceId);
   const setPreview = useConfiguratorUIStore((s) => s.setPreview);
   const assembly = useWatchAssemblyStore((s) => s.assembly);
   const updateDialFaceConfig = useDesignEngineStore((s) => s.updateDialFaceConfig);
+  const visualReferenceConfig = useDesignEngineStore((s) => s.visualReferenceConfig);
+  const updateVisualReferenceConfig = useDesignEngineStore((s) => s.updateVisualReferenceConfig);
 
   const activePart = activePartInstanceId ? assembly.parts[activePartInstanceId] : null;
 
@@ -66,6 +75,18 @@ export const StyleTab: React.FC = () => {
       color: palette.primary,
       secondaryColor: palette.secondary
     });
+  };
+
+  const handleArtwork = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !['image/png', 'image/jpeg', 'image/webp'].includes(file.type) || file.size > 2_000_000) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        updateVisualReferenceConfig({ artworkDataUrl: reader.result, artworkName: file.name });
+      }
+    };
+    reader.readAsDataURL(file);
   };
 
   return (
@@ -138,6 +159,29 @@ export const StyleTab: React.FC = () => {
             </button>
           ))}
         </div>
+      </div>
+
+      <div className="space-y-2 pt-2 border-t border-slate-800">
+        <h4 className="text-[11px] font-mono text-slate-400 uppercase tracking-wider">Strap Style</h4>
+        <div className="grid grid-cols-2 gap-2">
+          {STRAP_STYLES.map((style) => <button key={style.id} type="button"
+            onClick={() => updateVisualReferenceConfig({ strapStyleId: style.id })}
+            className={cn('rounded-lg border p-2 text-left', visualReferenceConfig?.strapStyleId === style.id ? 'border-teal-400 bg-slate-800' : 'border-slate-800 bg-slate-900')}>
+            <span className="block text-xs text-slate-200">{style.label}</span>
+            <span className="block text-[10px] text-slate-400">{style.note}</span>
+          </button>)}
+        </div>
+      </div>
+
+      <div className="space-y-2 pt-2 border-t border-slate-800">
+        <h4 className="text-[11px] font-mono text-slate-400 uppercase tracking-wider">Custom Dial Artwork</h4>
+        <p className="text-[10px] text-slate-400">PNG, JPEG or WebP up to 2 MB. Preview-only; no manufacturing claim.</p>
+        <label className="block cursor-pointer rounded-lg border border-slate-700 bg-slate-900 p-2 text-center text-xs text-slate-200 hover:bg-slate-800">
+          {visualReferenceConfig?.artworkName ?? 'Choose logo or artwork'}
+          <input className="sr-only" type="file" accept="image/png,image/jpeg,image/webp" onChange={handleArtwork} />
+        </label>
+        {visualReferenceConfig?.artworkDataUrl && <button type="button" className="text-[10px] text-rose-300"
+          onClick={() => updateVisualReferenceConfig({ artworkDataUrl: undefined, artworkName: undefined })}>Remove artwork</button>}
       </div>
     </div>
   );

@@ -87,6 +87,9 @@ export interface WatchAssemblyDesignConfig {
     complicationId?: string;
     bezelId?: string;
     lumeId?: string;
+    strapStyleId?: 'rubber' | 'leather' | 'canvas' | 'racing';
+    artworkDataUrl?: string;
+    artworkName?: string;
   };
   visualReferenceId?: string;
   /** Optional deterministic procurement preset bound to a reviewed fixture. */

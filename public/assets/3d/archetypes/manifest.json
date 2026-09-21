@@ -1,0 +1,26 @@
+{
+  "status": "provisional-presentation",
+  "caseEnvelopeMm": 42,
+  "assets": [
+    "dial-diver.glb",
+    "bezel-diver.glb",
+    "hands-diver.glb",
+    "dial-pilot.glb",
+    "bezel-pilot.glb",
+    "hands-pilot.glb",
+    "dial-field.glb",
+    "bezel-field.glb",
+    "hands-field.glb",
+    "dial-dress.glb",
+    "bezel-dress.glb",
+    "hands-dress.glb",
+    "dial-chronograph.glb",
+    "bezel-chronograph.glb",
+    "hands-chronograph.glb",
+    "strap-rubber.glb",
+    "strap-leather.glb",
+    "strap-canvas.glb",
+    "strap-racing.glb",
+    "pushers-chronograph.glb"
+  ]
+}
