@@ -33,9 +33,10 @@ validation.
 The application can now check or represent the published case envelope, the
 22 mm strap gap, NH35 compatibility, 28.5 mm dial family, chapter-ring and
 bezel/crystal concentric diameters, radial hand length, and nominal NH35 hand
-family fit. The case, crown and hand GLBs were regenerated from the updated
-fixtures at the generator's `high` presentation quality; the published assets
-remain fixed-size preview assets rather than manufacturing CAD.
+family fit. The case, crown, hands, dial, chapter ring, bezel/insert, crystal,
+caseback and short strap-preview GLBs were generated at the `high` presentation
+quality and registered independently in the central 3D view. The published
+assets remain fixed-size previews rather than manufacturing CAD.
 
 Published high-quality asset hashes: `case.glb` SHA-256
 `813D870160AC69548A1C9C9AE841A9F3D106DE5285934D0683C9962E376A27C6`
@@ -45,8 +46,20 @@ crown-tube bore), `crown.glb` SHA-256
 (1 / 2306), and `hands.glb` SHA-256
 `64AA7A04E3D093F2A459A2E3F2A8E5D55F0C134738D1ACF52736E79D32A998D7`
 (15 / 4284). Blender 5.2.1 validated each asset and the combined high-quality
-review assembly (23 meshes / 10718 vertices). The deterministic review render
-was checked in top, front, side and three-quarter views.
+original three-part review assembly (23 meshes / 10718 vertices).
+
+The six added GLBs are `dial.glb` (14 meshes / 3168 vertices),
+`chapter-ring.glb` (61 / 3360), `bezel.glb` (62 / 5280), `crystal.glb`
+(1 / 960), `caseback.glb` (2 / 2880), and `strap.glb` (8 / 23088). Their
+SHA-256 hashes are, respectively,
+`FF0F46FA82EF6A95C0BF58F065DDA9FAEDA1B18F14C16D9D44197F53E7E1AA3D`,
+`463B823E01CBB2F90D6F31C3E367CB6AC588959B7908F8FB9C94A8496FA6B004`,
+`B41E583D35A6B6D0E059CCA7D69E24D154096623C6BAD22CA60E0ECE191DE760`,
+`7A7288230BD9520F18E15E1FB19B86E67A4AE9512B0147B1055FFF8AB7DC8055`,
+`733B63184F8E80BF5876388A2A62CFC9B9E70A7E9414D2A4D24E978C7278C89B`,
+and `2AB9F4E269E8D913E0F1CD60DF73461BA75233B5C4C73D29136F94F2E4A62AE2`.
+Blender 5.2.1 validated the complete assembly at 171 meshes / 49454 vertices,
+and its top, front, side and three-quarter review renders were inspected.
 
 ## What remains provisional
 
@@ -55,6 +68,10 @@ The application now uses estimated nominal baselines as engineering soft
 warnings so ordering and preview generation can proceed. These values remain
 provisional, are not manufacturing tolerances, and do not support production-fit
 approval. Nominal hand bores are not broach-tolerance specifications.
+The 41.0 mm bezel carrier envelope, 1.5 mm visual crystal thickness, 35.5 x
+1.8 mm caseback exterior and 19 mm-per-side strap preview profile are
+presentation baselines only; their published mating interfaces remain recorded
+separately and Golden Sample #1 must replace these exterior assumptions.
 
 The previous chronograph pusher geometry is retained as a separate capability
 for VK fixtures; it is not part of this NMK901 reference.

@@ -108,6 +108,14 @@ When `pusherCount` is 1 or 2 and `pusherLayout` is `2h-4h`, the generator adds p
 
 ### Presentation visual library
 
+The NMK901 complete-reference generator
+[`tools/blender/reference_42_supplemental.py`](../tools/blender/reference_42_supplemental.py)
+uses `reference_42_supplemental.json` to emit independent dial, chapter-ring,
+bezel, crystal, caseback and strap-preview GLBs. Use `--quality high` for the
+published `public/assets/3d/reference-42/` assets. The caseback exterior, bezel
+carrier envelope, crystal thickness and strap profile are presentation-only
+estimated nominal values pending Golden Sample #1 validation.
+
 The presentation-only library generator is [`tools/blender/generate_visual_library.py`](../tools/blender/generate_visual_library.py). It creates the registered 40 mm case, bezel, domed crystal and hand-set GLBs under `public/assets/3d/`; these assets are fixed-size visual aids and are not manufacturing evidence.
 
 ```powershell

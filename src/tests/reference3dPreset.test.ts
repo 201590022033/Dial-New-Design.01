@@ -27,12 +27,10 @@ describe('P5 reviewed reference configuration', () => {
     expect(selected.designConfig?.fitEvidence?.movementHandBores?.status).toBe('specified');
     expect(selected.designConfig?.assemblyAnchors?.['crown-interface']?.positionMm).toEqual([21.8, 0, 0]);
     const visuals = watchAssemblyToVisualModel(selected);
-    for (const category of ['case', 'crown', 'hands'] as const) {
+    for (const category of ['strap', 'caseback', 'case', 'dial', 'chapter-ring', 'bezel', 'crystal', 'crown', 'hands'] as const) {
       expect(visuals.assets[category].assetType).toBe('glb');
       expect(visuals.visible[category]).toBe(true);
     }
-    expect(visuals.visible.dial).toBe(false);
-    expect(visuals.visible.crystal).toBe(false);
     expect(selected.parts['inst-dial-blank']?.visible).toBe(true);
   });
 
@@ -53,6 +51,8 @@ describe('P5 reviewed reference configuration', () => {
     expect(watchAssemblyToVisualModel(resized).assets.case.assetType).toBe('procedural');
     expect(watchAssemblyToVisualModel(resized).assets.crown.assetType).toBe('procedural');
     expect(watchAssemblyToVisualModel(resized).assets.hands.assetType).toBe('procedural');
+    expect(watchAssemblyToVisualModel(resized).assets.dial.assetType).toBe('procedural');
+    expect(watchAssemblyToVisualModel(resized).assets.crystal.assetType).toBe('procedural');
     const altered = structuredClone(selected);
     if (altered.parts['inst-crown']!.parametricGeometry?.schema === 'parametric-crown/v1') {
       altered.parts['inst-crown']!.parametricGeometry.headLengthMm = 4;
@@ -62,6 +62,8 @@ describe('P5 reviewed reference configuration', () => {
     expect(cleared.designConfig?.visualReferenceId).toBeUndefined();
     expect(cleared.parts['inst-crown']!.parametricGeometry).toEqual(selected.parts['inst-crown']!.parametricGeometry);
     expect(watchAssemblyToVisualModel(cleared).assets.crown.assetType).toBe('procedural');
+    expect(watchAssemblyToVisualModel(cleared).assets.dial.assetType).toBe('procedural');
+    expect(watchAssemblyToVisualModel(cleared).assets.strap.assetType).toBe('procedural');
     expect(selected.parts['inst-crown']!.visual?.assetId).toBe('reference-42-crown-preview');
   });
 

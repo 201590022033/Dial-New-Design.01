@@ -1,4 +1,4 @@
-"""Review-only assembly of the three independent 42 mm fixture assets.
+"""Review-only assembly of the independent 42 mm fixture assets.
 
 The case, removable crown and hand set retain distinct mesh names. The fixture
 frames are visual placement values, not measured movement or sealing data.
@@ -14,6 +14,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import parametric_case_v1
 import parametric_crown_v1
 import parametric_hand_v1
+import reference_42_supplemental
 
 
 def build(manifest, quality="normal"):
@@ -23,6 +24,8 @@ def build(manifest, quality="normal"):
         crown_parameters = json.load(source)
     with open(manifest["hands"], encoding="utf-8") as source:
         hand_parameters = json.load(source)
+    with open(manifest["supplemental"], encoding="utf-8") as source:
+        supplemental_parameters = json.load(source)
     case = parametric_case_v1.build(case_parameters, quality)
     crown = parametric_crown_v1.build(crown_parameters, quality)
     hands = parametric_hand_v1.build(hand_parameters, quality)
@@ -36,7 +39,22 @@ def build(manifest, quality="normal"):
         obj.location.x += tube_end + gap
     for obj in hands.objects:
         obj.location.z += manifest["handStackZMm"]
-    return [*case.objects, *crown.objects, *hands.objects]
+    supplemental = []
+    placement = supplemental_parameters["placement"]
+    placements = {
+        "dial": placement["dialCenterZMm"],
+        "chapter-ring": placement["chapterRingCenterZMm"],
+        "bezel": placement["bezelCenterZMm"],
+        "crystal": placement["crystalCenterZMm"],
+        "caseback": placement["casebackCenterZMm"],
+        "strap": 0.0,
+    }
+    for asset, z in placements.items():
+        objects = reference_42_supplemental.build(asset, supplemental_parameters, quality)
+        for obj in objects:
+            obj.location.z += z
+        supplemental.extend(objects)
+    return [*case.objects, *crown.objects, *hands.objects, *supplemental]
 
 
 def main():
@@ -48,7 +66,7 @@ def main():
     with open(args.params, encoding="utf-8") as source:
         manifest = json.load(source)
     directory = os.path.dirname(os.path.abspath(args.params))
-    for key in ("case", "crown", "hands"):
+    for key in ("case", "crown", "hands", "supplemental"):
         manifest[key] = os.path.join(directory, manifest[key])
     objects = build(manifest, args.quality)
     bpy.ops.object.select_all(action="DESELECT")

@@ -79,6 +79,9 @@ export const visualCategoryForPart = (part: WatchAssemblyPartInstance): VisualCa
   if (kind === 'pushers') return 'pushers';
   if (kind === 'crystal' || kind?.includes('sapphire')) return 'crystal';
   if (kind === 'case' || kind === 'midcase') return 'case';
+  if (kind === 'caseback') return 'caseback';
+  if (kind === 'strap-integration' || kind === 'bracelet-integration') return 'strap';
+  if (kind === 'chapter-ring' || kind === 'rehaut') return 'chapter-ring';
   if (kind === 'rotating-bezel' || kind === 'fixed-bezel') return 'bezel';
   if (kind === 'dial-blank') return 'dial';
   if (part.category === 'hands') return 'hands';
@@ -112,13 +115,10 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
     const diameterMatches = resolved.referenceCaseDiameterMm === undefined ||
       (assembly.globalDimensions.caseDiameterMm === resolved.referenceCaseDiameterMm && (!referenceOnly || referenceIsCurrent));
     assets[category] = diameterMatches ? resolved : visualAssetRegistry[fallbackId]!;
-    const fallbackFinish: FinishProfileId = category === 'dial' ? 'dial' : category === 'crystal' ? 'sapphire' : category === 'bezel' ? 'polished-steel' : 'brushed-steel';
+    const fallbackFinish: FinishProfileId = category === 'dial' ? 'dial' : category === 'crystal' ? 'sapphire' : category === 'strap' || category === 'chapter-ring' ? 'black-pvd' : category === 'bezel' ? 'polished-steel' : 'brushed-steel';
     finishes[category] = resolveFinishProfile(resolved.materialProfile ?? materialProfile(part, fallbackFinish), fallbackFinish);
     // Legacy documents retain the main schematic; crown requires an actual part.
     visible[category] = part ? part.visible : category !== 'crown';
-    // This reference has no measured dial/crystal stack; the schematic layers
-    // occlude the reviewed hands and imply unchecked axial clearances.
-    if ((category === 'crystal' || category === 'dial') && referenceIsCurrent) visible[category] = false;
     transforms[category] = part?.visual?.transform;
   }
   const candidate = crownPart?.parametricGeometry;

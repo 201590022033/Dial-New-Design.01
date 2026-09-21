@@ -135,6 +135,20 @@ procedural renderer also has higher-density meshes, dial markers, case lugs,
 shadows and a presentation surface. These assets improve debugging and visual
 inspection but do not change the engineering evidence gate.
 
+### P8 complete 42 mm central-view assembly
+
+The opt-in NMK901 reference now loads nine independent high-quality GLBs in the
+central view: strap preview, caseback, midcase, dial, chapter ring, bezel and
+insert, hands, crystal, and crown. The complete deterministic Blender review
+contains 171 meshes and 49,454 vertices. Published dial, chapter-ring,
+bezel-insert, crystal-diameter, case, crown and hand dimensions remain distinct
+from estimated visual placement and exterior baselines.
+
+The next visual milestone is presentation polish: replace the deliberately
+simple strap and caseback exterior assumptions when Golden Sample #1 evidence
+arrives, then refine PBR materials, crystal reflections, lighting, shadows,
+camera composition and browser performance/LOD behavior.
+
 ## Deliberate non-goals
 
 No massive application rewrite, huge style catalogue, fabricated calibre dimensions, or one-GLB-per-variation asset library is planned in this pass.

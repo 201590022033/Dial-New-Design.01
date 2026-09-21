@@ -45,7 +45,15 @@ export const applyReference42Preview = (assembly: WatchAssembly): WatchAssembly 
   const existingCase = assembly.parts['inst-midcase'] ?? createDefaultWatchAssembly().parts['inst-midcase']!;
   const crown = assembly.parts['inst-crown'];
   const hands = assembly.parts['inst-hour-hand'];
-  if (!crown || !hands) throw new Error('Reference preview requires crown and hour-hand assembly parts');
+  const dial = assembly.parts['inst-dial-blank'];
+  const chapterRing = assembly.parts['inst-chapter-ring'];
+  const bezel = assembly.parts['inst-rotating-bezel'];
+  const crystal = assembly.parts['inst-crystal'];
+  const caseback = assembly.parts['inst-caseback'];
+  const strap = assembly.parts['inst-strap-integration'];
+  if (!crown || !hands || !dial || !chapterRing || !bezel || !crystal || !caseback || !strap) {
+    throw new Error('Reference preview requires the complete case, face-stack and strap assembly parts');
+  }
   const selected: Record<string, WatchAssemblyPartInstance> = {
     'inst-midcase': {
       ...existingCase, visible: true,
@@ -63,6 +71,42 @@ export const applyReference42Preview = (assembly: WatchAssembly): WatchAssembly 
       ...hands, visible: true,
       parametricGeometry: structuredClone(reference42Parameters.hands), geometryProvenance: previewProvenance,
       visual: { category: 'hands', assetId: 'reference-42-hands-preview' }
+    },
+    'inst-dial-blank': {
+      ...dial, visible: true,
+      dimensions: { ...dial.dimensions, diameterMm: 28.5, widthMm: 28.5, thicknessMm: 0.4 },
+      geometryProvenance: previewProvenance,
+      visual: { category: 'dial', assetId: 'reference-42-dial-preview' }
+    },
+    'inst-chapter-ring': {
+      ...chapterRing, visible: true,
+      dimensions: { ...chapterRing.dimensions, diameterMm: 30.5, widthMm: 1.5, thicknessMm: 2.3 },
+      geometryProvenance: previewProvenance,
+      visual: { category: 'chapter-ring', assetId: 'reference-42-chapter-ring-preview' }
+    },
+    'inst-rotating-bezel': {
+      ...bezel, visible: true,
+      dimensions: { ...bezel.dimensions, diameterMm: 41, widthMm: 4.75, thicknessMm: 2.2 },
+      geometryProvenance: previewProvenance,
+      visual: { category: 'bezel', assetId: 'reference-42-bezel-preview' }
+    },
+    'inst-crystal': {
+      ...crystal, visible: true,
+      dimensions: { ...crystal.dimensions, diameterMm: 31.5, widthMm: 31.5, thicknessMm: 1.5 },
+      geometryProvenance: previewProvenance,
+      visual: { category: 'crystal', assetId: 'reference-42-crystal-preview' }
+    },
+    'inst-caseback': {
+      ...caseback, visible: true,
+      dimensions: { ...caseback.dimensions, diameterMm: 35.5, widthMm: 35.5, thicknessMm: 1.8 },
+      geometryProvenance: previewProvenance,
+      visual: { category: 'caseback', assetId: 'reference-42-caseback-preview' }
+    },
+    'inst-strap-integration': {
+      ...strap, visible: true,
+      dimensions: { ...strap.dimensions, diameterMm: 22, widthMm: 22, thicknessMm: 3.2 },
+      geometryProvenance: previewProvenance,
+      visual: { category: 'strap', assetId: 'reference-42-strap-preview' }
     }
   };
   const diameter = reference42Parameters.case.caseDiameter;
@@ -106,7 +150,11 @@ export const applyReference42Preview = (assembly: WatchAssembly): WatchAssembly 
 export const useProceduralReference42 = (assembly: WatchAssembly): WatchAssembly => {
   if (assembly.designConfig?.visualReferenceId !== REFERENCE_42_ID) return assembly;
   const parts = { ...assembly.parts };
-  for (const [instanceId, category] of [['inst-midcase', 'case'], ['inst-crown', 'crown'], ['inst-hour-hand', 'hands']] as const) {
+  for (const [instanceId, category] of [
+    ['inst-midcase', 'case'], ['inst-caseback', 'caseback'], ['inst-strap-integration', 'strap'],
+    ['inst-dial-blank', 'dial'], ['inst-chapter-ring', 'chapter-ring'], ['inst-rotating-bezel', 'bezel'],
+    ['inst-crystal', 'crystal'], ['inst-crown', 'crown'], ['inst-hour-hand', 'hands']
+  ] as const) {
     const part = parts[instanceId];
     if (part?.visual?.assetId === `reference-42-${category}-preview`) {
       parts[instanceId] = { ...part, visual: { ...part.visual, assetId: undefined } };

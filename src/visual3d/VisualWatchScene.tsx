@@ -18,6 +18,14 @@ const Cylinder = ({ radius, depth, position = [0, 0, 0], axis = 'Z', material }:
 const ProceduralComponent = ({ category, model }: { category: VisualCategory; model: VisualWatchModel }) => {
   const radius = model.caseDiameterMm / 2;
   switch (category) {
+    case 'strap': return <group>
+      {[1, -1].map((sign) => <mesh key={sign} castShadow position={[0, sign * radius * 1.55, -0.3]}>
+        <boxGeometry args={[radius * 1.02, radius * 1.1, 1.8]} /><meshStandardMaterial {...finish(model.finishes.strap)} />
+      </mesh>)}
+    </group>;
+    case 'caseback': return <mesh castShadow position={[0, 0, -model.caseThicknessMm / 2]} rotation={[Math.PI / 2, 0, 0]}>
+      <cylinderGeometry args={[radius * 0.83, radius * 0.83, 1.4, 128]} /><meshStandardMaterial {...finish(model.finishes.caseback)} />
+    </mesh>;
     case 'case': return <group>
       <mesh castShadow>
         <torusGeometry args={[radius * 0.9, radius * 0.1, 24, 128]} /><meshStandardMaterial {...finish(model.finishes.case)} />
@@ -39,6 +47,9 @@ const ProceduralComponent = ({ category, model }: { category: VisualCategory; mo
       </mesh>
     </group>;
     }
+    case 'chapter-ring': return <mesh position={[0, 0, 0.5]} rotation={[Math.PI / 2, 0, 0]}>
+      <torusGeometry args={[model.dial.outerDiameterMm / 2 + 0.5, 0.75, 20, 128]} /><meshStandardMaterial {...finish(model.finishes['chapter-ring'])} />
+    </mesh>;
     case 'dial': return <group>
       <mesh rotation={[Math.PI / 2, 0, 0]}>
         <cylinderGeometry args={[model.dial.outerDiameterMm / 2, model.dial.outerDiameterMm / 2, model.dial.thicknessMm, 128]} /><meshStandardMaterial {...finish(model.finishes.dial, model.dialColor)} roughness={0.36 + model.dial.textureIntensity * 0.35} />

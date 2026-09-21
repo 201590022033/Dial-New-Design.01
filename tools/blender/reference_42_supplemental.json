@@ -1,0 +1,51 @@
+{
+  "schema": "reference-42-supplemental/v1",
+  "dial": {
+    "outerDiameterMm": 28.5,
+    "thicknessMm": 0.4,
+    "centreHoleDiameterMm": 1.5
+  },
+  "chapterRing": {
+    "outerDiameterMm": 30.5,
+    "innerDiameterMm": 27.5,
+    "heightMm": 2.3
+  },
+  "bezel": {
+    "outerDiameterMm": 41.0,
+    "innerDiameterMm": 31.5,
+    "heightMm": 2.2,
+    "insertOuterDiameterMm": 38.0,
+    "insertInnerDiameterMm": 31.5,
+    "insertThicknessMm": 0.8
+  },
+  "crystal": {
+    "outerDiameterMm": 31.5,
+    "thicknessMm": 1.5,
+    "edgeBevelMm": 0.18
+  },
+  "caseback": {
+    "outerDiameterMm": 35.5,
+    "threadNominal": "M30x0.50",
+    "heightMm": 1.8,
+    "gasketInsideDiameterMm": 30.6,
+    "gasketCrossSectionMm": 0.9
+  },
+  "strap": {
+    "lugWidthMm": 22.0,
+    "previewLengthPerSideMm": 19.0,
+    "thicknessMm": 3.2,
+    "taperEndWidthMm": 20.0
+  },
+  "placement": {
+    "dialCenterZMm": 3.7,
+    "chapterRingCenterZMm": 4.75,
+    "bezelCenterZMm": 5.65,
+    "crystalCenterZMm": 6.25,
+    "casebackCenterZMm": -5.65
+  },
+  "provenance": {
+    "status": "ESTIMATED_NOMINAL",
+    "source": "Supplied SKX007/SRPD references plus AI Nominal Baseline Estimation (SKX007/NH35 standard)",
+    "note": "Presentation geometry only. Caseback exterior, bezel carrier envelope, crystal thickness and strap profile await Golden Sample #1 validation."
+  }
+}
