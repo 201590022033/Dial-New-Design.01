@@ -34,16 +34,19 @@ The application can now check or represent the published case envelope, the
 22 mm strap gap, NH35 compatibility, 28.5 mm dial family, chapter-ring and
 bezel/crystal concentric diameters, radial hand length, and nominal NH35 hand
 family fit. The case, crown and hand GLBs were regenerated from the updated
-fixtures; the published assets remain fixed-size preview assets.
+fixtures at the generator's `high` presentation quality; the published assets
+remain fixed-size preview assets rather than manufacturing CAD.
 
-Published asset hashes: regenerated `case.glb` SHA-256
-`181E8DCE64BC54A40F1996FA1EA19B329D95463204355CCD7362F1063EDEB157`
-(7 meshes / 3360 vertices, estimated seat steps, spring-bar holes and crown-tube bore), `crown.glb` SHA-256
-`A66DFA85FAD5FAB586914E434A172A30A1CCFD38A5DB24FC693643C081D596A8`
-(1 / 1538), and `hands.glb` SHA-256
-`84D0A639097CD9B6F59A4F75155DF4ADD3F6D9212FAE2A314DC20EB6CA0BA904`
-(15 / 2940). Blender 5.2.1 validated each asset and the combined review
-assembly (23 meshes / 6174 vertices).
+Published high-quality asset hashes: `case.glb` SHA-256
+`813D870160AC69548A1C9C9AE841A9F3D106DE5285934D0683C9962E376A27C6`
+(7 meshes / 4128 vertices, estimated seat steps, spring-bar holes and
+crown-tube bore), `crown.glb` SHA-256
+`8A0717DA056A9A747E130853160B6B91C29CE8FED35C29E66688B2A224E09207`
+(1 / 2306), and `hands.glb` SHA-256
+`64AA7A04E3D093F2A459A2E3F2A8E5D55F0C134738D1ACF52736E79D32A998D7`
+(15 / 4284). Blender 5.2.1 validated each asset and the combined high-quality
+review assembly (23 meshes / 10718 vertices). The deterministic review render
+was checked in top, front, side and three-quarter views.
 
 ## What remains provisional
 
