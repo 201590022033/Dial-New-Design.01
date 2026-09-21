@@ -14,6 +14,7 @@ import { defaultBezelConfig, type BezelConfig, type BezelType } from '@/domain/g
 import { defaultLumeConfig, type LumeEngineConfig } from '@/domain/generators/lumeEngine';
 import type { TextureKind } from '@/domain/generators/textureEngine';
 import type { ScaleKind } from '@/domain/scales/types';
+import type { WatchComponentKind } from '@/domain/watch-components/types';
 
 export type TemplateId =
   | 'classic-dress'
@@ -38,6 +39,8 @@ export interface TemplateDefinition {
   bezelType: BezelType;
   movementSuggestions: string[];
   scaleSuggestion: ScaleKind;
+  /** Component kinds that a design using this archetype must visibly include. */
+  requiredComponentKinds: WatchComponentKind[];
   palette: {
     primary: string;
     secondary: string;
@@ -54,6 +57,7 @@ export interface TemplatePayload {
   lume: LumeEngineConfig;
   scaleSuggestion: ScaleKind;
   movementSuggestions: string[];
+  requiredComponentKinds: WatchComponentKind[];
 }
 
 export const templateLibrary: TemplateDefinition[] = [
@@ -68,6 +72,7 @@ export const templateLibrary: TemplateDefinition[] = [
     bezelType: 'fixed',
     movementSuggestions: ['eta-2824', 'eta-2892', 'nh38'],
     scaleSuggestion: 'circular',
+    requiredComponentKinds: [],
     palette: { primary: '#F8FAFC', secondary: '#CBD5E1', accent: '#111827' }
   },
   {
@@ -81,6 +86,7 @@ export const templateLibrary: TemplateDefinition[] = [
     bezelType: 'fixed',
     movementSuggestions: ['nh35', 'nh36'],
     scaleSuggestion: 'circular',
+    requiredComponentKinds: [],
     palette: { primary: '#0F172A', secondary: '#F8FAFC', accent: '#F59E0B' }
   },
   {
@@ -94,6 +100,7 @@ export const templateLibrary: TemplateDefinition[] = [
     bezelType: 'fixed',
     movementSuggestions: ['nh35', 'nh38'],
     scaleSuggestion: 'circular',
+    requiredComponentKinds: [],
     palette: { primary: '#111827', secondary: '#E2E8F0', accent: '#C7F9CC' }
   },
   {
@@ -107,6 +114,7 @@ export const templateLibrary: TemplateDefinition[] = [
     bezelType: 'fixed',
     movementSuggestions: ['nh36', 'nh34'],
     scaleSuggestion: 'countdown',
+    requiredComponentKinds: [],
     palette: { primary: '#1F2937', secondary: '#0B1224', accent: '#A3E635' }
   },
   {
@@ -120,6 +128,7 @@ export const templateLibrary: TemplateDefinition[] = [
     bezelType: 'fixed',
     movementSuggestions: ['nh35', 'nh36', 'eta-2824'],
     scaleSuggestion: 'circular',
+    requiredComponentKinds: [],
     palette: { primary: '#0F172A', secondary: '#334155', accent: '#E2E8F0' }
   },
   {
@@ -133,6 +142,7 @@ export const templateLibrary: TemplateDefinition[] = [
     bezelType: 'fixed',
     movementSuggestions: ['vk63', 'vk64', 'vk68', 'vk73'],
     scaleSuggestion: 'tachymeter',
+    requiredComponentKinds: ['pushers', 'chronograph-seconds'],
     palette: { primary: '#111827', secondary: '#1E293B', accent: '#F59E0B' }
   },
   {
@@ -146,6 +156,7 @@ export const templateLibrary: TemplateDefinition[] = [
     bezelType: 'dive',
     movementSuggestions: ['nh35', 'nh36', 'nh34'],
     scaleSuggestion: 'countdown',
+    requiredComponentKinds: [],
     palette: { primary: '#0B1224', secondary: '#1D4ED8', accent: '#C7F9CC' }
   },
   {
@@ -159,6 +170,7 @@ export const templateLibrary: TemplateDefinition[] = [
     bezelType: 'fixed',
     movementSuggestions: ['nh35', 'eta-2824'],
     scaleSuggestion: 'circular',
+    requiredComponentKinds: [],
     palette: { primary: '#0F172A', secondary: '#E2E8F0', accent: '#F59E0B' }
   },
   {
@@ -172,6 +184,7 @@ export const templateLibrary: TemplateDefinition[] = [
     bezelType: 'slide-rule',
     movementSuggestions: ['vk63', 'vk64', 'eta-2892'],
     scaleSuggestion: 'slide-rule',
+    requiredComponentKinds: ['pushers'],
     palette: { primary: '#0B1224', secondary: '#334155', accent: '#F8FAFC' }
   },
   {
@@ -185,6 +198,7 @@ export const templateLibrary: TemplateDefinition[] = [
     bezelType: 'smooth',
     movementSuggestions: ['nh38', 'nh39', 'eta-2892'],
     scaleSuggestion: 'circular',
+    requiredComponentKinds: [],
     palette: { primary: '#F8FAFC', secondary: '#E2E8F0', accent: '#0F172A' }
   }
 ];
@@ -252,6 +266,7 @@ export const createTemplatePayload = (id: TemplateId): TemplatePayload | null =>
     bezel,
     lume,
     scaleSuggestion: template.scaleSuggestion,
-    movementSuggestions: template.movementSuggestions
+    movementSuggestions: template.movementSuggestions,
+    requiredComponentKinds: template.requiredComponentKinds
   };
 }

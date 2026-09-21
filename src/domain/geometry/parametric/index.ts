@@ -3,3 +3,4 @@ export * from './validation';
 export * from './placement';
 export * from './crown';
 export * from './referenceAssessment';
+export * from './dial';

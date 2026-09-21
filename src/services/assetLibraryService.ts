@@ -1,11 +1,16 @@
 import {
   chapterRingAssets,
+  archetypeReferenceAssets,
+  bezelReferenceAssets,
+  complicationReferenceAssets,
   handAssets,
+  lumeReferenceAssets,
   manufacturingRuleAssets,
   markerAssets,
   materialAssets,
   scaleAssets,
   supplierProfileAssets,
+  styleAliasReferences,
   typographyAssets,
   type TypographyAssetDefinition
 } from '@/domain/asset-library';
@@ -19,7 +24,12 @@ export const assetLibrarySummary = () => {
     materials: materialAssets.length,
     typography: typographyAssets.length,
     manufacturingRules: manufacturingRuleAssets.length,
-    suppliers: supplierProfileAssets.length
+    suppliers: supplierProfileAssets.length,
+    lumes: lumeReferenceAssets.length,
+    bezelReferences: bezelReferenceAssets.length,
+    complicationReferences: complicationReferenceAssets.length,
+    archetypeReferences: archetypeReferenceAssets.length,
+    styleAliases: styleAliasReferences.length
   };
 };
 

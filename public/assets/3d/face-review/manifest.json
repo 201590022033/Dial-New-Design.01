@@ -1,0 +1,19 @@
+{
+  "status": "provisional-presentation",
+  "units": "mm",
+  "assets": [
+    "dial-date3-sunburst.glb",
+    "dial-date6-linen.glb",
+    "dial-daydate-sunburst.glb",
+    "dial-chrono-guilloche.glb",
+    "crystal-flat.glb",
+    "crystal-domed.glb",
+    "chapter-minutes.glb",
+    "chapter-tachy.glb",
+    "chapter-slide.glb",
+    "bezel-minutes.glb",
+    "bezel-tachy.glb",
+    "bezel-slide.glb",
+    "assembly-animated.glb"
+  ]
+}

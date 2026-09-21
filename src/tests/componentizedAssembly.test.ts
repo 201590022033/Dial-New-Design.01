@@ -41,7 +41,7 @@ describe('P4 independent assembly components', () => {
     expect(visualCategoryForPart(a.parts['inst-midcase']!)).toBe('case');
     expect(visualCategoryForPart(a.parts['inst-caseback']!)).toBeUndefined();
     expect(visualCategoryForPart(a.parts['inst-lugs']!)).toBeUndefined();
-    expect(visualCategoryForPart(a.parts['inst-pushers']!)).toBeUndefined();
+    expect(visualCategoryForPart(a.parts['inst-pushers']!)).toBe('pushers');
     a.parts['inst-crown']!.name = 'My renamed part';
     expect(visualCategoryForPart(a.parts['inst-crown']!)).toBe('crown');
   });

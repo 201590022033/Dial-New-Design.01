@@ -82,6 +82,39 @@ roughness and provisional provenance while leaving authored GLB materials intact
 No texture maps or measured surface specifications are claimed yet; those are
 the next texture refinement step after finish references are selected.
 
+### P7 chronograph pusher status
+
+The case schema, Blender generator, browser procedural preview, movement
+templates and template archetypes now support two chronograph pushers at 2 h and
+4 h. The `chronograph` and `navitimer-style` templates require `pushers` as a
+required component kind, and VK mecha-quartz movements declare `pusherCount: 2`
+and positions `[60, -60]`. Compatibility rules flag mismatches and missing
+components. Pusher engagement and clearance evidence are tracked as provisional;
+verified measurements are needed before any fit claim.
+
+### P7 measurement research status
+
+The first online evidence pass is recorded in [canonical measurement evidence](CANONICAL_MEASUREMENT_EVIDENCE.md).
+Official TMI, ETA and Miyota documentation and real supplier pages were checked,
+but the repository's existing AliExpress/supplier records are synthetic demo
+fixtures and cannot count as confirmations. No case-set, stem, crown, pusher,
+dial-seat, hand-stack or crystal-clearance value has been promoted to verified
+fit data. The next evidence step is to select one exact case-set SKU and obtain
+three matching confirmations or repeat measurements for that same SKU. The
+lower threshold does not allow unrelated case listings to be merged into one
+canonical case set.
+
+### P7 visual library status
+
+Presentation-only GLBs now exist for a 40 mm case, diver bezel, domed crystal and
+Mercedes-style hand set under `public/assets/3d/`. A texture-ready 32 mm dial
+layout fixture with three subdial slots and date/day aperture slots is also
+included. They are registry-backed,
+fixed-size visual assets and fall back safely when the case is resized. The
+procedural renderer also has higher-density meshes, dial markers, case lugs,
+shadows and a presentation surface. These assets improve debugging and visual
+inspection but do not change the engineering evidence gate.
+
 ## Deliberate non-goals
 
 No massive application rewrite, huge style catalogue, fabricated calibre dimensions, or one-GLB-per-variation asset library is planned in this pass.

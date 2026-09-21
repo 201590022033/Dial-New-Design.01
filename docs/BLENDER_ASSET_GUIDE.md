@@ -96,7 +96,28 @@ blender --background --python tools/blender/parametric_case_v1.py -- --quality n
 blender --background --python tools/blender/parametric_case_v1.py -- --params case.json --quality high --output public/assets/3d/generated/cases/case.glb
 ```
 
-Quality controls radial sampling (`preview`, `normal`, `high`) and is not part of the physical case schema. The generator creates/rebuilds only `DD_PARAMETRIC_CASE`, including a smooth revolved mid-case, paired tapered lugs at the 12/6 strap ends, and embedded crown boss/tube source objects. Re-running is idempotent. GLB export is optional and selection-scoped. `lugWidth` is the total pair envelope and `lugPairGap` is the clear strap/spring-bar gap; fixture values remain provisional.
+Quality controls radial sampling (`preview`, `normal`, `high`) and is not part of the physical case schema. The generator creates/rebuilds only `DD_PARAMETRIC_CASE`, including a smooth revolved mid-case, paired tapered lugs at the 12/6 strap ends, embedded crown boss/tube source objects, and optional chronograph pusher bosses/tubes at 2 h and 4 h. Re-running is idempotent. GLB export is optional and selection-scoped. `lugWidth` is the total pair envelope and `lugPairGap` is the clear strap/spring-bar gap; fixture values remain provisional.
+
+### Lug attachment
+
+The lug root is positioned so that it overlaps the case shoulder by `lugCaseOverlap`. This keeps the tapered lug visibly connected to the case surface across the full allowed `lugToLug` range. The default `lugCaseOverlap` in the embedded reference preset is 0.8 mm; older fixtures that used 2.2 mm were burying the root too deep and should be regenerated.
+
+### Chronograph pushers
+
+When `pusherCount` is 1 or 2 and `pusherLayout` is `2h-4h`, the generator adds pusher tube and boss cylinders at +60° (2 h) and −60° (4 h) around the crown (+X) axis. Pusher dimensions are independent of the crown and follow the same embed/length convention. These are visual/mechanical interface geometry only; stem, return spring, gasket and sealing are not modelled.
+
+### Presentation visual library
+
+The presentation-only library generator is [`tools/blender/generate_visual_library.py`](../tools/blender/generate_visual_library.py). It creates the registered 40 mm case, bezel, domed crystal and hand-set GLBs under `public/assets/3d/`; these assets are fixed-size visual aids and are not manufacturing evidence.
+
+```powershell
+blender --background --factory-startup --python tools/blender/generate_visual_library.py -- --asset bezel --output public/assets/3d/bezels/bezel_diver_40mm_v1.glb
+blender --background --factory-startup --python tools/blender/generate_visual_library.py -- --asset crystal --output public/assets/3d/crystals/crystal_domed_32mm_v1.glb
+blender --background --factory-startup --python tools/blender/generate_visual_library.py -- --asset hands --output public/assets/3d/hands/hands_mercedes_v1.glb
+blender --background --factory-startup --python tools/blender/parametric_dial_v1.py -- --params tools/blender/test_dial_face_40mm.json --output public/assets/3d/dials/dial_face_40mm_layout_v1.glb
+```
+
+The dial fixture is texture-ready for Blender rendering: its procedural surface shader is preserved in the GLB, and its marker geometry, three chronograph subdial slots, and date/day apertures are separate meshes. These are presentation fixtures; dial dimensions and complication placement remain provisional until canonical supplier evidence is complete.
 
 ## Shared local component render-and-review harness
 

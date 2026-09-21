@@ -1,8 +1,8 @@
 import type { AnchorId, ComponentCategory } from '@/domain/geometry/parametric';
 export type VisualCategory = ComponentCategory;
-export const visualCategories: VisualCategory[] = ['case', 'dial', 'bezel', 'crystal', 'hands', 'crown'];
+export const visualCategories: VisualCategory[] = ['case', 'dial', 'bezel', 'crystal', 'hands', 'crown', 'pushers'];
 export const categoryAnchor: Record<VisualCategory, AnchorId> = {
-  case: 'watch-axis', bezel: 'dial-seat', dial: 'dial-seat', crystal: 'dial-seat', hands: 'hand-stack', crown: 'crown-interface'
+  case: 'watch-axis', bezel: 'dial-seat', dial: 'dial-seat', crystal: 'dial-seat', hands: 'hand-stack', crown: 'crown-interface', pushers: 'watch-axis'
 };
 
 export type VisualAssetDescriptor = {
@@ -33,16 +33,18 @@ export const visualAssetRegistry: Record<string, VisualAssetDescriptor> = {
   // Opt-in path only: review fixture output is not automatically published here.
   'crown-reference-v1': { assetId: 'crown-reference-v1', category: 'crown', assetType: 'glb', assetPath: '/assets/3d/generated/crowns/crown-v1.glb', anchor: 'crown-interface', units: 'millimetres', upAxis: 'Y' },
   'visual-crown-default': { assetId: 'visual-crown-default', category: 'crown', assetType: 'procedural', materialProfile: 'polished-steel', anchor: 'crown-interface' },
+  'visual-pushers-default': { assetId: 'visual-pushers-default', category: 'pushers', assetType: 'procedural', materialProfile: 'polished-steel', anchor: 'watch-axis' },
   'visual-case-default': { assetId: 'visual-case-default', category: 'case', assetType: 'procedural', materialProfile: 'brushed-steel' },
   'visual-dial-default': { assetId: 'visual-dial-default', category: 'dial', assetType: 'procedural', materialProfile: 'dial' },
   'visual-bezel-default': { assetId: 'visual-bezel-default', category: 'bezel', assetType: 'procedural', materialProfile: 'polished-steel' },
   'visual-crystal-default': { assetId: 'visual-crystal-default', category: 'crystal', assetType: 'procedural', materialProfile: 'sapphire' },
   'visual-hands-baton': { assetId: 'visual-hands-baton', category: 'hands', assetType: 'procedural', handStyle: 'baton', materialProfile: 'polished-steel' },
   'visual-hands-mercedes': { assetId: 'visual-hands-mercedes', category: 'hands', assetType: 'procedural', handStyle: 'mercedes', materialProfile: 'polished-steel' }
-  , 'case-round-40mm-v1': { assetId: 'case-round-40mm-v1', category: 'case', assetType: 'glb', assetPath: '/assets/3d/cases/case_round_40mm_v1.glb', materialProfile: 'brushed-steel', anchor: 'watch-axis' }
-  , 'bezel-diver-40mm-v1': { assetId: 'bezel-diver-40mm-v1', category: 'bezel', assetType: 'glb', assetPath: '/assets/3d/bezels/bezel_diver_40mm_v1.glb', materialProfile: 'polished-steel', anchor: 'watch-axis' }
-  , 'crystal-domed-32mm-v1': { assetId: 'crystal-domed-32mm-v1', category: 'crystal', assetType: 'glb', assetPath: '/assets/3d/crystals/crystal_domed_32mm_v1.glb', materialProfile: 'sapphire', anchor: 'dial-seat' }
-  , 'hands-mercedes-v1': { assetId: 'hands-mercedes-v1', category: 'hands', assetType: 'glb', assetPath: '/assets/3d/hands/hands_mercedes_v1.glb', handStyle: 'mercedes', materialProfile: 'polished-steel', anchor: 'hand-stack' }
+  , 'case-round-40mm-v1': { assetId: 'case-round-40mm-v1', category: 'case', assetType: 'glb', assetPath: '/assets/3d/cases/case_round_40mm_v1.glb', materialProfile: 'brushed-steel', anchor: 'watch-axis', referenceCaseDiameterMm: 40 }
+  , 'bezel-diver-40mm-v1': { assetId: 'bezel-diver-40mm-v1', category: 'bezel', assetType: 'glb', assetPath: '/assets/3d/bezels/bezel_diver_40mm_v1.glb', materialProfile: 'polished-steel', anchor: 'dial-seat', referenceCaseDiameterMm: 40 }
+  , 'crystal-domed-32mm-v1': { assetId: 'crystal-domed-32mm-v1', category: 'crystal', assetType: 'glb', assetPath: '/assets/3d/crystals/crystal_domed_32mm_v1.glb', materialProfile: 'sapphire', anchor: 'dial-seat', referenceCaseDiameterMm: 40 }
+  , 'hands-mercedes-v1': { assetId: 'hands-mercedes-v1', category: 'hands', assetType: 'glb', assetPath: '/assets/3d/hands/hands_mercedes_v1.glb', handStyle: 'mercedes', materialProfile: 'polished-steel', anchor: 'hand-stack', referenceCaseDiameterMm: 40 }
+  , 'dial-face-40mm-layout-v1': { assetId: 'dial-face-40mm-layout-v1', category: 'dial', assetType: 'glb', assetPath: '/assets/3d/dials/dial_face_40mm_layout_v1.glb', materialProfile: 'dial', anchor: 'dial-seat', referenceCaseDiameterMm: 40 }
 };
 
 export const resolveVisualAsset = (assetId: string | undefined, fallback: VisualAssetDescriptor): VisualAssetDescriptor =>

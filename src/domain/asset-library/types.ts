@@ -160,3 +160,49 @@ export interface SupplierProfileDataDefinition {
   evidenceClassification: ManufacturingEvidenceClassification;
   colorLimitations: string;
 }
+
+/** Visual taxonomy references. These records are discovery aids, not fit or manufacturing evidence. */
+export interface LumeReferenceDefinition {
+  id: string;
+  label: string;
+  visualColor: string;
+  emissionBehavior: 'persistent' | 'backlight' | 'historic' | 'unknown';
+  safetyNote: string;
+  provenance: 'reference-only';
+}
+
+export interface BezelReferenceDefinition {
+  id: string;
+  label: string;
+  functionalFamily: 'fixed' | 'dive' | 'gmt' | 'tachymeter' | 'decorative';
+  rotating: boolean;
+  scaleAttachment: string | null;
+  provenance: 'reference-only';
+}
+
+export interface ComplicationReferenceDefinition {
+  id: string;
+  label: string;
+  displayFamily: 'calendar' | 'time-zone' | 'chronograph' | 'astronomical' | 'utility' | 'mechanical';
+  windowOrSubdialCount: number;
+  movementRequired: boolean;
+  provenance: 'reference-only';
+}
+
+export interface WatchArchetypeReferenceDefinition {
+  id: string;
+  label: string;
+  useCases: string[];
+  visualSignals: string[];
+  recommendedFamilies: string[];
+  provenance: 'reference-only';
+}
+
+export interface StyleAliasReferenceDefinition {
+  id: string;
+  category: 'hand' | 'marker' | 'dial-finish';
+  canonicalLabel: string;
+  aliases: string[];
+  sourceReference: string;
+  provenance: 'reference-only';
+}

@@ -7,6 +7,8 @@ export type DimensionMm = number | { status: 'unknown'; reason?: string; source?
 export type TipStyle = 'NONE' | 'POINT' | 'TRIANGLE' | 'SPEAR';
 export type TailStyle = 'NONE' | 'NEEDLE' | 'BATON' | 'ARROW' | 'LOLLIPOP' | 'COUNTERWEIGHT';
 
+export type PusherLayout = 'none' | '2h-4h' | 'custom';
+
 export interface ParametricCaseV1 {
   schema: typeof PARAMETRIC_CASE_V1;
   caseDiameter: DimensionMm; midcaseHeight: DimensionMm; lugWidth: DimensionMm; lugToLug: DimensionMm;
@@ -19,6 +21,28 @@ export interface ParametricCaseV1 {
   lugThickness: DimensionMm; lugTaperStrength: DimensionMm;
   crownTubeRadius: DimensionMm; crownTubeLength: DimensionMm; crownBossRadius: DimensionMm;
   crownBossLength: DimensionMm; crownBossEmbed: DimensionMm; crownTubeEmbed: DimensionMm;
+  /** Number of chronograph pushers (0, 1, or 2). Default 0 for non-chronograph cases. */
+  pusherCount: number;
+  /** Pusher angular layout. '2h-4h' places pushers at +60° and -60° around the crown (3h) axis. */
+  pusherLayout: PusherLayout;
+  /** Base angular offset in degrees; 0 keeps 2h/4h symmetric around +X (3h). */
+  pusherAngularOffsetDeg: number;
+  pusherTubeRadius: DimensionMm; pusherTubeLength: DimensionMm; pusherTubeEmbed: DimensionMm;
+  pusherBossRadius: DimensionMm; pusherBossLength: DimensionMm; pusherBossEmbed: DimensionMm;
+}
+
+export interface ParametricPusherV1 {
+  schema: 'parametric-pusher/v1';
+  /** Angular position in degrees; 60 = 2h, -60 = 4h when crown is at 3h. */
+  angularPositionDeg: number;
+  tubeRadius: DimensionMm; tubeLength: DimensionMm; tubeEmbed: DimensionMm;
+  bossRadius: DimensionMm; bossLength: DimensionMm; bossEmbed: DimensionMm;
+  headDiameterMm: DimensionMm; headLengthMm: DimensionMm; stemDiameterMm: DimensionMm;
+}
+
+export interface ParametricPusherSetV1 {
+  schema: 'parametric-pusher-set/v1';
+  pushers: ParametricPusherV1[];
 }
 
 export interface LumeRegionsV1 { body: boolean; tip: boolean; tail: boolean; }

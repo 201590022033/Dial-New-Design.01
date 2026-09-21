@@ -30,6 +30,10 @@ export type CompatibilityRuleCode =
   | 'BEZEL_INSERT_FIT_VALID'
   | 'DATE_WINDOW_MISALIGNMENT'
   | 'DATE_WINDOW_ALIGNMENT_VALID'
+  | 'TEMPLATE_REQUIRED_COMPONENT_MISSING'
+  | 'PUSHER_COUNT_MISMATCH'
+  | 'PUSHER_CASE_FIT_VALID'
+  | 'PUSHER_POSITION_UNKNOWN'
   | 'UNVERIFIED_CRITICAL_DIMENSION'
   | 'PROVISIONAL_VERIFICATION'
   | 'CONFIRMED_VERIFICATION'
@@ -67,12 +71,12 @@ export interface CompatibilityCheckResult {
 
   expected?: {
     value: number;
-    unit: 'mm' | 'deg';
+    unit: 'mm' | 'deg' | 'count';
   };
 
   actual?: {
     value: number;
-    unit: 'mm' | 'deg';
+    unit: 'mm' | 'deg' | 'count';
   };
 
   difference?: number;
@@ -152,6 +156,8 @@ export interface MovementEngineeringSpecs {
   handSizesMm: { hour: number; minute: number; second: number };
   datePosition?: string | null;
   feetPositionsDeg?: number[];
+  pusherCount?: number;
+  pusherPositionsDeg?: number[];
 }
 
 export interface CaseEngineeringSpecs {

@@ -14,9 +14,12 @@ REFERENCE = {
     'dialOpening': 31.5, 'crystalSeatDiameter': 32.5, 'casebackOpening': 34.0,
     'upperCaseRadiusReduction': .45, 'lowerCaseRadiusReduction': .65, 'middleCaseBulge': .20,
     'bezelLipHeight': 1.10, 'casebackLipHeight': .80, 'lugRootWidth': 5.2, 'lugTipWidth': 4.0, 'lugPairGap': 6.0,
-    'lugCaseOverlap': 2.2, 'lugTipDrop': 1.35, 'lugThickness': 4.5, 'lugTaperStrength': .80,
+    'lugCaseOverlap': 0.8, 'lugTipDrop': 1.35, 'lugThickness': 4.5, 'lugTaperStrength': .80,
     'crownTubeRadius': 1.50, 'crownTubeLength': 2.30, 'crownBossRadius': 2.10,
     'crownBossLength': 1.50, 'crownBossEmbed': 2.20, 'crownTubeEmbed': 1.50,
+    'pusherCount': 0, 'pusherLayout': 'none', 'pusherAngularOffsetDeg': 0,
+    'pusherTubeRadius': 0.90, 'pusherTubeLength': 1.80, 'pusherTubeEmbed': 1.20,
+    'pusherBossRadius': 1.40, 'pusherBossLength': 1.00, 'pusherBossEmbed': 1.20,
 }
 def number(p, name):
     v = p.get(name)
@@ -25,14 +28,21 @@ def number(p, name):
     if v < 0: raise ValueError("negative dimension: " + name)
     return float(v)
 def validate(p):
-    required = list(REFERENCE.keys())[1:]
-    for k in required: number(p, k)
+    numeric_required = [k for k in REFERENCE.keys() if k not in ('schema', 'pusherLayout')]
+    for k in numeric_required: number(p, k)
     if number(p, 'caseDiameter') <= 0: raise ValueError('caseDiameter must be greater than zero')
     if number(p, 'dialOpening') >= number(p, 'caseDiameter') or number(p, 'crystalSeatDiameter') >= number(p, 'caseDiameter'): raise ValueError('openings must be smaller than caseDiameter')
     if number(p, 'lugToLug') < number(p, 'caseDiameter'): raise ValueError('lugToLug must not be smaller than caseDiameter')
     if number(p, 'lugTipWidth') > number(p, 'lugWidth'): raise ValueError('lugTipWidth must not exceed lugWidth')
     if number(p, 'lugPairGap') > number(p, 'lugWidth'):
         raise ValueError('lugPairGap must not exceed the nominal lugWidth/strap envelope')
+    pc = int(number(p, 'pusherCount'))
+    if pc not in (0, 1, 2): raise ValueError('pusherCount must be 0, 1, or 2')
+    if pc > 0:
+        layout = p.get('pusherLayout')
+        if layout not in ('2h-4h', 'custom'): raise ValueError('pusherLayout must be 2h-4h or custom when pusherCount > 0')
+        if number(p, 'pusherTubeRadius') > number(p, 'pusherBossRadius'):
+            raise ValueError('pusherTubeRadius must not exceed pusherBossRadius')
 def mat(name, color, metallic=0.8, rough=.3):
     m = bpy.data.materials.get(name) or bpy.data.materials.new(name); m.diffuse_color = (*color, 1); m.metallic = metallic; m.roughness = rough; return m
 def mesh(name, verts, faces, collection, material=None):
@@ -62,9 +72,9 @@ def build(p, quality='normal'):
     r=number(p,'caseDiameter')/2; root_width=number(p,'lugRootWidth'); tip_width=number(p,'lugTipWidth'); pair_gap=number(p,'lugPairGap'); span=number(p,'lugToLug')/2
     # Two tapered prisms at each strap end. The crown axis (+X) stays clear;
     # the case retains only its boss and tube on that side.
-    # Pull the root plane inward by half its width so the full tapered root
-    # intersects the case shoulder even when the pair gap is widened.
-    root=r-number(p,'lugCaseOverlap')-root_width/2
+    # Overlap the lug root with the case shoulder by lugCaseOverlap so the taper
+    # starts at the case surface and remains visible even when the pair gap is widened.
+    root=r+number(p,'lugCaseOverlap')-root_width/2
     for end_name, end_sign in [('12',1),('6',-1)]:
       for side_name, side_sign in [('L',-1),('R',1)]:
         root_center=side_sign*(pair_gap/2 + root_width/2); tip_center=side_sign*(pair_gap/2 + tip_width/2)
@@ -76,6 +86,27 @@ def build(p, quality='normal'):
         bevel=ob.modifiers.new('Conservative edge bevel','BEVEL'); bevel.width=.18; bevel.segments=2
     x=r-number(p,'crownBossEmbed')+number(p,'crownBossLength')/2; cylinder('DD_CASE_CROWN_BOSS',number(p,'crownBossRadius'),number(p,'crownBossLength'),(x,0,0),col,polished)
     x=r-number(p,'crownTubeEmbed')+number(p,'crownTubeLength')/2; cylinder('DD_CASE_CROWN_TUBE',number(p,'crownTubeRadius'),number(p,'crownTubeLength'),(x,0,0),col,polished)
+    # Chronograph pushers at 2h (+60°) and 4h (-60°) around the +X crown axis.
+    pc=int(number(p,'pusherCount'))
+    if pc > 0 and p.get('pusherLayout') in ('2h-4h','custom'):
+        offset=number(p,'pusherAngularOffsetDeg')*math.pi/180
+        angles=[math.pi/3+offset, -math.pi/3+offset][:pc]
+        for i, theta in enumerate(angles):
+            name_suffix='2H' if i==0 else '4H'
+            dx, dy = math.cos(theta), math.sin(theta)
+            tube_embed=number(p,'pusherTubeEmbed'); tube_len=number(p,'pusherTubeLength')
+            tube_r=number(p,'pusherTubeRadius')
+            # Tube starts embedded in case and extends outward along the pusher axis.
+            tube_start=r-tube_embed
+            tx=(tube_start+tube_len/2)*dx; ty=(tube_start+tube_len/2)*dy
+            bpy.ops.mesh.primitive_cylinder_add(vertices=64, radius=tube_r, depth=tube_len, location=(tx,ty,0), rotation=(0, math.pi/2, theta-math.pi/2))
+            ob=bpy.context.object; ob.name=f'DD_CASE_PUSHER_TUBE_{name_suffix}'; col.objects.link(ob); [c.objects.unlink(ob) for c in list(ob.users_collection) if c != col]; ob.data.materials.append(polished)
+            boss_embed=number(p,'pusherBossEmbed'); boss_len=number(p,'pusherBossLength')
+            boss_r=number(p,'pusherBossRadius')
+            boss_start=r-boss_embed
+            bx=(boss_start+boss_len/2)*dx; by=(boss_start+boss_len/2)*dy
+            bpy.ops.mesh.primitive_cylinder_add(vertices=64, radius=boss_r, depth=boss_len, location=(bx,by,0), rotation=(0, math.pi/2, theta-math.pi/2))
+            ob=bpy.context.object; ob.name=f'DD_CASE_PUSHER_BOSS_{name_suffix}'; col.objects.link(ob); [c.objects.unlink(ob) for c in list(ob.users_collection) if c != col]; ob.data.materials.append(polished)
     bpy.context.scene['DD_PARAMETRIC_SCHEMA']=SCHEMA; bpy.context.scene['DD_PARAMETRIC_QUALITY']=quality; return col
 def main():
     ap=argparse.ArgumentParser(); ap.add_argument('--params'); ap.add_argument('--output'); ap.add_argument('--quality',choices=QUALITY,default='normal'); args=ap.parse_args(sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else [])

@@ -1,0 +1,18 @@
+{
+  "schema": "parametric-dial/v1",
+  "outerDiameterMm": 32.0,
+  "thicknessMm": 0.4,
+  "centreHoleDiameterMm": 1.5,
+  "markerLayout": { "kind": "baton", "count": 12, "startAngleDeg": -90, "radiusInnerMm": 11.5, "radiusOuterMm": 14.2, "widthMm": 0.5, "applied": true, "printed": true, "lumed": true },
+  "subdials": [
+    { "role": "chronograph-seconds", "angleDeg": 180, "radiusMm": 3.2, "handRadiusMm": 2.4, "markerCount": 12 },
+    { "role": "chronograph-minutes", "angleDeg": 330, "radiusMm": 3.2, "handRadiusMm": 2.4, "markerCount": 12 },
+    { "role": "chronograph-hours", "angleDeg": 30, "radiusMm": 3.2, "handRadiusMm": 2.4, "markerCount": 12 }
+  ],
+  "windows": [
+    { "kind": "date", "angleDeg": 90, "widthMm": 3.5, "heightMm": 1.4, "cornerRadiusMm": 0.25 },
+    { "kind": "day", "angleDeg": 180, "widthMm": 3.5, "heightMm": 1.4, "cornerRadiusMm": 0.25 }
+  ],
+  "surface": { "colorRgb": [0.03, 0.08, 0.16], "secondaryColorRgb": [0.005, 0.015, 0.04], "finish": "textured", "textureIntensity": 0.72, "textureContrast": 0.74 },
+  "provenance": { "status": "provisional", "source": "Presentation layout fixture; no measured dial or movement clearance evidence" }
+}

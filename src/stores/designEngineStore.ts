@@ -43,6 +43,7 @@ import type { ScaleKind } from '@/domain/scales/types';
 import type { DesignOverlay } from '@/renderer/types';
 import type { CollisionWarning } from '@/domain/geometry/collisionEngine';
 import { useWatchAssemblyStore } from '@/stores/watchAssemblyStore';
+import type { WatchAssembly } from '@/domain/assembly/assemblyTypes';
 
 interface DesignEngineState {
   dialFaceConfig: DialFaceConfig;
@@ -51,6 +52,7 @@ interface DesignEngineState {
   chapterRingConfig: ChapterRingConfiguration;
   bezelConfig: BezelConfig;
   lumeConfig: LumeEngineConfig;
+  visualReferenceConfig: NonNullable<WatchAssembly['designConfig']>['visualReferenceConfig'];
   selectedMovementId: string;
   activeTemplateId: TemplateId;
   suggestedScaleKind: ScaleKind;
@@ -69,6 +71,7 @@ interface DesignEngineState {
   updateChapterRingConfig: (patch: Partial<ChapterRingConfiguration>) => void;
   updateBezelConfig: (patch: Partial<BezelConfig>) => void;
   updateLumeConfig: (patch: Partial<LumeEngineConfig>) => void;
+  updateVisualReferenceConfig: (patch: NonNullable<WatchAssembly['designConfig']>['visualReferenceConfig']) => void;
   selectMovement: (movementId: string) => void;
   applyTemplate: (templateId: TemplateId) => void;
   setCollisionWarnings: (warnings: CollisionWarning[]) => void;
@@ -139,6 +142,7 @@ export const useDesignEngineStore = create<DesignEngineState>((set, get) => ({
   chapterRingConfig: defaultChapterRingConfig,
   bezelConfig: defaultBezelConfig,
   lumeConfig: defaultLumeConfig,
+  visualReferenceConfig: {},
   selectedMovementId: defaultMovementId,
   activeTemplateId: 'classic-dress',
   suggestedScaleKind: 'circular',
@@ -200,6 +204,10 @@ export const useDesignEngineStore = create<DesignEngineState>((set, get) => ({
       }
     }));
     get().regenerate();
+  },
+  updateVisualReferenceConfig: (patch) => {
+    useWatchAssemblyStore.getState().updateVisualReferenceConfig(patch);
+    set((state) => ({ visualReferenceConfig: { ...state.visualReferenceConfig, ...patch } }));
   },
   selectMovement: (movementId) => {
     const recommendations = getMovementDesignRecommendations(movementId);
@@ -321,6 +329,7 @@ export const useDesignEngineStore = create<DesignEngineState>((set, get) => ({
       chapterRingConfig: defaultChapterRingConfig,
       bezelConfig: defaultBezelConfig,
       lumeConfig: defaultLumeConfig,
+      visualReferenceConfig: {},
       activeTemplateId: 'classic-dress',
       selectedMovementId: defaultMovementId,
       movementRecommendations: getMovementDesignRecommendations(defaultMovementId),

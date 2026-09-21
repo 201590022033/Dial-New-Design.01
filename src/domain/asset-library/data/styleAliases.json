@@ -1,0 +1,16 @@
+[
+  { "id": "hand-breguet", "category": "hand", "canonicalLabel": "Breguet", "aliases": ["Breguet hand", "open circle hand"], "sourceReference": "social-watch-reference-2026-09-20", "provenance": "reference-only" },
+  { "id": "hand-broad-arrow", "category": "hand", "canonicalLabel": "Broad Arrow", "aliases": ["Arrow", "Broad Arrow hand"], "sourceReference": "social-watch-reference-2026-09-20", "provenance": "reference-only" },
+  { "id": "hand-obelisque", "category": "hand", "canonicalLabel": "Obelisque", "aliases": ["Obelisk"], "sourceReference": "social-watch-reference-2026-09-20", "provenance": "reference-only" },
+  { "id": "hand-louis-xv", "category": "hand", "canonicalLabel": "Louis XV", "aliases": ["Louis XV hand"], "sourceReference": "social-watch-reference-2026-09-20", "provenance": "reference-only" },
+  { "id": "hand-fleur-de-lys", "category": "hand", "canonicalLabel": "Fleur-de-Lys", "aliases": ["Fleur de Lys"], "sourceReference": "social-watch-reference-2026-09-20", "provenance": "reference-only" },
+  { "id": "hand-teardrop", "category": "hand", "canonicalLabel": "Teardrop", "aliases": ["Pear hand"], "sourceReference": "social-watch-reference-2026-09-20", "provenance": "reference-only" },
+  { "id": "hand-lollipop", "category": "hand", "canonicalLabel": "Lollipop", "aliases": ["Lollipop seconds"], "sourceReference": "social-watch-reference-2026-09-20", "provenance": "reference-only" },
+  { "id": "hand-skeleton", "category": "hand", "canonicalLabel": "Skeleton", "aliases": ["Open-work hand"], "sourceReference": "social-watch-reference-2026-09-20", "provenance": "reference-only" },
+  { "id": "marker-stick", "category": "marker", "canonicalLabel": "Stick", "aliases": ["Baton index"], "sourceReference": "social-watch-reference-2026-09-20", "provenance": "reference-only" },
+  { "id": "marker-dot", "category": "marker", "canonicalLabel": "Dot", "aliases": ["Round index", "Circle index"], "sourceReference": "social-watch-reference-2026-09-20", "provenance": "reference-only" },
+  { "id": "marker-square", "category": "marker", "canonicalLabel": "Square", "aliases": ["Block index"], "sourceReference": "social-watch-reference-2026-09-20", "provenance": "reference-only" },
+  { "id": "marker-baguette", "category": "marker", "canonicalLabel": "Baguette", "aliases": ["Oblong index"], "sourceReference": "social-watch-reference-2026-09-20", "provenance": "reference-only" },
+  { "id": "marker-painted", "category": "marker", "canonicalLabel": "Painted", "aliases": ["Printed index"], "sourceReference": "social-watch-reference-2026-09-20", "provenance": "reference-only" },
+  { "id": "marker-combination", "category": "marker", "canonicalLabel": "Combination", "aliases": ["Mixed numerals and indices"], "sourceReference": "social-watch-reference-2026-09-20", "provenance": "reference-only" }
+]

@@ -1,0 +1,12 @@
+[
+  { "id": "lume-super-luminova", "label": "Super-LumiNova", "visualColor": "#8CFF72", "emissionBehavior": "persistent", "safetyNote": "Reference label; exact compound and grade must be supplier-confirmed.", "provenance": "reference-only" },
+  { "id": "lume-tritium-h3", "label": "Tritium H3", "visualColor": "#F4C16E", "emissionBehavior": "persistent", "safetyNote": "Radioactive-material handling and regulatory requirements must be confirmed before production.", "provenance": "reference-only" },
+  { "id": "lume-chromalight", "label": "Chromalight", "visualColor": "#62D9FF", "emissionBehavior": "persistent", "safetyNote": "Brand/proprietary reference label; do not treat as a generic material specification.", "provenance": "reference-only" },
+  { "id": "lume-lumibrite", "label": "LumiBrite", "visualColor": "#91FF73", "emissionBehavior": "persistent", "safetyNote": "Brand/proprietary reference label; exact pigment grade is unspecified.", "provenance": "reference-only" },
+  { "id": "lume-electroluminescent", "label": "Electroluminescent / Indiglo", "visualColor": "#55DFFF", "emissionBehavior": "backlight", "safetyNote": "Requires an electronic backlight system; not interchangeable with paint or gas lume.", "provenance": "reference-only" },
+  { "id": "lume-historic-radium", "label": "Historic Radium", "visualColor": "#B7E68C", "emissionBehavior": "historic", "safetyNote": "Historic reference only; do not specify radioactive material for production.", "provenance": "reference-only" },
+  { "id": "lume-zinc-sulfide", "label": "Zinc Sulfide", "visualColor": "#FFD48A", "emissionBehavior": "historic", "safetyNote": "Reference label; performance depends on binder, pigment and activation method.", "provenance": "reference-only" },
+  { "id": "lume-c1-green", "label": "C1 Green", "visualColor": "#8CFF72", "emissionBehavior": "persistent", "safetyNote": "Reference grade label; supplier data is required for production behavior.", "provenance": "reference-only" },
+  { "id": "lume-bgw9-blue-white", "label": "BGW9 Blue-White", "visualColor": "#9EDBFF", "emissionBehavior": "persistent", "safetyNote": "Reference grade label; supplier data is required for production behavior.", "provenance": "reference-only" },
+  { "id": "lume-x1-extra-bright", "label": "X1 Extra Bright", "visualColor": "#A4FF74", "emissionBehavior": "persistent", "safetyNote": "Reference grade label; supplier data is required for production behavior.", "provenance": "reference-only" }
+]

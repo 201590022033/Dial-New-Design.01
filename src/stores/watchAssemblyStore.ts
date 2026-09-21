@@ -53,6 +53,7 @@ export interface WatchAssemblyStoreState {
   updateMarkerConfig: (patch: Partial<MarkerEngineConfig>) => void;
   updateTypographyConfig: (patch: Partial<TypographyConfig>) => void;
   updateDialFaceConfig: (patch: Partial<DialFaceConfig>) => void;
+  updateVisualReferenceConfig: (patch: NonNullable<WatchAssembly['designConfig']>['visualReferenceConfig']) => void;
   updateTextureConfig: (patch: Partial<TextureEngineConfig>) => void;
   applyTemplate: (templateId: TemplateId, colors?: { primary: string; secondary: string; accent: string }) => void;
 
@@ -351,6 +352,23 @@ export const useWatchAssemblyStore = create<WatchAssemblyStoreState>((set, get) 
     });
   },
 
+  updateVisualReferenceConfig: (patch) => {
+    set((state) => ({
+      assembly: {
+        ...state.assembly,
+        designConfig: {
+          ...state.assembly.designConfig,
+          visualReferenceConfig: {
+            ...state.assembly.designConfig?.visualReferenceConfig,
+            ...patch
+          }
+        },
+        metadata: { ...state.assembly.metadata, updatedAtIso: new Date().toISOString() }
+      },
+      dirty: true
+    }));
+  },
+
   updateTextureConfig: (patch) => {
     set((state) => {
       const current = state.assembly.designConfig?.textureConfig;
@@ -373,18 +391,24 @@ export const useWatchAssemblyStore = create<WatchAssemblyStoreState>((set, get) 
 
   applyTemplate: (templateId, colors) => {
     const template = getTemplateById(templateId);
-    set((state) => ({
-      assembly: {
-        ...state.assembly,
-        templateId,
-        selectedColorPalette: colors ?? (template ? { ...template.palette } : state.assembly.selectedColorPalette),
-        metadata: {
-          ...state.assembly.metadata,
-          updatedAtIso: new Date().toISOString()
-        }
-      },
-      dirty: true
-    }));
+    set((state) => {
+      const currentMovement = state.assembly.metadata.movement;
+      const suggestedMovement = template?.movementSuggestions[0];
+      const movementIsCompatible = !template || template.movementSuggestions.length === 0 || template.movementSuggestions.includes(currentMovement);
+      return {
+        assembly: {
+          ...state.assembly,
+          templateId,
+          selectedColorPalette: colors ?? (template ? { ...template.palette } : state.assembly.selectedColorPalette),
+          metadata: {
+            ...state.assembly.metadata,
+            movement: movementIsCompatible ? currentMovement : (suggestedMovement ?? currentMovement),
+            updatedAtIso: new Date().toISOString()
+          }
+        },
+        dirty: true
+      };
+    });
   },
 
   addBand: (kind: BandKind, geometry: DonutGeometry) => {

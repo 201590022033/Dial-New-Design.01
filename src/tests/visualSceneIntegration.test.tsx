@@ -32,6 +32,7 @@ describe('P4 scene integration and GLB failure boundaries', () => {
   it.each(visualCategories)('routes %s GLBs through the shared loader and fallback', (category) => {
     const model = watchAssemblyToVisualModel(createDefaultWatchAssembly());
     model.assets[category] = { ...descriptor, assetId: category, category, anchor: categoryAnchor[category] };
+    model.visible[category] = true;
     const node = VisualComponent({ category, model })! as ReactElement<{ name: string }>;
     expect(node.props.name).toBe(category);
     const asset = child(child(node)) as ReactElement<React.ComponentProps<typeof GlbAsset>>;

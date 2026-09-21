@@ -12,6 +12,12 @@ import {
 } from '@/domain/scales/framework';
 import { listTexturePlugins } from '@/domain/generators/textureEngine';
 import {
+  archetypeReferenceAssets,
+  bezelReferenceAssets,
+  complicationReferenceAssets,
+  lumeReferenceAssets
+} from '@/domain/asset-library';
+import {
   getComponentInspectorSchema,
   resolveSelectedComponentId,
   type InspectorSectionSchema
@@ -54,6 +60,7 @@ export const RightInspector = () => {
   const typographyConfig = useDesignEngineStore((s) => s.typographyConfig);
   const chapterRingConfig = useDesignEngineStore((s) => s.chapterRingConfig);
   const bezelConfig = useDesignEngineStore((s) => s.bezelConfig);
+  const visualReferenceConfig = useDesignEngineStore((s) => s.visualReferenceConfig);
   const movementRecommendations = useDesignEngineStore((s) => s.movementRecommendations);
   const collisionWarnings = useDesignEngineStore((s) => s.collisionWarnings);
   const updateDialFaceConfig = useDesignEngineStore((s) => s.updateDialFaceConfig);
@@ -61,6 +68,8 @@ export const RightInspector = () => {
   const updateTypographyConfig = useDesignEngineStore((s) => s.updateTypographyConfig);
   const updateChapterRingConfig = useDesignEngineStore((s) => s.updateChapterRingConfig);
   const updateBezelConfig = useDesignEngineStore((s) => s.updateBezelConfig);
+  const updateLumeConfig = useDesignEngineStore((s) => s.updateLumeConfig);
+  const updateVisualReferenceConfig = useDesignEngineStore((s) => s.updateVisualReferenceConfig);
 
   const activeComponent = resolveSelectedComponentId(selectedBand, selectedComponentId);
   const schema = getComponentInspectorSchema(activeComponent);
@@ -1460,6 +1469,69 @@ export const RightInspector = () => {
       </h2>
 
       <div className="min-h-0 flex-1 space-y-3 overflow-auto pr-1">
+        <CollapsibleCard title="Reference Profiles" accent="amber" defaultOpen>
+          <div className="grid grid-cols-2 gap-2">
+            <label className="col-span-2 rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+              <span className="ds-label-inspector">Watch Archetype</span>
+              <select
+                className="ds-input mt-1"
+                value={visualReferenceConfig?.archetypeId ?? ''}
+                onChange={(event) => updateVisualReferenceConfig({ archetypeId: event.target.value || undefined })}
+              >
+                <option value="">None</option>
+                {archetypeReferenceAssets.map((asset) => <option key={asset.id} value={asset.id}>{asset.label}</option>)}
+              </select>
+            </label>
+            <label className="col-span-2 rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+              <span className="ds-label-inspector">Complication Layout</span>
+              <select
+                className="ds-input mt-1"
+                value={visualReferenceConfig?.complicationId ?? ''}
+                onChange={(event) => updateVisualReferenceConfig({ complicationId: event.target.value || undefined })}
+              >
+                <option value="">None</option>
+                {complicationReferenceAssets.map((asset) => <option key={asset.id} value={asset.id}>{asset.label}</option>)}
+              </select>
+            </label>
+            <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+              <span className="ds-label-inspector">Bezel Reference</span>
+              <select
+                className="ds-input mt-1"
+                value={visualReferenceConfig?.bezelId ?? ''}
+                onChange={(event) => {
+                  const id = event.target.value || undefined;
+                  const reference = bezelReferenceAssets.find((asset) => asset.id === id);
+                  updateVisualReferenceConfig({ bezelId: id });
+                  if (reference) {
+                    const type = (reference.functionalFamily === 'dive' ? 'dive' : reference.functionalFamily === 'gmt' ? 'gmt' : reference.functionalFamily === 'tachymeter' ? 'fixed' : reference.id === 'bezel-coin-edge' ? 'coin-edge' : 'smooth') as typeof bezelConfig.type;
+                    const profile = (reference.id === 'bezel-coin-edge' ? 'coin-edge' : reference.id === 'bezel-fluted' ? 'scalloped' : 'smooth') as typeof bezelConfig.profile;
+                    updateBezelConfig({ type, rotating: reference.rotating, profile });
+                  }
+                }}
+              >
+                <option value="">None</option>
+                {bezelReferenceAssets.map((asset) => <option key={asset.id} value={asset.id}>{asset.label}</option>)}
+              </select>
+            </label>
+            <label className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
+              <span className="ds-label-inspector">Lume Reference</span>
+              <select
+                className="ds-input mt-1"
+                value={visualReferenceConfig?.lumeId ?? ''}
+                onChange={(event) => {
+                  const id = event.target.value || undefined;
+                  const reference = lumeReferenceAssets.find((asset) => asset.id === id);
+                  updateVisualReferenceConfig({ lumeId: id });
+                  if (reference) updateLumeConfig({ mode: 'filled', color: reference.visualColor });
+                }}
+              >
+                <option value="">None</option>
+                {lumeReferenceAssets.map((asset) => <option key={asset.id} value={asset.id}>{asset.label}</option>)}
+              </select>
+            </label>
+          </div>
+          <p className="mt-2 text-[10px] leading-4 text-engineering-muted">Reference profiles affect preview styling and layout metadata only. Fit and manufacturing evidence remain separate.</p>
+        </CollapsibleCard>
         {schema.sections.map((section) => (
           <CollapsibleCard
             key={section.id}

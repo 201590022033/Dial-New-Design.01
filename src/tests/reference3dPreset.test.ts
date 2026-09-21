@@ -64,6 +64,7 @@ describe('P5 reviewed reference configuration', () => {
     const issues = assessReference3dFit(selected);
     expect(issues.some((issue) => issue.code === 'CROWN_LUG_OVERLAP')).toBe(false);
     expect(issues.filter((issue) => issue.code === 'HAND_BORE_MISMATCH' && issue.status === 'conflict')).toHaveLength(3);
+    expect(issues.some((issue) => issue.code === 'PUSHER_COUNT_MISMATCH' && issue.status === 'conflict')).toBe(true);
     expect(issues.some((issue) => issue.code === 'CROWN_ENGAGEMENT_UNKNOWN' && issue.status === 'unknown')).toBe(true);
     expect(issues.some((issue) => issue.code === 'STACK_CLEARANCE_UNKNOWN' && issue.status === 'unknown')).toBe(true);
     expect(issues.some((issue) => issue.code === 'STEM_INTERFACE_UNKNOWN' && issue.status === 'unknown')).toBe(true);

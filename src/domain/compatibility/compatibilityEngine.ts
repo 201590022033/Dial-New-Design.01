@@ -23,6 +23,8 @@ import { checkBezelCaseCompatibility } from './rules/bezelCaseRule';
 import { checkBezelInsertCompatibility } from './rules/bezelInsertRule';
 import { checkDateWindowMovementCompatibility } from './rules/dateWindowMovementRule';
 import { checkCatalogueVerificationState } from './rules/catalogueVerificationRule';
+import { checkTemplateRequiredComponents } from './rules/templateRequiredComponentsRule';
+import { checkMovementPusherCompatibility } from './rules/movementPusherRule';
 
 /**
  * Executes all physical compatibility rules against an assembly and optional candidate item.
@@ -51,6 +53,8 @@ export const runCompatibilityRules = (
   checks.push(...checkBezelCaseCompatibility(assembly, geometry, candidateItem));
   checks.push(...checkBezelInsertCompatibility(assembly, geometry, candidateItem));
   checks.push(...checkDateWindowMovementCompatibility(assembly, candidateItem));
+  checks.push(...checkTemplateRequiredComponents(assembly, candidateItem));
+  checks.push(...checkMovementPusherCompatibility(assembly, candidateItem));
 
   // 4. Map any severe 2.5D cylindrical CAD collision diagnostics
   for (const diag of geometry.diagnostics) {

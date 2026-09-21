@@ -11,6 +11,15 @@ export const caseCrownInterfacePosition = (c: ParametricCaseV1): Vector3Tuple | 
   return [(c.caseDiameter as number) / 2 - (c.crownTubeEmbed as number) + (c.crownTubeLength as number), 0, 0];
 };
 
+/** Computes the outer tube-end position for a chronograph pusher at a given angle (degrees, 0° = 3h). */
+export const casePusherInterfacePosition = (c: ParametricCaseV1, angleDeg: number): Vector3Tuple | undefined => {
+  const values = [c.caseDiameter, c.pusherTubeEmbed, c.pusherTubeLength];
+  if (!values.every((n) => typeof n === 'number' && Number.isFinite(n) && n >= 0)) return undefined;
+  const r = (c.caseDiameter as number) / 2 - (c.pusherTubeEmbed as number) + (c.pusherTubeLength as number);
+  const theta = (angleDeg * Math.PI) / 180;
+  return [r * Math.cos(theta), r * Math.sin(theta), 0];
+};
+
 export const resolveAssemblyAnchors = (assembly: WatchAssembly, caseParams?: ParametricCaseV1): AssemblyAnchors => {
   const diameter = assembly.globalDimensions.caseDiameterMm;
   const thickness = assembly.globalDimensions.totalThicknessMm;
@@ -21,10 +30,18 @@ export const resolveAssemblyAnchors = (assembly: WatchAssembly, caseParams?: Par
     'watch-axis': { positionMm: [0, 0, 0], rotationRad: [0, 0, 0], provenance: { status: 'specified', source: 'Engineering coordinate convention' } },
     'dial-seat': preview([0, 0, height / 2]),
     'hand-stack': preview([0, 0, height / 2 + 0.8]),
-    'crown-interface': preview([radius, 0, 0])
+    'crown-interface': preview([radius, 0, 0]),
+    'pusher-2h': preview([radius * Math.cos(Math.PI / 3), radius * Math.sin(Math.PI / 3), 0]),
+    'pusher-4h': preview([radius * Math.cos(-Math.PI / 3), radius * Math.sin(-Math.PI / 3), 0])
   };
   const tubeEnd = caseParams && caseCrownInterfacePosition(caseParams);
   if (tubeEnd) anchors['crown-interface'] = { ...preview(tubeEnd), provenance: { status: 'specified', source: 'parametric-case/v1 tube end; supplied parameters, not manufacturing verification' } };
+  if (caseParams && caseParams.pusherCount > 0) {
+    const pusher2h = casePusherInterfacePosition(caseParams, 60 + (typeof caseParams.pusherAngularOffsetDeg === 'number' ? caseParams.pusherAngularOffsetDeg : 0));
+    const pusher4h = casePusherInterfacePosition(caseParams, -60 + (typeof caseParams.pusherAngularOffsetDeg === 'number' ? caseParams.pusherAngularOffsetDeg : 0));
+    if (pusher2h) anchors['pusher-2h'] = { ...preview(pusher2h), provenance: { status: 'specified', source: 'parametric-case/v1 pusher tube end; supplied parameters, not manufacturing verification' } };
+    if (pusher4h) anchors['pusher-4h'] = { ...preview(pusher4h), provenance: { status: 'specified', source: 'parametric-case/v1 pusher tube end; supplied parameters, not manufacturing verification' } };
+  }
   for (const id of Object.keys(anchors) as (keyof AssemblyAnchors)[]) {
     const supplied = assembly.designConfig?.assemblyAnchors?.[id];
     if (supplied && finiteVector(supplied.positionMm) && finiteVector(supplied.rotationRad) && supplied.provenance?.source && ['specified', 'provisional'].includes(supplied.provenance.status)) anchors[id] = supplied;

@@ -22,6 +22,26 @@ describe('WatchAssembly visual adapter', () => {
     expect(watchAssemblyToVisualModel(withHand(assembly, { visualHandStyle: 'mercedes' })).hands.style).toBe('mercedes');
   });
 
+  it('wires marker geometry, movement subdials and date windows into the visual dial model', () => {
+    const assembly = createDefaultWatchAssembly();
+    assembly.metadata.movement = 'vk63';
+    assembly.designConfig!.markerConfig = { ...assembly.designConfig!.markerConfig!, count: 24 };
+    const model = watchAssemblyToVisualModel(assembly);
+    expect(model.dial.markers).toHaveLength(24);
+    expect(model.dial.subdials).toHaveLength(2);
+    expect(model.dial.windows.some((window) => window.kind === 'date')).toBe(true);
+  });
+
+  it('binds the default dial GLB and exposes movement pushers for chronograph previews', () => {
+    const assembly = createDefaultWatchAssembly();
+    expect(watchAssemblyToVisualModel(assembly).assets.dial.assetId).toBe('dial-face-40mm-layout-v1');
+    assembly.metadata.movement = 'vk63';
+    const model = watchAssemblyToVisualModel(assembly);
+    expect(model.pushers.count).toBe(2);
+    expect(model.pushers.positionsDeg).toEqual([60, -60]);
+    expect(model.visible.pushers).toBe(true);
+  });
+
   it.each([
     ['brushed', 'brushed-steel'],
     ['polished', 'polished-steel'],

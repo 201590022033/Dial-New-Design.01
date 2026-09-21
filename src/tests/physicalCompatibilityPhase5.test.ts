@@ -352,8 +352,54 @@ describe('Phase 5: Deterministic Physical Compatibility Engine', () => {
     });
   });
 
-  // 10. Overall Assembly Evaluation
-  describe('10. Whole Assembly Evaluation', () => {
+  // 10. Pusher / Template archetype compatibility
+  describe('10. Pusher ↔ Movement & Template Archetypes', () => {
+    it('returns GREEN when movement and case both specify no pushers', () => {
+      const assembly = createDefaultWatchAssembly();
+      const evaluation = evaluateAssembly(assembly);
+      expect(evaluation.checks.some((r) => r.code === 'PUSHER_CASE_FIT_VALID' && r.status === 'green')).toBe(true);
+    });
+
+    it('returns RED when a chronograph movement lacks pusher case geometry', () => {
+      const assembly = createDefaultWatchAssembly();
+      assembly.metadata.movement = 'vk63';
+      assembly.templateId = 'chronograph';
+      const evaluation = evaluateAssembly(assembly);
+      expect(evaluation.checks.some((r) => r.code === 'PUSHER_COUNT_MISMATCH' && r.status === 'red')).toBe(true);
+      expect(evaluation.checks.some((r) => r.code === 'TEMPLATE_REQUIRED_COMPONENT_MISSING' && r.status === 'red')).toBe(true);
+    });
+
+    it('returns GREEN when a chronograph assembly includes visible pushers and matching case geometry', () => {
+      const assembly = createDefaultWatchAssembly();
+      assembly.metadata.movement = 'vk63';
+      assembly.templateId = 'chronograph';
+      const pushersPart = assembly.parts['inst-pushers'];
+      if (pushersPart) pushersPart.visible = true;
+      const casePart = assembly.parts['inst-midcase'];
+      if (casePart) {
+        casePart.parametricGeometry = {
+          schema: 'parametric-case/v1',
+          caseDiameter: 42, midcaseHeight: 7, lugWidth: 20, lugToLug: 49,
+          dialOpening: 33.5, crystalSeatDiameter: 34.5, casebackOpening: 36,
+          upperCaseRadiusReduction: 0.45, lowerCaseRadiusReduction: 0.65, middleCaseBulge: 0.2,
+          bezelLipHeight: 1.1, casebackLipHeight: 0.8,
+          lugRootWidth: 5.2, lugTipWidth: 4.0, lugPairGap: 16, lugCaseOverlap: 0.8,
+          lugTipDrop: 1.35, lugThickness: 4.5, lugTaperStrength: 0.8,
+          crownTubeRadius: 1.5, crownTubeLength: 2.3, crownBossRadius: 2.1,
+          crownBossLength: 1.5, crownBossEmbed: 2.2, crownTubeEmbed: 1.5,
+          pusherCount: 2, pusherLayout: '2h-4h', pusherAngularOffsetDeg: 0,
+          pusherTubeRadius: 0.9, pusherTubeLength: 1.8, pusherTubeEmbed: 1.2,
+          pusherBossRadius: 1.4, pusherBossLength: 1.0, pusherBossEmbed: 1.2
+        };
+      }
+      const evaluation = evaluateAssembly(assembly);
+      expect(evaluation.checks.some((r) => r.code === 'PUSHER_CASE_FIT_VALID' && r.status === 'green')).toBe(true);
+      expect(evaluation.checks.some((r) => r.code === 'TEMPLATE_REQUIRED_COMPONENT_MISSING' && r.status === 'green')).toBe(true);
+    });
+  });
+
+  // 11. Overall Assembly Evaluation
+  describe('11. Whole Assembly Evaluation', () => {
     it('evaluates the default assembly as GREEN across all verified interfaces', () => {
       const assembly = createDefaultWatchAssembly();
       const evaluation = evaluateAssembly(assembly);

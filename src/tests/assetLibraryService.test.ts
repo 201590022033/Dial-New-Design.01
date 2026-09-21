@@ -1,12 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import {
   chapterRingAssets,
+  archetypeReferenceAssets,
+  bezelReferenceAssets,
+  complicationReferenceAssets,
   handAssets,
+  lumeReferenceAssets,
   manufacturingRuleAssets,
   markerAssets,
   materialAssets,
   scaleAssets,
   supplierProfileAssets,
+  styleAliasReferences,
   typographyAssets
 } from '@/domain/asset-library';
 import {
@@ -25,6 +30,18 @@ describe('asset library service', () => {
     expect(typographyAssets.length).toBeGreaterThanOrEqual(9);
     expect(manufacturingRuleAssets.length).toBeGreaterThanOrEqual(10);
     expect(supplierProfileAssets.length).toBeGreaterThanOrEqual(4);
+    expect(lumeReferenceAssets.length).toBe(10);
+    expect(bezelReferenceAssets.length).toBe(8);
+    expect(complicationReferenceAssets.length).toBe(12);
+    expect(archetypeReferenceAssets.length).toBeGreaterThanOrEqual(9);
+    expect(styleAliasReferences.length).toBeGreaterThanOrEqual(10);
+  });
+
+  it('keeps visual reference taxonomies explicitly non-engineering', () => {
+    expect(lumeReferenceAssets.every((asset) => asset.provenance === 'reference-only')).toBe(true);
+    expect(bezelReferenceAssets.every((asset) => asset.provenance === 'reference-only')).toBe(true);
+    expect(complicationReferenceAssets.find((asset) => asset.id === 'complication-chronograph')?.windowOrSubdialCount).toBe(3);
+    expect(styleAliasReferences.find((asset) => asset.id === 'hand-broad-arrow')?.aliases).toContain('Arrow');
   });
 
   it('produces an aggregate summary and source categories', () => {

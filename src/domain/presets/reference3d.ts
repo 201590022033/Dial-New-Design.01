@@ -66,7 +66,9 @@ export const applyReference42Preview = (assembly: WatchAssembly): WatchAssembly 
         crownEngagement: unknownEvidence('Stem, thread, gasket and insertion evidence not supplied'),
         dialSeat: unknownEvidence('Visual frame only; measured dial seating evidence not supplied'),
         handStack: unknownEvidence('Visual frame only; measured axial stack evidence not supplied'),
-        crystalClearance: unknownEvidence('Crystal underside and hand clearance evidence not supplied')
+        crystalClearance: unknownEvidence('Crystal underside and hand clearance evidence not supplied'),
+        pusherEngagement: unknownEvidence('Pusher stem, return spring, gasket and insertion evidence not supplied'),
+        pusherClearance: unknownEvidence('Pusher boss/tube clearance against crown, lugs and case shoulder not verified')
       },
       assemblyAnchors: {
         ...assembly.designConfig?.assemblyAnchors,

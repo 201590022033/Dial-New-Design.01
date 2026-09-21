@@ -55,6 +55,7 @@ export const syncAssemblyDownstream = (assembly: WatchAssembly): void => {
         dialFaceConfig: textureConfig
           ? { ...prev.dialFaceConfig, texture: textureConfig }
           : prev.dialFaceConfig,
+        visualReferenceConfig: assembly.designConfig?.visualReferenceConfig ?? prev.visualReferenceConfig,
         activeTemplateId: (assembly.templateId as TemplateId) ?? prev.activeTemplateId,
         colors: { ...assembly.selectedColorPalette }
       }));

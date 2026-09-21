@@ -1,0 +1,14 @@
+[
+  { "id": "complication-date", "label": "Date", "displayFamily": "calendar", "windowOrSubdialCount": 1, "movementRequired": true, "provenance": "reference-only" },
+  { "id": "complication-day-date", "label": "Day-Date", "displayFamily": "calendar", "windowOrSubdialCount": 2, "movementRequired": true, "provenance": "reference-only" },
+  { "id": "complication-gmt", "label": "GMT", "displayFamily": "time-zone", "windowOrSubdialCount": 1, "movementRequired": true, "provenance": "reference-only" },
+  { "id": "complication-chronograph", "label": "Chronograph", "displayFamily": "chronograph", "windowOrSubdialCount": 3, "movementRequired": true, "provenance": "reference-only" },
+  { "id": "complication-moonphase", "label": "Moonphase", "displayFamily": "astronomical", "windowOrSubdialCount": 1, "movementRequired": true, "provenance": "reference-only" },
+  { "id": "complication-power-reserve", "label": "Power Reserve", "displayFamily": "utility", "windowOrSubdialCount": 1, "movementRequired": true, "provenance": "reference-only" },
+  { "id": "complication-annual-calendar", "label": "Annual Calendar", "displayFamily": "calendar", "windowOrSubdialCount": 3, "movementRequired": true, "provenance": "reference-only" },
+  { "id": "complication-perpetual-calendar", "label": "Perpetual Calendar", "displayFamily": "calendar", "windowOrSubdialCount": 3, "movementRequired": true, "provenance": "reference-only" },
+  { "id": "complication-world-time", "label": "World Time", "displayFamily": "time-zone", "windowOrSubdialCount": 2, "movementRequired": true, "provenance": "reference-only" },
+  { "id": "complication-alarm", "label": "Alarm", "displayFamily": "utility", "windowOrSubdialCount": 1, "movementRequired": true, "provenance": "reference-only" },
+  { "id": "complication-dual-time", "label": "Dual Time", "displayFamily": "time-zone", "windowOrSubdialCount": 1, "movementRequired": true, "provenance": "reference-only" },
+  { "id": "complication-tourbillon", "label": "Tourbillon", "displayFamily": "mechanical", "windowOrSubdialCount": 1, "movementRequired": true, "provenance": "reference-only" }
+]

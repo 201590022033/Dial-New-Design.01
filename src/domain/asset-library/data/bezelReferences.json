@@ -1,0 +1,10 @@
+[
+  { "id": "bezel-smooth", "label": "Smooth", "functionalFamily": "fixed", "rotating": false, "scaleAttachment": null, "provenance": "reference-only" },
+  { "id": "bezel-fluted", "label": "Fluted", "functionalFamily": "decorative", "rotating": false, "scaleAttachment": null, "provenance": "reference-only" },
+  { "id": "bezel-coin-edge", "label": "Coin Edge", "functionalFamily": "decorative", "rotating": true, "scaleAttachment": null, "provenance": "reference-only" },
+  { "id": "bezel-engine-turned", "label": "Engine Turned", "functionalFamily": "decorative", "rotating": false, "scaleAttachment": null, "provenance": "reference-only" },
+  { "id": "bezel-dive", "label": "Dive", "functionalFamily": "dive", "rotating": true, "scaleAttachment": "countdown", "provenance": "reference-only" },
+  { "id": "bezel-gmt-24-hour", "label": "GMT 24-Hour", "functionalFamily": "gmt", "rotating": true, "scaleAttachment": "custom", "provenance": "reference-only" },
+  { "id": "bezel-tachymeter", "label": "Tachymeter", "functionalFamily": "tachymeter", "rotating": false, "scaleAttachment": "tachymeter", "provenance": "reference-only" },
+  { "id": "bezel-gem-set", "label": "Gem Set", "functionalFamily": "decorative", "rotating": false, "scaleAttachment": null, "provenance": "reference-only" }
+]

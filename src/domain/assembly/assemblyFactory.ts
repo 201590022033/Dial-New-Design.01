@@ -45,13 +45,12 @@ export const createDefaultWatchAssembly = (): WatchAssembly => {
   defaultCatalogueItems.forEach((catItem, index) => {
     const instanceId = `inst-${catItem.kind}`;
     const baseZ = categoryZOrder[catItem.category] ?? 50;
-
     parts[instanceId] = {
       instanceId,
       catalogueItemId: catItem.id,
       name: catItem.displayName,
       category: catItem.category,
-      visible: true,
+      visible: catItem.kind !== 'pushers',
       locked: false,
       layerIndex: baseZ * 10 + index,
       material: catItem.defaultMaterial,
@@ -77,6 +76,13 @@ export const createDefaultWatchAssembly = (): WatchAssembly => {
 
   // Sort partOrder by layerIndex
   partOrder.sort((a, b) => (parts[a]?.layerIndex ?? 0) - (parts[b]?.layerIndex ?? 0));
+
+  // The reviewed 40 mm dial GLB is the default presentation binding. The visual
+  // adapter automatically falls back to the procedural dial when the case size
+  // or an authored component binding does not match this fixed-size fixture.
+  if (parts['inst-dial-blank']) {
+    parts['inst-dial-blank'].visual = { category: 'dial', assetId: 'dial-face-40mm-layout-v1' };
+  }
 
   return {
     version: WATCH_ASSEMBLY_VERSION,

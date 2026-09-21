@@ -4,7 +4,7 @@ import type { ParametricCaseV1, ParametricHandSetV1, DimensionMm } from './types
 import type { ParametricCrownV1 } from './crown';
 
 export interface ReferenceFitIssue {
-  code: 'CROWN_LUG_OVERLAP' | 'LUG_LAYOUT_UNKNOWN' | 'HAND_BORE_MISMATCH' | 'CROWN_ENGAGEMENT_UNKNOWN' | 'STACK_CLEARANCE_UNKNOWN' | 'STEM_INTERFACE_UNKNOWN';
+  code: 'CROWN_LUG_OVERLAP' | 'LUG_LAYOUT_UNKNOWN' | 'HAND_BORE_MISMATCH' | 'CROWN_ENGAGEMENT_UNKNOWN' | 'STACK_CLEARANCE_UNKNOWN' | 'STEM_INTERFACE_UNKNOWN' | 'PUSHER_COUNT_MISMATCH' | 'PUSHER_POSITION_UNKNOWN' | 'PUSHER_CLEARANCE_UNKNOWN';
   status: 'conflict' | 'unknown';
   detail: string;
 }
@@ -31,6 +31,32 @@ export const assessReference3dFit = (assembly: WatchAssembly): ReferenceFitIssue
     if (rear >= tubeEnd) issues.push({ code: 'CROWN_ENGAGEMENT_UNKNOWN', status: 'unknown', detail: 'The crown rear face meets or clears the tube end; no insertion depth or sealed mechanical engagement is specified.' });
   }
   const movement = movementLibrary.find((item) => item.id === assembly.metadata.movement);
+  if (movement && movement.pusherCount !== caseSpec.pusherCount) {
+    issues.push({
+      code: 'PUSHER_COUNT_MISMATCH',
+      status: 'conflict',
+      detail: `Case specifies ${caseSpec.pusherCount} pusher(s) but ${movement.name} requires ${movement.pusherCount}.`
+    });
+  }
+  if (movement && caseSpec.pusherCount > 0) {
+    if (caseSpec.pusherCount === movement.pusherCount && caseSpec.pusherLayout === '2h-4h' && movement.pusherPositionsDeg.length >= 2) {
+      const offset = typeof caseSpec.pusherAngularOffsetDeg === 'number' ? caseSpec.pusherAngularOffsetDeg : 0;
+      const expected = [60 + offset, -60 + offset];
+      const actual = movement.pusherPositionsDeg.slice(0, 2);
+      if (Math.abs(expected[0]! - actual[0]!) > 1 || Math.abs(expected[1]! - actual[1]!) > 1) {
+        issues.push({
+          code: 'PUSHER_POSITION_UNKNOWN',
+          status: 'unknown',
+          detail: `Case pusher layout (${expected.join(', ')}°) differs from ${movement.name} positions (${actual.join(', ')}°).`
+        });
+      }
+    }
+    issues.push({
+      code: 'PUSHER_CLEARANCE_UNKNOWN',
+      status: 'unknown',
+      detail: 'Pusher tube/boss clearance against crown, lugs and case shoulder has not been verified.'
+    });
+  }
   if (movement) {
     for (const [kind, hand, key] of [['hour', handSet.hour, 'hour'], ['minute', handSet.minute, 'minute'], ['seconds', handSet.seconds, 'second']] as const) {
       if (!hand) continue;

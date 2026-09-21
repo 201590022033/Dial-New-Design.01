@@ -1,0 +1,24 @@
+{
+  "id": "social-watch-reference-2026-09-20",
+  "status": "reference-only",
+  "source": "User-supplied WhatsApp screenshots",
+  "images": [
+    { "file": "WhatsApp Image 2026-09-20 at 14.32.59 (1).jpeg", "topics": ["watch-archetypes", "occasion-compositions"] },
+    { "file": "WhatsApp Image 2026-09-20 at 14.32.59.jpeg", "topics": ["hand-styles"] },
+    { "file": "WhatsApp Image 2026-09-20 at 14.32.33 (2).jpeg", "topics": ["exploded-assembly", "case-components", "movement-components"] },
+    { "file": "WhatsApp Image 2026-09-20 at 14.32.33 (1).jpeg", "topics": ["exploded-assembly", "case-components", "bracelet-components"] },
+    { "file": "WhatsApp Image 2026-09-20 at 14.32.33.jpeg", "topics": ["exploded-assembly", "chronograph-components"] },
+    { "file": "WhatsApp Image 2026-09-20 at 14.32.32 (2).jpeg", "topics": ["exploded-assembly", "dive-components"] },
+    { "file": "WhatsApp Image 2026-09-20 at 14.32.32 (1).jpeg", "topics": ["dial-archetypes", "date", "day-date", "chronograph", "gmt"] },
+    { "file": "WhatsApp Image 2026-09-20 at 14.32.32.jpeg", "topics": ["bezel-styles"] },
+    { "file": "WhatsApp Image 2026-09-20 at 14.32.31 (3).jpeg", "topics": ["complications"] },
+    { "file": "WhatsApp Image 2026-09-20 at 14.32.31 (2).jpeg", "topics": ["chronograph-dial-archetypes", "panda-dials"] },
+    { "file": "WhatsApp Image 2026-09-20 at 14.32.31 (1).jpeg", "topics": ["gmt-components", "exploded-assembly"] },
+    { "file": "WhatsApp Image 2026-09-20 at 14.32.31.jpeg", "topics": ["lume-families"] },
+    { "file": "WhatsApp Image 2026-09-20 at 14.32.30 (2).jpeg", "topics": ["movement-families"] },
+    { "file": "WhatsApp Image 2026-09-20 at 14.32.30 (1).jpeg", "topics": ["dial-textures", "dial-finishes"] },
+    { "file": "WhatsApp Image 2026-09-20 at 14.32.30.jpeg", "topics": ["hand-styles"] },
+    { "file": "WhatsApp Image 2026-09-20 at 14.32.29 (1).jpeg", "topics": ["index-styles", "marker-styles"] },
+    { "file": "WhatsApp Image 2026-09-20 at 14.32.29.jpeg", "topics": ["lume-families"], "duplicateOf": "WhatsApp Image 2026-09-20 at 14.32.31.jpeg" }
+  ]
+}

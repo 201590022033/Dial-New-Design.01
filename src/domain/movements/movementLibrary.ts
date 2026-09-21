@@ -20,6 +20,10 @@ export interface MovementTemplate {
   recommendedBezelDiameterMm: number;
   feetPositionsDeg: number[];
   dateWindowSupported: boolean;
+  /** Number of chronograph/function pushers required by the calibre (0, 1, or 2). */
+  pusherCount: number;
+  /** Angular positions of pushers in degrees; 0° = 3h crown axis, +60° = 2h, -60° = 4h. */
+  pusherPositionsDeg: number[];
 }
 
 export const movementLibrary: MovementTemplate[] = [
@@ -37,7 +41,9 @@ export const movementLibrary: MovementTemplate[] = [
     recommendedChapterRingDiameterMm: 36,
     recommendedBezelDiameterMm: 40,
     feetPositionsDeg: [45, 225],
-    dateWindowSupported: true
+    dateWindowSupported: true,
+    pusherCount: 2,
+    pusherPositionsDeg: [60, -60]
   },
   {
     id: 'vk64',
@@ -53,7 +59,9 @@ export const movementLibrary: MovementTemplate[] = [
     recommendedChapterRingDiameterMm: 36,
     recommendedBezelDiameterMm: 40,
     feetPositionsDeg: [35, 215],
-    dateWindowSupported: true
+    dateWindowSupported: true,
+    pusherCount: 2,
+    pusherPositionsDeg: [60, -60]
   },
   {
     id: 'vk67',
@@ -69,7 +77,9 @@ export const movementLibrary: MovementTemplate[] = [
     recommendedChapterRingDiameterMm: 36,
     recommendedBezelDiameterMm: 40,
     feetPositionsDeg: [40, 220],
-    dateWindowSupported: false
+    dateWindowSupported: false,
+    pusherCount: 2,
+    pusherPositionsDeg: [60, -60]
   },
   {
     id: 'vk68',
@@ -85,7 +95,9 @@ export const movementLibrary: MovementTemplate[] = [
     recommendedChapterRingDiameterMm: 36,
     recommendedBezelDiameterMm: 40,
     feetPositionsDeg: [45, 225],
-    dateWindowSupported: false
+    dateWindowSupported: false,
+    pusherCount: 2,
+    pusherPositionsDeg: [60, -60]
   },
   {
     id: 'vk73',
@@ -101,7 +113,9 @@ export const movementLibrary: MovementTemplate[] = [
     recommendedChapterRingDiameterMm: 36,
     recommendedBezelDiameterMm: 40,
     feetPositionsDeg: [45, 225],
-    dateWindowSupported: true
+    dateWindowSupported: true,
+    pusherCount: 2,
+    pusherPositionsDeg: [60, -60]
   },
   {
     id: 'vk83',
@@ -117,7 +131,9 @@ export const movementLibrary: MovementTemplate[] = [
     recommendedChapterRingDiameterMm: 36,
     recommendedBezelDiameterMm: 40,
     feetPositionsDeg: [45, 225],
-    dateWindowSupported: false
+    dateWindowSupported: false,
+    pusherCount: 2,
+    pusherPositionsDeg: [60, -60]
   },
   {
     id: 'nh34',
@@ -133,7 +149,9 @@ export const movementLibrary: MovementTemplate[] = [
     recommendedChapterRingDiameterMm: 35,
     recommendedBezelDiameterMm: 39,
     feetPositionsDeg: [35, 215],
-    dateWindowSupported: true
+    dateWindowSupported: true,
+    pusherCount: 0,
+    pusherPositionsDeg: []
   },
   {
     id: 'nh35',
@@ -149,7 +167,9 @@ export const movementLibrary: MovementTemplate[] = [
     recommendedChapterRingDiameterMm: 35,
     recommendedBezelDiameterMm: 39,
     feetPositionsDeg: [35, 215],
-    dateWindowSupported: true
+    dateWindowSupported: true,
+    pusherCount: 0,
+    pusherPositionsDeg: []
   },
   {
     id: 'nh36',
@@ -165,7 +185,9 @@ export const movementLibrary: MovementTemplate[] = [
     recommendedChapterRingDiameterMm: 35,
     recommendedBezelDiameterMm: 39,
     feetPositionsDeg: [35, 215],
-    dateWindowSupported: true
+    dateWindowSupported: true,
+    pusherCount: 0,
+    pusherPositionsDeg: []
   },
   {
     id: 'nh38',
@@ -181,7 +203,9 @@ export const movementLibrary: MovementTemplate[] = [
     recommendedChapterRingDiameterMm: 35,
     recommendedBezelDiameterMm: 39,
     feetPositionsDeg: [35, 215],
-    dateWindowSupported: false
+    dateWindowSupported: false,
+    pusherCount: 0,
+    pusherPositionsDeg: []
   },
   {
     id: 'nh39',
@@ -197,7 +221,9 @@ export const movementLibrary: MovementTemplate[] = [
     recommendedChapterRingDiameterMm: 35,
     recommendedBezelDiameterMm: 39,
     feetPositionsDeg: [35, 215],
-    dateWindowSupported: false
+    dateWindowSupported: false,
+    pusherCount: 0,
+    pusherPositionsDeg: []
   },
   {
     id: 'nh70',
@@ -213,7 +239,9 @@ export const movementLibrary: MovementTemplate[] = [
     recommendedChapterRingDiameterMm: 35,
     recommendedBezelDiameterMm: 39,
     feetPositionsDeg: [35, 215],
-    dateWindowSupported: false
+    dateWindowSupported: false,
+    pusherCount: 0,
+    pusherPositionsDeg: []
   },
   {
     id: 'eta-2824',
@@ -229,7 +257,9 @@ export const movementLibrary: MovementTemplate[] = [
     recommendedChapterRingDiameterMm: 31,
     recommendedBezelDiameterMm: 36,
     feetPositionsDeg: [35, 215],
-    dateWindowSupported: true
+    dateWindowSupported: true,
+    pusherCount: 0,
+    pusherPositionsDeg: []
   },
   {
     id: 'eta-2892',
@@ -245,7 +275,9 @@ export const movementLibrary: MovementTemplate[] = [
     recommendedChapterRingDiameterMm: 31,
     recommendedBezelDiameterMm: 36,
     feetPositionsDeg: [35, 215],
-    dateWindowSupported: true
+    dateWindowSupported: true,
+    pusherCount: 0,
+    pusherPositionsDeg: []
   },
   {
     id: 'sw200',
@@ -261,7 +293,9 @@ export const movementLibrary: MovementTemplate[] = [
     recommendedChapterRingDiameterMm: 31,
     recommendedBezelDiameterMm: 36,
     feetPositionsDeg: [35, 215],
-    dateWindowSupported: true
+    dateWindowSupported: true,
+    pusherCount: 0,
+    pusherPositionsDeg: []
   },
   {
     id: 'miyota-8215',
@@ -277,6 +311,8 @@ export const movementLibrary: MovementTemplate[] = [
     recommendedChapterRingDiameterMm: 32,
     recommendedBezelDiameterMm: 37,
     feetPositionsDeg: [35, 215],
-    dateWindowSupported: true
+    dateWindowSupported: true,
+    pusherCount: 0,
+    pusherPositionsDeg: []
   }
 ];

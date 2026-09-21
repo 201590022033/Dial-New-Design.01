@@ -7,5 +7,8 @@
   "lugRootWidth": 5.2, "lugTipWidth": 4.0, "lugPairGap": 16.0, "lugCaseOverlap": 2.2,
   "lugTipDrop": 1.35, "lugThickness": 4.5, "lugTaperStrength": 0.8,
   "crownTubeRadius": 1.5, "crownTubeLength": 2.3, "crownBossRadius": 2.1,
-  "crownBossLength": 1.5, "crownBossEmbed": 2.2, "crownTubeEmbed": 1.5
+  "crownBossLength": 1.5, "crownBossEmbed": 2.2, "crownTubeEmbed": 1.5,
+  "pusherCount": 2, "pusherLayout": "2h-4h", "pusherAngularOffsetDeg": 0,
+  "pusherTubeRadius": 0.9, "pusherTubeLength": 1.8, "pusherTubeEmbed": 1.2,
+  "pusherBossRadius": 1.4, "pusherBossLength": 1.0, "pusherBossEmbed": 1.2
 }
