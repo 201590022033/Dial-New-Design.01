@@ -5,6 +5,7 @@ import { Color, Material, Mesh, MeshPhysicalMaterial, MeshStandardMaterial } fro
 import type { VisualAssetDescriptor } from './visualAssetRegistry';
 
 type AssetAppearance = {
+  archetypeId?: string;
   dialColor: string;
   strapColor: string;
   bezelColor: string;
@@ -115,7 +116,7 @@ export const LoadedGlbAsset = ({ descriptor, appearance }: { descriptor: VisualA
           material.metalness = 0.42;
           material.roughness = 0.25;
         } else if (objectName.includes('HAND_') || objectName.includes('HAND_HUB')) {
-          material.color = new Color('#d7dde3');
+          material.color = new Color(appearance?.archetypeId === 'archetype-chronograph' ? '#26313d' : '#d7dde3');
           material.metalness = 1;
           material.roughness = 0.09;
           material.envMapIntensity = 1.95;
@@ -133,7 +134,7 @@ export const LoadedGlbAsset = ({ descriptor, appearance }: { descriptor: VisualA
     });
     if (!hasMesh) throw new Error('GLB has no mesh');
     return clone;
-  }, [appearance?.dialTextureIntensity, appearance?.dialTextureKind, appearance?.lumeColor, appearance?.lumeEnabled, appearance?.strapStyleId, bezelColor, dialColor, gltf, strapColor]);
+  }, [appearance?.archetypeId, appearance?.dialTextureIntensity, appearance?.dialTextureKind, appearance?.lumeColor, appearance?.lumeEnabled, appearance?.strapStyleId, bezelColor, dialColor, gltf, strapColor]);
   return <group position={descriptor.offset} rotation={descriptor.rotation} scale={descriptor.scale}>
     <group rotation={descriptor.upAxis === 'Z' ? [0, 0, 0] : [Math.PI / 2, 0, 0]} scale={descriptor.units === 'metres' ? 1000 : 1}>
       <primitive object={scene} dispose={null} />

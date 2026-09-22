@@ -72,6 +72,7 @@ export type VisualWatchModel = {
     lumeColor?: string;
   };
   archetypeAppearance: {
+    archetypeId?: string;
     dialColor: string;
     strapColor: string;
     bezelColor: string;
@@ -263,6 +264,7 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
       lumeColor: lumeReference?.visualColor
     },
     archetypeAppearance: {
+      archetypeId: visualReferences.archetypeId,
       dialColor: archetypeProfile?.dialColor ?? dialPart?.color ?? assembly.selectedColorPalette.primary,
       strapColor: archetypeProfile?.strapColor ?? '#080b10',
       bezelColor: visualReferences.bezelId === 'bezel-gmt-24-hour' ? '#173e77' : visualReferences.bezelId === 'bezel-tachymeter' ? '#16191d' : visualReferences.bezelId === 'bezel-smooth' ? '#7f8791' : '#05080d',

@@ -47,6 +47,7 @@ describe('WatchAssembly visual adapter', () => {
     const model = watchAssemblyToVisualModel(assembly);
     expect(model.assets.hands.assetId).toBe('archetype-hands-chronograph-syringe');
     expect(model.assets.hands.offset).toEqual([0, 0, 1.4]);
+    expect(model.archetypeAppearance.archetypeId).toBe('archetype-chronograph');
     expect(model.dial.subdials.every((subdial) => subdial.handStyle === 'syringe')).toBe(true);
   });
 

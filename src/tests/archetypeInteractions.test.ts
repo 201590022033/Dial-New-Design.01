@@ -28,6 +28,8 @@ describe('archetype rendering and dashboard routing', () => {
       'round', 'arabic-numeral', 'roman-numeral', 'arabic-numeral', 'baton'
     ]);
     expect(builds.at(-1)?.assembly).toMatchObject({ metadata: { movement: 'vk63' }, parts: { 'inst-pushers': { visible: true } } });
+    expect(builds.at(-1)?.status).toBe('PRESENTATION_ONLY');
+    expect(builds.at(-1)?.partExplanations[0]?.componentName).toBe('TMI VK63A Meca-Quartz Movement');
   });
 
   it('restyles the current high-detail assembly without discarding its visual asset bindings', () => {

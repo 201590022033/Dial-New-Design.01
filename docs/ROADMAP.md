@@ -18,6 +18,10 @@ The official VK63A drawing review replaces the estimated 6.2 mm register spacing
 
 The first 2048 px Dark Dramatic review exposed and corrected two presentation defects: archetype hand GLBs were below the dial surface, and baked dial signatures duplicated the configurable typography layer. Archetype hand assets now use a reviewed axial preview offset, dial signatures remain controlled by the live typography system, and exported render filenames identify archetype, lug family, subdial-hand style and camera preset. These are visual-composition corrections only and do not change interface evidence.
 
+### P11 VK63 high-detail presentation pass
+
+The chronograph dial now carries a dense outer minute track, applied hour markers and three layered 7.50 mm-centred register assemblies with dark inset surfaces, polished rims, inner tracks, 30-step scales and compact numerals. The main hour/minute/chronograph hands use tapered profiles and the needle, baton and syringe register-hand choices now have genuinely different silhouettes rather than width-only variants. Register artwork and silhouettes remain `ESTIMATED_NOMINAL`; the published TMI centres and post bores remain the engineering authority.
+
 ## Status at the parametric 3D milestone
 
 The repository already provides a production-oriented 2D dial engineering system: typed watch assemblies, concentric geometry and validation engines, movement templates, manufacturing evidence, SVG/export workflows, project persistence, and a visual 3D adapter with procedural fallbacks and optional GLB descriptors. The architecture baseline remains frozen; new work must compose with those contracts.

@@ -79,8 +79,8 @@ export const StarterBuildPanel: React.FC = () => {
             <ShieldCheck className="h-4 w-4 text-teal-400" />
             <h4 className="font-semibold text-slate-100">{starter.title}</h4>
           </div>
-          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-950/60 text-emerald-400 border border-emerald-800">
-            VERIFIED SPEC
+          <span className={`text-[10px] font-mono px-2 py-0.5 rounded border ${starter.status === 'VERIFIED_SPEC' ? 'bg-emerald-950/60 text-emerald-400 border-emerald-800' : 'bg-rose-950/60 text-rose-300 border-rose-800'}`}>
+            {starter.status.replace('_', ' ')}
           </span>
         </div>
         <p className="text-[11px] text-slate-400">{starter.description}</p>

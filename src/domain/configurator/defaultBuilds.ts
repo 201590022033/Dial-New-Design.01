@@ -15,6 +15,7 @@ export interface StarterBuildDefinition {
   buildType: StarterBuildType;
   title: string;
   description: string;
+  status: 'VERIFIED_SPEC' | 'PRESENTATION_ONLY';
   assembly: WatchAssembly;
   partExplanations: StarterPartExplanation[];
 }
@@ -50,7 +51,7 @@ export const createStarterBuild = (
     };
   }
 
-  const partExplanations: StarterPartExplanation[] = [
+  const nh35PartExplanations: StarterPartExplanation[] = [
     {
       partInstanceId: 'inst-movement',
       catalogueItemId: 'cat-movement-nh35',
@@ -129,11 +130,59 @@ export const createStarterBuild = (
     }
   ];
 
+  const chronographPartExplanations: StarterPartExplanation[] = [
+    {
+      partInstanceId: 'inst-movement', catalogueItemId: 'cat-movement-vk63',
+      componentName: 'TMI VK63A Meca-Quartz Movement',
+      reasons: [
+        'Official TMI drawing supplies the 9h, 6h and 3h register centres at 7.50mm',
+        'Official post dimensions drive the three register-hand bore requirements',
+        'Commercial movement, dial and hand supplier SKUs remain to be qualified'
+      ]
+    },
+    {
+      partInstanceId: 'inst-case', catalogueItemId: 'cat-case-vk63-preview',
+      componentName: '42mm Chronograph Case Preview',
+      reasons: [
+        'Provides a visual envelope for crown and 2h/4h pushers',
+        'Does not claim compatibility with the non-chronograph NMK901 case',
+        'Pusher tube, stem and movement-retention interfaces require a dedicated platform drawing'
+      ]
+    },
+    {
+      partInstanceId: 'inst-dial', catalogueItemId: 'cat-dial-vk63-preview',
+      componentName: 'VK63 Three-Register Dial Preview',
+      reasons: [
+        'Register centres follow the published VK63 drawing',
+        'Recess depth, artwork diameter and printed scale geometry are estimated presentation values',
+        'Final dial diameter and feet must be matched to the selected VK63 case and supplier'
+      ]
+    },
+    {
+      partInstanceId: 'inst-hands-hour', catalogueItemId: 'cat-hands-vk63-preview',
+      componentName: 'VK63 Main and Register Hand Set',
+      reasons: [
+        'Needle, baton and syringe register silhouettes are independently configurable',
+        'Published movement post dimensions are recorded while hand silhouettes remain estimated',
+        'Supplier broach tolerances and axial stack clearance remain unverified'
+      ]
+    },
+    {
+      partInstanceId: 'inst-pushers', catalogueItemId: 'cat-pushers-vk63-preview',
+      componentName: '2h / 4h Chronograph Pushers',
+      reasons: [
+        'Correctly communicates the two-actuator VK63 control layout',
+        'Presentation geometry only until tube, seal and engagement drawings are supplied'
+      ]
+    }
+  ];
+
   return {
     buildType,
     title: titles[buildType],
     description: descriptions[buildType],
+    status: buildType === 'chronograph' ? 'PRESENTATION_ONLY' : 'VERIFIED_SPEC',
     assembly: base,
-    partExplanations
+    partExplanations: buildType === 'chronograph' ? chronographPartExplanations : nh35PartExplanations
   };
 };

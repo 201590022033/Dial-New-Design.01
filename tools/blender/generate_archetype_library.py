@@ -24,6 +24,63 @@ COLORS = {
 }
 
 
+def prism_outline(name, points, height, z, material, bevel=.0):
+    """Create a shallow, watertight hand or dial detail from a 2D outline."""
+    count = len(points)
+    vertices = [(x, y, z - height / 2) for x, y in points]
+    vertices += [(x, y, z + height / 2) for x, y in points]
+    faces = [tuple(range(count - 1, -1, -1)), tuple(range(count, count * 2))]
+    for index in range(count):
+        nxt = (index + 1) % count
+        faces.append((index, nxt, count + nxt, count + index))
+    mesh = bpy.data.meshes.new(name + "_MESH")
+    mesh.from_pydata(vertices, [], faces)
+    mesh.update()
+    obj = bpy.data.objects.new(name, mesh)
+    bpy.context.collection.objects.link(obj)
+    return ref.finish(obj, material, bevel)
+
+
+def tapered_hand(name, length, root_width, shoulder_width, tip_width, tail_length,
+                 height, z, angle, material):
+    outline = [(-root_width / 2, -tail_length), (root_width / 2, -tail_length),
+               (shoulder_width / 2, length * .18), (tip_width / 2, length),
+               (-tip_width / 2, length), (-shoulder_width / 2, length * .18)]
+    hand = prism_outline(name, outline, height, z, material, min(.06, root_width * .12))
+    hand.rotation_euler.z = -math.radians(angle)
+    return hand
+
+
+def register_hand(name, style, length, z, angle, material):
+    if style == "needle":
+        outline = [(-.09, -.42), (.09, -.42), (.07, length * .82),
+                   (.0, length), (-.07, length * .82)]
+    elif style == "baton":
+        outline = [(-.17, -.38), (.17, -.38), (.15, length * .88),
+                   (.08, length), (-.08, length), (-.15, length * .88)]
+    else:
+        outline = [(-.10, -.40), (.10, -.40), (.09, length * .60),
+                   (.24, length * .78), (.0, length), (-.24, length * .78),
+                   (-.09, length * .60)]
+    hand = prism_outline(name, outline, .12, z, material, .025)
+    hand.rotation_euler.z = -math.radians(angle)
+    return hand
+
+
+def join_objects(name, objects):
+    """Consolidate presentation details while preserving material slots."""
+    if not objects:
+        raise ValueError(f"Cannot join empty object group: {name}")
+    bpy.ops.object.select_all(action="DESELECT")
+    for obj in objects:
+        obj.select_set(True)
+    bpy.context.view_layer.objects.active = objects[0]
+    bpy.ops.object.join()
+    joined = bpy.context.object
+    joined.name = name
+    return joined
+
+
 def export(objects, path):
     bpy.ops.object.select_all(action="DESELECT")
     for obj in objects:
@@ -56,18 +113,48 @@ def dial(style):
     elif style == "dress":
         objects.extend(ref.add_radial_markers("DD_ARCH_DRESS_INDEX", 12, 11.9, .18, 1.25, .11, .28, steel, 0))
     elif style == "chronograph":
-        objects.extend(ref.add_radial_markers("DD_ARCH_CHRONO_INDEX", 12, 12.1, .28, 1.15, .11, .28, steel, 3))
+        minute_details = ref.add_radial_markers("DD_ARCH_CHRONO_MINUTE", 60, 13.25, .08, .38, .06, .25, ink, 5)
+        hour_details = ref.add_radial_markers("DD_ARCH_CHRONO_INDEX", 12, 11.85, .25, 1.12, .12, .31, steel, 3)
+        objects.extend(minute_details)
+        objects.extend(hour_details)
+        register_details = [[], [], []]
         # TMI VK63A dial drawing: all three register centres are 7.50 mm from centre.
         for index, (x, y) in enumerate(((-7.5, 0), (7.5, 0), (0, -7.5))):
-            sub = ref.annulus(f"DD_ARCH_REGISTER_{index}", 6.2, .8, .12, recess, 96, .28)
-            sub.location.x, sub.location.y = x, y
-            objects.append(sub)
-            for tick in range(12):
-                a = math.radians(tick * 30)
-                marker = ref.box(f"DD_ARCH_REGISTER_TICK_{index}_{tick}", (.08, .42, .06),
-                                 (x + 2.25 * math.sin(a), y + 2.25 * math.cos(a), .38), ink)
+            recessed_surface = ref.cylinder(f"DD_ARCH_REGISTER_RECESS_{index}", 6.25, .06, recess, 96, z=.215, bevel=.06)
+            recessed_surface.location.x, recessed_surface.location.y = x, y
+            objects.append(recessed_surface)
+            register_details[index].append(recessed_surface)
+            polished_ring = ref.annulus(f"DD_ARCH_REGISTER_RING_{index}", 6.55, 6.15, .10, steel, 96, .27)
+            polished_ring.location.x, polished_ring.location.y = x, y
+            objects.append(polished_ring)
+            register_details[index].append(polished_ring)
+            track_ring = ref.annulus(f"DD_ARCH_REGISTER_TRACK_{index}", 5.35, 5.15, .05, ink, 96, .285)
+            track_ring.location.x, track_ring.location.y = x, y
+            objects.append(track_ring)
+            register_details[index].append(track_ring)
+            for tick in range(30):
+                a = math.radians(tick * 12)
+                major = tick % 5 == 0
+                marker = ref.box(f"DD_ARCH_REGISTER_TICK_{index}_{tick:02d}",
+                                 ((.11 if major else .055), (.48 if major else .26), .055),
+                                 (x + 2.32 * math.sin(a), y + 2.32 * math.cos(a), .325), ink)
                 marker.rotation_euler.z = -a
                 objects.append(marker)
+                register_details[index].append(marker)
+            for label_index, label in enumerate(("30", "10", "20")):
+                a = math.radians(label_index * 120)
+                label_mesh = ref.text_mesh(f"DD_ARCH_REGISTER_LABEL_{index}_{label}", label, .43,
+                                           (x + 1.55 * math.sin(a), y + 1.55 * math.cos(a), .335), ink, .008)
+                objects.append(label_mesh)
+                register_details[index].append(label_mesh)
+        face = objects[0]
+        objects = [
+            face,
+            join_objects("DD_ARCH_CHRONO_MINUTE_TRACK", minute_details),
+            join_objects("DD_ARCH_CHRONO_HOUR_MARKERS", hour_details),
+            *[join_objects(f"DD_ARCH_REGISTER_ASSEMBLY_{index}", details)
+              for index, details in enumerate(register_details)]
+        ]
     else:
         objects.extend(ref.add_radial_markers("DD_ARCH_DIVE_INDEX", 12, 11.6, .72, 1.55, .18, .30, ink, 3))
         objects.extend(ref.add_radial_markers("DD_ARCH_DIVE_MINUTE", 60, 13.3, .08, .35, .06, .27, ink))
@@ -108,35 +195,49 @@ def hands(style, subdial_style="needle"):
     _, accent, _ = COLORS[style]
     metal = ref.material("archetype hand metal", (.68, .73, .80), .96, .1)
     lume = ref.material("archetype hand lume", accent, .04, .28)
+    register_ink = ref.material("VK63 register hand", (.72, .12, .06), .72, .16) if style == "chronograph" else metal
     objects = []
     widths = {"diver": (1.55, 1.05), "pilot": (1.05, .72), "field": (.85, .58),
               "dress": (.48, .28), "chronograph": (.62, .34)}[style]
     for index, (length, width, angle) in enumerate(((8.6, widths[0], -35), (12.0, widths[1], 52), (13.0, .18, 138))):
-        a = math.radians(angle)
-        x, y = length * .42 * math.sin(a), length * .42 * math.cos(a)
-        hand = ref.box(f"DD_ARCH_HAND_{index}", (width, length, .16), (x, y, .28 + index * .18), metal, .12)
-        hand.rotation_euler.z = -a
-        objects.append(hand)
-        if index < 2 and style != "dress":
-            inlay = ref.box(f"DD_ARCH_HAND_LUME_{index}", (width * .38, length * .66, .05),
-                            (x, y, .39 + index * .18), lume, .05)
-            inlay.rotation_euler.z = -a
-            objects.append(inlay)
+        if style == "chronograph":
+            hand_name = "DD_ARCH_CHRONO_SECONDS" if index == 2 else f"DD_ARCH_HAND_{index}"
+            hand = tapered_hand(hand_name, length,
+                                width if index < 2 else .28,
+                                width * .78 if index < 2 else .16,
+                                .18 if index < 2 else .055,
+                                1.05 if index < 2 else 2.25,
+                                .16 if index < 2 else .10, .30 + index * .18,
+                                angle, metal if index < 2 else register_ink)
+            objects.append(hand)
+            if index < 2:
+                inlay_length = length * .58
+                a = math.radians(angle)
+                inlay = ref.box(f"DD_ARCH_HAND_LUME_{index}", (width * .28, inlay_length, .045),
+                                (inlay_length * .58 * math.sin(a), inlay_length * .58 * math.cos(a), .405 + index * .18), lume, .035)
+                inlay.rotation_euler.z = -a
+                objects.append(inlay)
+        else:
+            a = math.radians(angle)
+            x, y = length * .42 * math.sin(a), length * .42 * math.cos(a)
+            hand = ref.box(f"DD_ARCH_HAND_{index}", (width, length, .16), (x, y, .28 + index * .18), metal, .12)
+            hand.rotation_euler.z = -a
+            objects.append(hand)
+            if index < 2 and style != "dress":
+                inlay = ref.box(f"DD_ARCH_HAND_LUME_{index}", (width * .38, length * .66, .05),
+                                (x, y, .39 + index * .18), lume, .05)
+                inlay.rotation_euler.z = -a
+                objects.append(inlay)
     objects.append(ref.cylinder("DD_ARCH_HAND_HUB", 1.45, .5, metal, 64, z=.55, bevel=.12))
     if style == "chronograph":
         # VK63 roles: 9h minute counter, 6h small seconds, 3h 24-hour.
         # Register centres and post bores are published by TMI; hand silhouettes remain presentation geometry.
-        register_ink = ref.material("VK63 register hand", (.72, .12, .06), .72, .16)
-        style_width = {"needle": .14, "baton": .30, "syringe": .22}[subdial_style]
         bores = (.37, .295, .32)
         for index, (x, y, angle) in enumerate(((-7.5, 0, 18), (0, -7.5, 128), (7.5, 0, -42))):
             length = 2.45
-            a = math.radians(angle)
-            hand = ref.box(f"DD_ARCH_VK63_{subdial_style.upper()}_{index}",
-                           (style_width, length, .12),
-                           (x + length * .42 * math.sin(a), y + length * .42 * math.cos(a), .82),
-                           register_ink, .06)
-            hand.rotation_euler.z = -a
+            hand = register_hand(f"DD_ARCH_VK63_{subdial_style.upper()}_{index}",
+                                 subdial_style, length, .82, angle, register_ink)
+            hand.location.x, hand.location.y = x, y
             hand["DD_MOVEMENT"] = "VK63"
             hand["DD_REGISTER_HAND_STYLE"] = subdial_style
             hand["DD_REGISTER_CENTER_STATUS"] = "PUBLISHED"
