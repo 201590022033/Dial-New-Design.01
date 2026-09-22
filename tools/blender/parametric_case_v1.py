@@ -66,16 +66,30 @@ def mesh(name, verts, faces, collection, material=None):
     if material: ob.data.materials.append(material)
     for poly in me.polygons: poly.use_smooth = True
     return ob
+def torus(name, major_radius, minor_radius, z, collection, material, major_segments=192, minor_segments=12):
+    bpy.ops.mesh.primitive_torus_add(major_segments=major_segments, minor_segments=minor_segments,
+                                    location=(0, 0, z), major_radius=major_radius, minor_radius=minor_radius)
+    ob=bpy.context.object; ob.name=name; collection.objects.link(ob)
+    [c.objects.unlink(ob) for c in list(ob.users_collection) if c != collection]
+    ob.data.materials.append(material)
+    for poly in ob.data.polygons: poly.use_smooth=True
+    return ob
 def revolve(p, n, collection, material):
     r = number(p, 'caseDiameter') / 2; h = number(p, 'midcaseHeight'); inner = number(p, 'dialOpening') / 2
-    # Dense, smooth cross-section: inner lower opening -> rounded lower shoulder -> belly -> upper shoulder -> inner seat.
+    upper = number(p, 'upperCaseRadiusReduction'); lower = number(p, 'lowerCaseRadiusReduction')
+    bulge = number(p, 'middleCaseBulge')
+    # Dense, smooth cross-section: lower opening -> caseback land -> lower chamfer ->
+    # brushed belly -> upper chamfer -> crystal/chapter/dial seats. The shoulder
+    # reduction parameters now control the silhouette instead of being metadata only.
     chapter_z = h / 2 - number(p, 'chapterRingSeatDepth')
     dial_z = h / 2 - number(p, 'dialSeatDepth')
     crystal_radius = number(p, 'crystalSeatDiameter') / 2
     profile = [
-        (inner, -h/2+.8), (r-.8, -h/2+.2), (r, -h*.25),
-        (r+number(p,'middleCaseBulge'), 0), (r, h*.25),
-        (r-.55, h/2-.35), (crystal_radius, h/2),
+        (inner, -h/2+.8), (r-lower-.55, -h/2+.2),
+        (r-lower*.55, -h/2+.34), (r-lower*.12, -h*.34),
+        (r+bulge*.72, -h*.13), (r+bulge, 0), (r+bulge*.72, h*.13),
+        (r-upper*.12, h*.34), (r-upper*.62, h/2-.34),
+        (crystal_radius, h/2),
         (crystal_radius-.45, h/2), (crystal_radius-.45, chapter_z),
         (inner+.35, chapter_z), (inner+.35, dial_z), (inner, dial_z)
     ]
@@ -108,30 +122,38 @@ def cut_spring_bar_hole(lug, p, center_x, center_y, center_z, width):
         bpy.ops.object.modifier_apply(modifier=modifier.name)
     finally:
         bpy.data.objects.remove(cutter, do_unlink=True)
-def lug_loft(name, p, end_sign, side_sign, root_y, span, collection, material):
+def lug_loft(name, p, end_sign, side_sign, root_y, span, collection, material, polished):
     style=p.get('lugStyle','straight'); root_w=number(p,'lugRootWidth'); tip_w=number(p,'lugTipWidth')
     thickness=number(p,'lugThickness'); drop=number(p,'lugTipDrop'); gap=number(p,'lugPairGap')
     root_x=side_sign*(gap/2+root_w/2); tip_x=side_sign*(gap/2+tip_w/2)
     verts=[]
-    for t in (0.0,.5,1.0):
+    sections=(0.0,.18,.42,.68,.86,1.0)
+    for t in sections:
+        eased=t*t*(3-2*t)
         y=(1-t)*root_y+t*end_sign*span
-        x=(1-t)*root_x+t*tip_x
-        width=(1-t)*root_w+t*tip_w
-        z=-drop/2
-        if style=='curved': z=-drop*(.15+.85*t*t)*number(p,'lugCurveStrength')
-        elif style=='teardrop': width*=1-.5*t*t; z-=drop*.25*t
-        elif style=='twisted': x+=side_sign*.55*math.sin(math.pi*t)
-        angle=math.radians(number(p,'lugTwistDeg')*t) if style=='twisted' else 0
+        x=(1-eased)*root_x+eased*tip_x
+        width=(1-eased)*root_w+eased*tip_w
+        z=-drop*(.12+.38*eased)
+        if style=='curved': z=-drop*(.08+.92*eased)*number(p,'lugCurveStrength')
+        elif style=='teardrop': width*=1-.48*eased*eased; z-=drop*.22*eased
+        elif style=='twisted': x+=side_sign*.55*math.sin(math.pi*eased)
+        angle=math.radians(number(p,'lugTwistDeg')*eased) if style=='twisted' else 0
         for sx,sz in ((-1,-1),(1,-1),(1,1),(-1,1)):
             dx=sx*width/2; dz=sz*thickness/2
             rx=dx*math.cos(angle)-dz*math.sin(angle); rz=dx*math.sin(angle)+dz*math.cos(angle)
-            if style=='faceted' and sz>0: rz+=number(p,'lugFacetDepth')*(1-abs(.5-t)*2)
+            if style=='faceted' and sz>0: rz+=number(p,'lugFacetDepth')*math.sin(math.pi*t)
             verts.append((x+rx,y,z+rz))
-    faces=[(0,1,2,3),(8,11,10,9)]
-    for section in range(2):
+    last=(len(sections)-1)*4
+    faces=[(0,1,2,3),(last,last+3,last+2,last+1)]
+    for section in range(len(sections)-1):
         a=section*4; b=(section+1)*4
         for edge in range(4): faces.append((a+edge,a+(edge+1)%4,b+(edge+1)%4,b+edge))
     ob=mesh(name,verts,faces,collection,material); ob['DD_LUG_STYLE']=style; ob['DD_GEOMETRY_STATUS']='ESTIMATED_NOMINAL'
+    ob.data.materials.append(polished)
+    # Top planes become a controlled polished facet while flanks remain brushed.
+    for poly in ob.data.polygons:
+        if poly.normal.z > .48: poly.material_index=1
+    ob['DD_SURFACE_TREATMENT']='brushed-flanks/polished-upper-facet'
     return ob, root_x
 def fixed_wire_lug(name, p, end_sign, root_y, span, collection, material):
     gap=number(p,'lugPairGap'); wire=number(p,'lugWireDiameter'); x=gap/2+wire/2
@@ -157,9 +179,16 @@ def build(p, quality='normal'):
         for ob in list(old.objects): bpy.data.objects.remove(ob, do_unlink=True)
         bpy.data.collections.remove(old)
     col=bpy.data.collections.new('DD_PARAMETRIC_CASE'); bpy.context.scene.collection.children.link(col)
-    steel=mat('DD Brushed Steel', (.32,.36,.4), .9, .28); polished=mat('DD Polished Steel', (.65,.68,.72), .95, .12)
+    steel=mat('DD Brushed Steel', (.38,.42,.47), .96, .3); polished=mat('DD Polished Steel', (.72,.76,.82), 1.0, .075)
     n=QUALITY[quality]; revolve(p,n,col,steel)
     r=number(p,'caseDiameter')/2; root_width=number(p,'lugRootWidth'); tip_width=number(p,'lugTipWidth'); pair_gap=number(p,'lugPairGap'); span=number(p,'lugToLug')/2
+    # Separate polished shoulder bands create readable transitions under studio
+    # lighting without changing the controlled case envelope.
+    upper_radius=r-number(p,'upperCaseRadiusReduction')*.38
+    lower_radius=r-number(p,'lowerCaseRadiusReduction')*.42
+    upper_band=torus('DD_CASE_UPPER_CHAMFER',upper_radius,.13,number(p,'midcaseHeight')*.405,col,polished,n,10)
+    lower_band=torus('DD_CASE_LOWER_CHAMFER',lower_radius,.11,-number(p,'midcaseHeight')*.405,col,polished,n,10)
+    upper_band['DD_SURFACE_TREATMENT']='polished-upper-transition'; lower_band['DD_SURFACE_TREATMENT']='polished-lower-transition'
     # Two tapered prisms at each strap end. The crown axis (+X) stays clear;
     # the case retains only its boss and tube on that side.
     # Follow the circular case shoulder at each root corner, inset by
@@ -177,7 +206,7 @@ def build(p, quality='normal'):
         continue
       lug_objects=[]
       for side_name, side_sign in [('L',-1),('R',1)]:
-        ob,root_center=lug_loft('DD_CASE_LUG_'+end_name+'_'+side_name,p,end_sign,side_sign,root_y,span,col,steel)
+        ob,root_center=lug_loft('DD_CASE_LUG_'+end_name+'_'+side_name,p,end_sign,side_sign,root_y,span,col,steel,polished)
         hole_y=end_sign*(span-number(p,'springBarHoleFromLugTip'))
         hole_z=-number(p,'lugTipDrop')/2-number(p,'lugThickness')/2+number(p,'springBarHoleFromLowerLugEdge')
         cut_spring_bar_hole(ob,p,root_center,hole_y,hole_z,root_width)
@@ -188,7 +217,7 @@ def build(p, quality='normal'):
             cutter=bpy.context.object; cutter.scale=(root_width*number(p,'lugSkeletonCutoutRatio')/2,abs(end_sign*span-root_y)*.27,number(p,'lugThickness'))
             modifier=ob.modifiers.new('Skeleton lug cutout','BOOLEAN'); modifier.operation='DIFFERENCE'; modifier.solver='EXACT'; modifier.object=cutter
             bpy.context.view_layer.objects.active=ob; bpy.ops.object.modifier_apply(modifier=modifier.name); bpy.data.objects.remove(cutter,do_unlink=True)
-        bevel=ob.modifiers.new('Lug family edge treatment','BEVEL'); bevel.width=.18 if style!='teardrop' else .32; bevel.segments=3
+        bevel=ob.modifiers.new('Lug family edge treatment','BEVEL'); bevel.width=.22 if style!='teardrop' else .34; bevel.segments=4
       if style=='hooded':
         hood_len=number(p,'lugHoodLength'); hood_y=root_y+end_sign*hood_len/2
         bpy.ops.mesh.primitive_cube_add(location=(0,hood_y,number(p,'lugThickness')*.18-number(p,'lugTipDrop')/2), scale=(pair_gap/2+root_width,hood_len/2,number(p,'lugThickness')*.16))

@@ -310,9 +310,12 @@ export const VisualWatchScene = ({ model, rotation, cameraDistance, onExporterRe
     <color attach="background" args={['#05070b']} />
     <hemisphereLight args={['#dce8ff', '#020307', 0.38]} />
     <ambientLight intensity={0.08} />
-    <directionalLight castShadow position={[5.5, -4, 8]} intensity={4.2} color="#fff3df" shadow-mapSize={[2048, 2048]} shadow-bias={-0.00015} />
-    <directionalLight position={[-6, -1, 5]} intensity={2.4} color="#6e9fff" />
-    <directionalLight position={[1, 6, 4]} intensity={2.1} color="#ffb477" />
+    <directionalLight castShadow position={[5.5, -4, 8]} intensity={3.4} color="#fff3df" shadow-mapSize={[2048, 2048]} shadow-bias={-0.00015} />
+    <rectAreaLight position={[4.5, -2.8, 6.5]} rotation={[-0.2, 0.45, 0.18]} width={3.2} height={8} intensity={7.2} color="#fff4df" />
+    <rectAreaLight position={[-5.2, -0.5, 4.5]} rotation={[0.1, -0.65, -0.1]} width={2.4} height={7} intensity={5.4} color="#739fff" />
+    <rectAreaLight position={[0.5, 5.5, 3.2]} rotation={[0.8, 0, Math.PI]} width={6} height={2} intensity={4.1} color="#ffad73" />
+    <directionalLight position={[-6, -1, 5]} intensity={1.15} color="#6e9fff" />
+    <directionalLight position={[1, 6, 4]} intensity={1.0} color="#ffb477" />
     <pointLight position={[0, -4, 5]} intensity={1.1} color="#ffffff" distance={18} decay={2} />
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, -1.18]} receiveShadow>
       <circleGeometry args={[45, 128]} />

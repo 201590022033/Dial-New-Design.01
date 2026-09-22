@@ -64,10 +64,15 @@ export const LoadedGlbAsset = ({ descriptor, appearance }: { descriptor: VisualA
             material.clearcoatRoughness = 0.015;
           }
           object.castShadow = false;
+        } else if (objectName.includes('CASE_UPPER_CHAMFER') || objectName.includes('CASE_LOWER_CHAMFER')) {
+          material.color = new Color('#e0e5ea');
+          material.metalness = 1;
+          material.roughness = 0.055;
+          material.envMapIntensity = 2.45;
         } else if (objectName.includes('CASE_MIDCASE')) {
           material.color = new Color('#b5bec8');
           material.metalness = 1;
-          material.roughness = 0.2;
+          material.roughness = 0.24;
           material.envMapIntensity = 1.9;
         } else if (objectName.includes('CASE_LUG')) {
           material.color = new Color('#a6b0bb');
