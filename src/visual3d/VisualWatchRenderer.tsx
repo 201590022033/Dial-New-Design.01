@@ -30,6 +30,12 @@ export const VisualWatchRenderer = ({ assembly, presentationMode, onTogglePresen
   const exporter = useRef<StillExporter | null>(null);
   const [exportReady, setExportReady] = useState(false);
   const [exportStatus, setExportStatus] = useState('');
+  const archetypeSlug = savedRender?.archetypeId?.replace(/^archetype-/, '') ?? 'custom';
+  const lugSlug = savedRender?.lugStyleId ?? 'straight';
+  const subdialSlug = savedRender?.archetypeId === 'archetype-chronograph'
+    ? `-${savedRender.subdialHandStyle ?? 'needle'}`
+    : '';
+  const exportBaseName = `NMK901-${archetypeSlug}-${lugSlug}${subdialSlug}-${activePreset}`;
   useEffect(() => {
     const preset = savedRender?.renderPreset ?? 'studio';
     setActivePreset(preset);
@@ -43,7 +49,7 @@ export const VisualWatchRenderer = ({ assembly, presentationMode, onTogglePresen
   const exportStill = () => {
     if (!exporter.current) return;
     const link = document.createElement('a');
-    link.download = `NMK901-${new Date().toISOString().slice(0, 10)}-2048.png`;
+    link.download = `${exportBaseName}-2048.png`;
     link.href = exporter.current();
     link.click();
     setExportStatus('Exported 2048 × 2048 PNG');
@@ -108,6 +114,7 @@ export const VisualWatchRenderer = ({ assembly, presentationMode, onTogglePresen
     <div className="absolute left-3 top-3 max-w-[min(340px,70%)] rounded-lg border border-slate-500/40 bg-slate-950/85 p-3 text-xs text-white shadow-lg" onPointerDown={(event) => event.stopPropagation()}>
       <p className="font-semibold">3D reference preview</p>
       <p className="mt-1 text-slate-300">Dark dramatic studio · 42 mm case · provisional geometry.</p>
+      <p className="mt-1 capitalize text-cyan-100">{lugSlug} lugs{savedRender?.archetypeId === 'archetype-chronograph' ? ` · ${savedRender.subdialHandStyle ?? 'needle'} subdial hands` : ''}</p>
       <div className="mt-1 flex flex-wrap gap-1 text-[9px] font-semibold uppercase"><span className="rounded border border-amber-500/40 px-1.5 py-0.5 text-amber-200">{platform.evidenceStatus.replaceAll('_', ' ')}</span>{activeKit && <span className={activeKit.status === 'COMPATIBLE_KIT' ? 'rounded border border-emerald-500/40 px-1.5 py-0.5 text-emerald-200' : 'rounded border border-rose-500/40 px-1.5 py-0.5 text-rose-200'}>{activeKit.status.replaceAll('_', ' ')}</span>}</div>
       {!referenceSelected && <p className="mt-1 text-slate-300">Loading applies the 42 mm case, face stack, crown, hand set, caseback and strap preview.</p>}
       <button type="button" className="mt-2 rounded border border-slate-400/50 px-2 py-1 hover:bg-slate-700" onClick={referenceSelected ? clearReference : selectReference}>

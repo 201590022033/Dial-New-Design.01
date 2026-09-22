@@ -14,6 +14,10 @@ The 42 mm preview now supports straight, curved, twisted, hooded, integrated, dr
 
 The official VK63A drawing review replaces the estimated 6.2 mm register spacing with published 7.50 mm centres and records the published register posts. Register artwork size and hand silhouettes remain estimated pending supplier dial and hand drawings. See `docs/VK63_ENGINEERING_REFERENCE.md`.
 
+### P11 central-view visual QA
+
+The first 2048 px Dark Dramatic review exposed and corrected two presentation defects: archetype hand GLBs were below the dial surface, and baked dial signatures duplicated the configurable typography layer. Archetype hand assets now use a reviewed axial preview offset, dial signatures remain controlled by the live typography system, and exported render filenames identify archetype, lug family, subdial-hand style and camera preset. These are visual-composition corrections only and do not change interface evidence.
+
 ## Status at the parametric 3D milestone
 
 The repository already provides a production-oriented 2D dial engineering system: typed watch assemblies, concentric geometry and validation engines, movement templates, manufacturing evidence, SVG/export workflows, project persistence, and a visual 3D adapter with procedural fallbacks and optional GLB descriptors. The architecture baseline remains frozen; new work must compose with those contracts.

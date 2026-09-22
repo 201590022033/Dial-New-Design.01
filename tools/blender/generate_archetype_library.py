@@ -55,7 +55,6 @@ def dial(style):
         objects.append(ref.triangle("DD_ARCH_ORIENTATION", 12.0, 1.5, 1.65, .12, .30, ink))
     elif style == "dress":
         objects.extend(ref.add_radial_markers("DD_ARCH_DRESS_INDEX", 12, 11.9, .18, 1.25, .11, .28, steel, 0))
-        objects.append(ref.text_mesh("DD_ARCH_DRESS_SIGNATURE", "AUTOMATIC", .65, (0, -5.2, .27), ink, .012))
     elif style == "chronograph":
         objects.extend(ref.add_radial_markers("DD_ARCH_CHRONO_INDEX", 12, 12.1, .28, 1.15, .11, .28, steel, 3))
         # TMI VK63A dial drawing: all three register centres are 7.50 mm from centre.
@@ -69,7 +68,6 @@ def dial(style):
                                  (x + 2.25 * math.sin(a), y + 2.25 * math.cos(a), .38), ink)
                 marker.rotation_euler.z = -a
                 objects.append(marker)
-        objects.append(ref.text_mesh("DD_ARCH_CHRONO_SIGNATURE", "CHRONOGRAPH", .58, (0, 5.0, .28), ink, .012))
     else:
         objects.extend(ref.add_radial_markers("DD_ARCH_DIVE_INDEX", 12, 11.6, .72, 1.55, .18, .30, ink, 3))
         objects.extend(ref.add_radial_markers("DD_ARCH_DIVE_MINUTE", 60, 13.3, .08, .35, .06, .27, ink))
