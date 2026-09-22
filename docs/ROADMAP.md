@@ -207,6 +207,23 @@ materials are cloned before refinement so cached assets remain immutable across
 archetype changes. The material profiles remain explicitly provisional visual
 choices; Golden Sample color, gloss, texture and optical validation is deferred.
 
+### P13 dark studio and platform/kit library
+
+The visual renderer now uses one intentional Dark Dramatic studio instead of a
+growing environment preset catalogue. The library separates the shared NMK901
+platform from archetype presentation kits and exposes evidence/compatibility
+labels in the viewer and controlled BOM. NMK901 remains
+`GOLDEN_SAMPLE_PENDING`; compatible NH35 kits remain orderable with existing
+assembly warnings, while Chronograph, GMT and Digital Sport are
+`PRESENTATION_ONLY` and blocked from the NMK901 ordering pipeline.
+
+The next library phase is documented in
+[`ARCHETYPE_PLATFORM_LIBRARY.md`](ARCHETYPE_PLATFORM_LIBRARY.md): ingest two
+new reference images, model movement-owned subdial geometry and hand interfaces,
+map those interfaces to supplier-qualified components, then regenerate the dial
+and subdial-hand GLBs. No image-derived subdial position will become engineering
+truth without a matching movement record.
+
 ## Deliberate non-goals
 
 No massive application rewrite, huge style catalogue, fabricated calibre dimensions, or one-GLB-per-variation asset library is planned in this pass.

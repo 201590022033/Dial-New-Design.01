@@ -1,5 +1,6 @@
 import type { WatchAssembly } from '@/domain/assembly/assemblyTypes';
 import { getArchetypeVisualProfile } from '@/domain/configurator/archetypeProfiles';
+import { assessArchetypeKitForPlatform } from '@/domain/library/watchPlatformLibrary';
 import { watchAssemblyToVisualModel } from './watchAssemblyToVisualModel';
 
 export const CAMERA_PRESETS = {
@@ -19,6 +20,7 @@ export interface RenderAlignmentCheck {
 export const assessRenderAlignment = (assembly: WatchAssembly): RenderAlignmentCheck[] => {
   const model = watchAssemblyToVisualModel(assembly);
   const profile = getArchetypeVisualProfile(assembly.designConfig?.visualReferenceConfig?.archetypeId);
+  const kitAssessment = assessArchetypeKitForPlatform(assembly.designConfig?.visualReferenceConfig?.archetypeId);
   const config = assembly.designConfig?.visualReferenceConfig;
   const requiredAssets = ['case', 'dial', 'bezel', 'hands', 'strap'] as const;
   const missingAssets = requiredAssets.filter((category) => !model.assets[category].assetPath);
@@ -28,8 +30,8 @@ export const assessRenderAlignment = (assembly: WatchAssembly): RenderAlignmentC
   return [
     {
       label: 'Archetype binding',
-      status: profile ? 'pass' : 'warning',
-      detail: profile ? `${profile.archetypeId} is bound to the central model.` : 'Choose an archetype to lock the presentation set.'
+      status: profile && kitAssessment.compatible ? 'pass' : 'warning',
+      detail: profile ? kitAssessment.compatible ? `${profile.archetypeId} is a compatible NMK901 visual kit.` : kitAssessment.reason : 'Choose an archetype to lock the presentation set.'
     },
     {
       label: 'Component alignment',

@@ -7,6 +7,8 @@ import {
   type EngineeringProvenanceStatus
 } from '@/domain/ordering/controlledNmk901Order';
 import { cn } from '@/utils/cn';
+import { useWatchAssemblyStore } from '@/stores/watchAssemblyStore';
+import { getArchetypeKit, watchPlatformLibrary, NMK901_PLATFORM_ID } from '@/domain/library/watchPlatformLibrary';
 
 const provenanceLabel: Record<EngineeringProvenanceStatus, string> = {
   PUBLISHED: 'Published',
@@ -26,7 +28,10 @@ const statusClass = (status: ControlledBomLine['validationStatus']): string =>
       : 'text-orange-300 bg-orange-950/40 border-orange-800/70';
 
 export const ControlledBomPanel: React.FC = () => {
-  const bom = generateControlledBom();
+  const archetypeId = useWatchAssemblyStore((state) => state.assembly.designConfig?.visualReferenceConfig?.archetypeId);
+  const kit = getArchetypeKit(archetypeId);
+  const platform = watchPlatformLibrary[NMK901_PLATFORM_ID]!;
+  const bom = generateControlledBom(undefined, archetypeId);
   const passed = bom.fit.checks.filter((check) => check.status === 'pass').length;
   const failed = bom.fit.checks.filter((check) => check.status === 'fail').length;
   const warnings = bom.fit.softWarnings.length;
@@ -43,6 +48,10 @@ export const ControlledBomPanel: React.FC = () => {
           <ClipboardList className="h-5 w-5 shrink-0 text-teal-400" />
         </div>
         <p className="mt-2 font-mono text-[10px] text-slate-500">{CONTROLLED_ORDER_ID}</p>
+        <div className="mt-2 flex flex-wrap gap-1 text-[9px] font-semibold uppercase">
+          <span className="rounded border border-amber-700/70 bg-amber-950/40 px-1.5 py-0.5 text-amber-200">{platform.evidenceStatus.replaceAll('_', ' ')}</span>
+          {kit && <span className={cn('rounded border px-1.5 py-0.5', kit.status === 'COMPATIBLE_KIT' ? 'border-emerald-700/70 bg-emerald-950/40 text-emerald-200' : 'border-rose-700/70 bg-rose-950/40 text-rose-200')}>{kit.status.replaceAll('_', ' ')}</span>}
+        </div>
       </div>
 
       <div className="mt-3 grid grid-cols-3 gap-2">
@@ -60,12 +69,12 @@ export const ControlledBomPanel: React.FC = () => {
         </div>
       </div>
 
-      <div className="mt-3 rounded-lg border border-teal-800/60 bg-teal-950/20 p-2.5">
-        <div className="flex items-center gap-2 text-teal-300">
+      <div className={cn('mt-3 rounded-lg border p-2.5', bom.fit.orderable ? 'border-teal-800/60 bg-teal-950/20' : 'border-rose-800/70 bg-rose-950/30')}>
+        <div className={cn('flex items-center gap-2', bom.fit.orderable ? 'text-teal-300' : 'text-rose-300')}>
           <ShieldCheck className="h-4 w-4" />
           <span className="font-semibold">Order status: {bom.fit.orderable ? 'Orderable' : 'Blocked'}</span>
         </div>
-        <p className="mt-1 text-[11px] text-slate-300">Supported interfaces pass; supplier-controlled and golden-sample values remain visible as assembly validation holds.</p>
+        <p className="mt-1 text-[11px] text-slate-300">{bom.fit.orderable ? 'Supported interfaces pass; supplier-controlled and golden-sample values remain visible as assembly validation holds.' : kit?.reason ?? 'The selected configuration is not compatible with this controlled platform.'}</p>
       </div>
 
       <div className="mt-4 space-y-2">

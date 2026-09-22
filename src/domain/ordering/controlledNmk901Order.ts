@@ -1,3 +1,5 @@
+import { assessArchetypeKitForPlatform, NMK901_PLATFORM_ID } from '@/domain/library/watchPlatformLibrary';
+
 /**
  * The one deliberately small, orderable configuration in this milestone.
  *
@@ -303,7 +305,8 @@ const estimatedCheck = (
 
 /** Checks only supported compatibility relationships; unknown machining stays manual. */
 export const evaluateControlledFit = (
-  selection: ControlledOrderSelection = CONTROLLED_NMK901_SELECTION
+  selection: ControlledOrderSelection = CONTROLLED_NMK901_SELECTION,
+  archetypeId?: string
 ): ControlledFitEvaluation => {
   const f = CONTROLLED_NMK901_FIXTURE.fields;
   const maxHandLengthMm = Math.max(
@@ -372,6 +375,18 @@ export const evaluateControlledFit = (
     estimatedCheck('crystal-axial-seat', 'Crystal axial gasket seat depth', `${f.crystalAxialSeatZ.value} mm`, '1.80 mm', f.crystalAxialSeatZ.uncertaintyMm ?? 0.1),
     estimatedCheck('hand-crystal-clearance', 'Hand-to-crystal axial clearance', `${f.handCrystalClearance.value} mm`, '0.65 mm', f.handCrystalClearance.uncertaintyMm ?? 0.12)
   ];
+  if (archetypeId) {
+    const kit = assessArchetypeKitForPlatform(archetypeId, NMK901_PLATFORM_ID);
+    checks.push({
+      id: 'archetype-platform',
+      label: 'Archetype/platform compatibility',
+      status: kit.compatible ? 'pass' : 'fail',
+      summary: kit.compatible ? 'Archetype kit retains the controlled NMK901/NH35 interfaces.' : kit.reason,
+      expected: 'COMPATIBLE_KIT for NMK901/NH35',
+      actual: kit.status ?? 'No kit selected',
+      provenance: 'COMPATIBILITY_ONLY'
+    });
+  }
 
   const manualValidationRequired = [
     'Spring-bar hole diameter and XY location (estimate ±0.10 mm)',
@@ -415,9 +430,10 @@ export interface ControlledBom {
 
 /** Generates the same BOM order and line content for the same controlled selection. */
 export const generateControlledBom = (
-  selection: ControlledOrderSelection = CONTROLLED_NMK901_SELECTION
+  selection: ControlledOrderSelection = CONTROLLED_NMK901_SELECTION,
+  archetypeId?: string
 ): ControlledBom => {
-  const fit = evaluateControlledFit(selection);
+  const fit = evaluateControlledFit(selection, archetypeId);
   const manual = 'Orderable as a matched assembly; physical golden-sample validation remains required.';
   const lines: ControlledBomLine[] = [
     { componentType: 'case', selectedComponent: 'NMK901-compatible 42 mm SKX007/SRPD case', sku: 'NMK901-CASE-42', quantity: 1, compatibilityStatus: 'matched-assembly', provenance: 'PUBLISHED', criticalDimensions: { caseOd: '42.00 mm', lugToLug: '46.00 mm', lugGap: '22.00 mm' }, validationStatus: 'supported', orderability: 'orderable-with-assembly-validation', notes: manual },

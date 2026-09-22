@@ -1,5 +1,6 @@
 import type { WatchAssembly } from '@/domain/assembly/assemblyTypes';
 import { createTemplatePayload, getTemplateById, type TemplateId } from '@/domain/generators/templateLibrary';
+import { getArchetypeKit } from '@/domain/library/watchPlatformLibrary';
 
 export interface ArchetypeVisualProfile {
   archetypeId: string;
@@ -28,11 +29,11 @@ const PROFILE_BY_ID: Record<string, ArchetypeVisualProfile> = {
 };
 
 export const RENDER_GALLERY_ARCHETYPES = [
-  { id: 'archetype-dress-formal', label: 'Dress' },
-  { id: 'archetype-field', label: 'Field' },
-  { id: 'archetype-dive', label: 'Diver' },
-  { id: 'archetype-pilot', label: 'Pilot' },
-  { id: 'archetype-chronograph', label: 'Chronograph' }
+  { id: 'archetype-dress-formal', label: 'Dress', status: getArchetypeKit('archetype-dress-formal')!.status },
+  { id: 'archetype-field', label: 'Field', status: getArchetypeKit('archetype-field')!.status },
+  { id: 'archetype-dive', label: 'Diver', status: getArchetypeKit('archetype-dive')!.status },
+  { id: 'archetype-pilot', label: 'Pilot', status: getArchetypeKit('archetype-pilot')!.status },
+  { id: 'archetype-chronograph', label: 'Chronograph', status: getArchetypeKit('archetype-chronograph')!.status }
 ] as const;
 
 export const getArchetypeVisualProfile = (archetypeId: string | undefined): ArchetypeVisualProfile | undefined =>

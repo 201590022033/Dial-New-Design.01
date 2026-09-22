@@ -8,6 +8,7 @@ import { useWatchAssemblyStore } from '@/stores/watchAssemblyStore';
 import { REFERENCE_42_ID } from '@/domain/presets/reference3d';
 import { assessReference3dFit } from '@/domain/geometry/parametric';
 import { assessRenderAlignment, CAMERA_PRESETS, createStoredZip, dataUrlToBytes, type CameraPresetId } from './renderQuality';
+import { getArchetypeKit, NMK901_PLATFORM_ID, watchPlatformLibrary } from '@/domain/library/watchPlatformLibrary';
 
 export const VisualWatchRenderer = ({ assembly, presentationMode, onTogglePresentationMode }: { assembly: WatchAssembly; presentationMode: boolean; onTogglePresentationMode: () => void }) => {
   const model = useMemo(() => watchAssemblyToVisualModel(assembly), [assembly]);
@@ -22,6 +23,8 @@ export const VisualWatchRenderer = ({ assembly, presentationMode, onTogglePresen
   const referenceSelected = assembly.designConfig?.visualReferenceId === REFERENCE_42_ID;
   const issues = useMemo(() => assessReference3dFit(assembly), [assembly]);
   const alignmentChecks = useMemo(() => assessRenderAlignment(assembly), [assembly]);
+  const activeKit = getArchetypeKit(savedRender?.archetypeId);
+  const platform = watchPlatformLibrary[NMK901_PLATFORM_ID]!;
   const conflicts = issues.filter((issue) => issue.status === 'conflict');
   const dragStart = useRef<{ x: number; y: number } | null>(null);
   const exporter = useRef<StillExporter | null>(null);
@@ -63,6 +66,9 @@ export const VisualWatchRenderer = ({ assembly, presentationMode, onTogglePresen
       generatedAt: new Date().toISOString(),
       project: assembly.metadata.name,
       archetype: savedRender?.archetypeId ?? null,
+      platform: { id: platform.platformId, evidenceStatus: platform.evidenceStatus },
+      archetypeKit: activeKit ? { status: activeKit.status, movementIds: activeKit.movementIds, supplierMappingStatus: activeKit.supplierMappingStatus } : null,
+      studio: 'dark-dramatic',
       camera: { preset: activePreset, rotation, distance: cameraDistance },
       alignmentChecks
     };
@@ -81,7 +87,7 @@ export const VisualWatchRenderer = ({ assembly, presentationMode, onTogglePresen
     setExportStatus('Exported render package: PNG, project and review manifest');
   };
   return <div
-    className="relative h-full w-full overflow-hidden rounded-panel bg-[#d8d3c8]"
+    className="relative h-full w-full overflow-hidden rounded-panel bg-[#05070b]"
     onWheel={(event) => {
       const next = Math.max(7, Math.min(22, cameraDistance + event.deltaY * 0.004));
       setCameraDistance(next);
@@ -101,7 +107,8 @@ export const VisualWatchRenderer = ({ assembly, presentationMode, onTogglePresen
     <VisualWatchScene model={model} rotation={rotation} cameraDistance={cameraDistance} onExporterReady={registerExporter} />
     <div className="absolute left-3 top-3 max-w-[min(340px,70%)] rounded-lg border border-slate-500/40 bg-slate-950/85 p-3 text-xs text-white shadow-lg" onPointerDown={(event) => event.stopPropagation()}>
       <p className="font-semibold">3D reference preview</p>
-      <p className="mt-1 text-slate-300">42 mm case · complete visual assembly. Provisional geometry.</p>
+      <p className="mt-1 text-slate-300">Dark dramatic studio · 42 mm case · provisional geometry.</p>
+      <div className="mt-1 flex flex-wrap gap-1 text-[9px] font-semibold uppercase"><span className="rounded border border-amber-500/40 px-1.5 py-0.5 text-amber-200">{platform.evidenceStatus.replaceAll('_', ' ')}</span>{activeKit && <span className={activeKit.status === 'COMPATIBLE_KIT' ? 'rounded border border-emerald-500/40 px-1.5 py-0.5 text-emerald-200' : 'rounded border border-rose-500/40 px-1.5 py-0.5 text-rose-200'}>{activeKit.status.replaceAll('_', ' ')}</span>}</div>
       {!referenceSelected && <p className="mt-1 text-slate-300">Loading applies the 42 mm case, face stack, crown, hand set, caseback and strap preview.</p>}
       <button type="button" className="mt-2 rounded border border-slate-400/50 px-2 py-1 hover:bg-slate-700" onClick={referenceSelected ? clearReference : selectReference}>
         {referenceSelected ? 'Use procedural preview' : 'Load 42 mm reference set'}
@@ -135,7 +142,8 @@ export const VisualWatchRenderer = ({ assembly, presentationMode, onTogglePresen
         <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-300">Render gallery</p>
         <div className="flex flex-wrap gap-1">{RENDER_GALLERY_ARCHETYPES.map((entry) => <button key={entry.id} type="button"
           className={`rounded px-2 py-1 text-[10px] ${savedRender?.archetypeId === entry.id ? 'bg-cyan-600 text-white' : 'bg-slate-800 text-slate-200 hover:bg-slate-700'}`}
-          onClick={() => updateVisualReference({ archetypeId: entry.id })}>{entry.label}</button>)}</div>
+          title={entry.status === 'PRESENTATION_ONLY' ? 'Presentation only; not orderable on NMK901' : 'Compatible NMK901 visual kit'}
+          onClick={() => updateVisualReference({ archetypeId: entry.id })}>{entry.label}{entry.status === 'PRESENTATION_ONLY' ? ' · preview' : ''}</button>)}</div>
       </div>
       <div className="flex gap-2">
         <details className="rounded-lg border border-slate-500/40 bg-slate-950/85 px-3 py-2 text-[10px] text-white shadow-lg">

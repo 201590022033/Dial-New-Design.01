@@ -34,7 +34,7 @@ export const FinalReviewModal: React.FC<FinalReviewModalProps> = ({ isOpen, onCl
 
   const parts = Object.values(assembly.parts);
   const controlledBom = assembly.designConfig?.controlledOrderId === CONTROLLED_ORDER_ID
-    ? generateControlledBom()
+    ? generateControlledBom(undefined, assembly.designConfig?.visualReferenceConfig?.archetypeId)
     : null;
 
   const handleExportBom = () => {

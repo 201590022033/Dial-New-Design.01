@@ -142,4 +142,14 @@ describe('controlled NMK901 ordering fixture', () => {
     expect(result.orderable).toBe(false);
     expect(result.checks.find((check) => check.id === 'case-envelope')?.status).toBe('fail');
   });
+
+  it('blocks presentation-only archetypes from the NMK901 order', () => {
+    const chronograph = generateControlledBom(CONTROLLED_NMK901_SELECTION, 'archetype-chronograph');
+    expect(chronograph.fit.orderable).toBe(false);
+    expect(chronograph.fit.checks.find((check) => check.id === 'archetype-platform')).toMatchObject({ status: 'fail' });
+
+    const diver = generateControlledBom(CONTROLLED_NMK901_SELECTION, 'archetype-dive');
+    expect(diver.fit.orderable).toBe(true);
+    expect(diver.fit.checks.find((check) => check.id === 'archetype-platform')).toMatchObject({ status: 'pass' });
+  });
 });
