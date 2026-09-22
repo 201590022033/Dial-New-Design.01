@@ -14,7 +14,7 @@ The 42 mm preview now supports straight, curved, twisted, hooded, integrated, dr
 
 ### P11 case and lug presentation refinement
 
-The case generator now applies its upper and lower shoulder-reduction parameters to the actual silhouette, uses a denser eased loft through each conventional lug, and separates brushed flanks from polished upper facets. Polished upper/lower case transition bands and broad rectangular studio reflection lights make the chamfers and lug curvature legible in the central viewer. These refinements preserve the controlled 42 mm envelope and remain `provisional-presentation`; they do not upgrade any lug family to verified fit geometry.
+The case generator now applies its upper and lower shoulder-reduction parameters to the actual silhouette, uses a denser eased loft through each conventional lug, and separates brushed flanks from polished upper facets. Integrated polished midcase shoulder surfaces and broad rectangular studio reflection lights make the chamfers and lug curvature legible without adding detached decorative geometry. These refinements preserve the controlled 42 mm envelope and remain `provisional-presentation`; they do not upgrade any lug family to verified fit geometry.
 
 The official VK63A drawing review replaces the estimated 6.2 mm register spacing with published 7.50 mm centres and records the published register posts. Register artwork size and hand silhouettes remain estimated pending supplier dial and hand drawings. See `docs/VK63_ENGINEERING_REFERENCE.md`.
 

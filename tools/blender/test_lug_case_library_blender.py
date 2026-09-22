@@ -14,13 +14,13 @@ if manifest.get('status') != 'provisional-presentation' or set(manifest.get('sty
     raise AssertionError('Lug-case manifest is incomplete or has invalid provenance')
 for style, filename in zip(manifest['styles'], manifest['assets']):
     meshes, report = import_glb(str(root / filename))
-    if report['mesh_count'] < 6:
+    if report['mesh_count'] < 5:
         raise AssertionError(f'{style} case has too few meshes')
     if not any(obj.get('DD_LUG_LIBRARY_STYLE') == style for obj in meshes):
         raise AssertionError(f'{style} provenance metadata missing')
-    names = {obj.name.split('.')[0] for obj in meshes}
-    if not {'DD_CASE_UPPER_CHAMFER', 'DD_CASE_LOWER_CHAMFER'}.issubset(names):
-        raise AssertionError(f'{style} case is missing polished shoulder transitions')
+    midcase = next((obj for obj in meshes if obj.name.split('.')[0] == 'DD_CASE_MIDCASE'), None)
+    if not midcase or midcase.get('DD_SURFACE_TREATMENT') != 'brushed-belly/integrated-polished-shoulders':
+        raise AssertionError(f'{style} case is missing integrated polished shoulders')
     if style not in {'wire', 'integrated'} and not any(obj.get('DD_SURFACE_TREATMENT') == 'brushed-flanks/polished-upper-facet' for obj in meshes):
         raise AssertionError(f'{style} lug surface treatment metadata missing')
 print(f'Lug-case library PASS: {len(expected)} GLBs')

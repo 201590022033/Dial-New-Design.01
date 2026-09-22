@@ -66,15 +66,7 @@ def mesh(name, verts, faces, collection, material=None):
     if material: ob.data.materials.append(material)
     for poly in me.polygons: poly.use_smooth = True
     return ob
-def torus(name, major_radius, minor_radius, z, collection, material, major_segments=192, minor_segments=12):
-    bpy.ops.mesh.primitive_torus_add(major_segments=major_segments, minor_segments=minor_segments,
-                                    location=(0, 0, z), major_radius=major_radius, minor_radius=minor_radius)
-    ob=bpy.context.object; ob.name=name; collection.objects.link(ob)
-    [c.objects.unlink(ob) for c in list(ob.users_collection) if c != collection]
-    ob.data.materials.append(material)
-    for poly in ob.data.polygons: poly.use_smooth=True
-    return ob
-def revolve(p, n, collection, material):
+def revolve(p, n, collection, material, polished):
     r = number(p, 'caseDiameter') / 2; h = number(p, 'midcaseHeight'); inner = number(p, 'dialOpening') / 2
     upper = number(p, 'upperCaseRadiusReduction'); lower = number(p, 'lowerCaseRadiusReduction')
     bulge = number(p, 'middleCaseBulge')
@@ -97,7 +89,14 @@ def revolve(p, n, collection, material):
     verts = [v for ring in rings for v in ring]; faces=[]
     for j in range(len(rings)-1):
         for i in range(n): faces.append((j*n+i, j*n+(i+1)%n, (j+1)*n+(i+1)%n, (j+1)*n+i))
-    return mesh('DD_CASE_MIDCASE', verts, faces, collection, material)
+    ob=mesh('DD_CASE_MIDCASE', verts, faces, collection, material)
+    ob.data.materials.append(polished)
+    # Polished shoulders are material regions on the continuous revolved shell,
+    # not separate rings. This keeps the case coherent from every camera angle.
+    for segment in (2, 7):
+        for index in range(n): ob.data.polygons[segment*n+index].material_index=1
+    ob['DD_SURFACE_TREATMENT']='brushed-belly/integrated-polished-shoulders'
+    return ob
 def cylinder(name, radius, depth, loc, collection, material):
     bpy.ops.mesh.primitive_cylinder_add(vertices=64, radius=radius, depth=depth, location=loc, rotation=(0, math.pi/2, 0)); ob=bpy.context.object; ob.name=name; collection.objects.link(ob); [c.objects.unlink(ob) for c in list(ob.users_collection) if c != collection]; ob.data.materials.append(material); return ob
 def tube(name, outer_radius, inner_radius, depth, loc, collection, material):
@@ -180,15 +179,8 @@ def build(p, quality='normal'):
         bpy.data.collections.remove(old)
     col=bpy.data.collections.new('DD_PARAMETRIC_CASE'); bpy.context.scene.collection.children.link(col)
     steel=mat('DD Brushed Steel', (.38,.42,.47), .96, .3); polished=mat('DD Polished Steel', (.72,.76,.82), 1.0, .075)
-    n=QUALITY[quality]; revolve(p,n,col,steel)
+    n=QUALITY[quality]; revolve(p,n,col,steel,polished)
     r=number(p,'caseDiameter')/2; root_width=number(p,'lugRootWidth'); tip_width=number(p,'lugTipWidth'); pair_gap=number(p,'lugPairGap'); span=number(p,'lugToLug')/2
-    # Separate polished shoulder bands create readable transitions under studio
-    # lighting without changing the controlled case envelope.
-    upper_radius=r-number(p,'upperCaseRadiusReduction')*.38
-    lower_radius=r-number(p,'lowerCaseRadiusReduction')*.42
-    upper_band=torus('DD_CASE_UPPER_CHAMFER',upper_radius,.13,number(p,'midcaseHeight')*.405,col,polished,n,10)
-    lower_band=torus('DD_CASE_LOWER_CHAMFER',lower_radius,.11,-number(p,'midcaseHeight')*.405,col,polished,n,10)
-    upper_band['DD_SURFACE_TREATMENT']='polished-upper-transition'; lower_band['DD_SURFACE_TREATMENT']='polished-lower-transition'
     # Two tapered prisms at each strap end. The crown axis (+X) stays clear;
     # the case retains only its boss and tube on that side.
     # Follow the circular case shoulder at each root corner, inset by
