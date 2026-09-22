@@ -317,7 +317,7 @@ export const VisualWatchScene = ({ model, rotation, cameraDistance, onExporterRe
     <directionalLight position={[-6, -1, 5]} intensity={1.15} color="#6e9fff" />
     <directionalLight position={[1, 6, 4]} intensity={1.0} color="#ffb477" />
     <pointLight position={[0, -4, 5]} intensity={1.1} color="#ffffff" distance={18} decay={2} />
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, -1.18]} receiveShadow>
+    <mesh position={[0, 0, -1.18]} receiveShadow>
       <circleGeometry args={[45, 128]} />
       <meshStandardMaterial color="#080b12" roughness={0.68} metalness={0.18} envMapIntensity={0.5} />
     </mesh>

@@ -29,6 +29,10 @@ describe('P4 scene integration and GLB failure boundaries', () => {
     expect(scene.type).toBe(Canvas);
     expect(scene.props.frameloop).toBe('demand');
     expect(scene.props.gl.preserveDrawingBuffer).toBe(true);
+    const sceneChildren = scene.props.children as ReactElement<{ receiveShadow?: boolean }>[];
+    const shadowReceiver = sceneChildren.find((element) => element.type === 'mesh' && element.props.receiveShadow) as ReactElement<{ position: number[]; rotation?: number[] }>;
+    expect(shadowReceiver.props.position).toEqual([0, 0, -1.18]);
+    expect(shadowReceiver.props.rotation).toBeUndefined();
     const watch = scene.props.children.at(-1)! as ReactElement<{ scale: number; children: ReactElement<{ category: string }>[] }>;
     expect(watch.props.scale).toBe(0.1);
     expect(watch.props.children.map((e: ReactElement<{ category: string }>) => e.props.category)).toEqual(visualCategories);

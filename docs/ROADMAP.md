@@ -16,6 +16,8 @@ The 42 mm preview now supports straight, curved, twisted, hooded, integrated, dr
 
 The case generator now applies its upper and lower shoulder-reduction parameters to the actual silhouette, uses a denser eased loft through each conventional lug, and separates brushed flanks from polished upper facets. Integrated polished midcase shoulder surfaces and broad rectangular studio reflection lights make the chamfers and lug curvature legible without adding detached decorative geometry. These refinements preserve the controlled 42 mm envelope and remain `provisional-presentation`; they do not upgrade any lug family to verified fit geometry.
 
+The dark studio shadow receiver now remains parallel to the watch face and behind the full assembly. This removes the edge-on black disk that previously intersected and visually split the watch when the camera was rotated away from the face preset.
+
 The official VK63A drawing review replaces the estimated 6.2 mm register spacing with published 7.50 mm centres and records the published register posts. Register artwork size and hand silhouettes remain estimated pending supplier dial and hand drawings. See `docs/VK63_ENGINEERING_REFERENCE.md`.
 
 ### P11 central-view visual QA
