@@ -88,6 +88,8 @@ export interface WatchAssemblyDesignConfig {
     bezelId?: string;
     lumeId?: string;
     strapStyleId?: 'rubber' | 'leather' | 'canvas' | 'racing';
+    /** Presentation style for movement-owned register hands; fit still requires bore evidence. */
+    subdialHandStyle?: 'needle' | 'baton' | 'syringe';
     artworkDataUrl?: string;
     artworkName?: string;
     /** Saved presentation choices. These are authored render settings, not viewport session state. */

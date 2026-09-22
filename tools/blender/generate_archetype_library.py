@@ -105,7 +105,7 @@ def bezel(style):
     return objects
 
 
-def hands(style):
+def hands(style, subdial_style="needle"):
     _, accent, _ = COLORS[style]
     metal = ref.material("archetype hand metal", (.68, .73, .80), .96, .1)
     lume = ref.material("archetype hand lume", accent, .04, .28)
@@ -124,6 +124,26 @@ def hands(style):
             inlay.rotation_euler.z = -a
             objects.append(inlay)
     objects.append(ref.cylinder("DD_ARCH_HAND_HUB", 1.45, .5, metal, 64, z=.55, bevel=.12))
+    if style == "chronograph":
+        # VK63 roles: 9h minute counter, 6h small seconds, 3h 24-hour.
+        # Register centre radius and hand lengths are estimated preview geometry.
+        register_ink = ref.material("VK63 register hand", (.72, .12, .06), .72, .16)
+        style_width = {"needle": .14, "baton": .30, "syringe": .22}[subdial_style]
+        for index, (x, y, angle) in enumerate(((-6.2, 0, 18), (0, -6.2, 128), (6.2, 0, -42))):
+            length = 2.45
+            a = math.radians(angle)
+            hand = ref.box(f"DD_ARCH_VK63_{subdial_style.upper()}_{index}",
+                           (style_width, length, .12),
+                           (x + length * .42 * math.sin(a), y + length * .42 * math.cos(a), .82),
+                           register_ink, .06)
+            hand.rotation_euler.z = -a
+            hand["DD_MOVEMENT"] = "VK63"
+            hand["DD_REGISTER_HAND_STYLE"] = subdial_style
+            hand["DD_GEOMETRY_STATUS"] = "ESTIMATED_NOMINAL"
+            objects.append(hand)
+            hub = ref.cylinder(f"DD_ARCH_VK63_HUB_{index}", .28, .16, metal, 32, z=.84, bevel=.04)
+            hub.location.x, hub.location.y = x, y
+            objects.append(hub)
     return objects
 
 
@@ -178,6 +198,11 @@ def main():
             name = f"{kind}-{style}.glb"
             export(builder(style), os.path.join(output, name))
             assets.append(name)
+    for subdial_style in ("needle", "baton", "syringe"):
+        ref.clear()
+        name = f"hands-chronograph-{subdial_style}.glb"
+        export(hands("chronograph", subdial_style), os.path.join(output, name))
+        assets.append(name)
     for style in ("rubber", "leather", "canvas", "racing"):
         ref.clear()
         name = f"strap-{style}.glb"

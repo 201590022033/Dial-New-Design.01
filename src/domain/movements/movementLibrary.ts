@@ -1,3 +1,36 @@
+export type MovementSubdialRole =
+  | 'small-seconds'
+  | 'chronograph-minutes'
+  | 'chronograph-hours'
+  | '24-hour'
+  | 'power-reserve'
+  | 'day'
+  | 'date'
+  | 'month'
+  | 'moonphase'
+  | 'gmt'
+  | 'custom';
+
+export type MovementEvidenceStatus = 'PUBLISHED' | 'ESTIMATED_NOMINAL' | 'UNVERIFIED';
+
+export interface MovementSubdialDefinition {
+  id: string;
+  role: MovementSubdialRole;
+  /** Clock position using the visual convention 0deg=12h, 90deg=3h. */
+  angleDeg: number;
+  clockPosition: string;
+  centerRadiusMm: number | null;
+  previewCenterRadiusMm: number;
+  registerRadiusMm: number;
+  handRadiusMm: number;
+  markerCount: number;
+  scaleMax: number;
+  handBoreMm: number | null;
+  rotationDirection: 'clockwise' | 'counter-clockwise';
+  layoutEvidence: { status: MovementEvidenceStatus; source: string };
+  geometryEvidence: { status: MovementEvidenceStatus; source: string };
+}
+
 export interface MovementTemplate {
   id: string;
   name: string;
@@ -6,6 +39,8 @@ export interface MovementTemplate {
   centerHoleMm: number;
   stemPosition: '3h' | '4h' | '9h';
   subdialPositionsDeg: number[];
+  /** Movement-owned register semantics. Legacy angle arrays must not be used for new layouts. */
+  subdials?: MovementSubdialDefinition[];
   datePosition: string | null;
   handSizesMm: {
     hour: number;
@@ -26,6 +61,27 @@ export interface MovementTemplate {
   pusherPositionsDeg: number[];
 }
 
+const TMI_VK_SOURCE = 'https://www.timemodule.com/en/product_line_up/quartz/chronograph/premium_chronograph_VK/';
+const TMI_VK63_GUIDE = 'https://www.timemodule.com/uploads/attachments/download/Technical%20Guide/VK63_TG.pdf';
+const TMI_VK67_GUIDE = 'https://www.timemodule.com/uploads/attachments/download/Technical%20Guide/VK67_TG.pdf';
+const ESTIMATED_REGISTER_SOURCE = 'AI nominal preview baseline; physical movement/dial drawing required';
+const vkRegister = (
+  id: string,
+  role: MovementSubdialRole,
+  angleDeg: number,
+  clockPosition: string,
+  scaleMax: number,
+  markerCount: number,
+  source = TMI_VK_SOURCE,
+  layoutStatus: MovementEvidenceStatus = 'PUBLISHED'
+): MovementSubdialDefinition => ({
+  id, role, angleDeg, clockPosition, centerRadiusMm: null, previewCenterRadiusMm: 6.2,
+  registerRadiusMm: 3.1, handRadiusMm: 2.45, markerCount, scaleMax, handBoreMm: null,
+  rotationDirection: 'clockwise',
+  layoutEvidence: { status: layoutStatus, source },
+  geometryEvidence: { status: 'ESTIMATED_NOMINAL', source: ESTIMATED_REGISTER_SOURCE }
+});
+
 export const movementLibrary: MovementTemplate[] = [
   {
     id: 'vk63',
@@ -34,7 +90,12 @@ export const movementLibrary: MovementTemplate[] = [
     dialDiameterMm: 30.5,
     centerHoleMm: 1.6,
     stemPosition: '3h',
-    subdialPositionsDeg: [180, 330],
+    subdialPositionsDeg: [270, 180, 90],
+    subdials: [
+      vkRegister('vk63-minute-counter', 'chronograph-minutes', 270, '9h', 60, 12, TMI_VK63_GUIDE),
+      vkRegister('vk63-small-seconds', 'small-seconds', 180, '6h', 60, 12, TMI_VK63_GUIDE),
+      vkRegister('vk63-24-hour', '24-hour', 90, '3h', 24, 8, TMI_VK63_GUIDE)
+    ],
     datePosition: '4:30',
     handSizesMm: { hour: 1.5, minute: 0.9, second: 0.2 },
     clearancesMm: { dialToHands: 0.2, handsToCrystal: 0.35 },
@@ -52,7 +113,11 @@ export const movementLibrary: MovementTemplate[] = [
     dialDiameterMm: 30.5,
     centerHoleMm: 1.6,
     stemPosition: '3h',
-    subdialPositionsDeg: [180, 330],
+    subdialPositionsDeg: [270, 90],
+    subdials: [
+      vkRegister('vk64-minute-counter', 'chronograph-minutes', 270, '9h', 60, 12, TMI_VK_SOURCE, 'UNVERIFIED'),
+      vkRegister('vk64-24-hour', '24-hour', 90, '3h', 24, 8, TMI_VK_SOURCE, 'UNVERIFIED')
+    ],
     datePosition: '3:00',
     handSizesMm: { hour: 1.5, minute: 0.9, second: 0.2 },
     clearancesMm: { dialToHands: 0.2, handsToCrystal: 0.35 },
@@ -70,7 +135,12 @@ export const movementLibrary: MovementTemplate[] = [
     dialDiameterMm: 30.5,
     centerHoleMm: 1.6,
     stemPosition: '3h',
-    subdialPositionsDeg: [150, 210],
+    subdialPositionsDeg: [0, 270, 180],
+    subdials: [
+      vkRegister('vk67-minute-counter', 'chronograph-minutes', 0, '12h', 60, 12, TMI_VK67_GUIDE),
+      vkRegister('vk67-hour-counter', 'chronograph-hours', 270, '9h', 12, 12, TMI_VK67_GUIDE),
+      vkRegister('vk67-small-seconds', 'small-seconds', 180, '6h', 60, 12, TMI_VK67_GUIDE)
+    ],
     datePosition: 'none',
     handSizesMm: { hour: 1.5, minute: 0.9, second: 0.2 },
     clearancesMm: { dialToHands: 0.2, handsToCrystal: 0.35 },
@@ -88,7 +158,12 @@ export const movementLibrary: MovementTemplate[] = [
     dialDiameterMm: 30.5,
     centerHoleMm: 1.6,
     stemPosition: '3h',
-    subdialPositionsDeg: [150, 270],
+    subdialPositionsDeg: [270, 180, 90],
+    subdials: [
+      vkRegister('vk68-minute-counter', 'chronograph-minutes', 270, '9h', 60, 12, TMI_VK_SOURCE, 'UNVERIFIED'),
+      vkRegister('vk68-small-seconds', 'small-seconds', 180, '6h', 60, 12, TMI_VK_SOURCE, 'UNVERIFIED'),
+      vkRegister('vk68-24-hour', '24-hour', 90, '3h', 24, 8, TMI_VK_SOURCE, 'UNVERIFIED')
+    ],
     datePosition: 'none',
     handSizesMm: { hour: 1.5, minute: 0.9, second: 0.2 },
     clearancesMm: { dialToHands: 0.2, handsToCrystal: 0.35 },
@@ -106,7 +181,12 @@ export const movementLibrary: MovementTemplate[] = [
     dialDiameterMm: 30.5,
     centerHoleMm: 1.6,
     stemPosition: '3h',
-    subdialPositionsDeg: [150, 210],
+    subdialPositionsDeg: [270, 180, 90],
+    subdials: [
+      vkRegister('vk73-minute-counter', 'chronograph-minutes', 270, '9h', 60, 12, TMI_VK_SOURCE, 'UNVERIFIED'),
+      vkRegister('vk73-small-seconds', 'small-seconds', 180, '6h', 60, 12, TMI_VK_SOURCE, 'UNVERIFIED'),
+      vkRegister('vk73-24-hour', '24-hour', 90, '3h', 24, 8, TMI_VK_SOURCE, 'UNVERIFIED')
+    ],
     datePosition: '6:00',
     handSizesMm: { hour: 1.5, minute: 0.9, second: 0.2 },
     clearancesMm: { dialToHands: 0.2, handsToCrystal: 0.35 },
@@ -305,6 +385,25 @@ export const movementLibrary: MovementTemplate[] = [
     centerHoleMm: 1.5,
     stemPosition: '3h',
     subdialPositionsDeg: [],
+    datePosition: '3:00',
+    handSizesMm: { hour: 1.5, minute: 0.9, second: 0.2 },
+    clearancesMm: { dialToHands: 0.16, handsToCrystal: 0.3 },
+    recommendedChapterRingDiameterMm: 32,
+    recommendedBezelDiameterMm: 37,
+    feetPositionsDeg: [35, 215],
+    dateWindowSupported: true,
+    pusherCount: 0,
+    pusherPositionsDeg: []
+  },
+  {
+    id: 'miyota-9015',
+    name: 'Miyota 9015',
+    manufacturer: 'Miyota',
+    dialDiameterMm: 26,
+    centerHoleMm: 1.5,
+    stemPosition: '3h',
+    subdialPositionsDeg: [],
+    subdials: [],
     datePosition: '3:00',
     handSizesMm: { hour: 1.5, minute: 0.9, second: 0.2 },
     clearancesMm: { dialToHands: 0.16, handsToCrystal: 0.3 },

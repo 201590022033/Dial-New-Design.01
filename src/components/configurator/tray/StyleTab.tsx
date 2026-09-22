@@ -28,6 +28,12 @@ const STRAP_STYLES = [
   { id: 'racing', label: 'Racing', note: 'Perforated chronograph strap' }
 ] as const;
 
+const SUBDIAL_HAND_STYLES = [
+  { id: 'needle', label: 'Needle', note: 'Fine technical register hand' },
+  { id: 'baton', label: 'Baton', note: 'Bold rectangular register hand' },
+  { id: 'syringe', label: 'Syringe', note: 'Tapered instrument register hand' }
+] as const;
+
 export const StyleTab: React.FC = () => {
   const activePartInstanceId = useConfiguratorUIStore((s) => s.activePartInstanceId);
   const setPreview = useConfiguratorUIStore((s) => s.setPreview);
@@ -169,6 +175,18 @@ export const StyleTab: React.FC = () => {
             className={cn('rounded-lg border p-2 text-left', visualReferenceConfig?.strapStyleId === style.id ? 'border-teal-400 bg-slate-800' : 'border-slate-800 bg-slate-900')}>
             <span className="block text-xs text-slate-200">{style.label}</span>
             <span className="block text-[10px] text-slate-400">{style.note}</span>
+          </button>)}
+        </div>
+      </div>
+
+      <div className="space-y-2 pt-2 border-t border-slate-800">
+        <h4 className="text-[11px] font-mono text-slate-400 uppercase tracking-wider">Subdial Hands</h4>
+        <p className="text-[10px] text-slate-400">Shown for movement-owned registers. Supplier bore verification is still required.</p>
+        <div className="grid grid-cols-3 gap-2">
+          {SUBDIAL_HAND_STYLES.map((style) => <button key={style.id} type="button" title={style.note}
+            onClick={() => updateVisualReferenceConfig({ subdialHandStyle: style.id })}
+            className={cn('rounded-lg border p-2 text-left', (visualReferenceConfig?.subdialHandStyle ?? 'needle') === style.id ? 'border-teal-400 bg-slate-800' : 'border-slate-800 bg-slate-900')}>
+            <span className="block text-xs text-slate-200">{style.label}</span>
           </button>)}
         </div>
       </div>

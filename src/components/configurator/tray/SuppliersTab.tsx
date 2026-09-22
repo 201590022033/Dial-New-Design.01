@@ -5,6 +5,8 @@ import { useWatchAssemblyStore } from '@/stores/watchAssemblyStore';
 import { useCatalogueStore } from '@/stores/catalogueStore';
 import { useSourcingStore } from '@/stores/sourcingStore';
 import { cn } from '@/utils/cn';
+import { getMovementSupplierReadiness } from '@/domain/movements/movementSupplierReadiness';
+import { getCatalogueItem } from '@/domain/catalogue/catalogueRegistry';
 
 export const SuppliersTab: React.FC = () => {
   const activePartInstanceId = useConfiguratorUIStore((s) => s.activePartInstanceId);
@@ -27,6 +29,9 @@ export const SuppliersTab: React.FC = () => {
   );
 
   const selectedListingId = sourcingSelections[activePartInstanceId] ?? null;
+  const movementReadiness = getCatalogueItem(activePart?.catalogueItemId ?? '')?.kind === 'movement'
+    ? getMovementSupplierReadiness(assembly.metadata.movement)
+    : null;
 
   return (
     <div className="flex flex-col h-full overflow-y-auto p-3 gap-4" data-testid="suppliers-tab">
@@ -38,6 +43,15 @@ export const SuppliersTab: React.FC = () => {
           Selecting a seller updates procurement records and BOM pricing with zero mutation to CAD geometry.
         </p>
       </div>
+
+      {movementReadiness && !movementReadiness.orderable && (
+        <div className="rounded-lg border border-amber-700/60 bg-amber-950/30 p-3 text-[11px] text-amber-100">
+          <p className="font-semibold">Movement-specific sourcing is incomplete</p>
+          <ul className="mt-1 list-disc space-y-1 pl-4 text-amber-200/80">
+            {movementReadiness.blockingReasons.map((reason) => <li key={reason}>{reason}</li>)}
+          </ul>
+        </div>
+      )}
 
       {relevantListings.length === 0 ? (
         <div className="p-4 rounded-lg bg-slate-900 border border-slate-800 text-center text-slate-400 text-xs">

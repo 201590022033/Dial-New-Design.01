@@ -24,12 +24,29 @@ describe('WatchAssembly visual adapter', () => {
 
   it('wires marker geometry, movement subdials and date windows into the visual dial model', () => {
     const assembly = createDefaultWatchAssembly();
+    assembly.globalDimensions.caseDiameterMm = 42;
     assembly.metadata.movement = 'vk63';
     assembly.designConfig!.markerConfig = { ...assembly.designConfig!.markerConfig!, count: 24 };
     const model = watchAssemblyToVisualModel(assembly);
     expect(model.dial.markers).toHaveLength(24);
-    expect(model.dial.subdials).toHaveLength(2);
+    expect(model.dial.subdials).toHaveLength(3);
+    expect(model.dial.subdials.map((subdial) => [subdial.role, subdial.angleDeg])).toEqual([
+      ['chronograph-minutes', 270], ['small-seconds', 180], ['24-hour', 90]
+    ]);
     expect(model.dial.windows.some((window) => window.kind === 'date')).toBe(true);
+  });
+
+  it('switches the chronograph register-hand GLB without changing movement geometry', () => {
+    const assembly = createDefaultWatchAssembly();
+    assembly.globalDimensions.caseDiameterMm = 42;
+    assembly.metadata.movement = 'vk63';
+    assembly.designConfig!.visualReferenceConfig = {
+      archetypeId: 'archetype-chronograph',
+      subdialHandStyle: 'syringe'
+    };
+    const model = watchAssemblyToVisualModel(assembly);
+    expect(model.assets.hands.assetId).toBe('archetype-hands-chronograph-syringe');
+    expect(model.dial.subdials.every((subdial) => subdial.handStyle === 'syringe')).toBe(true);
   });
 
   it('maps configurable typography into the 3D dial artwork layer', () => {

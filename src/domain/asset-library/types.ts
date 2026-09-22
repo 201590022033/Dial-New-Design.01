@@ -206,3 +206,21 @@ export interface StyleAliasReferenceDefinition {
   sourceReference: string;
   provenance: 'reference-only';
 }
+
+export interface SubdialReferenceDefinition {
+  id: string;
+  label: string;
+  role: 'small-seconds' | 'chronograph-minutes' | 'chronograph-hours' | '24-hour' | 'power-reserve' | 'day' | 'date' | 'month' | 'moonphase' | 'gmt';
+  movementOwned: true;
+  sourceReference: string;
+  provenance: 'reference-only';
+}
+
+export interface LugReferenceDefinition {
+  id: string;
+  label: string;
+  family: 'straight' | 'curved' | 'twisted' | 'hooded' | 'integrated' | 'drilled' | 'wire' | 'teardrop' | 'faceted' | 'skeleton';
+  affectsCaseGeometry: true;
+  sourceReference: string;
+  provenance: 'reference-only';
+}

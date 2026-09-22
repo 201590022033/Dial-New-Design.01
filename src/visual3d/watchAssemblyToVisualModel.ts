@@ -30,7 +30,7 @@ export type DialVisualDescriptor = {
   thicknessMm: number;
   centreHoleDiameterMm: number;
   markers: Array<{ angleDeg: number; innerRadiusMm: number; outerRadiusMm: number; widthMm: number; text?: string; lumed: boolean }>;
-  subdials: Array<{ role: string; angleDeg: number; radiusMm: number; handRadiusMm: number; markerCount: number }>;
+  subdials: Array<{ role: string; angleDeg: number; centerRadiusMm: number; radiusMm: number; handRadiusMm: number; markerCount: number; scaleMax: number; handStyle: 'needle' | 'baton' | 'syringe'; geometryStatus: string }>;
   windows: Array<{ kind: 'date' | 'day' | 'day-date'; angleDeg: number; widthMm: number; heightMm: number; cornerRadiusMm: number }>;
   textureKind: string;
   textureIntensity: number;
@@ -134,6 +134,9 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
     pushers: archetypeProfile.pusherAssetId,
     strap: `archetype-strap-${visualReferences.strapStyleId ?? archetypeProfile.strapStyleId}`
   } : {};
+  if (visualReferences.archetypeId === 'archetype-chronograph' && visualReferences.subdialHandStyle) {
+    archetypeAssets.hands = `archetype-hands-chronograph-${visualReferences.subdialHandStyle}`;
+  }
   if (visualReferences.strapStyleId) {
     archetypeAssets.strap = `archetype-strap-${visualReferences.strapStyleId}`;
   }
@@ -200,9 +203,16 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
       thicknessMm: positive(dialPart?.dimensions.thicknessMm, 0.4),
       centreHoleDiameterMm: positive(dialConfig?.centreHole?.diameterMm, 1.5),
       markers: generateMarkers(markerConfig).map((marker) => ({ ...marker, lumed: markerConfig.style.lumed })),
-      subdials: (movement?.subdialPositionsDeg ?? []).map((angleDeg, index) => ({
-        role: movement?.pusherCount ? ['chronograph-seconds', 'chronograph-minutes', 'chronograph-hours'][index] ?? 'custom' : 'small-seconds',
-        angleDeg, radiusMm: 3.6, handRadiusMm: 2.8, markerCount: 12
+      subdials: (movement?.subdials ?? []).map((subdial) => ({
+        role: subdial.role,
+        angleDeg: subdial.angleDeg,
+        centerRadiusMm: subdial.centerRadiusMm ?? subdial.previewCenterRadiusMm,
+        radiusMm: subdial.registerRadiusMm,
+        handRadiusMm: subdial.handRadiusMm,
+        markerCount: subdial.markerCount,
+        scaleMax: subdial.scaleMax,
+        handStyle: visualReferences.subdialHandStyle ?? 'needle',
+        geometryStatus: subdial.geometryEvidence.status
       })),
       windows,
       textureKind: dialTexture.kind,

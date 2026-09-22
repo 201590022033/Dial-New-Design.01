@@ -1,0 +1,9 @@
+{
+  "capturedAt": "2026-09-22",
+  "provenance": "reference-only",
+  "files": [
+    { "file": "watch-subdials.jpeg", "sha256": "42960634056F9104F4ADA714157697505B883A6CB89CCD0B7537973D276674D6", "purpose": "subdial taxonomy" },
+    { "file": "watch-movements.jpeg", "sha256": "D82D994ACBD60F759455E94A231E2A31B8D22126CB659F2A70511FDBAD3445CE", "purpose": "movement comparison prompt" },
+    { "file": "watch-lugs.jpeg", "sha256": "2A3B8FFB9D87C354EB83AF133603469DE5B78A80CF924A3CB71897CAEDF5A186", "purpose": "lug taxonomy" }
+  ]
+}

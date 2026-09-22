@@ -1,5 +1,13 @@
 # Dial Designer Roadmap
 
+## P11 movement-owned subdials and case-family expansion
+
+The first movement-owned dial architecture is now implemented for TMI VK63. The central preview uses the published 9 h chronograph-minute, 6 h small-seconds and 3 h 24-hour roles, with configurable needle, baton and syringe register-hand presentation assets. The social-media subdial, movement and lug references are catalogued as `reference-only`.
+
+The VK63 radial register distance, register diameter and hand geometry are temporary `ESTIMATED_NOMINAL` preview values. Commercial movement, compatible dial and register-hand supplier mappings remain incomplete, so this slice is intentionally not orderable. The next engineering step is to attach a reviewed VK63 technical/dial drawing and supplier SKUs, verify register centres and hand bores, then promote only those interfaces supported by evidence.
+
+Lug families are queued as separate case-platform variants rather than decorative archetype choices. Curved, twisted, hooded, integrated, wire, teardrop, faceted and skeleton lugs must each receive their own measured case envelope before GLB generation can claim physical compatibility.
+
 ## Status at the parametric 3D milestone
 
 The repository already provides a production-oriented 2D dial engineering system: typed watch assemblies, concentric geometry and validation engines, movement templates, manufacturing evidence, SVG/export workflows, project persistence, and a visual 3D adapter with procedural fallbacks and optional GLB descriptors. The architecture baseline remains frozen; new work must compose with those contracts.

@@ -1,0 +1,12 @@
+[
+  { "id": "lug-straight", "label": "Straight lugs", "family": "straight", "affectsCaseGeometry": true, "sourceReference": "2026-09-22/watch-lugs.jpeg", "provenance": "reference-only" },
+  { "id": "lug-curved", "label": "Curved lugs", "family": "curved", "affectsCaseGeometry": true, "sourceReference": "2026-09-22/watch-lugs.jpeg", "provenance": "reference-only" },
+  { "id": "lug-twisted", "label": "Twisted lugs", "family": "twisted", "affectsCaseGeometry": true, "sourceReference": "2026-09-22/watch-lugs.jpeg", "provenance": "reference-only" },
+  { "id": "lug-hooded", "label": "Hooded lugs", "family": "hooded", "affectsCaseGeometry": true, "sourceReference": "2026-09-22/watch-lugs.jpeg", "provenance": "reference-only" },
+  { "id": "lug-integrated", "label": "Integrated lugs", "family": "integrated", "affectsCaseGeometry": true, "sourceReference": "2026-09-22/watch-lugs.jpeg", "provenance": "reference-only" },
+  { "id": "lug-drilled", "label": "Drilled lugs", "family": "drilled", "affectsCaseGeometry": true, "sourceReference": "2026-09-22/watch-lugs.jpeg", "provenance": "reference-only" },
+  { "id": "lug-wire", "label": "Wire lugs", "family": "wire", "affectsCaseGeometry": true, "sourceReference": "2026-09-22/watch-lugs.jpeg", "provenance": "reference-only" },
+  { "id": "lug-teardrop", "label": "Teardrop lugs", "family": "teardrop", "affectsCaseGeometry": true, "sourceReference": "2026-09-22/watch-lugs.jpeg", "provenance": "reference-only" },
+  { "id": "lug-faceted", "label": "Faceted lugs", "family": "faceted", "affectsCaseGeometry": true, "sourceReference": "2026-09-22/watch-lugs.jpeg", "provenance": "reference-only" },
+  { "id": "lug-skeleton", "label": "Skeleton lugs", "family": "skeleton", "affectsCaseGeometry": true, "sourceReference": "2026-09-22/watch-lugs.jpeg", "provenance": "reference-only" }
+]

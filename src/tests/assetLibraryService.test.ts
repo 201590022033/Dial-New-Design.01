@@ -12,6 +12,8 @@ import {
   scaleAssets,
   supplierProfileAssets,
   styleAliasReferences,
+  subdialReferenceAssets,
+  lugReferenceAssets,
   typographyAssets
 } from '@/domain/asset-library';
 import {
@@ -35,6 +37,8 @@ describe('asset library service', () => {
     expect(complicationReferenceAssets.length).toBe(12);
     expect(archetypeReferenceAssets.length).toBeGreaterThanOrEqual(9);
     expect(styleAliasReferences.length).toBeGreaterThanOrEqual(10);
+    expect(subdialReferenceAssets).toHaveLength(10);
+    expect(lugReferenceAssets).toHaveLength(10);
   });
 
   it('keeps visual reference taxonomies explicitly non-engineering', () => {
@@ -42,6 +46,8 @@ describe('asset library service', () => {
     expect(bezelReferenceAssets.every((asset) => asset.provenance === 'reference-only')).toBe(true);
     expect(complicationReferenceAssets.find((asset) => asset.id === 'complication-chronograph')?.windowOrSubdialCount).toBe(3);
     expect(styleAliasReferences.find((asset) => asset.id === 'hand-broad-arrow')?.aliases).toContain('Arrow');
+    expect(subdialReferenceAssets.every((asset) => asset.movementOwned && asset.provenance === 'reference-only')).toBe(true);
+    expect(lugReferenceAssets.every((asset) => asset.affectsCaseGeometry && asset.provenance === 'reference-only')).toBe(true);
   });
 
   it('produces an aggregate summary and source categories', () => {

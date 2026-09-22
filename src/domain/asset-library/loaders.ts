@@ -11,6 +11,8 @@ import bezelReferencesData from '@/domain/asset-library/data/bezelReferences.jso
 import complicationReferencesData from '@/domain/asset-library/data/complicationReferences.json';
 import archetypeReferencesData from '@/domain/asset-library/data/archetypeReferences.json';
 import styleAliasesData from '@/domain/asset-library/data/styleAliases.json';
+import subdialReferencesData from '@/domain/asset-library/data/subdialReferences.json';
+import lugReferencesData from '@/domain/asset-library/data/lugReferences.json';
 import type {
   BezelReferenceDefinition,
   ChapterRingAssetDefinition,
@@ -23,6 +25,8 @@ import type {
   ScaleAssetDefinition,
   SupplierProfileDataDefinition,
   StyleAliasReferenceDefinition,
+  SubdialReferenceDefinition,
+  LugReferenceDefinition,
   WatchArchetypeReferenceDefinition,
   TypographyAssetDefinition
 } from '@/domain/asset-library/types';
@@ -40,6 +44,8 @@ export const bezelReferenceAssets = bezelReferencesData as BezelReferenceDefinit
 export const complicationReferenceAssets = complicationReferencesData as ComplicationReferenceDefinition[];
 export const archetypeReferenceAssets = archetypeReferencesData as WatchArchetypeReferenceDefinition[];
 export const styleAliasReferences = styleAliasesData as StyleAliasReferenceDefinition[];
+export const subdialReferenceAssets = subdialReferencesData as SubdialReferenceDefinition[];
+export const lugReferenceAssets = lugReferencesData as LugReferenceDefinition[];
 
 export const getScaleAssetById = (id: string): ScaleAssetDefinition | null => {
   return scaleAssets.find((asset) => asset.id === id) ?? null;
@@ -66,3 +72,9 @@ export const getComplicationReferenceById = (id: string): ComplicationReferenceD
 
 export const getArchetypeReferenceById = (id: string): WatchArchetypeReferenceDefinition | null =>
   archetypeReferenceAssets.find((asset) => asset.id === id) ?? null;
+
+export const getSubdialReferenceById = (id: string): SubdialReferenceDefinition | null =>
+  subdialReferenceAssets.find((asset) => asset.id === id) ?? null;
+
+export const getLugReferenceById = (id: string): LugReferenceDefinition | null =>
+  lugReferenceAssets.find((asset) => asset.id === id) ?? null;

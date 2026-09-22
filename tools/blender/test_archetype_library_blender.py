@@ -10,7 +10,7 @@ from validate_glb import import_glb
 
 root = Path(__file__).resolve().parents[2] / "public" / "assets" / "3d" / "archetypes"
 manifest = json.loads((root / "manifest.json").read_text(encoding="utf-8"))
-expected = 20
+expected = 23
 if manifest.get("status") != "provisional-presentation" or len(manifest.get("assets", [])) != expected:
     raise AssertionError("Archetype manifest is incomplete or has invalid provenance")
 

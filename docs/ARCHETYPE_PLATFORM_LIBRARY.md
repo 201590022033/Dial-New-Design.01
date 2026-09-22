@@ -25,12 +25,11 @@ Each new watch offering is composed from two independent records:
 The order pipeline evaluates the combination. A presentation-only kit can be
 rendered, but it cannot produce an orderable NMK901 BOM.
 
-## Planned reference-image and subdial intake
+## Reference-image and subdial intake
 
-The next substantial phase begins after the two new reference images are added.
-For each image, record visible dial features, subdial centers as normalized dial
-coordinates, subdial diameter ratios, scale divisions, hand styles, apertures,
-typography and uncertainty. Image observations are visual evidence only.
+The 2026-09-22 subdial, movement and lug captures are now registered in the
+reference library. They provide role and style vocabulary only; dimensions are
+not inferred from social-media images.
 
 Subdial geometry must then be mapped to a specific movement record before GLB
 generation. Each movement layout will define subdial roles, center coordinates,
@@ -41,3 +40,10 @@ or bore data blocks ordering while still allowing a labelled preview.
 
 The generated dial and subdial-hand GLBs will consume those movement records;
 archetype images will control styling but never override movement geometry.
+
+VK63 is the first implementation of this flow. Its 9 h chronograph-minute,
+6 h small-seconds and 3 h 24-hour roles are published movement behavior. The
+current 6.2 mm register-centre radius and register-hand geometry are labelled
+`ESTIMATED_NOMINAL`; hand bores are unknown. Needle, baton and syringe GLBs are
+therefore valid presentation choices but remain non-orderable until compatible
+commercial SKUs and physical dimensions are reviewed.

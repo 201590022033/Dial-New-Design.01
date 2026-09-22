@@ -1,0 +1,12 @@
+[
+  { "id": "subdial-small-seconds", "label": "Small seconds", "role": "small-seconds", "movementOwned": true, "sourceReference": "2026-09-22/watch-subdials.jpeg", "provenance": "reference-only" },
+  { "id": "subdial-30-minute", "label": "30/60-minute counter", "role": "chronograph-minutes", "movementOwned": true, "sourceReference": "2026-09-22/watch-subdials.jpeg", "provenance": "reference-only" },
+  { "id": "subdial-12-hour", "label": "12-hour counter", "role": "chronograph-hours", "movementOwned": true, "sourceReference": "2026-09-22/watch-subdials.jpeg", "provenance": "reference-only" },
+  { "id": "subdial-24-hour", "label": "24-hour indicator", "role": "24-hour", "movementOwned": true, "sourceReference": "2026-09-22/watch-subdials.jpeg", "provenance": "reference-only" },
+  { "id": "subdial-power-reserve", "label": "Power reserve", "role": "power-reserve", "movementOwned": true, "sourceReference": "2026-09-22/watch-subdials.jpeg", "provenance": "reference-only" },
+  { "id": "subdial-day", "label": "Day of week", "role": "day", "movementOwned": true, "sourceReference": "2026-09-22/watch-subdials.jpeg", "provenance": "reference-only" },
+  { "id": "subdial-date", "label": "Pointer date", "role": "date", "movementOwned": true, "sourceReference": "2026-09-22/watch-subdials.jpeg", "provenance": "reference-only" },
+  { "id": "subdial-month", "label": "Month", "role": "month", "movementOwned": true, "sourceReference": "2026-09-22/watch-subdials.jpeg", "provenance": "reference-only" },
+  { "id": "subdial-moonphase", "label": "Moonphase", "role": "moonphase", "movementOwned": true, "sourceReference": "2026-09-22/watch-subdials.jpeg", "provenance": "reference-only" },
+  { "id": "subdial-gmt", "label": "GMT / dual time", "role": "gmt", "movementOwned": true, "sourceReference": "2026-09-22/watch-subdials.jpeg", "provenance": "reference-only" }
+]

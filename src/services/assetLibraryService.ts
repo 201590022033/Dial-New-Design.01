@@ -11,6 +11,8 @@ import {
   scaleAssets,
   supplierProfileAssets,
   styleAliasReferences,
+  subdialReferenceAssets,
+  lugReferenceAssets,
   typographyAssets,
   type TypographyAssetDefinition
 } from '@/domain/asset-library';
@@ -30,6 +32,8 @@ export const assetLibrarySummary = () => {
     complicationReferences: complicationReferenceAssets.length,
     archetypeReferences: archetypeReferenceAssets.length,
     styleAliases: styleAliasReferences.length
+    , subdialReferences: subdialReferenceAssets.length
+    , lugReferences: lugReferenceAssets.length
   };
 };
 

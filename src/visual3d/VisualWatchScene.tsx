@@ -184,11 +184,16 @@ const ProceduralComponent = ({ category, model }: { category: VisualCategory; mo
       })}
       {model.dial.subdials.map((subdial, index) => {
         const theta = (subdial.angleDeg * Math.PI) / 180;
-        const x = radius * 0.52 * Math.sin(theta);
-        const y = radius * 0.52 * Math.cos(theta);
+        const x = subdial.centerRadiusMm * Math.sin(theta);
+        const y = subdial.centerRadiusMm * Math.cos(theta);
+        const handWidth = subdial.handStyle === 'baton' ? 0.28 : subdial.handStyle === 'syringe' ? 0.22 : 0.14;
         return <group key={`subdial-${index}`} position={[x, y, 0.34]}>
           <mesh rotation={[Math.PI / 2, 0, 0]}><cylinderGeometry args={[subdial.radiusMm, subdial.radiusMm, 0.08, 64]} /><meshStandardMaterial {...finish(model.finishes.dial, '#111827')} /></mesh>
           <mesh rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[subdial.radiusMm * 0.82, 0.12, 12, 48]} /><meshStandardMaterial {...finish(model.finishes.bezel, '#94a3b8')} /></mesh>
+          <mesh position={[0, subdial.handRadiusMm * 0.42, 0.14]} rotation={[0, 0, index * 0.7]}>
+            <boxGeometry args={[handWidth, subdial.handRadiusMm, 0.12]} /><meshStandardMaterial {...finish(model.finishes.hands, model.archetypeAppearance.accentColor)} />
+          </mesh>
+          <mesh position={[0, 0, 0.18]} rotation={[Math.PI / 2, 0, 0]}><cylinderGeometry args={[0.28, 0.28, 0.14, 32]} /><meshStandardMaterial {...finish(model.finishes.hands)} /></mesh>
         </group>;
       })}
       {model.dial.windows.map((window, index) => {
