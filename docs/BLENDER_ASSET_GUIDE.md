@@ -143,7 +143,16 @@ blender --background --factory-startup --python tools/blender/generate_visual_li
 blender --background --factory-startup --python tools/blender/parametric_dial_v1.py -- --params tools/blender/test_dial_face_40mm.json --output public/assets/3d/dials/dial_face_40mm_layout_v1.glb
 ```
 
-The dial fixture is texture-ready for Blender rendering: its procedural surface shader is preserved in the GLB, and its marker geometry, three VK63-role chronograph registers, and date/day apertures are separate meshes. The VK63 layout semantics are movement-owned; the 6.2 mm preview centre radius, register size and hand bores remain estimated or unknown until canonical supplier evidence is complete.
+The dial fixture is texture-ready for Blender rendering: its procedural surface shader is preserved in the GLB, and its marker geometry, three VK63-role chronograph registers, and date/day apertures are separate meshes. The VK63 layout semantics, 7.50 mm register centres and post diameters come from TMI's official drawing; register artwork diameter and hand silhouettes remain estimated until supplier evidence is complete.
+
+## Lug-case option library
+
+`generate_lug_case_library.py` consumes the controlled 42 mm case fixture and generates ten complete case GLBs under `public/assets/3d/lug-cases/`. The styles are straight, curved, twisted, hooded, integrated, drilled, wire, teardrop, faceted and skeleton. These are selectable central-view assets with `provisional-presentation` provenance. They are not interchangeable manufacturing platforms: wire and integrated styles change the strap interface, and every family still needs its own measured drawing and physical validation.
+
+```powershell
+blender --background --factory-startup --python-exit-code 1 --python tools/blender/generate_lug_case_library.py -- --params tools/blender/test_case_42.json --output public/assets/3d/lug-cases
+blender --background --factory-startup --python-exit-code 1 --python tools/blender/test_lug_case_library_blender.py
+```
 
 ## Shared local component render-and-review harness
 

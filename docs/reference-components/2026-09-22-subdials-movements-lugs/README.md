@@ -8,7 +8,7 @@ These three user-supplied social-media captures are retained as visual taxonomy 
 | `watch-movements.jpeg` | NH35, NH36, NH38, Miyota 8215 and Miyota 9015 comparison prompt | Manufacturer documentation remains authoritative. These pictured movements do not gain subdials. |
 | `watch-lugs.jpeg` | Ten visual lug families | Lug style changes case geometry and needs a separate measured platform fixture. |
 
-The first implemented movement-specific slice is TMI VK63: 9 h chronograph-minute counter, 6 h small seconds and 3 h 24-hour indicator. Register radius, radial centre distance and hand bores remain `ESTIMATED_NOMINAL` or unknown until a reviewed technical drawing and physical Golden Sample measurements are attached.
+The first implemented movement-specific slice is TMI VK63: 9 h chronograph-minute counter, 6 h small seconds and 3 h 24-hour indicator. TMI's official drawing now supplies 7.50 mm register centres and post diameters. Register artwork radius and hand silhouettes remain `ESTIMATED_NOMINAL` until supplier drawings and physical samples are reviewed.
 
 Primary technical sources:
 

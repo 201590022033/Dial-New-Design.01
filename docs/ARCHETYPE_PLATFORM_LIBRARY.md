@@ -43,7 +43,8 @@ archetype images will control styling but never override movement geometry.
 
 VK63 is the first implementation of this flow. Its 9 h chronograph-minute,
 6 h small-seconds and 3 h 24-hour roles are published movement behavior. The
-current 6.2 mm register-centre radius and register-hand geometry are labelled
-`ESTIMATED_NOMINAL`; hand bores are unknown. Needle, baton and syringe GLBs are
-therefore valid presentation choices but remain non-orderable until compatible
-commercial SKUs and physical dimensions are reviewed.
+official TMI drawing now supplies 7.50 mm register centres and the three register
+post diameters. Register artwork size and hand silhouettes remain
+`ESTIMATED_NOMINAL`. Needle, baton and syringe GLBs are therefore valid
+presentation choices but remain non-orderable until compatible commercial dial
+and hand SKUs are reviewed.

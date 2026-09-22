@@ -7,6 +7,19 @@ const baseCase = (): ParametricCaseV1 => ({ schema: PARAMETRIC_CASE_V1, ...Objec
 const hand = (): ParametricHandV1 => ({ schema: PARAMETRIC_HAND_V1, hub: { diameter: 2, thickness: 0.2, pinionHoleDiameter: 0.5 }, body: { length: 10, rootWidth: 1, distalWidth: 0.5, thickness: 0.1 }, tip: { style: 'POINT', length: 2, width: 0.5, shoulderSweep: 0, lume: true }, tail: { style: 'NONE', length: 0, width: 0, lume: false }, lume: { body: true, tip: false, tail: false } });
 describe('parametric contracts', () => { it('exposes versions and validates known case/hand', () => { expect(PARAMETRIC_HAND_SET_V1).toBe('parametric-hand-set/v1'); expect(validateParametricCaseV1(baseCase()).status).toBe('valid'); expect(validateParametricHandV1(hand()).status).toBe('valid'); }); it('distinguishes invalid from unknown', () => { const c = baseCase(); c.caseDiameter = 0; expect(validateParametricCaseV1(c).status).toBe('invalid'); const h = hand(); h.hub.pinionHoleDiameter = u; expect(validateParametricHandV1(h).status).toBe('unknown'); }); it('supports variants, independent lume, and optional seconds', () => { const h = hand(); h.tip.style = 'TRIANGLE'; h.tail.style = 'COUNTERWEIGHT'; expect(h.lume).toEqual({ body: true, tip: false, tail: false }); const set: ParametricHandSetV1 = { schema: PARAMETRIC_HAND_SET_V1, hour: h, minute: h }; expect(set.seconds).toBeUndefined(); }); it('validates chronograph pusher configurations', () => { const c = baseCase(); c.pusherCount = 2; c.pusherLayout = '2h-4h'; c.pusherTubeRadius = 0.9; c.pusherTubeLength = 1.8; c.pusherTubeEmbed = 1.2; c.pusherBossRadius = 1.4; c.pusherBossLength = 1.0; c.pusherBossEmbed = 1.2; expect(validateParametricCaseV1(c).status).toBe('valid'); c.pusherTubeRadius = 2.0; expect(validateParametricCaseV1(c).errors).toContain('pusherTubeRadius must not exceed pusherBossRadius'); c.pusherCount = 3; expect(validateParametricCaseV1(c).status).toBe('invalid'); }); });
 
+describe('lug geometry variants', () => {
+  it.each(['straight','curved','twisted','hooded','integrated','drilled','wire','teardrop','faceted','skeleton'] as const)('accepts %s', (lugStyle) => {
+    const c = baseCase(); c.lugStyle = lugStyle; c.lugWireDiameter = 1.6; c.lugSkeletonCutoutRatio = .46;
+    expect(validateParametricCaseV1(c).status).toBe('valid');
+  });
+  it('rejects unsafe wire and skeleton parameters', () => {
+    const wire = baseCase(); wire.lugStyle = 'wire'; wire.lugWireDiameter = 0;
+    expect(validateParametricCaseV1(wire).status).toBe('invalid');
+    const skeleton = baseCase(); skeleton.lugStyle = 'skeleton'; skeleton.lugSkeletonCutoutRatio = .9;
+    expect(validateParametricCaseV1(skeleton).status).toBe('invalid');
+  });
+});
+
 const pusher = (): ParametricPusherV1 => ({ schema: 'parametric-pusher/v1', angularPositionDeg: 60, tubeRadius: 0.9, tubeLength: 1.8, tubeEmbed: 1.2, bossRadius: 1.4, bossLength: 1, bossEmbed: 1.2, headDiameterMm: 2.8, headLengthMm: 1.5, stemDiameterMm: 0.8 });
 describe('standalone pusher contract', () => { it('validates dimensions and preserves unknown status', () => { expect(validateParametricPusherV1(pusher()).status).toBe('valid'); const unknown = pusher(); unknown.stemDiameterMm = u; expect(validateParametricPusherV1(unknown).status).toBe('unknown'); const invalid = pusher(); invalid.tubeRadius = 2; expect(validateParametricPusherV1(invalid).errors).toContain('tubeRadius must not exceed bossRadius'); }); });
 

@@ -1,0 +1,28 @@
+{
+  "status": "provisional-presentation",
+  "caseEnvelopeMm": 42,
+  "styles": [
+    "straight",
+    "curved",
+    "twisted",
+    "hooded",
+    "integrated",
+    "drilled",
+    "wire",
+    "teardrop",
+    "faceted",
+    "skeleton"
+  ],
+  "assets": [
+    "case-lugs-straight.glb",
+    "case-lugs-curved.glb",
+    "case-lugs-twisted.glb",
+    "case-lugs-hooded.glb",
+    "case-lugs-integrated.glb",
+    "case-lugs-drilled.glb",
+    "case-lugs-wire.glb",
+    "case-lugs-teardrop.glb",
+    "case-lugs-faceted.glb",
+    "case-lugs-skeleton.glb"
+  ]
+}

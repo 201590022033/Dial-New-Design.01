@@ -121,6 +121,10 @@ export const applyReference42Preview = (assembly: WatchAssembly): WatchAssembly 
     designConfig: {
       ...assembly.designConfig,
       geometryParameters: { ...assembly.designConfig?.geometryParameters, caseDiameterMm: diameter },
+      visualReferenceConfig: {
+        ...assembly.designConfig?.visualReferenceConfig,
+        lugStyleId: assembly.designConfig?.visualReferenceConfig?.lugStyleId ?? 'straight'
+      },
       visualReferenceId: REFERENCE_42_ID,
       controlledOrderId: CONTROLLED_ORDER_ID,
       fitEvidence: {

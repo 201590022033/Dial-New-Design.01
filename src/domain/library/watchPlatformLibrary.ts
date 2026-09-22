@@ -61,7 +61,7 @@ export const archetypeKitLibrary: Record<string, ArchetypeKitDefinition> = {
   'archetype-chronograph': {
     archetypeId: 'archetype-chronograph', label: 'Chronograph', status: 'PRESENTATION_ONLY', compatiblePlatformIds: [],
     movementIds: ['vk63'], requiresSubdials: true, supplierMappingStatus: 'REQUIRED',
-    reason: 'The VK63 9/6/3 preview is movement-owned, but its case platform, dial geometry, register hand bores and commercial supplier map are not yet verified.'
+    reason: 'The VK63 9/6/3 centres and posts are published, but its case platform, commercial dial/hand SKUs and supplier map are not yet verified.'
   },
   'archetype-digital-sport': {
     archetypeId: 'archetype-digital-sport', label: 'Digital sport', status: 'PRESENTATION_ONLY', compatiblePlatformIds: [],

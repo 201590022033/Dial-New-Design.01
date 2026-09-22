@@ -15,6 +15,8 @@ REFERENCE = {
     'upperCaseRadiusReduction': .45, 'lowerCaseRadiusReduction': .65, 'middleCaseBulge': .20,
     'bezelLipHeight': 1.10, 'casebackLipHeight': .80, 'lugRootWidth': 5.2, 'lugTipWidth': 4.0, 'lugPairGap': 6.0,
     'lugCaseOverlap': 0.8, 'lugTipDrop': 1.35, 'lugThickness': 4.5, 'lugTaperStrength': .80,
+    'lugStyle': 'straight', 'lugCurveStrength': .75, 'lugTwistDeg': 16.0, 'lugHoodLength': 2.4,
+    'lugWireDiameter': 1.6, 'lugFacetDepth': .55, 'lugSkeletonCutoutRatio': .46,
     'crownTubeRadius': 1.50, 'crownTubeLength': 2.30, 'crownBossRadius': 2.10,
     'crownBossLength': 1.50, 'crownBossEmbed': 2.20, 'crownTubeEmbed': 1.50,
     'pusherCount': 0, 'pusherLayout': 'none', 'pusherAngularOffsetDeg': 0,
@@ -34,7 +36,7 @@ def number(p, name):
     if v < 0: raise ValueError("negative dimension: " + name)
     return float(v)
 def validate(p):
-    numeric_required = [k for k in REFERENCE.keys() if k not in ('schema', 'pusherLayout')]
+    numeric_required = [k for k in REFERENCE.keys() if k not in ('schema', 'pusherLayout', 'lugStyle')]
     for k in numeric_required: number(p, k)
     if number(p, 'caseDiameter') <= 0: raise ValueError('caseDiameter must be greater than zero')
     if number(p, 'dialOpening') >= number(p, 'caseDiameter') or number(p, 'crystalSeatDiameter') >= number(p, 'caseDiameter'): raise ValueError('openings must be smaller than caseDiameter')
@@ -46,6 +48,10 @@ def validate(p):
         raise ValueError('crownTubeBoreDiameter must be smaller than crownTubeThreadOuterDiameter')
     if number(p, 'springBarHoleFromLugTip') > number(p, 'lugToLug') / 2:
         raise ValueError('springBarHoleFromLugTip must remain inside the lug length')
+    if p.get('lugStyle', 'straight') not in ('straight','curved','twisted','hooded','integrated','drilled','wire','teardrop','faceted','skeleton'):
+        raise ValueError('unsupported lugStyle')
+    if p.get('lugStyle') == 'skeleton' and not 0 < number(p, 'lugSkeletonCutoutRatio') < .8:
+        raise ValueError('lugSkeletonCutoutRatio must be greater than 0 and less than 0.8')
     pc = int(number(p, 'pusherCount'))
     if pc not in (0, 1, 2): raise ValueError('pusherCount must be 0, 1, or 2')
     if pc > 0:
@@ -102,6 +108,49 @@ def cut_spring_bar_hole(lug, p, center_x, center_y, center_z, width):
         bpy.ops.object.modifier_apply(modifier=modifier.name)
     finally:
         bpy.data.objects.remove(cutter, do_unlink=True)
+def lug_loft(name, p, end_sign, side_sign, root_y, span, collection, material):
+    style=p.get('lugStyle','straight'); root_w=number(p,'lugRootWidth'); tip_w=number(p,'lugTipWidth')
+    thickness=number(p,'lugThickness'); drop=number(p,'lugTipDrop'); gap=number(p,'lugPairGap')
+    root_x=side_sign*(gap/2+root_w/2); tip_x=side_sign*(gap/2+tip_w/2)
+    verts=[]
+    for t in (0.0,.5,1.0):
+        y=(1-t)*root_y+t*end_sign*span
+        x=(1-t)*root_x+t*tip_x
+        width=(1-t)*root_w+t*tip_w
+        z=-drop/2
+        if style=='curved': z=-drop*(.15+.85*t*t)*number(p,'lugCurveStrength')
+        elif style=='teardrop': width*=1-.5*t*t; z-=drop*.25*t
+        elif style=='twisted': x+=side_sign*.55*math.sin(math.pi*t)
+        angle=math.radians(number(p,'lugTwistDeg')*t) if style=='twisted' else 0
+        for sx,sz in ((-1,-1),(1,-1),(1,1),(-1,1)):
+            dx=sx*width/2; dz=sz*thickness/2
+            rx=dx*math.cos(angle)-dz*math.sin(angle); rz=dx*math.sin(angle)+dz*math.cos(angle)
+            if style=='faceted' and sz>0: rz+=number(p,'lugFacetDepth')*(1-abs(.5-t)*2)
+            verts.append((x+rx,y,z+rz))
+    faces=[(0,1,2,3),(8,11,10,9)]
+    for section in range(2):
+        a=section*4; b=(section+1)*4
+        for edge in range(4): faces.append((a+edge,a+(edge+1)%4,b+(edge+1)%4,b+edge))
+    ob=mesh(name,verts,faces,collection,material); ob['DD_LUG_STYLE']=style; ob['DD_GEOMETRY_STATUS']='ESTIMATED_NOMINAL'
+    return ob, root_x
+def fixed_wire_lug(name, p, end_sign, root_y, span, collection, material):
+    gap=number(p,'lugPairGap'); wire=number(p,'lugWireDiameter'); x=gap/2+wire/2
+    curve=bpy.data.curves.new(name+'_CURVE','CURVE'); curve.dimensions='3D'; curve.resolution_u=12
+    curve.bevel_depth=wire/2; curve.bevel_resolution=4
+    spline=curve.splines.new('BEZIER'); spline.bezier_points.add(3)
+    coords=[(-x,root_y,0),(-x,end_sign*span,-number(p,'lugTipDrop')),(x,end_sign*span,-number(p,'lugTipDrop')),(x,root_y,0)]
+    for point,coord in zip(spline.bezier_points,coords): point.co=coord; point.handle_left_type='AUTO'; point.handle_right_type='AUTO'
+    ob=bpy.data.objects.new(name,curve); collection.objects.link(ob); ob.data.materials.append(material)
+    ob['DD_LUG_STYLE']='wire'; ob['DD_STRAP_INTERFACE']='fixed-wire'; ob['DD_GEOMETRY_STATUS']='ESTIMATED_NOMINAL'; return ob
+def integrated_lug(name, p, end_sign, root_y, span, collection, material):
+    root_w=number(p,'lugPairGap')+2*number(p,'lugRootWidth'); tip_w=number(p,'lugPairGap')
+    thickness=number(p,'lugThickness'); z=-number(p,'lugTipDrop')/2
+    verts=[]
+    for y,w in ((root_y,root_w),(end_sign*span,tip_w)):
+        verts += [(-w/2,y,z-thickness/2),(w/2,y,z-thickness/2),(w/2,y,z+thickness/2),(-w/2,y,z+thickness/2)]
+    faces=[(0,1,2,3),(4,7,6,5),(0,4,5,1),(1,5,6,2),(2,6,7,3),(3,7,4,0)]
+    ob=mesh(name,verts,faces,collection,material); ob['DD_LUG_STYLE']='integrated'; ob['DD_STRAP_INTERFACE']='integrated'; ob['DD_GEOMETRY_STATUS']='ESTIMATED_NOMINAL'
+    bevel=ob.modifiers.new('Integrated shoulder bevel','BEVEL'); bevel.width=.35; bevel.segments=3; return ob
 def build(p, quality='normal'):
     validate(p); old=bpy.data.collections.get('DD_PARAMETRIC_CASE')
     if old:
@@ -117,21 +166,34 @@ def build(p, quality='normal'):
     # lugCaseOverlap. A single flat radial root plane floats when a wide paired
     # lug is moved outward to match a published inside-lug width.
     root_radius=r-number(p,'lugCaseOverlap')
+    style=p.get('lugStyle','straight')
     for end_name, end_sign in [('12',1),('6',-1)]:
+      root_y=end_sign*math.sqrt(max(0,root_radius*root_radius-(pair_gap/2+root_width/2)**2))
+      if style=='wire':
+        fixed_wire_lug('DD_CASE_LUG_'+end_name+'_WIRE',p,end_sign,root_y,span,col,polished)
+        continue
+      if style=='integrated':
+        integrated_lug('DD_CASE_LUG_'+end_name+'_INTEGRATED',p,end_sign,root_y,span,col,steel)
+        continue
+      lug_objects=[]
       for side_name, side_sign in [('L',-1),('R',1)]:
-        root_center=side_sign*(pair_gap/2 + root_width/2); tip_center=side_sign*(pair_gap/2 + tip_width/2)
-        root_x0=root_center-root_width/2; root_x1=root_center+root_width/2
-        root_y0=end_sign*math.sqrt(max(0, root_radius*root_radius-root_x0*root_x0))
-        root_y1=end_sign*math.sqrt(max(0, root_radius*root_radius-root_x1*root_x1))
-        z=-number(p,'lugTipDrop')/2; pts=[]
-        for zz in (-number(p,'lugThickness')/2+z, number(p,'lugThickness')/2+z):
-            pts += [(root_x0, root_y0, zz), (root_x1, root_y1, zz),
-                    (tip_center+tip_width/2, end_sign*span, zz), (tip_center-tip_width/2, end_sign*span, zz)]
-        faces=[(0,1,2,3),(4,7,6,5),(0,4,5,1),(1,5,6,2),(2,6,7,3),(3,7,4,0)]; ob=mesh('DD_CASE_LUG_'+end_name+'_'+side_name,pts,faces,col,steel)
+        ob,root_center=lug_loft('DD_CASE_LUG_'+end_name+'_'+side_name,p,end_sign,side_sign,root_y,span,col,steel)
         hole_y=end_sign*(span-number(p,'springBarHoleFromLugTip'))
-        hole_z=(-number(p,'lugThickness')/2+z)+number(p,'springBarHoleFromLowerLugEdge')
+        hole_z=-number(p,'lugTipDrop')/2-number(p,'lugThickness')/2+number(p,'springBarHoleFromLowerLugEdge')
         cut_spring_bar_hole(ob,p,root_center,hole_y,hole_z,root_width)
-        bevel=ob.modifiers.new('Conservative edge bevel','BEVEL'); bevel.width=.18; bevel.segments=2
+        ob['DD_SPRING_BAR_ACCESS']='through-drilled' if style=='drilled' else 'inside-lug'
+        lug_objects.append(ob)
+        if style=='skeleton':
+            bpy.ops.mesh.primitive_cube_add(location=(root_center,(root_y+end_sign*span)/2,-number(p,'lugTipDrop')/2))
+            cutter=bpy.context.object; cutter.scale=(root_width*number(p,'lugSkeletonCutoutRatio')/2,abs(end_sign*span-root_y)*.27,number(p,'lugThickness'))
+            modifier=ob.modifiers.new('Skeleton lug cutout','BOOLEAN'); modifier.operation='DIFFERENCE'; modifier.solver='EXACT'; modifier.object=cutter
+            bpy.context.view_layer.objects.active=ob; bpy.ops.object.modifier_apply(modifier=modifier.name); bpy.data.objects.remove(cutter,do_unlink=True)
+        bevel=ob.modifiers.new('Lug family edge treatment','BEVEL'); bevel.width=.18 if style!='teardrop' else .32; bevel.segments=3
+      if style=='hooded':
+        hood_len=number(p,'lugHoodLength'); hood_y=root_y+end_sign*hood_len/2
+        bpy.ops.mesh.primitive_cube_add(location=(0,hood_y,number(p,'lugThickness')*.18-number(p,'lugTipDrop')/2), scale=(pair_gap/2+root_width,hood_len/2,number(p,'lugThickness')*.16))
+        hood=bpy.context.object; hood.name='DD_CASE_LUG_'+end_name+'_HOOD'; col.objects.link(hood); [c.objects.unlink(hood) for c in list(hood.users_collection) if c != col]; hood.data.materials.append(steel)
+        hood['DD_LUG_STYLE']='hooded'; hood['DD_GEOMETRY_STATUS']='ESTIMATED_NOMINAL'
     x=r-number(p,'crownBossEmbed')+number(p,'crownBossLength')/2; cylinder('DD_CASE_CROWN_BOSS',number(p,'crownBossRadius'),number(p,'crownBossLength'),(x,0,0),col,polished)
     x=r-number(p,'crownTubeEmbed')+number(p,'crownTubeLength')/2
     tube('DD_CASE_CROWN_TUBE',number(p,'crownTubeThreadOuterDiameter')/2,number(p,'crownTubeBoreDiameter')/2,number(p,'crownTubeLength'),(x,0,0),col,polished)

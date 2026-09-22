@@ -19,7 +19,8 @@ describe('P5 reviewed reference configuration', () => {
     expect(selected.parts['inst-midcase']!.parametricGeometry?.schema).toBe('parametric-case/v1');
     expect(selected.parts['inst-crown']!.parametricGeometry?.schema).toBe('parametric-crown/v1');
     expect(selected.parts['inst-hour-hand']!.parametricGeometry?.schema).toBe('parametric-hand-set/v1');
-    expect(selected.parts['inst-midcase']!.parametricGeometry).toMatchObject({ midcaseHeight: 10.2, lugWidth: 22, lugToLug: 46, pusherCount: 0 });
+    expect(selected.parts['inst-midcase']!.parametricGeometry).toMatchObject({ midcaseHeight: 10.2, lugWidth: 22, lugToLug: 46, lugStyle: 'straight', pusherCount: 0 });
+    expect(selected.designConfig?.visualReferenceConfig?.lugStyleId).toBe('straight');
     expect(selected.parts['inst-crown']!.parametricGeometry).toMatchObject({ headDiameterMm: 7, headLengthMm: 4.9 });
     expect(selected.parts['inst-hour-hand']!.parametricGeometry).toMatchObject({ hour: { hub: { pinionHoleDiameter: 1.5 } }, minute: { hub: { pinionHoleDiameter: 0.9 } }, seconds: { hub: { pinionHoleDiameter: 0.2 } } });
     expect(selected.parts['inst-hour-hand']!.geometryProvenance?.status).toBe('provisional');

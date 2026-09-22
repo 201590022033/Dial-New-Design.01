@@ -77,6 +77,16 @@ export const visualAssetRegistry: Record<string, VisualAssetDescriptor> = {
   , 'archetype-strap-leather': { assetId: 'archetype-strap-leather', category: 'strap', assetType: 'glb', assetPath: '/assets/3d/archetypes/strap-leather.glb', anchor: 'watch-axis', units: 'millimetres', upAxis: 'Y', referenceCaseDiameterMm: 42 }
   , 'archetype-strap-canvas': { assetId: 'archetype-strap-canvas', category: 'strap', assetType: 'glb', assetPath: '/assets/3d/archetypes/strap-canvas.glb', anchor: 'watch-axis', units: 'millimetres', upAxis: 'Y', referenceCaseDiameterMm: 42 }
   , 'archetype-strap-racing': { assetId: 'archetype-strap-racing', category: 'strap', assetType: 'glb', assetPath: '/assets/3d/archetypes/strap-racing.glb', anchor: 'watch-axis', units: 'millimetres', upAxis: 'Y', referenceCaseDiameterMm: 42 }
+  , 'lug-case-straight': { assetId: 'lug-case-straight', category: 'case', assetType: 'glb', assetPath: '/assets/3d/lug-cases/case-lugs-straight.glb', anchor: 'watch-axis', units: 'millimetres', upAxis: 'Y', referenceCaseDiameterMm: 42 }
+  , 'lug-case-curved': { assetId: 'lug-case-curved', category: 'case', assetType: 'glb', assetPath: '/assets/3d/lug-cases/case-lugs-curved.glb', anchor: 'watch-axis', units: 'millimetres', upAxis: 'Y', referenceCaseDiameterMm: 42 }
+  , 'lug-case-twisted': { assetId: 'lug-case-twisted', category: 'case', assetType: 'glb', assetPath: '/assets/3d/lug-cases/case-lugs-twisted.glb', anchor: 'watch-axis', units: 'millimetres', upAxis: 'Y', referenceCaseDiameterMm: 42 }
+  , 'lug-case-hooded': { assetId: 'lug-case-hooded', category: 'case', assetType: 'glb', assetPath: '/assets/3d/lug-cases/case-lugs-hooded.glb', anchor: 'watch-axis', units: 'millimetres', upAxis: 'Y', referenceCaseDiameterMm: 42 }
+  , 'lug-case-integrated': { assetId: 'lug-case-integrated', category: 'case', assetType: 'glb', assetPath: '/assets/3d/lug-cases/case-lugs-integrated.glb', anchor: 'watch-axis', units: 'millimetres', upAxis: 'Y', referenceCaseDiameterMm: 42 }
+  , 'lug-case-drilled': { assetId: 'lug-case-drilled', category: 'case', assetType: 'glb', assetPath: '/assets/3d/lug-cases/case-lugs-drilled.glb', anchor: 'watch-axis', units: 'millimetres', upAxis: 'Y', referenceCaseDiameterMm: 42 }
+  , 'lug-case-wire': { assetId: 'lug-case-wire', category: 'case', assetType: 'glb', assetPath: '/assets/3d/lug-cases/case-lugs-wire.glb', anchor: 'watch-axis', units: 'millimetres', upAxis: 'Y', referenceCaseDiameterMm: 42 }
+  , 'lug-case-teardrop': { assetId: 'lug-case-teardrop', category: 'case', assetType: 'glb', assetPath: '/assets/3d/lug-cases/case-lugs-teardrop.glb', anchor: 'watch-axis', units: 'millimetres', upAxis: 'Y', referenceCaseDiameterMm: 42 }
+  , 'lug-case-faceted': { assetId: 'lug-case-faceted', category: 'case', assetType: 'glb', assetPath: '/assets/3d/lug-cases/case-lugs-faceted.glb', anchor: 'watch-axis', units: 'millimetres', upAxis: 'Y', referenceCaseDiameterMm: 42 }
+  , 'lug-case-skeleton': { assetId: 'lug-case-skeleton', category: 'case', assetType: 'glb', assetPath: '/assets/3d/lug-cases/case-lugs-skeleton.glb', anchor: 'watch-axis', units: 'millimetres', upAxis: 'Y', referenceCaseDiameterMm: 42 }
 };
 
 export const resolveVisualAsset = (assetId: string | undefined, fallback: VisualAssetDescriptor): VisualAssetDescriptor =>

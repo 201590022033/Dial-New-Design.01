@@ -30,7 +30,7 @@ export type DialVisualDescriptor = {
   thicknessMm: number;
   centreHoleDiameterMm: number;
   markers: Array<{ angleDeg: number; innerRadiusMm: number; outerRadiusMm: number; widthMm: number; text?: string; lumed: boolean }>;
-  subdials: Array<{ role: string; angleDeg: number; centerRadiusMm: number; radiusMm: number; handRadiusMm: number; markerCount: number; scaleMax: number; handStyle: 'needle' | 'baton' | 'syringe'; geometryStatus: string }>;
+  subdials: Array<{ role: string; angleDeg: number; centerRadiusMm: number; radiusMm: number; handRadiusMm: number; markerCount: number; scaleMax: number; handStyle: 'needle' | 'baton' | 'syringe'; geometryStatus: string; registerDesignStatus: string }>;
   windows: Array<{ kind: 'date' | 'day' | 'day-date'; angleDeg: number; widthMm: number; heightMm: number; cornerRadiusMm: number }>;
   textureKind: string;
   textureIntensity: number;
@@ -137,6 +137,9 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
   if (visualReferences.archetypeId === 'archetype-chronograph' && visualReferences.subdialHandStyle) {
     archetypeAssets.hands = `archetype-hands-chronograph-${visualReferences.subdialHandStyle}`;
   }
+  if (visualReferences.lugStyleId) {
+    archetypeAssets.case = `lug-case-${visualReferences.lugStyleId}`;
+  }
   if (visualReferences.strapStyleId) {
     archetypeAssets.strap = `archetype-strap-${visualReferences.strapStyleId}`;
   }
@@ -212,7 +215,8 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
         markerCount: subdial.markerCount,
         scaleMax: subdial.scaleMax,
         handStyle: visualReferences.subdialHandStyle ?? 'needle',
-        geometryStatus: subdial.geometryEvidence.status
+        geometryStatus: subdial.geometryEvidence.status,
+        registerDesignStatus: subdial.registerDesignEvidence.status
       })),
       windows,
       textureKind: dialTexture.kind,

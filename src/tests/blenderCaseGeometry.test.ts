@@ -39,4 +39,14 @@ describe('Blender parametric case generator', () => {
     expect(py).toContain("cut_spring_bar_hole");
     expect(py).toContain("number(p,'crownTubeBoreDiameter')");
   });
+
+  it('supports every catalogued lug geometry family', () => {
+    expect(fixture.lugStyle).toBe('straight');
+    for (const style of ['straight','curved','twisted','hooded','integrated','drilled','wire','teardrop','faceted','skeleton']) {
+      expect(py).toContain(`'${style}'`);
+    }
+    expect(py).toContain("ob['DD_LUG_STYLE']=style");
+    expect(py).toContain("ob['DD_STRAP_INTERFACE']='integrated'");
+    expect(py).toContain("ob['DD_STRAP_INTERFACE']='fixed-wire'");
+  });
 });

@@ -49,6 +49,13 @@ describe('WatchAssembly visual adapter', () => {
     expect(model.dial.subdials.every((subdial) => subdial.handStyle === 'syringe')).toBe(true);
   });
 
+  it('switches the complete 42 mm case GLB when a lug family is selected', () => {
+    const assembly = createDefaultWatchAssembly();
+    assembly.globalDimensions.caseDiameterMm = 42;
+    assembly.designConfig!.visualReferenceConfig = { lugStyleId: 'twisted' };
+    expect(watchAssemblyToVisualModel(assembly).assets.case.assetId).toBe('lug-case-twisted');
+  });
+
   it('maps configurable typography into the 3D dial artwork layer', () => {
     const assembly = createDefaultWatchAssembly();
     assembly.designConfig!.typographyConfig = {

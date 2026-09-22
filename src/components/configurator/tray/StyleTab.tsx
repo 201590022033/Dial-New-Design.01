@@ -34,6 +34,11 @@ const SUBDIAL_HAND_STYLES = [
   { id: 'syringe', label: 'Syringe', note: 'Tapered instrument register hand' }
 ] as const;
 
+const LUG_STYLES = [
+  'straight', 'curved', 'twisted', 'hooded', 'integrated',
+  'drilled', 'wire', 'teardrop', 'faceted', 'skeleton'
+] as const;
+
 export const StyleTab: React.FC = () => {
   const activePartInstanceId = useConfiguratorUIStore((s) => s.activePartInstanceId);
   const setPreview = useConfiguratorUIStore((s) => s.setPreview);
@@ -175,6 +180,18 @@ export const StyleTab: React.FC = () => {
             className={cn('rounded-lg border p-2 text-left', visualReferenceConfig?.strapStyleId === style.id ? 'border-teal-400 bg-slate-800' : 'border-slate-800 bg-slate-900')}>
             <span className="block text-xs text-slate-200">{style.label}</span>
             <span className="block text-[10px] text-slate-400">{style.note}</span>
+          </button>)}
+        </div>
+      </div>
+
+      <div className="space-y-2 pt-2 border-t border-slate-800">
+        <h4 className="text-[11px] font-mono text-slate-400 uppercase tracking-wider">Case Lug Geometry</h4>
+        <p className="text-[10px] text-slate-400">42 mm presentation variants. Each shape needs separate physical validation before ordering.</p>
+        <div className="grid grid-cols-2 gap-2">
+          {LUG_STYLES.map((style) => <button key={style} type="button"
+            onClick={() => updateVisualReferenceConfig({ lugStyleId: style })}
+            className={cn('rounded-lg border p-2 text-left capitalize', (visualReferenceConfig?.lugStyleId ?? 'straight') === style ? 'border-teal-400 bg-slate-800' : 'border-slate-800 bg-slate-900')}>
+            <span className="text-xs text-slate-200">{style}</span>
           </button>)}
         </div>
       </div>

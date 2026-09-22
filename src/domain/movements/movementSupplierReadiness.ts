@@ -26,8 +26,8 @@ export const movementSupplierReadiness: Record<string, MovementSupplierReadiness
     orderable: false,
     blockingReasons: [
       'No reviewed commercial VK63 movement listing is mapped.',
-      'No reviewed VK63 dial-foot/register geometry listing is mapped.',
-      'Register hand bores and supplier SKUs are not yet verified.'
+      'No reviewed commercial dial listing is mapped to the published VK63 register and dial-foot geometry.',
+      'Published register post diameters are recorded, but matching hand supplier SKUs are not yet verified.'
     ]
   }
 };

@@ -4,9 +4,15 @@
 
 The first movement-owned dial architecture is now implemented for TMI VK63. The central preview uses the published 9 h chronograph-minute, 6 h small-seconds and 3 h 24-hour roles, with configurable needle, baton and syringe register-hand presentation assets. The social-media subdial, movement and lug references are catalogued as `reference-only`.
 
-The VK63 radial register distance, register diameter and hand geometry are temporary `ESTIMATED_NOMINAL` preview values. Commercial movement, compatible dial and register-hand supplier mappings remain incomplete, so this slice is intentionally not orderable. The next engineering step is to attach a reviewed VK63 technical/dial drawing and supplier SKUs, verify register centres and hand bores, then promote only those interfaces supported by evidence.
+The VK63 register centres and post diameters are now sourced from TMI's official drawing. Register artwork diameter and hand silhouettes remain temporary `ESTIMATED_NOMINAL` preview values. Commercial movement, compatible dial and register-hand supplier mappings remain incomplete, so this slice is intentionally not orderable. The next engineering step is supplier-SKU qualification and physical case/pusher validation.
 
 Lug families are queued as separate case-platform variants rather than decorative archetype choices. Curved, twisted, hooded, integrated, wire, teardrop, faceted and skeleton lugs must each receive their own measured case envelope before GLB generation can claim physical compatibility.
+
+### P11 lug-geometry implementation
+
+The 42 mm preview now supports straight, curved, twisted, hooded, integrated, drilled, wire, teardrop, faceted and skeleton case GLBs. The central-view Style controls select the complete case asset. All ten variants retain `provisional-presentation` provenance; integrated and wire options declare different strap interfaces and cannot inherit the NMK901 spring-bar fit claim.
+
+The official VK63A drawing review replaces the estimated 6.2 mm register spacing with published 7.50 mm centres and records the published register posts. Register artwork size and hand silhouettes remain estimated pending supplier dial and hand drawings. See `docs/VK63_ENGINEERING_REFERENCE.md`.
 
 ## Status at the parametric 3D milestone
 

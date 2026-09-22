@@ -8,6 +8,7 @@ export type TipStyle = 'NONE' | 'POINT' | 'TRIANGLE' | 'SPEAR';
 export type TailStyle = 'NONE' | 'NEEDLE' | 'BATON' | 'ARROW' | 'LOLLIPOP' | 'COUNTERWEIGHT';
 
 export type PusherLayout = 'none' | '2h-4h' | 'custom';
+export type LugGeometryStyle = 'straight' | 'curved' | 'twisted' | 'hooded' | 'integrated' | 'drilled' | 'wire' | 'teardrop' | 'faceted' | 'skeleton';
 
 export interface ParametricCaseV1 {
   schema: typeof PARAMETRIC_CASE_V1;
@@ -19,6 +20,14 @@ export interface ParametricCaseV1 {
   /** Clear distance between the two lugs at each strap end; fixture values may be provisional. */
   lugPairGap: DimensionMm;
   lugThickness: DimensionMm; lugTaperStrength: DimensionMm;
+  /** Presentation geometry family. Non-straight options need their own measured platform drawing before fit approval. */
+  lugStyle?: LugGeometryStyle;
+  lugCurveStrength?: DimensionMm;
+  lugTwistDeg?: number;
+  lugHoodLength?: DimensionMm;
+  lugWireDiameter?: DimensionMm;
+  lugFacetDepth?: DimensionMm;
+  lugSkeletonCutoutRatio?: DimensionMm;
   crownTubeRadius: DimensionMm; crownTubeLength: DimensionMm; crownBossRadius: DimensionMm;
   crownBossLength: DimensionMm; crownBossEmbed: DimensionMm; crownTubeEmbed: DimensionMm;
   /** Number of chronograph pushers (0, 1, or 2). Default 0 for non-chronograph cases. */

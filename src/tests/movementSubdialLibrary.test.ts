@@ -9,7 +9,11 @@ describe('movement-owned subdial library', () => {
       ['9h', 'chronograph-minutes'], ['6h', 'small-seconds'], ['3h', '24-hour']
     ]);
     expect(vk63.subdials?.every((register) => register.layoutEvidence.status === 'PUBLISHED')).toBe(true);
-    expect(vk63.subdials?.every((register) => register.geometryEvidence.status === 'ESTIMATED_NOMINAL')).toBe(true);
+    expect(vk63.centerHoleMm).toBe(2.05);
+    expect(vk63.subdials?.map((register) => [register.centerRadiusMm, register.handBoreMm])).toEqual([
+      [7.5, 0.37], [7.5, 0.295], [7.5, 0.32]
+    ]);
+    expect(vk63.subdials?.every((register) => register.geometryEvidence.status === 'PUBLISHED')).toBe(true);
   });
 
   it.each(['nh35', 'nh36', 'nh38', 'miyota-8215', 'miyota-9015'])('%s does not acquire decorative subdials', (id) => {

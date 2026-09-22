@@ -58,7 +58,8 @@ def dial(style):
         objects.append(ref.text_mesh("DD_ARCH_DRESS_SIGNATURE", "AUTOMATIC", .65, (0, -5.2, .27), ink, .012))
     elif style == "chronograph":
         objects.extend(ref.add_radial_markers("DD_ARCH_CHRONO_INDEX", 12, 12.1, .28, 1.15, .11, .28, steel, 3))
-        for index, (x, y) in enumerate(((-6.2, 0), (6.2, 0), (0, -6.2))):
+        # TMI VK63A dial drawing: all three register centres are 7.50 mm from centre.
+        for index, (x, y) in enumerate(((-7.5, 0), (7.5, 0), (0, -7.5))):
             sub = ref.annulus(f"DD_ARCH_REGISTER_{index}", 6.2, .8, .12, recess, 96, .28)
             sub.location.x, sub.location.y = x, y
             objects.append(sub)
@@ -126,10 +127,11 @@ def hands(style, subdial_style="needle"):
     objects.append(ref.cylinder("DD_ARCH_HAND_HUB", 1.45, .5, metal, 64, z=.55, bevel=.12))
     if style == "chronograph":
         # VK63 roles: 9h minute counter, 6h small seconds, 3h 24-hour.
-        # Register centre radius and hand lengths are estimated preview geometry.
+        # Register centres and post bores are published by TMI; hand silhouettes remain presentation geometry.
         register_ink = ref.material("VK63 register hand", (.72, .12, .06), .72, .16)
         style_width = {"needle": .14, "baton": .30, "syringe": .22}[subdial_style]
-        for index, (x, y, angle) in enumerate(((-6.2, 0, 18), (0, -6.2, 128), (6.2, 0, -42))):
+        bores = (.37, .295, .32)
+        for index, (x, y, angle) in enumerate(((-7.5, 0, 18), (0, -7.5, 128), (7.5, 0, -42))):
             length = 2.45
             a = math.radians(angle)
             hand = ref.box(f"DD_ARCH_VK63_{subdial_style.upper()}_{index}",
@@ -139,7 +141,9 @@ def hands(style, subdial_style="needle"):
             hand.rotation_euler.z = -a
             hand["DD_MOVEMENT"] = "VK63"
             hand["DD_REGISTER_HAND_STYLE"] = subdial_style
-            hand["DD_GEOMETRY_STATUS"] = "ESTIMATED_NOMINAL"
+            hand["DD_REGISTER_CENTER_STATUS"] = "PUBLISHED"
+            hand["DD_HAND_BORE_MM"] = bores[index]
+            hand["DD_HAND_SHAPE_STATUS"] = "ESTIMATED_NOMINAL"
             objects.append(hand)
             hub = ref.cylinder(f"DD_ARCH_VK63_HUB_{index}", .28, .16, metal, 32, z=.84, bevel=.04)
             hub.location.x, hub.location.y = x, y

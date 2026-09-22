@@ -29,6 +29,7 @@ export interface MovementSubdialDefinition {
   rotationDirection: 'clockwise' | 'counter-clockwise';
   layoutEvidence: { status: MovementEvidenceStatus; source: string };
   geometryEvidence: { status: MovementEvidenceStatus; source: string };
+  registerDesignEvidence: { status: MovementEvidenceStatus; source: string };
 }
 
 export interface MovementTemplate {
@@ -65,6 +66,7 @@ const TMI_VK_SOURCE = 'https://www.timemodule.com/en/product_line_up/quartz/chro
 const TMI_VK63_GUIDE = 'https://www.timemodule.com/uploads/attachments/download/Technical%20Guide/VK63_TG.pdf';
 const TMI_VK67_GUIDE = 'https://www.timemodule.com/uploads/attachments/download/Technical%20Guide/VK67_TG.pdf';
 const ESTIMATED_REGISTER_SOURCE = 'AI nominal preview baseline; physical movement/dial drawing required';
+const VK63_SPEC_DRAWING = 'TMI VK63A Watch Movement Specification and Drawing, version 1, revised 2021-12-14';
 const vkRegister = (
   id: string,
   role: MovementSubdialRole,
@@ -73,13 +75,20 @@ const vkRegister = (
   scaleMax: number,
   markerCount: number,
   source = TMI_VK_SOURCE,
-  layoutStatus: MovementEvidenceStatus = 'PUBLISHED'
+  layoutStatus: MovementEvidenceStatus = 'PUBLISHED',
+  publishedGeometry?: { centerRadiusMm: number; handBoreMm: number }
 ): MovementSubdialDefinition => ({
-  id, role, angleDeg, clockPosition, centerRadiusMm: null, previewCenterRadiusMm: 6.2,
-  registerRadiusMm: 3.1, handRadiusMm: 2.45, markerCount, scaleMax, handBoreMm: null,
+  id, role, angleDeg, clockPosition,
+  centerRadiusMm: publishedGeometry?.centerRadiusMm ?? null,
+  previewCenterRadiusMm: publishedGeometry?.centerRadiusMm ?? 6.2,
+  registerRadiusMm: 3.1, handRadiusMm: 2.45, markerCount, scaleMax,
+  handBoreMm: publishedGeometry?.handBoreMm ?? null,
   rotationDirection: 'clockwise',
   layoutEvidence: { status: layoutStatus, source },
-  geometryEvidence: { status: 'ESTIMATED_NOMINAL', source: ESTIMATED_REGISTER_SOURCE }
+  geometryEvidence: publishedGeometry
+    ? { status: 'PUBLISHED', source: VK63_SPEC_DRAWING }
+    : { status: 'ESTIMATED_NOMINAL', source: ESTIMATED_REGISTER_SOURCE },
+  registerDesignEvidence: { status: 'ESTIMATED_NOMINAL', source: 'Presentation register diameter and hand length; supplier dial drawing required' }
 });
 
 export const movementLibrary: MovementTemplate[] = [
@@ -88,13 +97,13 @@ export const movementLibrary: MovementTemplate[] = [
     name: 'VK63',
     manufacturer: 'Seiko/TMI',
     dialDiameterMm: 30.5,
-    centerHoleMm: 1.6,
+    centerHoleMm: 2.05,
     stemPosition: '3h',
     subdialPositionsDeg: [270, 180, 90],
     subdials: [
-      vkRegister('vk63-minute-counter', 'chronograph-minutes', 270, '9h', 60, 12, TMI_VK63_GUIDE),
-      vkRegister('vk63-small-seconds', 'small-seconds', 180, '6h', 60, 12, TMI_VK63_GUIDE),
-      vkRegister('vk63-24-hour', '24-hour', 90, '3h', 24, 8, TMI_VK63_GUIDE)
+      vkRegister('vk63-minute-counter', 'chronograph-minutes', 270, '9h', 60, 12, TMI_VK63_GUIDE, 'PUBLISHED', { centerRadiusMm: 7.5, handBoreMm: 0.37 }),
+      vkRegister('vk63-small-seconds', 'small-seconds', 180, '6h', 60, 12, TMI_VK63_GUIDE, 'PUBLISHED', { centerRadiusMm: 7.5, handBoreMm: 0.295 }),
+      vkRegister('vk63-24-hour', '24-hour', 90, '3h', 24, 8, TMI_VK63_GUIDE, 'PUBLISHED', { centerRadiusMm: 7.5, handBoreMm: 0.32 })
     ],
     datePosition: '4:30',
     handSizesMm: { hour: 1.5, minute: 0.9, second: 0.2 },
@@ -405,7 +414,7 @@ export const movementLibrary: MovementTemplate[] = [
     subdialPositionsDeg: [],
     subdials: [],
     datePosition: '3:00',
-    handSizesMm: { hour: 1.5, minute: 0.9, second: 0.2 },
+    handSizesMm: { hour: 1.506, minute: 0.89, second: 0.33 },
     clearancesMm: { dialToHands: 0.16, handsToCrystal: 0.3 },
     recommendedChapterRingDiameterMm: 32,
     recommendedBezelDiameterMm: 37,

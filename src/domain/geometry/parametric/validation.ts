@@ -15,6 +15,7 @@ const collect = (value: object, path = ''): { errors: string[]; unknown: string[
   return { errors, unknown };
 };
 const pusherKeys: (keyof ParametricCaseV1)[] = ['pusherTubeRadius', 'pusherTubeLength', 'pusherTubeEmbed', 'pusherBossRadius', 'pusherBossLength', 'pusherBossEmbed'];
+const lugStyles = new Set(['straight', 'curved', 'twisted', 'hooded', 'integrated', 'drilled', 'wire', 'teardrop', 'faceted', 'skeleton']);
 
 export const validateParametricCaseV1 = (c: ParametricCaseV1): ParametricValidationResult => {
   const r = collect(c); const pairs: [string, DimensionMm, string, DimensionMm][] = [['dialOpening', c.dialOpening, 'caseDiameter', c.caseDiameter], ['crystalSeatDiameter', c.crystalSeatDiameter, 'caseDiameter', c.caseDiameter]];
@@ -23,6 +24,9 @@ export const validateParametricCaseV1 = (c: ParametricCaseV1): ParametricValidat
   if (known(c.lugWidth) && known(c.lugTipWidth) && c.lugTipWidth > c.lugWidth) r.errors.push('lugTipWidth must not exceed lugWidth');
   if (known(c.lugPairGap) && known(c.lugWidth) && c.lugPairGap > c.lugWidth) r.errors.push('lugPairGap must not exceed the nominal lugWidth/strap envelope');
   if (known(c.lugToLug) && known(c.caseDiameter) && c.lugToLug < c.caseDiameter) r.errors.push('lugToLug must not be smaller than caseDiameter');
+  if (c.lugStyle !== undefined && !lugStyles.has(c.lugStyle)) r.errors.push('lugStyle must be a supported lug geometry family');
+  if (c.lugStyle === 'wire' && (!known(c.lugWireDiameter ?? { status: 'unknown' }) || Number(c.lugWireDiameter) <= 0)) r.errors.push('lugWireDiameter must be known and positive for wire lugs');
+  if (c.lugStyle === 'skeleton' && known(c.lugSkeletonCutoutRatio ?? 0) && (Number(c.lugSkeletonCutoutRatio) <= 0 || Number(c.lugSkeletonCutoutRatio) >= 0.8)) r.errors.push('lugSkeletonCutoutRatio must be greater than 0 and less than 0.8');
   const pusherCount = Math.max(0, Math.min(2, Math.round(Number(c.pusherCount) || 0)));
   if (c.pusherCount !== pusherCount) r.errors.push('pusherCount must be 0, 1, or 2');
   if (pusherCount > 0) {
