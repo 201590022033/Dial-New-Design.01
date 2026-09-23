@@ -22,7 +22,9 @@ The central viewer now treats browser Ctrl/Cmd-wheel zoom separately from 3D cam
 
 The visual scene no longer uses an oversized shadow-receiver disk. Removing it eliminates the grey wall and projected black strap slabs in oblique views; widened camera presets keep the complete watch visible in the central viewer and migrate the earlier preset distances automatically.
 
-Sapphire previews now use restrained presentation refraction. The crystal remains visible through reflection and clearcoat but no longer bends straight hand geometry into a large black arc across the dial.
+Correction: the earlier attribution of the black arc to sapphire refraction was not supported. Original sapphire materials are restored; the extra chapter-ring rotation was the geometry defect.
+
+The September 23 regression repair preserves the canonical watch assembly in autosave and `.dial` files (legacy files still migrate), invalidates the engineering renderer cache on remount, and scales the SVG about the viewport centre. Rotation starts only on primary left-button drags, cancels on lost capture, and has a visible Reset view control. The procedural fallback now has a full-depth annular case and an open-centred bezel rather than a thin torus case and opaque bezel disk. These are presentation fixes, not new manufacturing evidence.
 
 The dimensional fallback hand set now uses explicit polished hour/minute materials and a contrasting seconds hand, improving readability whenever an authored GLB is unavailable.
 

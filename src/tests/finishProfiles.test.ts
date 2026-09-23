@@ -18,7 +18,7 @@ describe('P7 finish profiles', () => {
   });
 
   it('provides optical and tactile presentation properties without manufacturing claims', () => {
-    expect(finishProfiles.sapphire).toMatchObject({ transmission: 0, opacity: 0.1, ior: 1.52, clearcoat: 1, provenance: 'provisional' });
+    expect(finishProfiles.sapphire).toMatchObject({ transmission: 0.98, ior: 1.76, clearcoat: 1, provenance: 'provisional' });
     expect(finishProfiles.lume).toMatchObject({ emissiveIntensity: 0.42, provenance: 'provisional' });
     expect(finishProfiles.canvas.roughness).toBeGreaterThan(finishProfiles.leather.roughness);
     expect(finishProfiles.leather.roughness).toBeLessThan(finishProfiles.rubber.roughness);

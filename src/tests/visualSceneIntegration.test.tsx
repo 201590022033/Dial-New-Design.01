@@ -56,6 +56,18 @@ describe('P4 scene integration and GLB failure boundaries', () => {
     expect(chapterRing.props.rotation).toBeUndefined();
   });
 
+  it('gives the fallback case full axial depth and leaves the bezel centre open', () => {
+    const model = watchAssemblyToVisualModel(createDefaultWatchAssembly());
+    type Profile = ReactElement<{ args: [{ x: number; y: number }[], number] }>;
+    const caseGroup = ProceduralComponent({ category: 'case', model }) as ReactElement<{ children: ReactElement[] }>;
+    const caseMesh = caseGroup.props.children[0]!;
+    const caseProfile = (child(caseMesh) as unknown as Profile[])[0]!.props.args[0];
+    expect(Math.max(...caseProfile.map(p => p.y)) - Math.min(...caseProfile.map(p => p.y))).toBe(model.caseThicknessMm);
+    const bezel = ProceduralComponent({ category: 'bezel', model }) as ReactElement<{ children: ReactElement[] }>;
+    const bezelProfile = (child(bezel.props.children[1]!) as unknown as Profile[])[0]!.props.args[0];
+    expect(Math.min(...bezelProfile.map(p => p.x))).toBeGreaterThan(0);
+  });
+
   it('shows the procedural fallback while loading and after a load failure', () => {
     const fallback = <mesh name="fallback" />;
     const boundary = new GlbAsset({ descriptor, fallback });

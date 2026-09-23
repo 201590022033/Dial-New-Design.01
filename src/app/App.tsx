@@ -11,6 +11,7 @@ import { CentreCanvas } from '@/components/layout/CentreCanvas';
 import { evaluateCollisions } from '@/domain/geometry/collisionEngine';
 import { materialById } from '@/domain/materials/materialLibrary';
 import { hydrateRuntimeProject } from '@/services/runtimeProjectHydrationService';
+import { useWatchAssemblyStore } from '@/stores/watchAssemblyStore';
 import {
   useBandsStore,
   useDesignEngineStore,
@@ -28,6 +29,8 @@ const HelpCenter = lazy(() =>
 );
 
 export const App = () => {
+  const assembly = useWatchAssemblyStore((state) => state.assembly);
+  const [hydrated, setHydrated] = useState(false);
   const [presentationMode, setPresentationMode] = useState(false);
   const [visualMode, setVisualMode] = useState<'engineering' | 'visual'>('engineering');
   const topToolbarRef = useRef<HTMLDivElement | null>(null);
@@ -173,10 +176,13 @@ export const App = () => {
     if (project) {
       hydrateRuntimeProject(project);
     }
+    setHydrated(true);
   }, [loadAutosave]);
 
   useEffect(() => {
+    if (!hydrated) return;
     setRuntimeSnapshot({
+      assembly,
       geometry: geometryParams,
       bands,
       selectedScaleKind,
@@ -203,6 +209,8 @@ export const App = () => {
     autosaveNow();
   }, [
     autosaveNow,
+    assembly,
+    hydrated,
     bands,
     futureCount,
     geometryParams,

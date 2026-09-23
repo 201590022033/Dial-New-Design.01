@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import type { WatchAssembly } from '@/domain/assembly/assemblyTypes';
 import { createBand } from '@/domain/bands/bandRegistry';
 import type { BandEntity } from '@/domain/bands/types';
 import { defaultGeometryParameters } from '@/domain/geometry/geometryEngine';
@@ -25,6 +26,7 @@ import {
 const AUTOSAVE_KEY = 'dial-designer/autosave';
 
 interface ProjectStoreState {
+  assembly?: WatchAssembly;
   info: ProjectInfo;
   geometry: GlobalGeometryParameters;
   bands: BandEntity[];
@@ -60,6 +62,7 @@ interface ProjectStoreState {
   dirty: boolean;
   setProjectInfo: (patch: Partial<ProjectInfo>) => void;
   setRuntimeSnapshot: (snapshot: {
+    assembly?: WatchAssembly;
     geometry: GlobalGeometryParameters;
     bands: BandEntity[];
     selectedScaleKind: ScaleKind;
@@ -168,6 +171,7 @@ export const useProjectStore = create<ProjectStoreState>((set, get) => ({
     })),
   setRuntimeSnapshot: (snapshot) =>
     set((state) => ({
+      assembly: snapshot.assembly,
       geometry: snapshot.geometry,
       bands: snapshot.bands,
       selectedScaleKind: snapshot.selectedScaleKind,
@@ -190,6 +194,7 @@ export const useProjectStore = create<ProjectStoreState>((set, get) => ({
     const state = get();
     return {
       version: DIAL_FILE_VERSION,
+      assembly: state.assembly,
       info: {
         ...state.info,
         updatedAtIso: new Date().toISOString()
@@ -245,6 +250,7 @@ export const useProjectStore = create<ProjectStoreState>((set, get) => ({
 
     set({
       info: project.info,
+      assembly: project.assembly,
       geometry: project.geometry,
       bands: project.bands,
       selectedScaleKind: project.scale.selectedScaleKind,
@@ -271,6 +277,7 @@ export const useProjectStore = create<ProjectStoreState>((set, get) => ({
   importProjectJson: (input) => {
     const project = deserializeDialProject(input);
     set({
+      assembly: project.assembly,
       info: project.info,
       geometry: project.geometry,
       bands: project.bands,
@@ -294,6 +301,7 @@ export const useProjectStore = create<ProjectStoreState>((set, get) => ({
   newProject: () => {
     const now = createDefaultProjectInfo();
     set({
+      assembly: undefined,
       info: now,
       geometry: defaultGeometryParameters,
       bands: defaultBands(),
@@ -333,6 +341,7 @@ export const useProjectStore = create<ProjectStoreState>((set, get) => ({
     try {
       const project = deserializeDialProject(payload);
       set({
+        assembly: project.assembly,
         info: project.info,
         geometry: project.geometry,
         bands: project.bands,

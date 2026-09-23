@@ -101,18 +101,41 @@ export const VisualWatchRenderer = ({ assembly, presentationMode, onTogglePresen
       setCameraDistance(next);
       saveCamera(rotation, next, activePreset);
     }}
-    onPointerDown={(event) => { dragStart.current = { x: event.clientX, y: event.clientY }; event.currentTarget.setPointerCapture(event.pointerId); }}
+    onPointerDown={(event) => {
+      if (event.button !== 0 || !event.isPrimary) return;
+      dragStart.current = { x: event.clientX, y: event.clientY };
+      event.currentTarget.setPointerCapture(event.pointerId);
+    }}
     onPointerMove={(event) => {
       if (!dragStart.current) return;
+      if ((event.buttons & 1) === 0) {
+        dragStart.current = null;
+        return;
+      }
       const dx = event.clientX - dragStart.current.x;
       const dy = event.clientY - dragStart.current.y;
       setRotation(([x, y]) => [x + dy * 0.005, y + dx * 0.005, 0]);
       dragStart.current = { x: event.clientX, y: event.clientY };
     }}
-    onPointerUp={() => { dragStart.current = null; saveCamera(); }}
+    onPointerUp={(event) => {
+      if (!dragStart.current || event.button !== 0) return;
+      dragStart.current = null;
+      if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+        event.currentTarget.releasePointerCapture(event.pointerId);
+      }
+      saveCamera();
+    }}
+    onPointerCancel={() => { dragStart.current = null; }}
+    onLostPointerCapture={() => { dragStart.current = null; }}
     onDoubleClick={() => applyCameraPreset('studio')}
   >
     <VisualWatchScene model={model} rotation={rotation} cameraDistance={cameraDistance} onExporterReady={registerExporter} />
+    <button type="button" className="absolute right-3 top-3 rounded-lg border border-slate-500/40 bg-slate-950/85 px-3 py-2 text-xs text-white hover:bg-slate-800"
+      onPointerDown={(event) => event.stopPropagation()}
+      onDoubleClick={(event) => event.stopPropagation()}
+      onClick={() => { dragStart.current = null; applyCameraPreset('studio'); }}>
+      Reset view
+    </button>
     <details className="absolute left-3 top-3 max-w-[min(320px,70%)] rounded-lg border border-slate-500/40 bg-slate-950/85 text-xs text-white shadow-lg" onPointerDown={(event) => event.stopPropagation()}>
       <summary className="cursor-pointer px-3 py-2 font-semibold">3D reference preview · controls</summary>
       <div className="border-t border-slate-500/30 px-3 pb-3">

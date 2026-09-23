@@ -146,8 +146,16 @@ export const ProceduralComponent = ({ category, model }: { category: VisualCateg
       <cylinderGeometry args={[radius * 0.83, radius * 0.83, 1.4, 128]} /><meshStandardMaterial {...finish(model.finishes.caseback)} />
     </mesh>;
     case 'case': return <group>
-      <mesh castShadow>
-        <torusGeometry args={[radius * 0.9, radius * 0.1, 24, 128]} /><meshPhysicalMaterial {...physicalFinish(model.finishes.case)} />
+      <mesh castShadow rotation={[Math.PI / 2, 0, 0]}>
+        <latheGeometry args={[[
+          new Vector2(radius * 0.78, -model.caseThicknessMm / 2),
+          new Vector2(radius * 0.95, -model.caseThicknessMm / 2),
+          new Vector2(radius, -model.caseThicknessMm / 2 + 0.5),
+          new Vector2(radius, model.caseThicknessMm / 2 - 0.5),
+          new Vector2(radius * 0.95, model.caseThicknessMm / 2),
+          new Vector2(radius * 0.78, model.caseThicknessMm / 2),
+          new Vector2(radius * 0.78, -model.caseThicknessMm / 2)
+        ], 128]} /><meshPhysicalMaterial {...physicalFinish(model.finishes.case)} />
       </mesh>
       {[1, -1].flatMap((y) => [-1, 1].map((x) => [x * radius * 0.42, y * radius * 0.98, -0.2] as [number, number, number])).map((position, index) =>
         <mesh key={index} castShadow position={position} rotation={[0, 0, position[0] > 0 ? -0.12 : 0.12]}>
@@ -164,7 +172,11 @@ export const ProceduralComponent = ({ category, model }: { category: VisualCateg
         <torusGeometry args={[radius * 0.88, radius * 0.045, 24, 128]} /><meshStandardMaterial {...finish(model.finishes.bezel)} />
       </mesh>
       <mesh rotation={[Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[radius * 0.8, radius * 0.8, 0.12, 96]} /><meshStandardMaterial {...finish(model.finishes.bezel, insertColor)} />
+        <latheGeometry args={[[
+          new Vector2(radius * 0.8, -0.06), new Vector2(radius * 0.89, -0.06),
+          new Vector2(radius * 0.89, 0.06), new Vector2(radius * 0.8, 0.06),
+          new Vector2(radius * 0.8, -0.06)
+        ], 96]} /><meshStandardMaterial {...finish(model.finishes.bezel, insertColor)} />
       </mesh>
     </group>;
     }
@@ -189,7 +201,7 @@ export const ProceduralComponent = ({ category, model }: { category: VisualCateg
         const handWidth = subdial.handStyle === 'baton' ? 0.28 : subdial.handStyle === 'syringe' ? 0.22 : 0.14;
         return <group key={`subdial-${index}`} position={[x, y, 0.34]}>
           <mesh rotation={[Math.PI / 2, 0, 0]}><cylinderGeometry args={[subdial.radiusMm, subdial.radiusMm, 0.08, 64]} /><meshStandardMaterial {...finish(model.finishes.dial, '#111827')} /></mesh>
-          <mesh rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[subdial.radiusMm * 0.82, 0.12, 12, 48]} /><meshStandardMaterial {...finish(model.finishes.bezel, '#94a3b8')} /></mesh>
+          <mesh><torusGeometry args={[subdial.radiusMm * 0.82, 0.12, 12, 48]} /><meshStandardMaterial {...finish(model.finishes.bezel, '#94a3b8')} /></mesh>
           <mesh position={[0, subdial.handRadiusMm * 0.42, 0.14]} rotation={[0, 0, index * 0.7]}>
             <boxGeometry args={[handWidth, subdial.handRadiusMm, 0.12]} /><meshStandardMaterial {...finish(model.finishes.hands, model.archetypeAppearance.accentColor)} />
           </mesh>

@@ -1,5 +1,5 @@
 import type { DialProjectFile } from '@/services/projectFileService';
-import { migrateLegacyProjectToAssembly } from '@/domain/assembly/assemblySerialization';
+import { deserializeWatchAssembly, migrateLegacyProjectToAssembly } from '@/domain/assembly/assemblySerialization';
 import { useWatchAssemblyStore } from '@/stores/watchAssemblyStore';
 import { useBandsStore } from '@/stores/bandsStore';
 import { useDesignEngineStore } from '@/stores/designEngineStore';
@@ -15,7 +15,9 @@ import { useSourcingStore } from '@/stores/sourcingStore';
  */
 export const hydrateRuntimeProject = (project: DialProjectFile): void => {
   // 1. Authoritative migration to WatchAssembly
-  const assembly = migrateLegacyProjectToAssembly(project);
+  const assembly = project.assembly
+    ? deserializeWatchAssembly(JSON.stringify(project.assembly))
+    : migrateLegacyProjectToAssembly(project);
   useWatchAssemblyStore.getState().setAssembly(assembly);
 
   // 2. If the persisted legacy project contains custom physical bands, preserve them in bandsStore

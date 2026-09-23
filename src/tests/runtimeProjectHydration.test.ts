@@ -1,4 +1,12 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+vi.hoisted(() => {
+  const values = new Map<string, string>();
+  vi.stubGlobal('localStorage', {
+    getItem: (key: string) => values.get(key) ?? null,
+    setItem: (key: string, value: string) => values.set(key, value),
+    removeItem: (key: string) => values.delete(key)
+  });
+});
 import { createBand } from '@/domain/bands/bandRegistry';
 import { defaultGeometryParameters } from '@/domain/geometry/geometryEngine';
 import { hydrateRuntimeProject } from '@/services/runtimeProjectHydrationService';
@@ -8,8 +16,25 @@ import { useDesignEngineStore } from '@/stores/designEngineStore';
 import { useScaleStore } from '@/stores/scaleStore';
 import { useSelectionStore } from '@/stores/selectionStore';
 import { useViewportStore } from '@/stores/viewportStore';
+import { useWatchAssemblyStore } from '@/stores/watchAssemblyStore';
+import { useProjectStore } from '@/stores/projectStore';
+import { serializeDialProject, deserializeDialProject } from '@/services/projectFileService';
 
 describe('runtime project hydration', () => {
+  it('round trips the canonical GLB assembly instead of replacing it with a legacy default', () => {
+    useWatchAssemblyStore.getState().selectReference42Preview();
+    const assembly = useWatchAssemblyStore.getState().assembly;
+    useProjectStore.setState({ assembly });
+    const restored = deserializeDialProject(serializeDialProject(useProjectStore.getState().buildProjectFile()));
+    useProjectStore.getState().autosaveNow();
+    expect(useProjectStore.getState().loadAutosave()?.assembly).toEqual(assembly);
+    useWatchAssemblyStore.getState().resetAssembly();
+    hydrateRuntimeProject(restored);
+    expect(useWatchAssemblyStore.getState().assembly).toEqual(assembly);
+    expect(restored.assembly?.parts).toEqual(assembly.parts);
+    useProjectStore.getState().newProject();
+    expect(useProjectStore.getState().buildProjectFile().assembly).toBeUndefined();
+  });
   it('treats persisted physical bands as the geometry authority', () => {
     const bands = [
       createBand('dial', 'dial-face', { innerRadius: 0, outerRadius: 13 }),

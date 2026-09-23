@@ -25,6 +25,7 @@ export class SvgRenderer implements RendererAdapter {
   private latestRenderKey = '';
 
   mount(container: HTMLElement): void {
+    this.latestRenderKey = '';
     this.container = container;
     this.root = SVG().addTo(container).size('100%', '100%');
     this.root.node.setAttribute('xmlns', SVG_NS);
@@ -35,6 +36,8 @@ export class SvgRenderer implements RendererAdapter {
     this.root?.remove();
     this.root = null;
     this.container = null;
+    this.latestRenderKey = '';
+    this.latestContext = null;
   }
 
   renderBands(bands: BandEntity[], context: RenderContext, options: RendererOptions): void {
@@ -43,6 +46,7 @@ export class SvgRenderer implements RendererAdapter {
     this.latestAssembly = assembly;
 
     const renderKey = JSON.stringify({
+      assembly,
       bands: bands.map((band) => ({
         id: band.id,
         visible: band.visible,
@@ -86,8 +90,9 @@ export class SvgRenderer implements RendererAdapter {
     this.latestFitScale = fitScale;
 
     const layer = this.root.group().id('bands');
-    layer.translate(context.panX, context.panY);
-    layer.scale(context.zoom * fitScale);
+    // Scale around the viewport centre, independent of the empty group's bounds.
+    const totalScale = context.zoom * fitScale;
+    layer.attr('transform', `matrix(${totalScale} 0 0 ${totalScale} ${context.panX + context.centerX * (1 - totalScale)} ${context.panY + context.centerY * (1 - totalScale)})`);
     const highlightedBandIds = new Set(options.highlightedBandIds);
     const hasFocusSelection = highlightedBandIds.size > 0;
     const physicalAssembly = resolvePhysicalAssembly(bands);
