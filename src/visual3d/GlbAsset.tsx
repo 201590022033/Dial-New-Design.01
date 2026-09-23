@@ -33,6 +33,9 @@ export const LoadedGlbAsset = ({ descriptor, appearance }: { descriptor: VisualA
       const objectName = object.name.toUpperCase();
       object.castShadow = true;
       object.receiveShadow = true;
+      if (objectName.includes('HAND_') || objectName.includes('HAND_HUB') || objectName.includes('CHRONO_SECONDS')) {
+        object.castShadow = false;
+      }
       const sourceMaterials = (Array.isArray(object.material) ? object.material : [object.material]) as Material[];
       const clonedMaterials = sourceMaterials.map((material) => {
         const isCrystal = material.name.toLowerCase().includes('sapphire') || objectName.includes('CRYSTAL');
@@ -52,14 +55,16 @@ export const LoadedGlbAsset = ({ descriptor, appearance }: { descriptor: VisualA
         if (name.includes('sapphire') || objectName.includes('CRYSTAL')) {
           material.color = new Color('#e8f7ff');
           material.transparent = true;
-          material.opacity = 1;
+          material.opacity = 0.1;
           material.depthWrite = false;
-          material.roughness = 0.025;
+          material.roughness = 0.06;
           material.envMapIntensity = 2.25;
           if (material instanceof MeshPhysicalMaterial) {
-            material.transmission = 0.98;
-            material.ior = 1.76;
-            material.thickness = 0.75;
+            // A restrained presentation material avoids severe screen-space
+            // refraction that bends straight hands into black arcs in previews.
+            material.transmission = 0;
+            material.ior = 1.52;
+            material.thickness = 0;
             material.clearcoat = 1;
             material.clearcoatRoughness = 0.015;
           }

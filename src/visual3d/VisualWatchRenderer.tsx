@@ -113,8 +113,9 @@ export const VisualWatchRenderer = ({ assembly, presentationMode, onTogglePresen
     onDoubleClick={() => applyCameraPreset('studio')}
   >
     <VisualWatchScene model={model} rotation={rotation} cameraDistance={cameraDistance} onExporterReady={registerExporter} />
-    <div className="absolute left-3 top-3 max-w-[min(340px,70%)] rounded-lg border border-slate-500/40 bg-slate-950/85 p-3 text-xs text-white shadow-lg" onPointerDown={(event) => event.stopPropagation()}>
-      <p className="font-semibold">3D reference preview</p>
+    <details className="absolute left-3 top-3 max-w-[min(320px,70%)] rounded-lg border border-slate-500/40 bg-slate-950/85 text-xs text-white shadow-lg" onPointerDown={(event) => event.stopPropagation()}>
+      <summary className="cursor-pointer px-3 py-2 font-semibold">3D reference preview · controls</summary>
+      <div className="border-t border-slate-500/30 px-3 pb-3">
       <p className="mt-1 text-slate-300">Dark dramatic studio · 42 mm case · provisional geometry.</p>
       <p className="mt-1 capitalize text-cyan-100">{lugSlug} lugs{savedRender?.archetypeId === 'archetype-chronograph' ? ` · ${savedRender.subdialHandStyle ?? 'needle'} subdial hands` : ''}</p>
       <div className="mt-1 flex flex-wrap gap-1 text-[9px] font-semibold uppercase"><span className="rounded border border-amber-500/40 px-1.5 py-0.5 text-amber-200">{platform.evidenceStatus.replaceAll('_', ' ')}</span>{activeKit && <span className={activeKit.status === 'COMPATIBLE_KIT' ? 'rounded border border-emerald-500/40 px-1.5 py-0.5 text-emerald-200' : 'rounded border border-rose-500/40 px-1.5 py-0.5 text-rose-200'}>{activeKit.status.replaceAll('_', ' ')}</span>}</div>
@@ -148,7 +149,8 @@ export const VisualWatchRenderer = ({ assembly, presentationMode, onTogglePresen
         <summary className="cursor-pointer">Review fit findings</summary>
         <ul className="mt-1 list-disc space-y-1 pl-4">{issues.map((issue, index) => <li key={`${issue.code}-${index}`}>{issue.detail}</li>)}</ul>
       </details>}
-    </div>
+      </div>
+    </details>
     <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between gap-3" onPointerDown={(event) => event.stopPropagation()}>
       <div className="rounded-lg border border-slate-500/40 bg-slate-950/85 p-2 text-white shadow-lg">
         <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-300">Render gallery</p>

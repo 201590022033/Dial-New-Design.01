@@ -134,7 +134,7 @@ export const DialArtwork = ({ model }: { model: VisualWatchModel }) => {
 };
 
 /** Schematic shapes in engineering mm. These are explicitly provisional previews. */
-const ProceduralComponent = ({ category, model }: { category: VisualCategory; model: VisualWatchModel }) => {
+export const ProceduralComponent = ({ category, model }: { category: VisualCategory; model: VisualWatchModel }) => {
   const radius = model.caseDiameterMm / 2;
   switch (category) {
     case 'strap': return <group>
@@ -168,7 +168,7 @@ const ProceduralComponent = ({ category, model }: { category: VisualCategory; mo
       </mesh>
     </group>;
     }
-    case 'chapter-ring': return <mesh position={[0, 0, 0.5]} rotation={[Math.PI / 2, 0, 0]}>
+    case 'chapter-ring': return <mesh position={[0, 0, 0.5]}>
       <torusGeometry args={[model.dial.outerDiameterMm / 2 + 0.5, 0.75, 20, 128]} /><meshStandardMaterial {...finish(model.finishes['chapter-ring'])} />
     </mesh>;
     case 'dial': return <group>
@@ -205,7 +205,7 @@ const ProceduralComponent = ({ category, model }: { category: VisualCategory; mo
       })}
     </group>;
     case 'crystal': return <mesh position={[0, 0, 2]} rotation={[Math.PI / 2, 0, 0]}>
-      <cylinderGeometry args={[radius * 0.86, radius * 0.86, 0.5, 96]} /><meshPhysicalMaterial {...physicalFinish(model.finishes.crystal)} transparent opacity={1} depthWrite={false} envMapIntensity={2.25} />
+      <cylinderGeometry args={[radius * 0.86, radius * 0.86, 0.5, 96]} /><meshPhysicalMaterial {...physicalFinish(model.finishes.crystal)} transparent opacity={model.finishes.crystal.opacity ?? 0.1} depthWrite={false} envMapIntensity={2.25} />
     </mesh>;
     case 'crown': return <Cylinder axis="X" radius={model.crown.diameterMm / 2} depth={model.crown.lengthMm} position={[model.crown.lengthMm / 2, 0, 0]} material={model.finishes.crown} />;
     case 'pushers': return <group>
@@ -224,13 +224,24 @@ const ProceduralComponent = ({ category, model }: { category: VisualCategory; mo
       {[{ length: radius * 0.5, width: 1.1, angle: 0.5 }, { length: radius * 0.72, width: 0.7, angle: -0.9 }, { length: radius * 0.78, width: 0.2, angle: 2 }].map((hand, index) =>
         <group key={index} rotation={[0, 0, hand.angle]} position={[0, 0, index * 0.2]}>
           <mesh position={[0, hand.length / 2, 0]}>
-            <boxGeometry args={[hand.width, hand.length, 0.15]} /><meshStandardMaterial {...finish(model.finishes.hands)} />
+            <boxGeometry args={[hand.width, hand.length, 0.15]} />
+            <meshPhysicalMaterial
+              color={index === 2 ? model.archetypeAppearance.accentColor : '#dbe4ec'}
+              metalness={index === 2 ? 0.55 : 0.88}
+              roughness={index === 2 ? 0.24 : 0.14}
+              clearcoat={0.32}
+              clearcoatRoughness={0.08}
+              envMapIntensity={2.1}
+            />
           </mesh>
           {model.hands.style === 'mercedes' && index === 0 && <mesh position={[0, hand.length * 0.65, 0]}>
             <torusGeometry args={[1, 0.25, 8, 24]} /><meshStandardMaterial {...finish(model.finishes.hands)} />
           </mesh>}
         </group>)}
-      <Cylinder radius={0.6} depth={0.5} material={model.finishes.hands} />
+      <mesh rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.6, 0.6, 0.5, 48]} />
+        <meshPhysicalMaterial color="#dbe4ec" metalness={0.9} roughness={0.12} clearcoat={0.35} clearcoatRoughness={0.06} envMapIntensity={2.1} />
+      </mesh>
     </group>;
   }
 };
@@ -328,10 +339,6 @@ export const VisualWatchScene = ({ model, rotation, cameraDistance, onExporterRe
     <directionalLight position={[-6, -1, 5]} intensity={1.15} color="#6e9fff" />
     <directionalLight position={[1, 6, 4]} intensity={1.0} color="#ffb477" />
     <pointLight position={[0, -4, 5]} intensity={1.1} color="#ffffff" distance={18} decay={2} />
-    <mesh position={[0, 0, -1.18]} receiveShadow>
-      <circleGeometry args={[45, 128]} />
-      <meshStandardMaterial color="#080b12" roughness={0.68} metalness={0.18} envMapIntensity={0.5} />
-    </mesh>
     <group rotation={rotation} scale={MM_TO_SCENE}>
       {visualCategories.map((category) => <VisualComponent key={category} category={category} model={model} />)}
     </group>

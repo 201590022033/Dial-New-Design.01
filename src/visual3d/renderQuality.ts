@@ -4,19 +4,26 @@ import { assessArchetypeKitForPlatform } from '@/domain/library/watchPlatformLib
 import { watchAssemblyToVisualModel } from './watchAssemblyToVisualModel';
 
 export const CAMERA_PRESETS = {
-  studio: { label: 'Studio', rotation: [0.15, -0.24, -0.02] as [number, number, number], distance: 11.4 },
-  face: { label: 'Face', rotation: [0, 0, 0] as [number, number, number], distance: 10.2 },
-  detail: { label: 'Detail', rotation: [0.08, -0.12, 0] as [number, number, number], distance: 8.2 }
+  studio: { label: 'Studio', rotation: [0.15, -0.24, -0.02] as [number, number, number], distance: 14.6 },
+  face: { label: 'Face', rotation: [0, 0, 0] as [number, number, number], distance: 13.4 },
+  detail: { label: 'Detail', rotation: [0.08, -0.12, 0] as [number, number, number], distance: 10.8 }
 } as const;
 
 export type CameraPresetId = keyof typeof CAMERA_PRESETS;
 
 export const CAMERA_DISTANCE_LIMITS = { min: 7, max: 16.5 } as const;
 
+const LEGACY_PRESET_DISTANCES: Record<CameraPresetId, readonly number[]> = {
+  studio: [11.4],
+  face: [10.2],
+  detail: [8.2]
+};
+
 /** Reject stale or corrupted project camera values while preserving valid user framing. */
 export const resolveCameraDistance = (value: unknown, preset: CameraPresetId): number =>
   typeof value === 'number' && Number.isFinite(value) &&
-  value >= CAMERA_DISTANCE_LIMITS.min && value <= CAMERA_DISTANCE_LIMITS.max
+  value >= CAMERA_DISTANCE_LIMITS.min && value <= CAMERA_DISTANCE_LIMITS.max &&
+  !LEGACY_PRESET_DISTANCES[preset].includes(value)
     ? value
     : CAMERA_PRESETS[preset].distance;
 

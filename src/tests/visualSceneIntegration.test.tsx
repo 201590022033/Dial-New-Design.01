@@ -5,7 +5,7 @@ import { BoxGeometry, Group, Mesh } from 'three';
 import { Canvas } from '@react-three/fiber';
 import { createDefaultWatchAssembly } from '@/domain/assembly/assemblyFactory';
 import { watchAssemblyToVisualModel } from '@/visual3d/watchAssemblyToVisualModel';
-import { VisualComponent, VisualWatchScene } from '@/visual3d/VisualWatchScene';
+import { ProceduralComponent, VisualComponent, VisualWatchScene } from '@/visual3d/VisualWatchScene';
 import { GlbAsset, LoadedGlbAsset } from '@/visual3d/GlbAsset';
 import { categoryAnchor, visualCategories, type VisualAssetDescriptor } from '@/visual3d/visualAssetRegistry';
 
@@ -30,9 +30,7 @@ describe('P4 scene integration and GLB failure boundaries', () => {
     expect(scene.props.frameloop).toBe('demand');
     expect(scene.props.gl.preserveDrawingBuffer).toBe(true);
     const sceneChildren = scene.props.children as ReactElement<{ receiveShadow?: boolean }>[];
-    const shadowReceiver = sceneChildren.find((element) => element.type === 'mesh' && element.props.receiveShadow) as ReactElement<{ position: number[]; rotation?: number[] }>;
-    expect(shadowReceiver.props.position).toEqual([0, 0, -1.18]);
-    expect(shadowReceiver.props.rotation).toBeUndefined();
+    expect(sceneChildren.some((element) => element.type === 'mesh' && element.props.receiveShadow)).toBe(false);
     const watch = scene.props.children.at(-1)! as ReactElement<{ scale: number; children: ReactElement<{ category: string }>[] }>;
     expect(watch.props.scale).toBe(0.1);
     expect(watch.props.children.map((e: ReactElement<{ category: string }>) => e.props.category)).toEqual(visualCategories);
@@ -50,6 +48,12 @@ describe('P4 scene integration and GLB failure boundaries', () => {
     expect(asset.props.fallback).toBeTruthy();
     model.visible[category] = false;
     expect(VisualComponent({ category, model })).toBeNull();
+  });
+
+  it('keeps the procedural chapter ring coplanar with the dial', () => {
+    const model = watchAssemblyToVisualModel(createDefaultWatchAssembly());
+    const chapterRing = ProceduralComponent({ category: 'chapter-ring', model }) as ReactElement<{ rotation?: number[] }>;
+    expect(chapterRing.props.rotation).toBeUndefined();
   });
 
   it('shows the procedural fallback while loading and after a load failure', () => {

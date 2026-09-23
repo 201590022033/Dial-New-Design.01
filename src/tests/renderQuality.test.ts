@@ -12,4 +12,10 @@ describe('render camera startup framing', () => {
     expect(resolveCameraDistance(Number.NaN, 'face')).toBe(CAMERA_PRESETS.face.distance);
     expect(resolveCameraDistance(undefined, 'studio')).toBe(CAMERA_PRESETS.studio.distance);
   });
+
+  it('migrates the previous preset distances to the wider central framing', () => {
+    expect(resolveCameraDistance(11.4, 'studio')).toBe(CAMERA_PRESETS.studio.distance);
+    expect(resolveCameraDistance(10.2, 'face')).toBe(CAMERA_PRESETS.face.distance);
+    expect(resolveCameraDistance(8.2, 'detail')).toBe(CAMERA_PRESETS.detail.distance);
+  });
 });

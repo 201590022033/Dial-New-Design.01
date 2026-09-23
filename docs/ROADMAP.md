@@ -20,6 +20,14 @@ The dark studio shadow receiver now remains parallel to the watch face and behin
 
 The central viewer now treats browser Ctrl/Cmd-wheel zoom separately from 3D camera zoom, rejects stale out-of-range saved camera distances, updates the live Three.js camera explicitly, and uses responsive workflow/inspector columns without a forced 1260 px workspace. The startup information card also collapses detailed evidence notes so the watch remains visible at 100% browser zoom on a 1280 × 720 viewport.
 
+The visual scene no longer uses an oversized shadow-receiver disk. Removing it eliminates the grey wall and projected black strap slabs in oblique views; widened camera presets keep the complete watch visible in the central viewer and migrate the earlier preset distances automatically.
+
+Sapphire previews now use restrained presentation refraction. The crystal remains visible through reflection and clearcoat but no longer bends straight hand geometry into a large black arc across the dial.
+
+The dimensional fallback hand set now uses explicit polished hour/minute materials and a contrasting seconds hand, improving readability whenever an authored GLB is unavailable.
+
+The procedural chapter ring now stays in the dial plane. Its previous extra 90° rotation stood the torus vertically through the watch and produced the prominent black hoop seen across the central preview.
+
 The official VK63A drawing review replaces the estimated 6.2 mm register spacing with published 7.50 mm centres and records the published register posts. Register artwork size and hand silhouettes remain estimated pending supplier dial and hand drawings. See `docs/VK63_ENGINEERING_REFERENCE.md`.
 
 ### P11 central-view visual QA
