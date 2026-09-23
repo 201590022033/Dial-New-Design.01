@@ -7,7 +7,7 @@ import { VisualWatchScene, type StillExporter } from './VisualWatchScene';
 import { useWatchAssemblyStore } from '@/stores/watchAssemblyStore';
 import { REFERENCE_42_ID } from '@/domain/presets/reference3d';
 import { assessReference3dFit } from '@/domain/geometry/parametric';
-import { assessRenderAlignment, CAMERA_PRESETS, createStoredZip, dataUrlToBytes, type CameraPresetId } from './renderQuality';
+import { assessRenderAlignment, CAMERA_DISTANCE_LIMITS, CAMERA_PRESETS, createStoredZip, dataUrlToBytes, resolveCameraDistance, type CameraPresetId } from './renderQuality';
 import { getArchetypeKit, NMK901_PLATFORM_ID, watchPlatformLibrary } from '@/domain/library/watchPlatformLibrary';
 
 export const VisualWatchRenderer = ({ assembly, presentationMode, onTogglePresentationMode }: { assembly: WatchAssembly; presentationMode: boolean; onTogglePresentationMode: () => void }) => {
@@ -16,7 +16,7 @@ export const VisualWatchRenderer = ({ assembly, presentationMode, onTogglePresen
   const initialPreset = savedRender?.renderPreset ?? 'studio';
   const [activePreset, setActivePreset] = useState<CameraPresetId>(initialPreset);
   const [rotation, setRotation] = useState<[number, number, number]>(savedRender?.renderRotation ?? CAMERA_PRESETS[initialPreset].rotation);
-  const [cameraDistance, setCameraDistance] = useState(savedRender?.renderDistance ?? CAMERA_PRESETS[initialPreset].distance);
+  const [cameraDistance, setCameraDistance] = useState(resolveCameraDistance(savedRender?.renderDistance, initialPreset));
   const selectReference = useWatchAssemblyStore((state) => state.selectReference42Preview);
   const clearReference = useWatchAssemblyStore((state) => state.clearReference42Preview);
   const updateVisualReference = useWatchAssemblyStore((state) => state.updateVisualReferenceConfig);
@@ -40,7 +40,7 @@ export const VisualWatchRenderer = ({ assembly, presentationMode, onTogglePresen
     const preset = savedRender?.renderPreset ?? 'studio';
     setActivePreset(preset);
     setRotation(savedRender?.renderRotation ?? CAMERA_PRESETS[preset].rotation);
-    setCameraDistance(savedRender?.renderDistance ?? CAMERA_PRESETS[preset].distance);
+    setCameraDistance(resolveCameraDistance(savedRender?.renderDistance, preset));
   }, [assembly.metadata.id, savedRender?.renderDistance, savedRender?.renderPreset, savedRender?.renderRotation]);
   const registerExporter = useCallback((next: StillExporter | null) => {
     exporter.current = next;
@@ -95,7 +95,9 @@ export const VisualWatchRenderer = ({ assembly, presentationMode, onTogglePresen
   return <div
     className="relative h-full w-full overflow-hidden rounded-panel bg-[#05070b]"
     onWheel={(event) => {
-      const next = Math.max(7, Math.min(22, cameraDistance + event.deltaY * 0.004));
+      // Browser/page zoom gestures must not also alter and persist the 3D camera.
+      if (event.ctrlKey || event.metaKey) return;
+      const next = Math.max(CAMERA_DISTANCE_LIMITS.min, Math.min(CAMERA_DISTANCE_LIMITS.max, cameraDistance + event.deltaY * 0.004));
       setCameraDistance(next);
       saveCamera(rotation, next, activePreset);
     }}
@@ -137,8 +139,11 @@ export const VisualWatchRenderer = ({ assembly, presentationMode, onTogglePresen
       {referenceSelected && <p role="status" className="mt-2 text-amber-200">
         {conflicts.length} known geometry conflict{conflicts.length === 1 ? '' : 's'}; {issues.length - conflicts.length} unverified fit check{issues.length - conflicts.length === 1 ? '' : 's'}. This set is for visual review only.
       </p>}
-      {referenceSelected && <p className="mt-1 text-slate-300">Face-stack and exterior GLBs use published dimensions plus explicitly estimated nominal placement.</p>}
-      {referenceSelected && <p className="mt-1 text-slate-300">P6 evidence gate: {Object.keys(assembly.designConfig?.fitEvidence ?? {}).length} provisional or unverified interfaces recorded.</p>}
+      {referenceSelected && <details className="mt-1 text-slate-300">
+        <summary className="cursor-pointer">Evidence and placement notes</summary>
+        <p className="mt-1">Face-stack and exterior GLBs use published dimensions plus explicitly estimated nominal placement.</p>
+        <p className="mt-1">P6 evidence gate: {Object.keys(assembly.designConfig?.fitEvidence ?? {}).length} provisional or unverified interfaces recorded.</p>
+      </details>}
       {referenceSelected && <details className="mt-1 max-h-36 overflow-auto text-slate-200">
         <summary className="cursor-pointer">Review fit findings</summary>
         <ul className="mt-1 list-disc space-y-1 pl-4">{issues.map((issue, index) => <li key={`${issue.code}-${index}`}>{issue.detail}</li>)}</ul>

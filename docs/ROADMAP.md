@@ -18,6 +18,8 @@ The case generator now applies its upper and lower shoulder-reduction parameters
 
 The dark studio shadow receiver now remains parallel to the watch face and behind the full assembly. This removes the edge-on black disk that previously intersected and visually split the watch when the camera was rotated away from the face preset.
 
+The central viewer now treats browser Ctrl/Cmd-wheel zoom separately from 3D camera zoom, rejects stale out-of-range saved camera distances, updates the live Three.js camera explicitly, and uses responsive workflow/inspector columns without a forced 1260 px workspace. The startup information card also collapses detailed evidence notes so the watch remains visible at 100% browser zoom on a 1280 × 720 viewport.
+
 The official VK63A drawing review replaces the estimated 6.2 mm register spacing with published 7.50 mm centres and records the published register posts. Register artwork size and hand silhouettes remain estimated pending supplier dial and hand drawings. See `docs/VK63_ENGINEERING_REFERENCE.md`.
 
 ### P11 central-view visual QA

@@ -268,6 +268,16 @@ const DarkDramaticEnvironment = () => {
   return null;
 };
 
+const CameraDistanceController = ({ distance }: { distance: number }) => {
+  const { camera, invalidate } = useThree();
+  useEffect(() => {
+    camera.position.set(0, 0, distance);
+    camera.updateProjectionMatrix();
+    invalidate();
+  }, [camera, distance, invalidate]);
+  return null;
+};
+
 export type StillExporter = () => string;
 
 const StillExporterBridge = ({ onReady }: { onReady?: (exporter: StillExporter | null) => void }) => {
@@ -306,6 +316,7 @@ export const VisualWatchScene = ({ model, rotation, cameraDistance, onExporterRe
   <Canvas frameloop="demand" shadows camera={{ position: [0, 0, cameraDistance], fov: 29 }} dpr={[1, 1.75]} gl={{ antialias: true, powerPreference: 'high-performance', preserveDrawingBuffer: true }}
     onCreated={({ gl }) => { gl.toneMapping = ACESFilmicToneMapping; gl.toneMappingExposure = 0.94; gl.outputColorSpace = SRGBColorSpace; }}>
     <DarkDramaticEnvironment />
+    <CameraDistanceController distance={cameraDistance} />
     <StillExporterBridge onReady={onExporterReady} />
     <color attach="background" args={['#05070b']} />
     <hemisphereLight args={['#dce8ff', '#020307', 0.38]} />

@@ -4,7 +4,7 @@ import { Focus, Maximize2, Minimize2, Move, Ruler, ScanLine, ZoomIn, ZoomOut } f
 import { Button } from '@/components/ui/Button';
 import { useResizeObserver } from '@/hooks/useResizeObserver';
 import { useRenderer } from '@/renderer/useRenderer';
-import { nextZoomValue } from '@/renderer/services/zoomService';
+import { isBrowserZoomGesture, nextZoomValue } from '@/renderer/services/zoomService';
 import { createPanState, resolvePan, type PanState } from '@/renderer/services/panService';
 import { resolveHighlightBandIds } from '@/features/shared/objectInspectorSchemas';
 import { useBandsStore, useDesignEngineStore, useScaleStore, useSelectionStore, useViewportStore, useConfiguratorUIStore, useWatchAssemblyStore } from '@/stores';
@@ -56,7 +56,7 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode, visua
   const resetPan = useViewportStore((s) => s.resetPan);
   const toggleGuides = useViewportStore((s) => s.toggleGuides);
 
-  const renderer = useRenderer(container);
+  const { renderer, ready: rendererReady } = useRenderer(container);
   const { width, height } = useResizeObserver(container);
   const panState = useRef<PanState | null>(null);
   const lastPan = useRef({ x: panX, y: panY });
@@ -123,6 +123,10 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode, visua
   };
 
   useEffect(() => {
+    if (!rendererReady || width <= 0 || height <= 0) {
+      return;
+    }
+
     renderer.renderBands(bands, renderContext, {
       showGuides: presentationMode ? false : showGuides,
       showSnapping,
@@ -136,6 +140,9 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode, visua
     });
   }, [
     renderer,
+    rendererReady,
+    width,
+    height,
     bands,
     renderContext,
     showGuides,
@@ -172,6 +179,10 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode, visua
             showGrid && workMode === 'advanced' && !presentationMode ? 'bg-grid bg-[size:62px_62px]' : ''
           ].join(' ')}
           onWheel={(event) => {
+            if (isBrowserZoomGesture(event.nativeEvent)) {
+              return;
+            }
+
             event.preventDefault();
 
             const targetRect = event.currentTarget.getBoundingClientRect();

@@ -110,7 +110,7 @@ export const LeftNavRail: React.FC = () => {
 
   return (
     <nav
-      className="flex flex-col h-full w-[72px] lg:w-[84px] bg-slate-900/95 border-r border-slate-800 text-slate-200 select-none py-3 px-1.5 justify-between shadow-lg"
+      className="flex h-full w-full flex-col justify-between border-r border-slate-800 bg-slate-900/95 px-1.5 py-3 text-slate-200 shadow-lg select-none"
       data-testid="left-nav-rail"
       aria-label="Configurator navigation and status rail"
     >

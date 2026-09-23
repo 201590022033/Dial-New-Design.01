@@ -318,7 +318,7 @@ export const App = () => {
 
       <main
         ref={workspaceRef}
-        className="flex min-h-0 flex-1 overflow-x-auto overflow-y-hidden"
+        className="flex min-h-0 flex-1 overflow-hidden"
         data-layout-region="workspace"
       >
         {/*
@@ -343,7 +343,7 @@ export const App = () => {
             'grid min-h-0 h-full flex-1 gap-3 overflow-hidden',
             presentationMode
               ? 'min-w-0 grid-cols-[minmax(0,1fr)]'
-              : 'min-w-[1260px] grid-cols-[80px_minmax(600px,1fr)_380px]'
+              : 'min-w-0 grid-cols-[72px_minmax(0,1fr)_minmax(300px,340px)] lg:grid-cols-[84px_minmax(0,1fr)_380px] xl:grid-cols-[84px_minmax(0,1fr)_400px]'
           ].join(' ')}
           data-layout-columns="3"
         >

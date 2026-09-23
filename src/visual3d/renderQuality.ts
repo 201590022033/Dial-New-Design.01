@@ -11,6 +11,15 @@ export const CAMERA_PRESETS = {
 
 export type CameraPresetId = keyof typeof CAMERA_PRESETS;
 
+export const CAMERA_DISTANCE_LIMITS = { min: 7, max: 16.5 } as const;
+
+/** Reject stale or corrupted project camera values while preserving valid user framing. */
+export const resolveCameraDistance = (value: unknown, preset: CameraPresetId): number =>
+  typeof value === 'number' && Number.isFinite(value) &&
+  value >= CAMERA_DISTANCE_LIMITS.min && value <= CAMERA_DISTANCE_LIMITS.max
+    ? value
+    : CAMERA_PRESETS[preset].distance;
+
 export interface RenderAlignmentCheck {
   label: string;
   status: 'pass' | 'warning';

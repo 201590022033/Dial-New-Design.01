@@ -48,7 +48,7 @@ export const RightTray: React.FC = () => {
 
   return (
     <aside
-      className="flex flex-col h-full w-[360px] lg:w-[400px] bg-slate-950 border-l border-slate-800 text-slate-200 shadow-xl select-none"
+      className="flex h-full w-full flex-col border-l border-slate-800 bg-slate-950 text-slate-200 shadow-xl select-none"
       data-testid="right-configurator-tray"
     >
       {/* Tray Header */}
