@@ -6,6 +6,7 @@ import { visualCategories, type VisualCategory } from './visualAssetRegistry';
 import { componentPlacement } from './componentPlacement';
 import { MM_TO_SCENE } from './assemblyAnchors';
 import { finishProfiles, type FinishProfile } from './finishProfiles';
+import { createPreviewLugGeometry } from './proceduralEnvelope';
 import { ACESFilmicToneMapping, CanvasTexture, LinearFilter, PerspectiveCamera, PMREMGenerator, SRGBColorSpace, Vector2 } from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 
@@ -134,8 +135,18 @@ export const DialArtwork = ({ model }: { model: VisualWatchModel }) => {
 };
 
 /** Schematic shapes in engineering mm. These are explicitly provisional previews. */
+const PreviewLug = ({ model, side, end }: { model: VisualWatchModel; side: number; end: number }) => {
+  const geometry = useMemo(() => createPreviewLugGeometry(model.previewEnvelope.lugs, side, end), [model.previewEnvelope.lugs, side, end]);
+  useEffect(() => () => geometry.dispose(), [geometry]);
+  return <mesh castShadow geometry={geometry}><meshPhysicalMaterial {...physicalFinish(model.finishes.case)} /></mesh>;
+};
+
 export const ProceduralComponent = ({ category, model }: { category: VisualCategory; model: VisualWatchModel }) => {
   const radius = model.caseDiameterMm / 2;
+  const envelope = model.previewEnvelope;
+  // GLBs can be watch-axis or dial-seat anchored. Fallbacks use the same assembled
+  // envelope in either case, not an extra fixed offset from whichever GLB failed.
+  const localZ = (z: number) => z - componentPlacement(model, category).anchor.positionMm[2];
   switch (category) {
     case 'strap': return <group>
       {[1, -1].map((sign) => <mesh key={sign} castShadow position={[0, sign * radius * 1.55, -0.3]}>
@@ -157,33 +168,38 @@ export const ProceduralComponent = ({ category, model }: { category: VisualCateg
           new Vector2(radius * 0.78, -model.caseThicknessMm / 2)
         ], 128]} /><meshPhysicalMaterial {...physicalFinish(model.finishes.case)} />
       </mesh>
-      {[1, -1].flatMap((y) => [-1, 1].map((x) => [x * radius * 0.42, y * radius * 0.98, -0.2] as [number, number, number])).map((position, index) =>
-        <mesh key={index} castShadow position={position} rotation={[0, 0, position[0] > 0 ? -0.12 : 0.12]}>
-          <boxGeometry args={[radius * 0.18, radius * 0.36, 0.7]} /><meshStandardMaterial {...finish(model.finishes.case)} />
-        </mesh>)}
+      {[1, -1].flatMap(end => [-1, 1].map(side => <PreviewLug key={`${side}-${end}`} model={model} side={side} end={end} />))}
     </group>;
     case 'bezel': {
       const bezelReference = model.referenceProfiles.bezelId;
       const insertColor = bezelReference === 'bezel-gem-set'
         ? '#b08d57'
         : model.archetypeAppearance.bezelColor;
-      return <group position={[0, 0, 0.2]}>
-      <mesh castShadow>
-        <torusGeometry args={[radius * 0.88, radius * 0.045, 24, 128]} /><meshStandardMaterial {...finish(model.finishes.bezel)} />
-      </mesh>
-      <mesh rotation={[Math.PI / 2, 0, 0]}>
+      return <group position={[0, 0, localZ(envelope.bezelZ)]}>
+      <mesh castShadow rotation={[Math.PI / 2, 0, 0]}>
         <latheGeometry args={[[
-          new Vector2(radius * 0.8, -0.06), new Vector2(radius * 0.89, -0.06),
-          new Vector2(radius * 0.89, 0.06), new Vector2(radius * 0.8, 0.06),
-          new Vector2(radius * 0.8, -0.06)
+          new Vector2(envelope.bezelInnerRadius, -envelope.bezelHeight / 2),
+          new Vector2(envelope.bezelOuterRadius - 0.3, -envelope.bezelHeight / 2),
+          new Vector2(envelope.bezelOuterRadius, -envelope.bezelHeight / 2 + 0.3),
+          new Vector2(envelope.bezelOuterRadius, envelope.bezelHeight / 2 - 0.3),
+          new Vector2(envelope.bezelOuterRadius - 0.3, envelope.bezelHeight / 2),
+          new Vector2(envelope.bezelInnerRadius, envelope.bezelHeight / 2),
+          new Vector2(envelope.bezelInnerRadius, -envelope.bezelHeight / 2)
+        ], 128]} /><meshStandardMaterial {...finish(model.finishes.bezel)} />
+      </mesh>
+      <mesh position={[0, 0, envelope.bezelHeight / 2 + 0.02]} rotation={[Math.PI / 2, 0, 0]}>
+        <latheGeometry args={[[
+          new Vector2(envelope.bezelInnerRadius + 0.2, -0.02), new Vector2(envelope.bezelOuterRadius - 0.7, -0.02),
+          new Vector2(envelope.bezelOuterRadius - 0.7, 0.06), new Vector2(envelope.bezelInnerRadius + 0.2, 0.06),
+          new Vector2(envelope.bezelInnerRadius + 0.2, -0.02)
         ], 96]} /><meshStandardMaterial {...finish(model.finishes.bezel, insertColor)} />
       </mesh>
     </group>;
     }
-    case 'chapter-ring': return <mesh position={[0, 0, 0.5]}>
+    case 'chapter-ring': return <mesh position={[0, 0, localZ(envelope.chapterZ)]}>
       <torusGeometry args={[model.dial.outerDiameterMm / 2 + 0.5, 0.75, 20, 128]} /><meshStandardMaterial {...finish(model.finishes['chapter-ring'])} />
     </mesh>;
-    case 'dial': return <group>
+    case 'dial': return <group position={[0, 0, localZ(envelope.dialZ)]}>
       <mesh rotation={[Math.PI / 2, 0, 0]}>
         <cylinderGeometry args={[model.dial.outerDiameterMm / 2, model.dial.outerDiameterMm / 2, model.dial.thicknessMm, 128]} /><meshPhysicalMaterial {...physicalFinish(model.finishes.dial, model.dialColor)} roughness={model.dial.textureKind === 'matte' ? 0.58 : Math.max(0.2, 0.45 - model.dial.textureIntensity * 0.2)} />
       </mesh>
@@ -216,8 +232,8 @@ export const ProceduralComponent = ({ category, model }: { category: VisualCateg
         </mesh>;
       })}
     </group>;
-    case 'crystal': return <mesh position={[0, 0, 2]} rotation={[Math.PI / 2, 0, 0]}>
-      <cylinderGeometry args={[radius * 0.86, radius * 0.86, 0.5, 96]} /><meshPhysicalMaterial {...physicalFinish(model.finishes.crystal)} transparent opacity={model.finishes.crystal.opacity ?? 0.1} depthWrite={false} envMapIntensity={2.25} />
+    case 'crystal': return <mesh position={[0, 0, localZ(envelope.crystalZ)]} rotation={[Math.PI / 2, 0, 0]}>
+      <cylinderGeometry args={[envelope.crystalRadius, envelope.crystalRadius, envelope.crystalThickness, 128]} /><meshPhysicalMaterial {...physicalFinish(model.finishes.crystal)} transparent opacity={model.finishes.crystal.opacity ?? 0.1} depthWrite={false} envMapIntensity={2.25} />
     </mesh>;
     case 'crown': return <Cylinder axis="X" radius={model.crown.diameterMm / 2} depth={model.crown.lengthMm} position={[model.crown.lengthMm / 2, 0, 0]} material={model.finishes.crown} />;
     case 'pushers': return <group>
@@ -232,7 +248,7 @@ export const ProceduralComponent = ({ category, model }: { category: VisualCateg
         return <group key={index}>{radial}</group>;
       }) : <mesh visible={false}><boxGeometry args={[0.01, 0.01, 0.01]} /></mesh>}
     </group>;
-    case 'hands': return <group>
+    case 'hands': return <group position={[0, 0, localZ(envelope.handsZ)]}>
       {[{ length: radius * 0.5, width: 1.1, angle: 0.5 }, { length: radius * 0.72, width: 0.7, angle: -0.9 }, { length: radius * 0.78, width: 0.2, angle: 2 }].map((hand, index) =>
         <group key={index} rotation={[0, 0, hand.angle]} position={[0, 0, index * 0.2]}>
           <mesh position={[0, hand.length / 2, 0]}>
@@ -267,7 +283,7 @@ export const VisualComponent = ({ category, model }: { category: VisualCategory;
   return <group name={category} position={placement.anchor.positionMm} rotation={placement.anchor.rotationRad}>
     <group position={placement.offset} rotation={placement.rotation}>
       {placement.glb ? <GlbAsset key={descriptor.assetId + ':' + descriptor.assetPath} descriptor={descriptor} fallback={fallback} appearance={model.archetypeAppearance} /> : fallback}
-      {category === 'dial' && <group position={placement.descriptorOffset}><DialArtwork model={model} /></group>}
+      {category === 'dial' && <group position={placement.glb ? placement.descriptorOffset : [0, 0, model.previewEnvelope.dialZ - placement.anchor.positionMm[2]]}><DialArtwork model={model} /></group>}
     </group>
   </group>;
 };

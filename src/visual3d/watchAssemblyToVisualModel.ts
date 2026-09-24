@@ -12,6 +12,7 @@ import { defaultDialFaceConfig } from '@/domain/generators/dialFaceGenerator';
 import { defaultTypographyConfig } from '@/domain/generators/typographyEngine';
 import { getArchetypeReferenceById, getBezelReferenceById, getComplicationReferenceById, getLumeReferenceById } from '@/domain/asset-library';
 import { getArchetypeVisualProfile } from '@/domain/configurator/archetypeProfiles';
+import { resolveProceduralEnvelope } from './proceduralEnvelope';
 
 export type PusherVisualDescriptor = {
   count: number;
@@ -51,6 +52,7 @@ export type DialVisualDescriptor = {
 export type VisualWatchModel = {
   caseDiameterMm: number;
   caseThicknessMm: number;
+  previewEnvelope: ReturnType<typeof resolveProceduralEnvelope>;
   caseMaterial: string;
   dialColor: string;
   dial: DialVisualDescriptor;
@@ -196,10 +198,15 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
     const angleDeg = position.includes('4') ? 45 : position.includes('6') ? 0 : position.includes('9') ? 90 : position.includes('12') ? 180 : 90;
     return { kind: kind === 'day-window' ? 'day' as const : 'date' as const, angleDeg, widthMm: positive(part.dimensions.widthMm, 3.4), heightMm: positive(part.dimensions.thicknessMm, 1.2), cornerRadiusMm: 0.25 };
   });
-    const dialDiameter = positive(dialPart?.dimensions.diameterMm, 32);
+  const dialDiameter = positive(dialPart?.dimensions.diameterMm, 32);
+  const caseHeight = positive(caseParams?.midcaseHeight, positive(assembly.globalDimensions.totalThicknessMm, 12.5));
+  // The authored 42 mm face components have fixed watch-axis coordinates. Keep
+  // any missing component in that same frame, even without the opt-in fixture.
+  const hasFixedFaceFrame = [assets.dial, assets.bezel, assets.crystal].some(asset => asset.assetType === 'glb' && asset.referenceCaseDiameterMm === 42);
   return {
     caseDiameterMm: positive(assembly.globalDimensions.caseDiameterMm, 40),
-    caseThicknessMm: positive(assembly.globalDimensions.totalThicknessMm, 12.5),
+    caseThicknessMm: caseHeight,
+    previewEnvelope: resolveProceduralEnvelope(positive(assembly.globalDimensions.caseDiameterMm, 40), caseHeight, caseParams, hasFixedFaceFrame ? 10.2 : caseHeight),
     caseMaterial: materialProfile(casePart, 'brushed-steel'),
     dialColor: dialPart?.color ?? assembly.selectedColorPalette.primary,
     dial: {

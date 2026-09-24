@@ -167,8 +167,12 @@ def bezel(style):
     steel = ref.material("archetype bezel steel", (.58, .64, .72), .94, .14)
     insert = ref.material("archetype bezel insert", dark, .25, .22)
     ink = ref.material("archetype bezel marking", accent, .08, .28)
-    height = .62 if style in ("dress", "field") else 1.0
-    inner_diameter = 32.0 if style in ("diver", "chronograph") else 37.8 if style == "pilot" else 38.2
+    # All these assets share the same 31.5 mm crystal at Z=6.25, thickness 1.5.
+    # The old .62/1.0 mm carrier left its top below the crystal and the larger
+    # dress/pilot apertures left an unsupported gap around the glass.
+    # Nominal presentation seat: top 5.65 + 2.8/2 = 7.05, crystal top = 7.0.
+    height = 2.8
+    inner_diameter = 31.5
     objects = [ref.annulus("DD_ARCH_BEZEL_CARRIER", 41, inner_diameter, height, steel, 160)]
     if style in ("diver", "chronograph"):
         objects.append(ref.annulus("DD_ARCH_BEZEL_INSERT", 39.2, 32.6, .28, insert, 160, height / 2 + .12))
@@ -291,9 +295,16 @@ def pushers():
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", required=True)
+    parser.add_argument("--bezel-only", action="store_true", help="Regenerate only bezel assets; preserve the remaining library and manifest")
     args = parser.parse_args(sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else [])
     output = os.path.abspath(args.output)
     os.makedirs(output, exist_ok=True)
+    if args.bezel_only:
+        for style in STYLES:
+            ref.clear()
+            export(bezel(style), os.path.join(output, f"bezel-{style}.glb"))
+        print(f"Generated {len(STYLES)} seated bezel assets")
+        return
     assets = []
     for style in STYLES:
         for kind, builder in (("dial", dial), ("bezel", bezel), ("hands", hands)):

@@ -20,6 +20,15 @@ for filename in manifest["assets"]:
     meshes, report = import_glb(str(root / filename))
     total_meshes += report["mesh_count"]
     mesh_names_by_asset[filename] = set(report["mesh_names"])
+    if filename.startswith("bezel-"):
+        carrier = next(obj for obj in meshes if obj.name == "DD_ARCH_BEZEL_CARRIER")
+        vertices = [carrier.matrix_world @ vertex.co for vertex in carrier.data.vertices]
+        top = max(vertex.z for vertex in vertices) + 5.65
+        inner_radius = min((vertex.x ** 2 + vertex.y ** 2) ** .5 for vertex in vertices)
+        if top < 7.0 or top > 7.15:
+            raise AssertionError(f"Crystal must sit inside the bezel rim, not proud of it: {filename}, top={top}")
+        if abs(inner_radius - 15.75) > .25:
+            raise AssertionError(f"Bezel must support the 31.5 mm crystal: {filename}, radius={inner_radius}")
     if not all(obj.get("DD_PROVENANCE_STATUS") == "provisional-presentation" for obj in meshes):
         raise AssertionError(f"Missing presentation provenance in {filename}")
 

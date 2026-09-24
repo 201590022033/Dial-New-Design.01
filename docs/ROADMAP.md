@@ -1,5 +1,13 @@
 # Dial Designer Roadmap
 
+## September 24 preview geometry regression repair
+
+The schematic case still had 0.7 mm lugs after its body was thickened, and its independent crystal offset left the glass above the bezel. Procedural lugs now use a six-section tapered solid derived from the existing nominal case envelope (4.5 mm thickness at 42 mm). Dial, hands, chapter ring, bezel and crystal share a single presentation stack, including the mixed GLB/fallback path. Fallback geometry uses the parametric midcase height where available rather than treating total watch thickness as midcase height.
+
+All five archetype bezel GLBs were regenerated with a 2.8 mm carrier and 31.5 mm crystal opening. Their carrier top is Z=7.05 mm around the existing crystal top at Z=7.00 mm; previously the thin carriers and wider dress/pilot openings did not seat that crystal. Authored archetype hands now use the same fixed watch-axis frame as their dials, including when the reference fixture has not been loaded. These are nominal presentation corrections only: no fit evidence or procurement approval was upgraded.
+
+Regression coverage includes basic 40 mm, mixed 42 mm and reference 42 mm chronographs, four lug solids, fallback frame placement, glass/rim height, hand clearance and Blender-imported bezel dimensions. Browser side-view review covers basic and authored rendering paths.
+
 ## P11 movement-owned subdials and case-family expansion
 
 The first movement-owned dial architecture is now implemented for TMI VK63. The central preview uses the published 9 h chronograph-minute, 6 h small-seconds and 3 h 24-hour roles, with configurable needle, baton and syringe register-hand presentation assets. The social-media subdial, movement and lug references are catalogued as `reference-only`.
