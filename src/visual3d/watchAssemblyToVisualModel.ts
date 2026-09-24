@@ -178,10 +178,16 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
       ? [60 + offset, -60 + offset].slice(0, pusherCount)
       : movement?.pusherPositionsDeg?.slice(0, pusherCount) ?? [])
     : [];
-  // A chronograph movement is enough to make the presentation pushers useful
-  // before a case-specific pusher drawing is attached. Keep authored case
-  // visibility authoritative when a case fixture already declares its count.
-  if (pushersPart && casePusherCount === undefined && pusherCount > 0) visible.pushers = true;
+  // A named visual profile owns whether its presentation includes pushers.
+  // Otherwise a retained VK63 movement can re-enable them after a diver/field
+  // switch, even though applyArchetypeVisualProfile explicitly hid the part.
+  // Also suppress stale GLB bindings/visibility bits restored from older saves.
+  if (archetypeProfile && !archetypeProfile.pusherAssetId) {
+    visible.pushers = false;
+  } else if (!archetypeProfile && pushersPart && casePusherCount === undefined && pusherCount > 0) {
+    // Retain movement-driven previews when no archetype was explicitly selected.
+    visible.pushers = true;
+  }
   const markerConfig: MarkerEngineConfig = assembly.designConfig?.markerConfig ?? defaultMarkerConfig;
   const dialConfig = assembly.designConfig?.dialFaceConfig;
   const dialTexture = dialConfig?.texture ?? defaultDialFaceConfig.texture;

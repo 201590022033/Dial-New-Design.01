@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { createDefaultWatchAssembly } from '@/domain/assembly/assemblyFactory';
 import { watchAssemblyToVisualModel } from '@/visual3d/watchAssemblyToVisualModel';
+import { createStarterBuild } from '@/domain/configurator/defaultBuilds';
+import { applyReference42Preview } from '@/domain/presets/reference3d';
+import { applyArchetypeVisualProfile } from '@/domain/configurator/archetypeProfiles';
+import { VisualComponent } from '@/visual3d/VisualWatchScene';
 
 const withHand = (assembly: ReturnType<typeof createDefaultWatchAssembly>, patch: Record<string, unknown>) => {
   const next = structuredClone(assembly);
@@ -10,6 +14,31 @@ const withHand = (assembly: ReturnType<typeof createDefaultWatchAssembly>, patch
 };
 
 describe('WatchAssembly visual adapter', () => {
+  it.each(['archetype-dive', 'archetype-field', 'archetype-pilot', 'archetype-dress-formal'])('unmounts chronograph pushers after switching to %s, including saved legacy bindings', (archetypeId) => {
+    for (const size of ['basic40', 'mixed42', 'reference42']) {
+      let base = createDefaultWatchAssembly();
+      if (size === 'mixed42') base.globalDimensions.caseDiameterMm = 42;
+      if (size === 'reference42') base = applyReference42Preview(base);
+      const chrono = createStarterBuild('chronograph', base).assembly;
+      chrono.parts['inst-pushers']!.visual = { category: 'pushers', assetId: 'archetype-pushers-chronograph' };
+      expect(watchAssemblyToVisualModel(chrono).visible.pushers).toBe(true);
+      const switched = applyArchetypeVisualProfile(chrono, archetypeId);
+      // Simulate an old save that retained the visibility bit as well as the binding.
+      for (const visible of [false, true]) {
+        switched.parts['inst-pushers']!.visible = visible;
+        const restored = JSON.parse(JSON.stringify(switched)) as typeof switched;
+        const model = watchAssemblyToVisualModel(restored);
+        expect(model.visible.pushers).toBe(false);
+        expect(VisualComponent({ category: 'pushers', model })).toBeNull();
+        // Visual switching must not silently replace the user's actual movement.
+        expect(restored.metadata.movement).toBe('vk63');
+        expect(restored.parts['inst-midcase']).toEqual(chrono.parts['inst-midcase']);
+        expect(restored.parts['inst-crystal']).toEqual(chrono.parts['inst-crystal']);
+      }
+      const back = applyArchetypeVisualProfile(switched, 'archetype-chronograph');
+      expect(watchAssemblyToVisualModel(back).visible.pushers).toBe(true);
+    }
+  });
   it('maps committed case dimensions', () => {
     const assembly = createDefaultWatchAssembly();
     assembly.globalDimensions.caseDiameterMm = 42;

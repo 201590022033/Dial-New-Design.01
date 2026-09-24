@@ -14,6 +14,8 @@ if manifest.get('status') != 'provisional-presentation' or set(manifest.get('sty
     raise AssertionError('Lug-case manifest is incomplete or has invalid provenance')
 for style, filename in zip(manifest['styles'], manifest['assets']):
     meshes, report = import_glb(str(root / filename))
+    if any('PUSHER' in obj.name.upper() for obj in meshes):
+        raise AssertionError(f'{style} NMK901 case must not contain baked chronograph pushers')
     if report['mesh_count'] < 5:
         raise AssertionError(f'{style} case has too few meshes')
     if not any(obj.get('DD_LUG_LIBRARY_STYLE') == style for obj in meshes):
