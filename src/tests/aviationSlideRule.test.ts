@@ -30,6 +30,11 @@ describe('aviation slide rule', () => {
     expect(chrono.context.endAngleDeg - chrono.context.startAngleDeg).toBe(280);
     expect(aviation.kind).toBe('slide-rule');
     expect(aviation.config.engineeringPreset).toBe('aviation-slide-rule');
+    const compass = getScaleProgram('compass', []);
+    expect(compass.kind).toBe('compass');
+    const compassResult = runScalePlugin(compass.kind, { ...getScalePlugin(compass.kind)!.defaultConfig, ...compass.config }, compass.context);
+    expect(compassResult?.labels.map((label) => label.text)).toEqual(expect.arrayContaining(['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW']));
+    expect(compassResult?.labels.filter((label) => label.text === 'N')).toHaveLength(1);
     const minuteRing = runScalePlugin(diver.kind, { ...getScalePlugin(diver.kind)!.defaultConfig, ...diver.config }, diver.context);
     expect(minuteRing?.ticks).toHaveLength(60);
   });
@@ -70,6 +75,14 @@ describe('aviation slide rule', () => {
     expect(chapter).toContain('data-ring="inner"');
     expect(chapter).not.toContain('outer-markings');
     expect(bezel).toBe(createAviationRingSvg(config, 'outer', 42));
+  });
+
+  it('keeps font size consistent across generated geometry and physical artwork', () => {
+    const large = { ...config, scaleFontSizeMm: 1.4 };
+    const preview = runScalePlugin('slide-rule', large, { startAngleDeg: 0, endAngleDeg: 360 });
+    expect(preview?.fontSizeMm).toBe(1.4);
+    expect(createAviationRingSvg(large, 'outer', 42)).toContain('font-size="1.4"');
+    expect(preview!.labels.length).toBeLessThanOrEqual(runScalePlugin('slide-rule', config, { startAngleDeg: 0, endAngleDeg: 360 })!.labels.length);
   });
 
   it('scopes the general export to the requested ring and invalidates rotated artwork', () => {

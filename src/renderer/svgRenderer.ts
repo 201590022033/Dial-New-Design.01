@@ -63,6 +63,7 @@ export class SvgRenderer implements RendererAdapter {
         // Rotation changes geometry without changing the number of marks.
         scaleTicks: options.scalePreview?.ticks.map((tick) => [tick.angleDeg, tick.radiusMm, tick.lengthMm, tick.ringId]),
         scaleLabels: options.scalePreview?.labels.map((label) => [label.angleDeg, label.radiusMm, label.text, label.ringId]),
+        scaleFontSizeMm: options.scalePreview?.fontSizeMm,
         designOverlay: options.designOverlay,
         selectedHitId: options.selectedHit?.partInstanceId ?? null,
         hoveredHitId: options.hoveredHit?.partInstanceId ?? null,
@@ -483,7 +484,7 @@ export class SvgRenderer implements RendererAdapter {
         const point = polarToCartesian(mmToPixels(label.radiusMm), label.angleDeg);
         (label.ringId === 'outer' ? outerScaleGroup : innerScaleGroup)
           .text(label.text)
-          .font({ size: 10, family: '"IBM Plex Mono", monospace', anchor: 'middle' })
+          .font({ size: mmToPixels(options.scalePreview?.fontSizeMm ?? 0.8), family: '"IBM Plex Mono", monospace', anchor: 'middle' })
           .fill('#E2E8F0')
           .center(context.centerX + point.x, context.centerY + point.y)
           .rotate(

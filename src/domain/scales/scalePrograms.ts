@@ -1,7 +1,7 @@
 import type { BandEntity } from '@/domain/bands/types';
 import type { ScaleKind, ScaleMathContext, ScalePluginConfig } from '@/domain/scales/types';
 
-export type ScaleProgram = 'diver' | 'chrono' | 'aviation';
+export type ScaleProgram = 'diver' | 'chrono' | 'aviation' | 'compass';
 
 export interface ScaleProgramSelection {
   kind: ScaleKind;
@@ -33,6 +33,19 @@ export const getScaleProgram = (program: ScaleProgram, bands: BandEntity[]): Sca
     context: { startAngleDeg: -140, endAngleDeg: 140 },
     bezel: { type: 'fixed', rotating: false }
   };
+  if (program === 'compass') return {
+    kind: 'compass',
+    config: {
+      startValue: 0, endValue: 360, majorStep: 45, minorStep: 15,
+      radiusMm: outer ? (outer.innerRadius + outer.outerRadius) / 2 : 18.7,
+      majorTickLengthMm: 0.65, minorTickLengthMm: 0.3,
+      tickDirection: 'inside', labelPlacement: 'inside',
+      labelOrientation: 'horizontal', labelFrequency: 1,
+      scaleFontSizeMm: 0.8
+    },
+    context: { startAngleDeg: 0, endAngleDeg: 360 },
+    bezel: { type: 'fixed', rotating: false }
+  };
   return {
     kind: 'slide-rule',
     config: {
@@ -41,7 +54,8 @@ export const getScaleProgram = (program: ScaleProgram, bands: BandEntity[]): Sca
       innerRadiusMm: chapter ? chapter.innerRadius + 1.2 : 16.3,
       outerRotationOffsetDeg: 0, innerRotationOffsetDeg: 0,
       ringSyncMode: 'independent', tickDensityProfile: 'sparse',
-      includeMinorLabels: false, calculationMode: 'division', direction: 'clockwise'
+      includeMinorLabels: false, calculationMode: 'division', direction: 'clockwise',
+      scaleFontSizeMm: 0.8
     },
     context: { startAngleDeg: 0, endAngleDeg: 360 },
     bezel: { type: 'slide-rule', rotating: true }

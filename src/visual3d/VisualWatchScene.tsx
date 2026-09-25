@@ -9,6 +9,8 @@ import { finishProfiles, type FinishProfile } from './finishProfiles';
 import { createPreviewCaseGeometry, createPreviewLugGeometry, createPreviewStrapGeometry } from './proceduralEnvelope';
 import { ACESFilmicToneMapping, CanvasTexture, LinearFilter, PerspectiveCamera, PMREMGenerator, SRGBColorSpace, Vector2 } from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
+import type { ScaleRunResult } from '@/services/scaleEngineService';
+import { ScaleArtwork3D } from './ScaleArtwork3D';
 
 const finish = (profile: FinishProfile, color?: string) => ({ color: color ?? profile.color, metalness: profile.metalness, roughness: profile.roughness });
 const physicalFinish = (profile: FinishProfile, color?: string) => ({
@@ -356,7 +358,7 @@ const StillExporterBridge = ({ onReady }: { onReady?: (exporter: StillExporter |
   return null;
 };
 
-export const VisualWatchScene = ({ model, rotation, cameraDistance, onExporterReady }: { model: VisualWatchModel; rotation: [number, number, number]; cameraDistance: number; onExporterReady?: (exporter: StillExporter | null) => void }) => (
+export const VisualWatchScene = ({ model, rotation, cameraDistance, scalePreview, onExporterReady }: { model: VisualWatchModel; rotation: [number, number, number]; cameraDistance: number; scalePreview?: ScaleRunResult | null; onExporterReady?: (exporter: StillExporter | null) => void }) => (
   <Canvas frameloop="demand" shadows camera={{ position: [0, 0, cameraDistance], fov: 29 }} dpr={[1, 1.75]} gl={{ antialias: true, powerPreference: 'high-performance', preserveDrawingBuffer: true }}
     onCreated={({ gl }) => { gl.toneMapping = ACESFilmicToneMapping; gl.toneMappingExposure = 0.94; gl.outputColorSpace = SRGBColorSpace; }}>
     <DarkDramaticEnvironment />
@@ -374,6 +376,7 @@ export const VisualWatchScene = ({ model, rotation, cameraDistance, onExporterRe
     <pointLight position={[0, -4, 5]} intensity={1.1} color="#ffffff" distance={18} decay={2} />
     <group rotation={rotation} scale={MM_TO_SCENE}>
       {visualCategories.map((category) => <VisualComponent key={category} category={category} model={model} />)}
+      <ScaleArtwork3D preview={scalePreview ?? null} model={model} />
     </group>
   </Canvas>
 );

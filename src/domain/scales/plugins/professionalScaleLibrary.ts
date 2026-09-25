@@ -303,6 +303,10 @@ const compassFormatter = (value: number): string => {
   if (normalized === 90) return 'E';
   if (normalized === 180) return 'S';
   if (normalized === 270) return 'W';
+  if (normalized === 45) return 'NE';
+  if (normalized === 135) return 'SE';
+  if (normalized === 225) return 'SW';
+  if (normalized === 315) return 'NW';
   return String(normalized);
 };
 

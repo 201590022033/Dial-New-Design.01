@@ -34,7 +34,9 @@ describe('P4 scene integration and GLB failure boundaries', () => {
     expect(sceneChildren.some((element) => element.type === 'mesh' && element.props.receiveShadow)).toBe(false);
     const watch = scene.props.children.at(-1)! as ReactElement<{ scale: number; children: ReactElement<{ category: string }>[] }>;
     expect(watch.props.scale).toBe(0.1);
-    expect(watch.props.children.map((e: ReactElement<{ category: string }>) => e.props.category)).toEqual(visualCategories);
+    const watchChildren = watch.props.children.flat() as ReactElement<{ category?: string }>[];
+    expect(watchChildren.filter((e) => e?.props?.category).map((e) => e.props.category)).toEqual(visualCategories);
+    expect(watchChildren.some((e) => (e?.type as { name?: string })?.name === 'ScaleArtwork3D')).toBe(true);
   });
 
   it.each(visualCategories)('routes %s GLBs through the shared loader and fallback', (category) => {

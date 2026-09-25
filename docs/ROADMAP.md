@@ -2,6 +2,8 @@
 
 ## September 25 scale-program workflow
 
+Follow-up: the Advanced panel now exposes a fourth compass program (cardinal/intercardinal points plus intermediate bearings), numeral-size control, and cursor-adjacent labels that identify bezel, chapter ring, inner bezel, or dial targets. Scale output also feeds a live HD preview artwork layer, so **zero GLB regenerations** are required for interactive preview. Actual engraved/UV-marked bezel insert and fixed chapter ring still need measured substrates and manufacturing review. See [BREITLING_SCALE_REFERENCE.md](BREITLING_SCALE_REFERENCE.md) for the primary-source design findings and next marking-detail pass. The in-app browser available during this pass lacked WebGL, so HD appearance needs visual confirmation in a WebGL-enabled browser.
+
 The right-hand Advanced studio now selects Diver (full 0–60 minute ring with the first 20 marks emphasized), Chronograph (open 60–500 reciprocal tachymeter), or Aviation (paired logarithmic bezel/chapter ring). Pilot/Diver/Racing recommendations select the same engine programs. The aviation panel provides five basic PPL planning calculations, bezel alignment, selectable graduation detail, and separate real-size marking SVGs. The default minute ring and legacy saved default now close to 360° without a duplicate 0/60 mark. See [AVIATION_SCALE_PROGRAMS.md](AVIATION_SCALE_PROGRAMS.md).
 
 Next production gate: measure actual bezel and chapter-ring marking surfaces, outline the SVG fonts, prove minimum readable text and line spacing on the intended laser/material, verify ring registration and physical rotation, then flight-instructor review of calculation examples. Current artwork remains preview-only.

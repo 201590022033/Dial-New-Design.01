@@ -21,6 +21,7 @@ interface CentreCanvasProps {
 export const CentreCanvas = ({ presentationMode, onTogglePresentationMode, visualMode, onToggleVisualMode }: CentreCanvasProps) => {
   const [container, setContainer] = useState<HTMLDivElement | null>(null);
   const [showGrid, setShowGrid] = useState(false);
+  const [hoverTarget, setHoverTarget] = useState<{ x: number; y: number; label: string } | null>(null);
   const bands = useBandsStore((s) => s.bands);
   const zoom = useViewportStore((s) => s.zoom);
   const panX = useViewportStore((s) => s.panX);
@@ -253,6 +254,18 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode, visua
               : null;
             hoverHit(semanticHit);
             hoverBand(semanticHit?.bandId ?? semanticHit?.partInstanceId ?? null);
+            const targetLabels: Record<string, string> = {
+              'band-outer-bezel': 'Rotating outer bezel',
+              'band-inner-bezel': 'Inner bezel / insert',
+              'band-chapter-ring': 'Fixed chapter ring',
+              'band-dial-face': 'Dial face'
+            };
+            const rect = event.currentTarget.getBoundingClientRect();
+            setHoverTarget(semanticHit ? {
+              x: Math.min(event.clientX - rect.left + 16, rect.width - 175),
+              y: Math.min(event.clientY - rect.top + 16, rect.height - 42),
+              label: targetLabels[semanticHit.bandId ?? ''] ?? semanticHit.label ?? 'Watch component'
+            } : null);
           }}
           onMouseUp={(event) => {
             if (panState.current) {
@@ -274,11 +287,13 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode, visua
             panState.current = null;
             hoverHit(null);
             hoverBand(null);
+            setHoverTarget(null);
           }}
           onDoubleClick={() => {
             fitToWatch();
           }}
         />
+        {hoverTarget && <div className="pointer-events-none absolute z-40 rounded border border-amber-400/70 bg-slate-950/95 px-2 py-1 text-[11px] font-semibold text-amber-100 shadow-lg" style={{ left: Math.max(4, hoverTarget.x), top: Math.max(4, hoverTarget.y) }} role="status">{hoverTarget.label}</div>}
 
         {/* Live Temporary Preview Banner */}
         {previewStatus === 'previewing' && (

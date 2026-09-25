@@ -13,6 +13,8 @@ import type {
 export interface ScaleRunResult {
   kind: ScaleKind;
   pluginName: string;
+  fontSizeMm: number;
+  color: string;
   ticks: ScaleTick[];
   labels: ScaleLabel[];
   geometry: ScaleGeometryOutput;
@@ -52,6 +54,8 @@ export const runScalePlugin = (
   const result: ScaleRunResult = {
     kind,
     pluginName: plugin.metadata.name,
+    fontSizeMm: config.scaleFontSizeMm ?? 0.8,
+    color: config.color,
     ticks,
     labels,
     geometry,

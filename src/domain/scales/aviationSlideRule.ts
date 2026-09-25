@@ -36,6 +36,25 @@ export const aviationBezelAlignment = (mode: AviationCalculation, first: number,
 };
 
 const numberedMarks = new Set([10, 12, 15, 20, 25, 30, 40, 50, 60, 70, 80, 90]);
+export const scaleFontSizeMm = (config: ScalePluginConfig): number => Math.max(0.45, Math.min(1.4, config.scaleFontSizeMm ?? 0.8));
+
+const separatedLabels = (labels: ScaleLabel[], fontSizeMm: number): ScaleLabel[] => {
+  const prioritized = [...labels].sort((a, b) => {
+    const priority = (label: ScaleLabel) => [10, 20, 30, 40, 50, 60].includes(label.value ?? -1) ? 0 : 1;
+    return priority(a) - priority(b) || (a.value ?? 0) - (b.value ?? 0);
+  });
+  const chosen: ScaleLabel[] = [];
+  for (const candidate of prioritized) {
+    const collides = chosen.some((label) => {
+      const angularDistance = Math.abs(((candidate.angleDeg - label.angleDeg + 540) % 360) - 180) * Math.PI / 180;
+      const availableArc = angularDistance * Math.min(candidate.radiusMm, label.radiusMm);
+      const requiredArc = (candidate.text.length + label.text.length) * fontSizeMm * 0.32 + 0.25;
+      return availableArc < requiredArc;
+    });
+    if (!collides) chosen.push(candidate);
+  }
+  return chosen.sort((a, b) => (a.value ?? 0) - (b.value ?? 0));
+};
 
 export const generateAviationRings = (config: ScalePluginConfig): { ticks: ScaleTick[]; labels: ScaleLabel[] } => {
   const ticks: ScaleTick[] = [];
@@ -67,7 +86,7 @@ export const generateAviationRings = (config: ScalePluginConfig): { ticks: Scale
       }
     }
   }
-  return { ticks, labels };
+  return { ticks, labels: ['outer', 'inner'].flatMap((ringId) => separatedLabels(labels.filter((label) => label.ringId === ringId), scaleFontSizeMm(config))) };
 };
 
 const escapeXml = (value: string): string => value.replace(/[<>&"']/g, (character) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&apos;' })[character] ?? character);
@@ -87,7 +106,7 @@ export const createAviationRingSvg = (config: ScalePluginConfig, ringId: 'outer'
   }).join('');
   const text = labels.filter((label) => label.ringId === ringId).map((label) => {
     const [x, y] = polar(label.radiusMm, label.angleDeg).split(',');
-    return `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="0.8" fill="#000">${escapeXml(label.text)}</text>`;
+    return `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="${scaleFontSizeMm(config)}" fill="#000">${escapeXml(label.text)}</text>`;
   }).join('');
   const half = caseDiameterMm / 2;
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${caseDiameterMm}mm" height="${caseDiameterMm}mm" viewBox="${-half} ${-half} ${caseDiameterMm} ${caseDiameterMm}" data-ring="${ringId}" data-units="mm"><title>Aviation slide rule ${ringId === 'outer' ? 'rotating bezel' : 'fixed chapter ring'} marking artwork</title><desc>Scale markings only. Preview geometry; verify material, font outlines, radial fit and engraving process before manufacture.</desc><g id="${ringId}-markings">${lines}${text}</g></svg>`;

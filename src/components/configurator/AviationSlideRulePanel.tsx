@@ -32,7 +32,7 @@ export const AviationSlideRulePanel = () => {
   const caseDiameterMm = useGlobalSettingsStore((state) => state.caseDiameterMm);
   const bands = useBandsStore((state) => state.bands);
   const active = kind === 'slide-rule' && config.engineeringPreset === 'aviation-slide-rule';
-  const activeProgram = active ? 'aviation' : kind === 'tachymeter' ? 'chrono' : kind === 'circular' ? 'diver' : 'other';
+  const activeProgram = active ? 'aviation' : kind === 'tachymeter' ? 'chrono' : kind === 'circular' ? 'diver' : kind === 'compass' ? 'compass' : 'other';
   const calculation = aviationCalculations[mode];
   const answer = calculateAviation(mode, first, second);
   const outerBand = bands.find((band) => band.kind === 'outer-bezel');
@@ -57,15 +57,21 @@ export const AviationSlideRulePanel = () => {
 
   return (
     <div className="space-y-2 text-xs text-engineering-text" data-testid="aviation-slide-rule-panel">
-      <p>One marking engine, three programs. Choose the physical scale that matches the watch.</p>
-      <div className="grid grid-cols-3 gap-1">
+      <p>One marking engine, four programs. Choose the physical scale that matches the watch.</p>
+      <div className="grid grid-cols-2 gap-1">
         <button type="button" aria-pressed={activeProgram === 'diver'} className={programClass('diver')} onClick={() => selectProgram('diver')}>Diver 0–60</button>
         <button type="button" aria-pressed={activeProgram === 'chrono'} className={programClass('chrono')} onClick={() => selectProgram('chrono')}>Chrono 60–500</button>
         <button type="button" aria-pressed={activeProgram === 'aviation'} className={programClass('aviation')} onClick={() => selectProgram('aviation')}>Aviation log</button>
+        <button type="button" aria-pressed={activeProgram === 'compass'} className={programClass('compass')} onClick={() => selectProgram('compass')}>Compass N–NW</button>
       </div>
       {activeProgram === 'diver' ? <p>Sixty evenly spaced minute marks. The first 20 minutes are emphasized for visibility; turn/return and decompression decisions still require a dive plan and instruments.</p> : null}
       {activeProgram === 'chrono' ? <p>Reciprocal tachymeter values 60–500 on an open arc. Read average speed after timing a known distance; choose units consistent with that distance.</p> : null}
+      {activeProgram === 'compass' ? <p>Cardinal and intercardinal bearings every 45°, with small tick marks between them. This is an orientation aid, not a magnetic compass.</p> : null}
       {activeProgram === 'other' ? <p>Select a program to generate its markings.</p> : null}
+      {activeProgram !== 'other' && <label className="block">Scale numeral size · {(config.scaleFontSizeMm ?? 0.8).toFixed(2)} mm
+        <input className="mt-1 w-full" aria-label="Scale numeral size" type="range" min="0.45" max="1.4" step="0.05" value={config.scaleFontSizeMm ?? 0.8} onChange={(event) => updateConfig({ scaleFontSizeMm: Number(event.target.value) })}/>
+        <span className="block text-[10px] text-engineering-muted">{active ? 'Crowded aviation numerals are omitted automatically; tick marks stay in place. ' : ''}Check the artwork at 1:1 before marking.</span>
+      </label>}
       {active ? (
         <>
           <label className="block">Calculation

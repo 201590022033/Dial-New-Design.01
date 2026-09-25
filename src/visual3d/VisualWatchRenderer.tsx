@@ -9,9 +9,11 @@ import { REFERENCE_42_ID } from '@/domain/presets/reference3d';
 import { assessReference3dFit } from '@/domain/geometry/parametric';
 import { assessRenderAlignment, CAMERA_DISTANCE_LIMITS, CAMERA_PRESETS, createStoredZip, dataUrlToBytes, resolveCameraDistance, type CameraPresetId } from './renderQuality';
 import { getArchetypeKit, NMK901_PLATFORM_ID, watchPlatformLibrary } from '@/domain/library/watchPlatformLibrary';
+import { useScaleStore } from '@/stores/scaleStore';
 
 export const VisualWatchRenderer = ({ assembly, presentationMode, onTogglePresentationMode }: { assembly: WatchAssembly; presentationMode: boolean; onTogglePresentationMode: () => void }) => {
   const model = useMemo(() => watchAssemblyToVisualModel(assembly), [assembly]);
+  const scalePreview = useScaleStore((state) => state.preview);
   const savedRender = assembly.designConfig?.visualReferenceConfig;
   const initialPreset = savedRender?.renderPreset ?? 'studio';
   const [activePreset, setActivePreset] = useState<CameraPresetId>(initialPreset);
@@ -129,7 +131,7 @@ export const VisualWatchRenderer = ({ assembly, presentationMode, onTogglePresen
     onLostPointerCapture={() => { dragStart.current = null; }}
     onDoubleClick={() => applyCameraPreset('studio')}
   >
-    <VisualWatchScene model={model} rotation={rotation} cameraDistance={cameraDistance} onExporterReady={registerExporter} />
+    <VisualWatchScene model={model} rotation={rotation} cameraDistance={cameraDistance} scalePreview={scalePreview} onExporterReady={registerExporter} />
     <button type="button" className="absolute right-3 top-3 rounded-lg border border-slate-500/40 bg-slate-950/85 px-3 py-2 text-xs text-white hover:bg-slate-800"
       onPointerDown={(event) => event.stopPropagation()}
       onDoubleClick={(event) => event.stopPropagation()}

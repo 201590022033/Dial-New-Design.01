@@ -177,6 +177,7 @@ export interface ScalePluginConfig {
   rotationOffsetDeg: number;
   color: string;
   fontFamily: string;
+  scaleFontSizeMm?: number;
   previewEnabled: boolean;
   bandInnerRadiusMm: number;
   bandOuterRadiusMm: number;
