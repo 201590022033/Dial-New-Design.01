@@ -228,7 +228,8 @@ export const useConfiguratorUIStore = create<ConfiguratorUIStoreState>((set, get
     };
     set({
       workMode: mode,
-      archetypePreviewAssembly: mode === 'build' ? get().archetypePreviewAssembly : null,
+      // Entering Build must never resurrect a stale starter preview.
+      archetypePreviewAssembly: null,
       ...(trayByMode[mode] ? { trayTab: trayByMode[mode] } : {})
     });
   },

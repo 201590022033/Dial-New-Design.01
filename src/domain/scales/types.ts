@@ -178,6 +178,7 @@ export interface ScalePluginConfig {
   color: string;
   fontFamily: string;
   scaleFontSizeMm?: number;
+  scaleTickLengthFactor?: number;
   previewEnabled: boolean;
   bandInnerRadiusMm: number;
   bandOuterRadiusMm: number;

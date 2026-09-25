@@ -6,6 +6,7 @@ import { useDesignEngineStore } from './designEngineStore';
 import { assemblyToBands, assemblyToWatchComponentEntities } from '@/domain/assembly/assemblyAdapters';
 import type { WatchAssembly } from '@/domain/assembly/assemblyTypes';
 import type { TemplateId } from '@/domain/generators/templateLibrary';
+import { useScaleStore } from './scaleStore';
 
 let isSyncing = false;
 
@@ -37,6 +38,7 @@ export const syncAssemblyDownstream = (assembly: WatchAssembly): void => {
     // 2. Sync bandsStore (DERIVED / ADAPTER)
     const bands = assemblyToBands(assembly);
     useBandsStore.setState({ bands });
+    useScaleStore.getState().syncArchetypeScale(assembly.designConfig?.visualReferenceConfig?.archetypeId, bands);
 
     // 3. Sync watchComponentStore (DERIVED / ADAPTER)
     try {

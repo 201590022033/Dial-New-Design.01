@@ -6,10 +6,10 @@ import { visualAssetRegistry, resolveVisualAssetByCategory, visualCategories, ty
 import { resolveAssemblyAnchors } from './assemblyAnchors';
 import { matchesReference42Parameters } from '@/domain/presets/reference3d';
 import { resolveFinishProfile, type FinishProfile, type FinishProfileId } from './finishProfiles';
-import { defaultMarkerConfig, generateMarkers, type MarkerEngineConfig } from '@/domain/generators/markerEngine';
+import { defaultMarkerConfig, generateMarkers, type MarkerEngineConfig, type MarkerKind } from '@/domain/generators/markerEngine';
 import { movementLibrary } from '@/domain/movements/movementLibrary';
 import { defaultDialFaceConfig } from '@/domain/generators/dialFaceGenerator';
-import { defaultTypographyConfig } from '@/domain/generators/typographyEngine';
+import { defaultTypographyConfig, fontFamilyForCategory } from '@/domain/generators/typographyEngine';
 import { getArchetypeReferenceById, getBezelReferenceById, getComplicationReferenceById, getLumeReferenceById } from '@/domain/asset-library';
 import { getArchetypeVisualProfile } from '@/domain/configurator/archetypeProfiles';
 import { resolveProceduralEnvelope } from './proceduralEnvelope';
@@ -31,6 +31,8 @@ export type DialVisualDescriptor = {
   thicknessMm: number;
   centreHoleDiameterMm: number;
   markers: Array<{ angleDeg: number; innerRadiusMm: number; outerRadiusMm: number; widthMm: number; text?: string; lumed: boolean }>;
+  markerKind: MarkerKind;
+  customMarkerOverride: boolean;
   subdials: Array<{ role: string; angleDeg: number; centerRadiusMm: number; radiusMm: number; handRadiusMm: number; markerCount: number; scaleMax: number; handStyle: 'needle' | 'baton' | 'syringe'; geometryStatus: string; registerDesignStatus: string }>;
   windows: Array<{ kind: 'date' | 'day' | 'day-date'; angleDeg: number; widthMm: number; heightMm: number; cornerRadiusMm: number }>;
   textureKind: string;
@@ -41,6 +43,7 @@ export type DialVisualDescriptor = {
     layout: 'straight' | 'arc' | 'circular' | 'radial' | 'vertical' | 'horizontal' | 'inside-circle' | 'outside-circle' | 'future-path';
     color: string;
     fontSizeMm: number;
+    fontFamily: string;
     radiusMm: number;
     angleStartDeg: number;
     angleSpanDeg: number;
@@ -143,6 +146,11 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
   if (visualReferences.lugStyleId) {
     archetypeAssets.case = `lug-case-${visualReferences.lugStyleId}`;
   }
+  if (visualReferences.dialMarkerMode && visualReferences.dialMarkerMode !== 'auto') {
+    // Authored dial GLBs contain baked indices. A user override must not render
+    // a second marker family on top of them.
+    archetypeAssets.dial = 'visual-dial-default';
+  }
   if (visualReferences.strapStyleId) {
     archetypeAssets.strap = `archetype-strap-${visualReferences.strapStyleId}`;
   }
@@ -220,6 +228,8 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
       thicknessMm: positive(dialPart?.dimensions.thicknessMm, 0.4),
       centreHoleDiameterMm: positive(dialConfig?.centreHole?.diameterMm, 1.5),
       markers: generateMarkers(markerConfig).map((marker) => ({ ...marker, lumed: markerConfig.style.lumed })),
+      markerKind: markerConfig.kind,
+      customMarkerOverride: Boolean(visualReferences.dialMarkerMode && visualReferences.dialMarkerMode !== 'auto'),
       subdials: (movement?.subdials ?? []).map((subdial) => ({
         role: subdial.role,
         angleDeg: subdial.angleDeg,
@@ -241,6 +251,7 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
         layout: typography.layout,
         color: typography.color,
         fontSizeMm: positive(typography.fontSizeMm, defaultTypographyConfig.fontSizeMm),
+        fontFamily: fontFamilyForCategory(typography.fontCategory),
         radiusMm: positive(typography.radiusMm, defaultTypographyConfig.radiusMm),
         angleStartDeg: typography.angleStartDeg,
         angleSpanDeg: typography.angleSpanDeg,

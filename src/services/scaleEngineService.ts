@@ -1,4 +1,5 @@
 import { getScalePlugin } from '@/domain/scales/scaleRegistry';
+import { styleScaleTicks } from '@/domain/scales/markingStyle';
 import type {
   ScaleGeometryOutput,
   ScaleKind,
@@ -14,6 +15,7 @@ export interface ScaleRunResult {
   kind: ScaleKind;
   pluginName: string;
   fontSizeMm: number;
+  fontFamily: string;
   color: string;
   ticks: ScaleTick[];
   labels: ScaleLabel[];
@@ -46,7 +48,7 @@ export const runScalePlugin = (
     return null;
   }
 
-  const ticks = plugin.tickGenerator(config, context);
+  const ticks = styleScaleTicks(plugin.tickGenerator(config, context), config);
   const labels = plugin.labelGenerator(ticks, config);
   const geometry = plugin.geometryGenerator(ticks, labels);
   const validation = plugin.validate(config, ticks, labels);
@@ -55,6 +57,7 @@ export const runScalePlugin = (
     kind,
     pluginName: plugin.metadata.name,
     fontSizeMm: config.scaleFontSizeMm ?? 0.8,
+    fontFamily: config.fontFamily,
     color: config.color,
     ticks,
     labels,

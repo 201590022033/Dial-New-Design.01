@@ -18,6 +18,56 @@ import type { CompatibilityStatus, ReverseCandidateResult } from '@/domain/compa
 import type { WatchAssembly } from '@/domain/assembly/assemblyTypes';
 import { rankCandidatesBySensitivity } from '@/domain/configurator/practicalSensitivities';
 import { cn } from '@/utils/cn';
+import { useDesignEngineStore } from '@/stores/designEngineStore';
+import { applyArchetypeVisualProfile, getArchetypeVisualProfile } from '@/domain/configurator/archetypeProfiles';
+import { defaultMarkerConfig, type MarkerKind } from '@/domain/generators/markerEngine';
+import type { TypographyFontCategory } from '@/domain/generators/typographyEngine';
+
+const indexChoices: Array<{ id: 'auto' | 'dots' | 'arabic' | 'roman' | 'ticks'; label: string; kind?: MarkerKind }> = [
+  { id: 'auto', label: 'Archetype default' },
+  { id: 'dots', label: 'Luminous dots', kind: 'round' },
+  { id: 'arabic', label: 'Arabic numerals', kind: 'arabic-numeral' },
+  { id: 'roman', label: 'Roman numerals', kind: 'roman-numeral' },
+  { id: 'ticks', label: 'Ticks only', kind: 'baton' }
+];
+
+const DialIndexOptions = () => {
+  const assembly = useWatchAssemblyStore((state) => state.assembly);
+  const markerConfig = useDesignEngineStore((state) => state.markerConfig);
+  const typographyConfig = useDesignEngineStore((state) => state.typographyConfig);
+  const updateMarkerConfig = useDesignEngineStore((state) => state.updateMarkerConfig);
+  const updateTypographyConfig = useDesignEngineStore((state) => state.updateTypographyConfig);
+  const updateVisualReferenceConfig = useDesignEngineStore((state) => state.updateVisualReferenceConfig);
+  const archetypeId = assembly.designConfig?.visualReferenceConfig?.archetypeId;
+  const mode = assembly.designConfig?.visualReferenceConfig?.dialMarkerMode ?? 'auto';
+  const profile = getArchetypeVisualProfile(archetypeId);
+  const selectMode = (choice: (typeof indexChoices)[number]) => {
+    if (choice.id === 'auto') {
+      const recommended = archetypeId ? applyArchetypeVisualProfile(assembly, archetypeId).designConfig?.markerConfig : defaultMarkerConfig;
+      updateMarkerConfig({ ...recommended, startAngleDeg: 0 });
+    } else if (choice.kind) {
+      updateMarkerConfig({
+        kind: choice.kind, count: 12, startAngleDeg: 0,
+        widthMm: choice.id === 'dots' ? 0.8 : choice.id === 'roman' ? 0.28 : 0.45,
+        style: { ...markerConfig.style, lumed: choice.id === 'dots' && archetypeId === 'archetype-dive' }
+      });
+    }
+    updateVisualReferenceConfig({ dialMarkerMode: choice.id });
+  };
+  return <section className="space-y-2 rounded-lg border border-slate-700 bg-slate-900/80 p-3 text-xs text-slate-200" aria-label="Dial indices and lettering">
+    <h3 className="font-semibold">Dial indices &amp; lettering</h3>
+    <p className="text-[11px] text-slate-400">{profile ? `${profile.templateId} default: ${mode === 'auto' ? markerConfig.kind.replaceAll('-', ' ') : 'custom override'}.` : 'Choose a dial index family.'} Roman XII and Arabic 12 align at the top; dots and ticks follow the 12-hour positions.</p>
+    <div className="grid grid-cols-2 gap-1">
+      {indexChoices.map((choice) => <button key={choice.id} type="button" aria-pressed={mode === choice.id} onClick={() => selectMode(choice)} className={cn('rounded border px-2 py-1.5 text-left text-[11px]', mode === choice.id ? 'border-teal-400 bg-teal-900/40 text-teal-100' : 'border-slate-700 bg-slate-950 text-slate-300 hover:border-teal-600')}>{choice.label}</button>)}
+    </div>
+    {mode !== 'auto' && <p className="text-[10px] text-amber-200">Custom indices use a procedural dial preview so they do not overlap indices baked into the archetype GLB. Revalidate artwork before production.</p>}
+    <label className="block text-[11px]">Dial lettering font
+      <select className="mt-1 w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5 text-slate-100" value={typographyConfig.fontCategory} onChange={(event) => updateTypographyConfig({ fontCategory: event.target.value as TypographyFontCategory })}>
+        {(['modern-sans', 'technical-sans', 'pilot', 'vintage', 'roman', 'arabic', 'railroad', 'military'] as TypographyFontCategory[]).map((font) => <option key={font} value={font}>{font.replaceAll('-', ' ')}</option>)}
+      </select>
+    </label>
+  </section>;
+};
 
 export const OptionsTab: React.FC = () => {
   const activePartInstanceId = useConfiguratorUIStore((s) => s.activePartInstanceId);
@@ -171,14 +221,16 @@ export const OptionsTab: React.FC = () => {
 
   if (!activePartInstanceId) {
     return (
-      <div className="p-6 text-center text-slate-400 text-xs">
-        Click a component on the watch preview to browse available options.
+      <div className="space-y-3 overflow-y-auto p-3 text-slate-400 text-xs">
+        <DialIndexOptions />
+        <p>Click a component on the watch preview to browse physical part options.</p>
       </div>
     );
   }
 
   return (
     <div className="flex flex-col h-full overflow-hidden p-3 gap-3" data-testid="options-tab">
+      <DialIndexOptions />
       {/* Search Header */}
       <div className="flex flex-col gap-1.5">
         <div className="relative">

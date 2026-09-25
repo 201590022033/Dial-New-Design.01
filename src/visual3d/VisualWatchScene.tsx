@@ -47,7 +47,7 @@ export const DialArtwork = ({ model }: { model: VisualWatchModel }) => {
     return () => { image.onload = null; image.onerror = null; };
   }, [artwork.customImageDataUrl]);
   const texture = useMemo(() => {
-    if (typeof document === 'undefined' || !artwork.content) return null;
+    if (typeof document === 'undefined') return null;
     const canvas = document.createElement('canvas');
     canvas.width = canvas.height = 1024;
     const context = canvas.getContext('2d');
@@ -62,7 +62,7 @@ export const DialArtwork = ({ model }: { model: VisualWatchModel }) => {
     context.lineWidth = Math.max(2, pixelsPerMm * 0.08);
     context.textAlign = 'center';
     context.textBaseline = 'middle';
-    if (!usesArchetypeDial && (archetype === 'archetype-field' || archetype === 'archetype-pilot')) {
+    if (!usesArchetypeDial && !model.dial.customMarkerOverride && (archetype === 'archetype-field' || archetype === 'archetype-pilot')) {
       const labels = archetype === 'archetype-pilot' ? [12, 3, 6, 9] : Array.from({ length: 12 }, (_, index) => index + 1);
       context.font = `700 ${(archetype === 'archetype-pilot' ? 1.7 : 1.05) * pixelsPerMm}px "Arial Narrow", Arial, sans-serif`;
       labels.forEach((label, index) => {
@@ -71,20 +71,20 @@ export const DialArtwork = ({ model }: { model: VisualWatchModel }) => {
         const radius = centre * (archetype === 'archetype-pilot' ? 0.68 : 0.72);
         context.fillText(String(label), centre + Math.sin(angle) * radius, centre - Math.cos(angle) * radius);
       });
-    } else if (!usesArchetypeDial && archetype === 'archetype-gmt-travel') {
+    } else if (!usesArchetypeDial && !model.dial.customMarkerOverride && archetype === 'archetype-gmt-travel') {
       context.font = `700 ${0.9 * pixelsPerMm}px Arial, sans-serif`;
       [24, 6, 12, 18].forEach((label, index) => {
         const angle = index * Math.PI / 2;
         const radius = centre * 0.7;
         context.fillText(String(label), centre + Math.sin(angle) * radius, centre - Math.cos(angle) * radius);
       });
-    } else if (!usesArchetypeDial && archetype === 'archetype-chronograph') {
+    } else if (!usesArchetypeDial && !model.dial.customMarkerOverride && archetype === 'archetype-chronograph') {
       ([[-0.22, 0], [0.22, 0], [0, 0.24]] as Array<[number, number]>).forEach(([x, y]) => {
         context.beginPath();
         context.arc(centre + centre * x, centre + centre * y, centre * 0.16, 0, Math.PI * 2);
         context.stroke();
       });
-    } else if (!usesArchetypeDial && archetype === 'archetype-dive') {
+    } else if (!usesArchetypeDial && !model.dial.customMarkerOverride && archetype === 'archetype-dive') {
       context.beginPath();
       context.moveTo(centre, centre * 0.14);
       context.lineTo(centre - centre * 0.055, centre * 0.24);
@@ -101,8 +101,18 @@ export const DialArtwork = ({ model }: { model: VisualWatchModel }) => {
     context.fillStyle = artwork.color;
     context.textAlign = 'center';
     context.textBaseline = 'middle';
-    context.font = `600 ${Math.max(18, artwork.fontSizeMm * pixelsPerMm)}px "Arial Narrow", Arial, sans-serif`;
-    if (artwork.layout === 'arc' || artwork.layout === 'circular' || artwork.layout === 'inside-circle' || artwork.layout === 'outside-circle') {
+    if (model.assets.dial.assetType === 'procedural') {
+      context.fillStyle = model.archetypeAppearance.accentColor;
+      context.font = `700 ${Math.max(22, 1.25 * pixelsPerMm)}px ${model.dial.markerKind === 'roman-numeral' ? 'Georgia, serif' : artwork.fontFamily}`;
+      for (const marker of model.dial.markers) {
+        if (!marker.text) continue;
+        const theta = marker.angleDeg * Math.PI / 180;
+        const r = (marker.innerRadiusMm + marker.outerRadiusMm) / 2 * pixelsPerMm;
+        context.fillText(marker.text, centre + Math.sin(theta) * r, centre - Math.cos(theta) * r);
+      }
+    }
+    context.font = `600 ${Math.max(18, artwork.fontSizeMm * pixelsPerMm)}px ${artwork.fontFamily}`;
+    if (artwork.content && (artwork.layout === 'arc' || artwork.layout === 'circular' || artwork.layout === 'inside-circle' || artwork.layout === 'outside-circle')) {
       const characters = [...artwork.content];
       const step = characters.length > 1 ? artwork.angleSpanDeg / (characters.length - 1) : 0;
       const radius = artwork.radiusMm * pixelsPerMm;
@@ -114,7 +124,7 @@ export const DialArtwork = ({ model }: { model: VisualWatchModel }) => {
         context.fillText(character, 0, 0);
         context.restore();
       });
-    } else {
+    } else if (artwork.content) {
       context.save();
       context.translate(centre, centre - artwork.radiusMm * pixelsPerMm * 0.45);
       if (artwork.layout === 'vertical') context.rotate(-Math.PI / 2);
@@ -127,7 +137,7 @@ export const DialArtwork = ({ model }: { model: VisualWatchModel }) => {
     result.magFilter = LinearFilter;
     result.needsUpdate = true;
     return result;
-  }, [artwork, customImage, model.archetypeAppearance, model.assets.dial.assetId, model.dial.outerDiameterMm, model.referenceProfiles.archetypeId]);
+  }, [artwork, customImage, model.archetypeAppearance, model.assets.dial, model.dial, model.referenceProfiles.archetypeId]);
   useEffect(() => () => texture?.dispose(), [texture]);
   if (!texture) return null;
   return <mesh position={[0, 0, model.dial.thicknessMm / 2 + 0.34]}>
@@ -211,8 +221,12 @@ export const ProceduralComponent = ({ category, model }: { category: VisualCateg
         <cylinderGeometry args={[model.dial.outerDiameterMm / 2, model.dial.outerDiameterMm / 2, model.dial.thicknessMm, 128]} /><meshPhysicalMaterial {...physicalFinish(model.finishes.dial, model.dialColor)} roughness={model.dial.textureKind === 'matte' ? 0.58 : Math.max(0.2, 0.45 - model.dial.textureIntensity * 0.2)} />
       </mesh>
       {model.dial.markers.map((marker, index) => {
+        if (marker.text) return null;
         const theta = (marker.angleDeg * Math.PI) / 180;
         const markerRadius = (marker.innerRadiusMm + marker.outerRadiusMm) / 2;
+        if (model.dial.markerKind === 'round') return <mesh key={index} position={[markerRadius * Math.sin(theta), markerRadius * Math.cos(theta), 0.28]}>
+          <sphereGeometry args={[Math.max(0.36, marker.widthMm), 18, 12]} /><meshPhysicalMaterial {...physicalFinish(model.finishes.hands, model.referenceProfiles.lumeColor ?? '#e5e7eb')} />
+        </mesh>;
         return <mesh key={index} position={[markerRadius * Math.sin(theta), markerRadius * Math.cos(theta), 0.28]} rotation={[0, 0, -theta]}>
           <boxGeometry args={[marker.widthMm, Math.max(0.35, marker.outerRadiusMm - marker.innerRadiusMm), 0.14]} /><meshPhysicalMaterial {...physicalFinish(marker.lumed ? { ...finishProfiles.lume, color: model.referenceProfiles.lumeColor ?? finishProfiles.lume.color } : model.finishes.hands, marker.lumed ? model.referenceProfiles.lumeColor ?? finishProfiles.lume.color : marker.text ? '#f59e0b' : '#e5e7eb')} />
         </mesh>;

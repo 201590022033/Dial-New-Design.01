@@ -90,6 +90,8 @@ export interface WatchAssemblyDesignConfig {
     strapStyleId?: 'rubber' | 'leather' | 'canvas' | 'racing';
     /** Presentation style for movement-owned register hands; fit still requires bore evidence. */
     subdialHandStyle?: 'needle' | 'baton' | 'syringe';
+    /** Auto follows the archetype; overrides switch to a marker-only procedural dial preview. */
+    dialMarkerMode?: 'auto' | 'dots' | 'arabic' | 'roman' | 'ticks';
     /** Provisional 42 mm case-lug presentation variant. */
     lugStyleId?: LugGeometryStyle;
     artworkDataUrl?: string;

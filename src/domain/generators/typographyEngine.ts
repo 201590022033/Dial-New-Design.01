@@ -41,13 +41,15 @@ export interface TypographyConfig {
 const fontByCategory: Record<TypographyFontCategory, string> = {
   'modern-sans': '"Space Grotesk", sans-serif',
   'technical-sans': '"IBM Plex Mono", monospace',
-  pilot: '"IBM Plex Mono", monospace',
-  vintage: 'serif',
-  roman: 'serif',
-  arabic: '"Space Grotesk", sans-serif',
-  railroad: '"IBM Plex Mono", monospace',
-  military: '"IBM Plex Mono", monospace'
+  pilot: '"Arial Narrow", Arial, sans-serif',
+  vintage: 'Georgia, serif',
+  roman: '"Times New Roman", Times, serif',
+  arabic: 'Arial, sans-serif',
+  railroad: '"Courier New", Courier, monospace',
+  military: 'Impact, "Arial Narrow", sans-serif'
 };
+
+export const fontFamilyForCategory = (category: TypographyFontCategory): string => fontByCategory[category];
 
 export const defaultTypographyConfig: TypographyConfig = {
   content: 'DIAL DESIGNER',

@@ -31,7 +31,7 @@ export interface MarkerEngineConfig {
 export const defaultMarkerConfig: MarkerEngineConfig = {
   kind: 'baton',
   count: 12,
-  startAngleDeg: -90,
+  startAngleDeg: 0,
   radiusInnerMm: 14.8,
   radiusOuterMm: 17.2,
   widthMm: 0.45,
@@ -45,7 +45,7 @@ export const defaultMarkerConfig: MarkerEngineConfig = {
   }
 };
 
-const romanNumerals = ['XII', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI'];
+const romanNumerals = ['XII', 'I', 'II', 'III', 'IIII', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI'];
 
 export const generateMarkers = (config: MarkerEngineConfig): PolarMarker[] => {
   const count = Math.max(1, Math.floor(config.count));

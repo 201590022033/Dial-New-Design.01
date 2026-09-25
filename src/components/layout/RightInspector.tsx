@@ -4,6 +4,8 @@ import { Panel } from '@/components/ui/Panel';
 import { CollapsibleCard } from '@/components/ui/CollapsibleCard';
 import { Button } from '@/components/ui/Button';
 import { AviationSlideRulePanel } from '@/components/configurator/AviationSlideRulePanel';
+import { scalePolicyForArchetype } from '@/domain/scales/archetypeScalePolicy';
+import { getScaleProgram } from '@/domain/scales/scalePrograms';
 import { listScalePlugins } from '@/domain/scales/scaleRegistry';
 import {
   buildProfileDefaults,
@@ -55,6 +57,8 @@ export const RightInspector = () => {
   const setScaleContext = useScaleStore((s) => s.setContext);
   const setScalePreviewEnabled = useScaleStore((s) => s.setPreviewEnabled);
   const scalePreviewEnabled = useScaleStore((s) => s.previewEnabled);
+  const scaleArchetypeId = useScaleStore((s) => s.activeArchetypeId);
+  const crossArchetypeUnlocked = useScaleStore((s) => s.crossArchetypeUnlocked);
 
   const dialFaceConfig = useDesignEngineStore((s) => s.dialFaceConfig);
   const markerConfig = useDesignEngineStore((s) => s.markerConfig);
@@ -528,7 +532,7 @@ export const RightInspector = () => {
               onChange={(event) => setSelectedScaleKind(event.target.value as typeof selectedScaleKind)}
             >
               {scalePlugins.map((plugin) => (
-                <option key={plugin.kind} value={plugin.kind}>
+                <option key={plugin.kind} value={plugin.kind} disabled={!crossArchetypeUnlocked && Boolean(scaleArchetypeId) && !scalePolicyForArchetype(scaleArchetypeId).allowed.some((program) => getScaleProgram(program, []).kind === plugin.kind)}>
                   {plugin.metadata.name} ({plugin.metadata.category})
                 </option>
               ))}

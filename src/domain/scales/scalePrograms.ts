@@ -39,7 +39,7 @@ export const getScaleProgram = (program: ScaleProgram, bands: BandEntity[]): Sca
       startValue: 0, endValue: 360, majorStep: 45, minorStep: 15,
       radiusMm: outer ? (outer.innerRadius + outer.outerRadius) / 2 : 18.7,
       majorTickLengthMm: 0.65, minorTickLengthMm: 0.3,
-      tickDirection: 'inside', labelPlacement: 'inside',
+      tickDirection: 'inside', labelPlacement: 'outside',
       labelOrientation: 'horizontal', labelFrequency: 1,
       scaleFontSizeMm: 0.8
     },

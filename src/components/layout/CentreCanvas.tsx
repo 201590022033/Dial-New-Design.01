@@ -262,8 +262,8 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode, visua
             };
             const rect = event.currentTarget.getBoundingClientRect();
             setHoverTarget(semanticHit ? {
-              x: Math.min(event.clientX - rect.left + 16, rect.width - 175),
-              y: Math.min(event.clientY - rect.top + 16, rect.height - 42),
+              x: Math.min(event.clientX - rect.left + 18, rect.width - 320),
+              y: Math.min(event.clientY - rect.top + 18, rect.height - 72),
               label: targetLabels[semanticHit.bandId ?? ''] ?? semanticHit.label ?? 'Watch component'
             } : null);
           }}
@@ -293,7 +293,7 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode, visua
             fitToWatch();
           }}
         />
-        {hoverTarget && <div className="pointer-events-none absolute z-40 rounded border border-amber-400/70 bg-slate-950/95 px-2 py-1 text-[11px] font-semibold text-amber-100 shadow-lg" style={{ left: Math.max(4, hoverTarget.x), top: Math.max(4, hoverTarget.y) }} role="status">{hoverTarget.label}</div>}
+        {hoverTarget && <div className="pointer-events-none absolute z-40 max-w-[min(310px,90%)] rounded border border-amber-400/70 bg-slate-950/95 px-3 py-2 text-[22px] font-semibold leading-tight text-amber-100 shadow-lg" style={{ left: Math.max(4, hoverTarget.x), top: Math.max(4, hoverTarget.y) }} role="status">{hoverTarget.label}</div>}
 
         {/* Live Temporary Preview Banner */}
         {previewStatus === 'previewing' && (

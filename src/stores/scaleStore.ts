@@ -10,6 +10,9 @@ import type {
 } from '@/domain/scales/types';
 import { runScalePlugin } from '@/services/scaleEngineService';
 import { fullMinuteRingContext } from '@/domain/scales/minuteRingContext';
+import { getScaleProgram, type ScaleProgram } from '@/domain/scales/scalePrograms';
+import { scalePolicyForArchetype } from '@/domain/scales/archetypeScalePolicy';
+import { useBandsStore } from './bandsStore';
 
 interface ScaleState {
   selectedScaleKind: ScaleKind;
@@ -19,6 +22,11 @@ interface ScaleState {
   validation: ScaleValidationResult | null;
   preview: ReturnType<typeof runScalePlugin>;
   engineeringReadout: ScaleEngineeringReadout | null;
+  activeArchetypeId?: string;
+  crossArchetypeUnlocked: boolean;
+  applyScaleProgram: (program: ScaleProgram, bands: BandEntity[]) => boolean;
+  syncArchetypeScale: (archetypeId: string | undefined, bands: BandEntity[]) => void;
+  setCrossArchetypeUnlocked: (unlocked: boolean, bands: BandEntity[]) => void;
   setSelectedScaleKind: (kind: ScaleKind) => void;
   updatePluginConfig: (params: Partial<ScalePluginConfig>) => void;
   setPreviewEnabled: (enabled: boolean) => void;
@@ -72,7 +80,48 @@ export const useScaleStore = create<ScaleState>((set, get) => ({
   validation: null,
   preview: null,
   engineeringReadout: null,
+  activeArchetypeId: undefined,
+  crossArchetypeUnlocked: false,
+  applyScaleProgram: (program, bands) => {
+    const state = get();
+    if (!state.crossArchetypeUnlocked && !scalePolicyForArchetype(state.activeArchetypeId).allowed.includes(program)) return false;
+    const selection = getScaleProgram(program, bands);
+    const defaults = getScalePlugin(selection.kind)?.defaultConfig ?? state.pluginConfig;
+    set({
+      selectedScaleKind: selection.kind,
+      pluginConfig: {
+        ...defaults, ...selection.config,
+        fontFamily: state.pluginConfig.fontFamily,
+        scaleFontSizeMm: state.pluginConfig.scaleFontSizeMm ?? 0.8,
+        scaleTickLengthFactor: state.pluginConfig.scaleTickLengthFactor ?? 1
+      },
+      context: selection.context,
+      previewEnabled: true
+    });
+    get().regeneratePreview();
+    return true;
+  },
+  syncArchetypeScale: (archetypeId, bands) => {
+    if (get().activeArchetypeId === archetypeId) return;
+    set({ activeArchetypeId: archetypeId, crossArchetypeUnlocked: false });
+    const recommended = scalePolicyForArchetype(archetypeId).recommended;
+    if (recommended) get().applyScaleProgram(recommended, bands);
+    else if (archetypeId) get().setPreviewEnabled(false);
+  },
+  setCrossArchetypeUnlocked: (unlocked, bands) => {
+    set({ crossArchetypeUnlocked: unlocked });
+    if (!unlocked) {
+      const recommended = scalePolicyForArchetype(get().activeArchetypeId).recommended;
+      if (recommended) get().applyScaleProgram(recommended, bands);
+      else if (get().activeArchetypeId) get().setPreviewEnabled(false);
+    }
+  },
   setSelectedScaleKind: (kind) => {
+    const state = get();
+    if (!state.crossArchetypeUnlocked && state.activeArchetypeId) {
+      const allowedKinds = scalePolicyForArchetype(state.activeArchetypeId).allowed.map((program) => getScaleProgram(program, []).kind);
+      if (!allowedKinds.includes(kind)) return;
+    }
     const plugin = getScalePlugin(kind);
     const nextConfig = plugin?.defaultConfig ?? get().pluginConfig;
 
@@ -132,7 +181,8 @@ export const useScaleStore = create<ScaleState>((set, get) => ({
   },
   regeneratePreview: () => {
     const state = get();
-    if (!state.previewEnabled) {
+    const permitted = state.crossArchetypeUnlocked || !state.activeArchetypeId || scalePolicyForArchetype(state.activeArchetypeId).allowed.some((program) => getScaleProgram(program, []).kind === state.selectedScaleKind);
+    if (!state.previewEnabled || !permitted) {
       set({ preview: null, validation: null, engineeringReadout: null });
       return;
     }
@@ -159,8 +209,10 @@ export const useScaleStore = create<ScaleState>((set, get) => ({
       previewEnabled: true,
       validation: null,
       preview: null,
-      engineeringReadout: null
+      engineeringReadout: null,
+      crossArchetypeUnlocked: false
     });
+    get().setCrossArchetypeUnlocked(false, useBandsStore.getState().bands);
     get().regeneratePreview();
   }
 }));

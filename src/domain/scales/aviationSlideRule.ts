@@ -1,4 +1,5 @@
 import type { ScaleLabel, ScalePluginConfig, ScaleTick } from '@/domain/scales/types';
+import { styleScaleTicks } from './markingStyle';
 
 export type AviationCalculation = 'time' | 'distance' | 'groundspeed' | 'fuel-used' | 'endurance';
 
@@ -94,7 +95,9 @@ const escapeXml = (value: string): string => value.replace(/[<>&"']/g, (characte
 // Marking artwork only; no case, dial, gasket, or cutting paths are implied.
 export const createAviationRingSvg = (config: ScalePluginConfig, ringId: 'outer' | 'inner', caseDiameterMm: number): string => {
   const homeConfig = { ...config, outerRotationOffsetDeg: 0, innerRotationOffsetDeg: 0 };
-  const { ticks, labels } = generateAviationRings(homeConfig);
+  const generated = generateAviationRings(homeConfig);
+  const ticks = styleScaleTicks(generated.ticks, homeConfig);
+  const labels = generated.labels;
   const polar = (radius: number, angle: number) => {
     const radians = (angle - 90) * Math.PI / 180;
     return `${(radius * Math.cos(radians)).toFixed(4)},${(radius * Math.sin(radians)).toFixed(4)}`;
@@ -106,7 +109,7 @@ export const createAviationRingSvg = (config: ScalePluginConfig, ringId: 'outer'
   }).join('');
   const text = labels.filter((label) => label.ringId === ringId).map((label) => {
     const [x, y] = polar(label.radiusMm, label.angleDeg).split(',');
-    return `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" font-family="sans-serif" font-size="${scaleFontSizeMm(config)}" fill="#000">${escapeXml(label.text)}</text>`;
+    return `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" font-family="${escapeXml(config.fontFamily)}" font-size="${scaleFontSizeMm(config)}" fill="#000">${escapeXml(label.text)}</text>`;
   }).join('');
   const half = caseDiameterMm / 2;
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${caseDiameterMm}mm" height="${caseDiameterMm}mm" viewBox="${-half} ${-half} ${caseDiameterMm} ${caseDiameterMm}" data-ring="${ringId}" data-units="mm"><title>Aviation slide rule ${ringId === 'outer' ? 'rotating bezel' : 'fixed chapter ring'} marking artwork</title><desc>Scale markings only. Preview geometry; verify material, font outlines, radial fit and engraving process before manufacture.</desc><g id="${ringId}-markings">${lines}${text}</g></svg>`;

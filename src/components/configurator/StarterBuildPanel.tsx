@@ -6,7 +6,13 @@ import { createStarterBuild, type StarterBuildType } from '@/domain/configurator
 import { syncAssemblyDownstream } from '@/stores/storeSync';
 
 export const StarterBuildPanel: React.FC = () => {
-  const [selectedType, setSelectedType] = useState<StarterBuildType>('diver');
+  const [selectedType, setSelectedType] = useState<StarterBuildType>(() => {
+    const archetype = useWatchAssemblyStore.getState().assembly.designConfig?.visualReferenceConfig?.archetypeId;
+    return archetype === 'archetype-chronograph' ? 'chronograph'
+      : archetype === 'archetype-pilot' ? 'pilot'
+      : archetype === 'archetype-field' ? 'field'
+      : archetype === 'archetype-dress-formal' ? 'dress' : 'diver';
+  });
   const [expandedPartId, setExpandedPartId] = useState<string | null>(null);
 
   const setWorkMode = useConfiguratorUIStore((s) => s.setWorkMode);
@@ -19,12 +25,18 @@ export const StarterBuildPanel: React.FC = () => {
   );
 
   useEffect(() => {
-    setArchetypePreview(starter.assembly);
-    syncAssemblyDownstream(starter.assembly);
     return () => {
+      setArchetypePreview(null);
       syncAssemblyDownstream(useWatchAssemblyStore.getState().assembly);
     };
-  }, [setArchetypePreview, starter]);
+  }, [setArchetypePreview]);
+
+  const previewStarter = (type: StarterBuildType) => {
+    setSelectedType(type);
+    const preview = createStarterBuild(type, useWatchAssemblyStore.getState().assembly);
+    setArchetypePreview(preview.assembly);
+    syncAssemblyDownstream(preview.assembly);
+  };
 
   const handleApplyStarter = () => {
     // Snapshot current before loading
@@ -59,7 +71,7 @@ export const StarterBuildPanel: React.FC = () => {
             <button
               key={type}
               type="button"
-              onClick={() => setSelectedType(type)}
+              onClick={() => previewStarter(type)}
               className={`p-2 rounded-lg border capitalize text-xs font-medium transition-all ${
                 selectedType === type
                   ? 'bg-teal-950/80 border-teal-400 text-teal-300 ring-1 ring-teal-400/30'
@@ -71,6 +83,7 @@ export const StarterBuildPanel: React.FC = () => {
           ))}
         </div>
       </div>
+      <p className="text-[11px] text-slate-400">Opening Build keeps the current watch. Choose an archetype to preview it, then use Load to apply it.</p>
 
       {/* Best-Value Starter Description */}
       <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800 space-y-3">

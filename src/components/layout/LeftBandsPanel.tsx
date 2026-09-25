@@ -143,9 +143,7 @@ export const LeftBandsPanel = () => {
   const dialFaceConfig = useDesignEngineStore((s) => s.dialFaceConfig);
   const scalePreview = useScaleStore((s) => s.preview);
   const selectedScaleKind = useScaleStore((s) => s.selectedScaleKind);
-  const setSelectedScaleKind = useScaleStore((s) => s.setSelectedScaleKind);
-  const updateScaleConfig = useScaleStore((s) => s.updatePluginConfig);
-  const setScaleContext = useScaleStore((s) => s.setContext);
+  const applyScaleProgram = useScaleStore((s) => s.applyScaleProgram);
   const updateBezelConfig = useDesignEngineStore((s) => s.updateBezelConfig);
   const scaleValidation = useScaleStore((s) => s.validation);
   const exportFormat = useExportStore((s) => s.format);
@@ -298,29 +296,27 @@ export const LeftBandsPanel = () => {
 
   const activeRecommendations = workspaceRecommendations[activeWorkspace];
 
-  const applyRecommendationAction = (action: RecommendationAction) => {
+  const applyRecommendationAction = (action: RecommendationAction): boolean => {
     if (action.type === 'case-diameter') {
       setCaseDiameter(action.value);
-      return;
+      return true;
     }
 
     if (action.type === 'movement') {
       selectMovement(action.value);
-      return;
+      return true;
     }
 
     if (action.type === 'scale-program') {
       const selection = getScaleProgram(action.value, bands);
-      setSelectedScaleKind(selection.kind);
-      updateScaleConfig(selection.config);
-      setScaleContext(selection.context);
+      if (!applyScaleProgram(action.value, bands)) return false;
       updateBezelConfig(selection.bezel);
-      return;
+      return true;
     }
 
     if (action.type === 'typography-font') {
       updateTypographyConfig({ fontCategory: action.value });
-      return;
+      return true;
     }
 
     if (action.type === 'dial-finish') {
@@ -332,13 +328,14 @@ export const LeftBandsPanel = () => {
           kind: textureKind
         }
       });
-      return;
+      return true;
     }
 
     updateDialFaceConfig({
       color: action.value.primary,
       secondaryColor: action.value.secondary
     });
+    return true;
   };
 
   const applyRecommendationById = (id: string) => {
@@ -347,7 +344,7 @@ export const LeftBandsPanel = () => {
       return;
     }
 
-    applyRecommendationAction(recommendation.action);
+    if (!applyRecommendationAction(recommendation.action)) return;
     const nextApplied = appliedRecommendationIds.includes(id)
       ? appliedRecommendationIds
       : [...appliedRecommendationIds, id];
@@ -501,10 +498,12 @@ export const LeftBandsPanel = () => {
               variant="primary"
               size="sm"
               onClick={() => {
-                activeRecommendations.forEach((entry) => applyRecommendationAction(entry.action));
-                setAppliedRecommendationIds(activeRecommendations.map((entry) => entry.id));
-                setTemplateHandled(true);
-                setTemplateOpen(false);
+                const applied = activeRecommendations.filter((entry) => applyRecommendationAction(entry.action));
+                setAppliedRecommendationIds(applied.map((entry) => entry.id));
+                if (applied.length === activeRecommendations.length) {
+                  setTemplateHandled(true);
+                  setTemplateOpen(false);
+                }
               }}
             >
               Apply All

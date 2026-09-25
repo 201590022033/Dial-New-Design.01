@@ -175,7 +175,8 @@ const renderOverlaySvg = (
     ? scalePreview.labels.filter((label) => includeMark(label.ringId)).map((label) => {
       const point = polarToCartesianPx(label.radiusMm, label.angleDeg);
       const safeText = label.text.replace(/[<>&"']/g, (character) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&apos;' })[character] ?? character);
-      return `<text x="${centerX + point.x}" y="${centerY + point.y}" fill="#E2E8F0" font-size="${scalePreview.fontSizeMm * 10}" text-anchor="middle" dominant-baseline="central" font-family="sans-serif">${safeText}</text>`;
+      const safeFamily = scalePreview.fontFamily.replace(/[<>&"']/g, (character) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&apos;' })[character] ?? character);
+      return `<text x="${centerX + point.x}" y="${centerY + point.y}" fill="#E2E8F0" font-size="${scalePreview.fontSizeMm * 10}" text-anchor="middle" dominant-baseline="central" font-family="${safeFamily}">${safeText}</text>`;
     }).join('') : '';
 
   return `<g id="engineering-overlay">${markerLines}${text}${ticks}${scaleLabels}</g>`;

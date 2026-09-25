@@ -45,7 +45,7 @@ const RingArtwork = ({ preview, model, ring }: { preview: ScaleRunResult; model:
     }
     context.textAlign = 'center';
     context.textBaseline = 'middle';
-    context.font = `600 ${preview.fontSizeMm * pxPerMm}px Arial, sans-serif`;
+    context.font = `600 ${preview.fontSizeMm * pxPerMm}px ${preview.fontFamily}`;
     for (const label of marks.labels) {
       const [x, y] = polar(label.radiusMm, label.angleDeg, pxPerMm, centre);
       context.save();

@@ -64,6 +64,7 @@ export class SvgRenderer implements RendererAdapter {
         scaleTicks: options.scalePreview?.ticks.map((tick) => [tick.angleDeg, tick.radiusMm, tick.lengthMm, tick.ringId]),
         scaleLabels: options.scalePreview?.labels.map((label) => [label.angleDeg, label.radiusMm, label.text, label.ringId]),
         scaleFontSizeMm: options.scalePreview?.fontSizeMm,
+        scaleFontFamily: options.scalePreview?.fontFamily,
         designOverlay: options.designOverlay,
         selectedHitId: options.selectedHit?.partInstanceId ?? null,
         hoveredHitId: options.hoveredHit?.partInstanceId ?? null,
@@ -308,7 +309,15 @@ export class SvgRenderer implements RendererAdapter {
         const outer = polarToCartesian(mmToPixels(outerRadiusMm), marker.angleDeg);
         const color = entry.lumed ? '#C7F9CC' : '#E2E8F0';
 
-        if (entry.kind === 'round') {
+        if (marker.text) {
+          const midpoint = polarToCartesian(mmToPixels((innerRadiusMm + outerRadiusMm) / 2), marker.angleDeg);
+          markersGroup.text(marker.text)
+            .font({ size: mmToPixels(Math.min(1.55, Math.max(0.9, markerLengthMm * 0.65))), family: entry.kind === 'roman-numeral' ? 'Georgia, serif' : 'Arial, sans-serif', anchor: 'middle', weight: 'bold' })
+            .fill(color)
+            .center(context.centerX + midpoint.x, context.centerY + midpoint.y)
+            .attr('data-marker-index', String(index))
+            .attr('data-interaction-role', 'rendering-primitive');
+        } else if (entry.kind === 'round') {
           const dotRadiusPx = Math.max(1.5, mmToPixels(marker.widthMm));
           const midpoint = polarToCartesian(
             mmToPixels((innerRadiusMm + outerRadiusMm) / 2),
@@ -484,7 +493,7 @@ export class SvgRenderer implements RendererAdapter {
         const point = polarToCartesian(mmToPixels(label.radiusMm), label.angleDeg);
         (label.ringId === 'outer' ? outerScaleGroup : innerScaleGroup)
           .text(label.text)
-          .font({ size: mmToPixels(options.scalePreview?.fontSizeMm ?? 0.8), family: '"IBM Plex Mono", monospace', anchor: 'middle' })
+          .font({ size: mmToPixels(options.scalePreview?.fontSizeMm ?? 0.8), family: options.scalePreview?.fontFamily ?? 'sans-serif', anchor: 'middle' })
           .fill('#E2E8F0')
           .center(context.centerX + point.x, context.centerY + point.y)
           .rotate(

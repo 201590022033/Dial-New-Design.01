@@ -63,6 +63,7 @@ export const applyArchetypeVisualProfile = (assembly: WatchAssembly, archetypeId
       ...assembly.designConfig,
       markerConfig: {
         ...payload.marker,
+        startAngleDeg: 0,
         radiusInnerMm: dialRadius - (profile.templateId === 'pilot' || profile.templateId === 'field' ? 4.1 : 3.1),
         radiusOuterMm: dialRadius - 1.15,
         widthMm: profile.templateId === 'diver' ? 0.95 : profile.templateId === 'classic-dress' ? 0.28 : 0.5
@@ -80,6 +81,7 @@ export const applyArchetypeVisualProfile = (assembly: WatchAssembly, archetypeId
       textureConfig: payload.dialFace.texture,
       visualReferenceConfig: {
         ...assembly.designConfig?.visualReferenceConfig,
+        dialMarkerMode: 'auto',
         archetypeId,
         bezelId: profile.bezelId,
         strapStyleId: profile.strapStyleId
