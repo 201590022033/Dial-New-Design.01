@@ -25,14 +25,14 @@ export const placeholderFeatures: PlaceholderFeature[] = [
   {
     id: 'slide-rule',
     title: 'Slide Rule',
-    status: 'planned',
-    description: 'Extension point for rotating logarithmic scales.'
+    status: 'experimental',
+    description: 'Aviation dual-ring logarithmic designer, five planning examples and paired marking SVGs; physical marking proof remains pending.'
   },
   {
     id: 'tachymeter',
     title: 'Tachymeter',
-    status: 'planned',
-    description: 'Extension point for speed scale generation templates.'
+    status: 'experimental',
+    description: 'Reciprocal 60–500 chronograph speed scale is available in the Advanced scale programs.'
   },
   {
     id: 'compass',

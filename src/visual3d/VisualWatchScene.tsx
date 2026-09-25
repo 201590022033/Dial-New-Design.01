@@ -6,7 +6,7 @@ import { visualCategories, type VisualCategory } from './visualAssetRegistry';
 import { componentPlacement } from './componentPlacement';
 import { MM_TO_SCENE } from './assemblyAnchors';
 import { finishProfiles, type FinishProfile } from './finishProfiles';
-import { createPreviewLugGeometry } from './proceduralEnvelope';
+import { createPreviewCaseGeometry, createPreviewLugGeometry, createPreviewStrapGeometry } from './proceduralEnvelope';
 import { ACESFilmicToneMapping, CanvasTexture, LinearFilter, PerspectiveCamera, PMREMGenerator, SRGBColorSpace, Vector2 } from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 
@@ -141,6 +141,23 @@ const PreviewLug = ({ model, side, end }: { model: VisualWatchModel; side: numbe
   return <mesh castShadow geometry={geometry}><meshPhysicalMaterial {...physicalFinish(model.finishes.case)} /></mesh>;
 };
 
+const PreviewCase = ({ model }: { model: VisualWatchModel }) => {
+  const geometry = useMemo(() => createPreviewCaseGeometry(model.caseDiameterMm / 2, model.caseThicknessMm, model.previewEnvelope.attachment), [model.caseDiameterMm, model.caseThicknessMm, model.previewEnvelope.attachment]);
+  useEffect(() => () => geometry.dispose(), [geometry]);
+  return <mesh castShadow geometry={geometry}><meshPhysicalMaterial {...physicalFinish(model.finishes.case)} /></mesh>;
+};
+
+const PreviewStrap = ({ model, sign }: { model: VisualWatchModel; sign: number }) => {
+  const a = model.previewEnvelope.attachment;
+  const geometry = useMemo(() => createPreviewStrapGeometry(a, sign), [a, sign]);
+  useEffect(() => () => geometry.dispose(), [geometry]);
+  return <group>
+    <mesh castShadow geometry={geometry}><meshPhysicalMaterial {...physicalFinish(model.finishes.strap)} /></mesh>
+    <Cylinder axis="X" radius={a.bodyRadius} depth={a.gap - .2} position={[0, sign * a.barY, a.barZ]} material={model.finishes.crown} />
+    <Cylinder axis="X" radius={a.tipRadius} depth={a.gap + 2 * a.tipEngagement} position={[0, sign * a.barY, a.barZ]} material={model.finishes.crown} />
+  </group>;
+};
+
 export const ProceduralComponent = ({ category, model }: { category: VisualCategory; model: VisualWatchModel }) => {
   const radius = model.caseDiameterMm / 2;
   const envelope = model.previewEnvelope;
@@ -149,25 +166,13 @@ export const ProceduralComponent = ({ category, model }: { category: VisualCateg
   const localZ = (z: number) => z - componentPlacement(model, category).anchor.positionMm[2];
   switch (category) {
     case 'strap': return <group>
-      {[1, -1].map((sign) => <mesh key={sign} castShadow position={[0, sign * radius * 1.55, -0.3]}>
-        <boxGeometry args={[radius * 1.02, radius * 1.1, 1.8]} /><meshPhysicalMaterial {...physicalFinish(model.finishes.strap)} />
-      </mesh>)}
+      {[1, -1].map(sign => <PreviewStrap key={sign} model={model} sign={sign} />)}
     </group>;
     case 'caseback': return <mesh castShadow position={[0, 0, -model.caseThicknessMm / 2]} rotation={[Math.PI / 2, 0, 0]}>
       <cylinderGeometry args={[radius * 0.83, radius * 0.83, 1.4, 128]} /><meshStandardMaterial {...finish(model.finishes.caseback)} />
     </mesh>;
     case 'case': return <group>
-      <mesh castShadow rotation={[Math.PI / 2, 0, 0]}>
-        <latheGeometry args={[[
-          new Vector2(radius * 0.78, -model.caseThicknessMm / 2),
-          new Vector2(radius * 0.95, -model.caseThicknessMm / 2),
-          new Vector2(radius, -model.caseThicknessMm / 2 + 0.5),
-          new Vector2(radius, model.caseThicknessMm / 2 - 0.5),
-          new Vector2(radius * 0.95, model.caseThicknessMm / 2),
-          new Vector2(radius * 0.78, model.caseThicknessMm / 2),
-          new Vector2(radius * 0.78, -model.caseThicknessMm / 2)
-        ], 128]} /><meshPhysicalMaterial {...physicalFinish(model.finishes.case)} />
-      </mesh>
+      <PreviewCase model={model} />
       {[1, -1].flatMap(end => [-1, 1].map(side => <PreviewLug key={`${side}-${end}`} model={model} side={side} end={end} />))}
     </group>;
     case 'bezel': {

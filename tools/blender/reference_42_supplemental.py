@@ -6,6 +6,8 @@ import os
 import sys
 
 import bpy
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from attachment_preview import attachment, SPEC
 
 QUALITY = {"preview": 64, "normal": 96, "high": 160}
 ASSETS = ("dial", "chapter-ring", "bezel", "crystal", "caseback", "strap")
@@ -167,23 +169,56 @@ def rectangular_frame(name, outer_width, outer_height, depth, wall, location, pl
 
 
 def tapered_strap(name, near_width, far_width, length, height, sign, mat):
-    near_y = sign * 23.0
-    far_y = sign * (23.0 + length)
-    z0, z1 = -height / 2, height / 2
-    vertices = [
-        (-near_width / 2, near_y, z0), (near_width / 2, near_y, z0),
-        (-far_width / 2, far_y, z0), (far_width / 2, far_y, z0),
-        (-near_width / 2, near_y, z1), (near_width / 2, near_y, z1),
-        (-far_width / 2, far_y, z1), (far_width / 2, far_y, z1),
-    ]
-    faces = [(0, 2, 3, 1), (4, 5, 7, 6), (0, 1, 5, 4),
-             (2, 6, 7, 3), (0, 4, 6, 2), (1, 3, 7, 5)]
+    a = attachment()
+    # Rounded eye around the SAME Y/Z axis as the existing lug holes.
+    near_width -= 2 * SPEC['strapSideClearanceMm']
+    outline = [(a['y']+length, a['z']-height/2, far_width),
+               (a['y']+length, a['z']+height/2, far_width)]
+    for i in range(25):
+        theta = math.pi/2 + math.pi*i/24
+        outline.append((a['y']+height/2*math.cos(theta),
+                        a['z']+height/2*math.sin(theta), near_width))
+    count = len(outline)
+    vertices = [(side*w/2, sign*y, z) for side in (-1, 1) for y,z,w in outline]
+    faces = [tuple(range(count-1, -1, -1)), tuple(range(count, count*2))]
+    for i in range(count):
+        j = (i+1) % count
+        faces.append((i, j, count+j, count+i))
+    if sign < 0: faces = [tuple(reversed(face)) for face in faces]
     mesh = bpy.data.meshes.new(name + "_MESH")
     mesh.from_pydata(vertices, [], faces)
     mesh.update()
     obj = bpy.data.objects.new(name, mesh)
     bpy.context.collection.objects.link(obj)
-    return finish(obj, mat, min(1.15, height * 0.32))
+    bpy.ops.mesh.primitive_cylinder_add(vertices=64, radius=SPEC['strapBoreRadiusMm'],
+        depth=near_width+2, location=(0, sign*a['y'], a['z']), rotation=(0, math.pi/2, 0))
+    cutter = bpy.context.object
+    modifier = obj.modifiers.new('Spring-bar eye', 'BOOLEAN')
+    modifier.operation='DIFFERENCE'; modifier.solver='EXACT'; modifier.object=cutter
+    bpy.context.view_layer.objects.active=obj
+    bpy.ops.object.modifier_apply(modifier=modifier.name)
+    bpy.data.objects.remove(cutter, do_unlink=True)
+    obj['DD_ATTACHMENT_AXIS_Y_MM'] = sign*a['y']
+    obj['DD_ATTACHMENT_AXIS_Z_MM'] = a['z']
+    obj['DD_ATTACHMENT_STATUS'] = SPEC['status']
+    return finish(obj, mat, .10)
+
+
+def spring_bars(mat):
+    a = attachment()
+    objects = []
+    for sign, label in ((1, '12'), (-1, '6')):
+        for suffix, radius, length in (
+            ('BODY', SPEC['springBarBodyRadiusMm'], a['gap']-.2),
+            ('TIPS', SPEC['springBarTipRadiusMm'], a['gap']+2*SPEC['springBarTipEngagementMm']),
+        ):
+            bpy.ops.mesh.primitive_cylinder_add(vertices=64, radius=radius, depth=length,
+                location=(0, sign*a['y'], a['z']), rotation=(0, math.pi/2, 0))
+            obj = bpy.context.object
+            obj.name = f'DD_SPRING_BAR_{label}_{suffix}'
+            obj['DD_ATTACHMENT_STATUS'] = SPEC['status']
+            objects.append(finish(obj, mat, .04))
+    return objects
 
 
 def build(asset, params, quality):
@@ -253,13 +288,14 @@ def build(asset, params, quality):
         built.append(annulus("DD_REF42_CASEBACK_GRIP", p["outerDiameterMm"] - 0.8, p["outerDiameterMm"] - 2.0, 0.22, polished, segments, -p["heightMm"] / 2 - 0.08))
     elif asset == "strap":
         p = params["strap"]
+        a = attachment()
         length = p["previewLengthPerSideMm"]
         for sign, label in ((1, "12"), (-1, "6")):
             strap = tapered_strap(f"DD_REF42_STRAP_{label}", p["lugWidthMm"], p["taperEndWidthMm"], length, p["thicknessMm"], sign, rubber)
             built.append(strap)
             for side in (-1, 1):
-                y = sign * (23.0 + length / 2)
-                bpy.ops.mesh.primitive_cube_add(location=(side * p["lugWidthMm"] * 0.28, y, p["thicknessMm"] / 2 + 0.10),
+                y = sign * (a['y'] + length / 2)
+                bpy.ops.mesh.primitive_cube_add(location=(side * p["lugWidthMm"] * 0.28, y, a['z'] + p["thicknessMm"] / 2 + 0.10),
                                                 scale=(0.32, length * 0.40, 0.10))
                 rail = bpy.context.object
                 rail.name = f"DD_REF42_STRAP_RAIL_{label}_{'L' if side < 0 else 'R'}"
@@ -267,24 +303,25 @@ def build(asset, params, quality):
                 built.append(rail)
         # Presentation hardware on the 12 o'clock tail: two rubber keepers and
         # a polished tang buckle. Dimensions are visual baselines, not fit data.
-        strap_end_y = 23.0 + length
+        strap_end_y = a['y'] + length
         for index, y in enumerate((strap_end_y - 5.4, strap_end_y - 2.9)):
             built.append(rectangular_frame(f"DD_REF42_STRAP_KEEPER_{index + 1}",
                                            p["taperEndWidthMm"] + 1.5, p["thicknessMm"] + 1.0,
-                                           1.35, 0.42, (0, y, 0), "XZ", rubber_detail))
+                                           1.35, 0.42, (0, y, a['z']), "XZ", rubber_detail))
         buckle_y = strap_end_y + 5.0
         built.append(rectangular_frame("DD_REF42_BUCKLE_FRAME", p["taperEndWidthMm"] + 2.5,
-                                       9.0, 2.2, 1.35, (0, buckle_y, 0.15), "XY", polished))
+                                       9.0, 2.2, 1.35, (0, buckle_y, a['z'] + 0.15), "XY", polished))
         bpy.ops.mesh.primitive_cylinder_add(vertices=64, radius=0.8, depth=p["taperEndWidthMm"] + 0.8,
-                                            location=(0, strap_end_y + 0.9, 0.15), rotation=(0, math.pi / 2, 0))
+                                            location=(0, strap_end_y + 0.9, a['z'] + 0.15), rotation=(0, math.pi / 2, 0))
         buckle_pin = bpy.context.object
         buckle_pin.name = "DD_REF42_BUCKLE_PIN"
         finish(buckle_pin, polished, 0.08)
         built.append(buckle_pin)
         tang = box("DD_REF42_BUCKLE_TANG", (1.1, 8.2, 0.55),
-                   (0, buckle_y - 0.2, 1.1), polished, 0.16)
+                   (0, buckle_y - 0.2, a['z'] + 1.1), polished, 0.16)
         tang.rotation_euler[2] = -0.035
         built.append(tang)
+        built.extend(spring_bars(polished))
     for obj in built:
         obj["DD_PROVENANCE_STATUS"] = params["provenance"]["status"]
         obj["DD_PROVENANCE_SOURCE"] = params["provenance"]["source"]

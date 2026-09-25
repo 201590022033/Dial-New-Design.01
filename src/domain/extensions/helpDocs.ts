@@ -10,13 +10,13 @@ export const helpDocPages: HelpDocPage[] = [
     id: 'slide-rule-math',
     title: 'Slide Rule Mathematics',
     category: 'Mathematics',
-    summary: 'Placeholder documentation for logarithmic ring ratios and pilot timing relationships.'
+    summary: 'Two logarithmic rings: align the outer rate to 60 on the fixed inner ring, then read time against distance or fuel quantity. The decade seam is 10/100; zero cannot be printed.'
   },
   {
     id: 'tachymeter-math',
     title: 'Tachymeter Mathematics',
     category: 'Mathematics',
-    summary: 'Placeholder documentation for speed-distance conversion marks and calibration spacing.'
+    summary: 'Reciprocal-time speed scale: over a known distance, average speed equals 3600 divided by elapsed seconds for a one-unit course. The 60–500 track is an open arc.'
   },
   {
     id: 'log-scales',

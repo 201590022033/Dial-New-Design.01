@@ -9,6 +9,7 @@ import type {
   ScaleValidationResult
 } from '@/domain/scales/types';
 import { runScalePlugin } from '@/services/scaleEngineService';
+import { fullMinuteRingContext } from '@/domain/scales/minuteRingContext';
 
 interface ScaleState {
   selectedScaleKind: ScaleKind;
@@ -61,10 +62,7 @@ const fallbackConfig: ScalePluginConfig = fallbackPlugin?.defaultConfig ?? {
   minimumLineWidthMm: 0.1
 };
 
-const defaultContext: ScaleMathContext = {
-  startAngleDeg: -140,
-  endAngleDeg: 140
-};
+const defaultContext: ScaleMathContext = fullMinuteRingContext;
 
 export const useScaleStore = create<ScaleState>((set, get) => ({
   selectedScaleKind: 'circular',

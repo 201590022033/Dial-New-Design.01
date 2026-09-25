@@ -1,5 +1,6 @@
 """Blender integration check for the generated archetype component library."""
 import json
+import math
 from pathlib import Path
 import sys
 
@@ -20,6 +21,24 @@ for filename in manifest["assets"]:
     meshes, report = import_glb(str(root / filename))
     total_meshes += report["mesh_count"]
     mesh_names_by_asset[filename] = set(report["mesh_names"])
+    if filename == "pushers-chronograph.glb":
+        if len(meshes) != 6:
+            raise AssertionError("Each chronograph pusher needs a button, stem and collar")
+        for index, angle in enumerate((35, -35)):
+            a = math.radians(angle)
+            def axial_bounds(suffix):
+                obj = next(obj for obj in meshes if obj.name == f"DD_ARCH_CHRONO_PUSHER_{index}{suffix}")
+                vertices = [obj.matrix_world @ vertex.co for vertex in obj.data.vertices]
+                radial = [v.x * math.cos(a) + v.y * math.sin(a) for v in vertices]
+                return min(radial), max(radial)
+            stem, collar, button = [axial_bounds(suffix) for suffix in ("_STEM", "_COLLAR", "")]
+            if not (stem[0] < 20.0 and collar[0] < 21.0 and
+                    stem[1] > button[0] + .2 and collar[1] > button[0] + .2):
+                raise AssertionError(f"Floating chronograph pusher {index}: {stem}, {collar}, {button}")
+            if abs(button[1] - 25.5) > .05:
+                raise AssertionError("Attaching pushers must not move the existing button envelope")
+    elif any("PUSHER" in obj.name.upper() for obj in meshes):
+        raise AssertionError(f"Pusher hardware leaked into a shared component: {filename}")
     if filename.startswith("bezel-"):
         carrier = next(obj for obj in meshes if obj.name == "DD_ARCH_BEZEL_CARRIER")
         vertices = [carrier.matrix_world @ vertex.co for vertex in carrier.data.vertices]

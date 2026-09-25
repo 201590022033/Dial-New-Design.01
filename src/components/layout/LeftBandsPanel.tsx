@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/Button';
 import { CollapsibleCard } from '@/components/ui/CollapsibleCard';
 import { movementLibrary } from '@/domain/movements/movementLibrary';
 import { templateLibrary, type TemplateId } from '@/domain/generators/templateLibrary';
+import { getScaleProgram, type ScaleProgram } from '@/domain/scales/scalePrograms';
 import {
   buildEngineeringExport,
   exportEngineeringByFormat,
@@ -38,7 +39,7 @@ type WorkspaceMode = 'Classic' | 'Pilot' | 'Diver' | 'Racing' | 'Dress' | 'Field
 type RecommendationAction =
   | { type: 'case-diameter'; value: number }
   | { type: 'movement'; value: string }
-  | { type: 'scale-kind'; value: 'circular' | 'slide-rule' | 'tachymeter' | 'countdown' }
+  | { type: 'scale-program'; value: ScaleProgram }
   | { type: 'typography-font'; value: 'modern-sans' | 'technical-sans' | 'pilot' | 'vintage' | 'roman' | 'arabic' | 'railroad' | 'military' }
   | { type: 'dial-finish'; value: 'matte' | 'sunburst' | 'textured' }
   | { type: 'dial-palette'; value: { primary: string; secondary: string } };
@@ -70,7 +71,7 @@ const defaultRenderContext = {
 const watchStructure: WatchStructureItem[] = [
   { label: 'Bezel', depth: 0, componentId: 'bezel', bandKind: null },
   { label: 'Outer Slide Rule', depth: 1, componentId: 'outer-slide-rule', bandKind: 'outer-bezel' },
-  { label: 'Inner Slide Rule', depth: 1, componentId: 'inner-slide-rule', bandKind: 'inner-bezel' },
+  { label: 'Inner Slide Rule', depth: 1, componentId: 'inner-slide-rule', bandKind: 'chapter-ring' },
   { label: 'Rotating Bezel', depth: 1, componentId: 'watch-rotating-bezel', bandKind: 'outer-bezel' },
   { label: 'Fixed Bezel', depth: 1, componentId: 'watch-fixed-bezel', bandKind: 'outer-bezel' },
   { label: 'Chapter Ring', depth: 0, componentId: 'chapter-ring', bandKind: 'chapter-ring' },
@@ -143,6 +144,9 @@ export const LeftBandsPanel = () => {
   const scalePreview = useScaleStore((s) => s.preview);
   const selectedScaleKind = useScaleStore((s) => s.selectedScaleKind);
   const setSelectedScaleKind = useScaleStore((s) => s.setSelectedScaleKind);
+  const updateScaleConfig = useScaleStore((s) => s.updatePluginConfig);
+  const setScaleContext = useScaleStore((s) => s.setContext);
+  const updateBezelConfig = useDesignEngineStore((s) => s.updateBezelConfig);
   const scaleValidation = useScaleStore((s) => s.validation);
   const exportFormat = useExportStore((s) => s.format);
   const exportTarget = useExportStore((s) => s.target);
@@ -193,7 +197,7 @@ export const LeftBandsPanel = () => {
           id: 'pilot-scale',
           label: 'Enable Slide Rule',
           detail: 'Adds navigation and engineering calculation context.',
-          action: { type: 'scale-kind', value: 'slide-rule' }
+          action: { type: 'scale-program', value: 'aviation' }
         },
         {
           id: 'pilot-font',
@@ -217,9 +221,9 @@ export const LeftBandsPanel = () => {
         },
         {
           id: 'diver-scale',
-          label: 'Countdown Scale',
-          detail: 'Elapsed-time friendly ring behavior.',
-          action: { type: 'scale-kind', value: 'countdown' }
+          label: '60-minute Dive Scale',
+          detail: 'Full elapsed-time ring with the first 20 minutes emphasized.',
+          action: { type: 'scale-program', value: 'diver' }
         },
         {
           id: 'diver-movement',
@@ -239,7 +243,7 @@ export const LeftBandsPanel = () => {
           id: 'racing-scale',
           label: 'Tachymeter Scale',
           detail: 'Speed-distance conversion orientation.',
-          action: { type: 'scale-kind', value: 'tachymeter' }
+          action: { type: 'scale-program', value: 'chrono' }
         },
         {
           id: 'racing-font',
@@ -305,8 +309,12 @@ export const LeftBandsPanel = () => {
       return;
     }
 
-    if (action.type === 'scale-kind') {
-      setSelectedScaleKind(action.value);
+    if (action.type === 'scale-program') {
+      const selection = getScaleProgram(action.value, bands);
+      setSelectedScaleKind(selection.kind);
+      updateScaleConfig(selection.config);
+      setScaleContext(selection.context);
+      updateBezelConfig(selection.bezel);
       return;
     }
 

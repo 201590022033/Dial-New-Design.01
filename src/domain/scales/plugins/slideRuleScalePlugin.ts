@@ -16,6 +16,7 @@ import {
 } from '@/domain/scales/framework';
 import type { ScaleValidationIssue } from '@/domain/scales/framework';
 import { createPreviewGeometry } from '@/domain/scales/preview';
+import { generateAviationRings } from '@/domain/scales/aviationSlideRule';
 import type {
   ScaleMathContext,
   ScalePlugin,
@@ -180,6 +181,9 @@ const createRingTicks = (
 };
 
 const generateTicks = (sourceConfig: ScalePluginConfig, context: ScaleMathContext): ScaleTick[] => {
+  if (sourceConfig.engineeringPreset === 'aviation-slide-rule') {
+    return generateAviationRings(sourceConfig).ticks;
+  }
   const config = applyEngineeringProfile(resolveSlideRulePreset(sourceConfig));
   const outerTicks = createRingTicks(config, context, 'outer');
   const innerTicks = createRingTicks(config, context, 'inner');
@@ -220,6 +224,9 @@ export const slideRuleScalePlugin: ScalePlugin = {
   },
   tickGenerator: (config, context) => generateTicks(config, context),
   labelGenerator: (ticks, sourceConfig) => {
+    if (sourceConfig.engineeringPreset === 'aviation-slide-rule') {
+      return generateAviationRings(sourceConfig).labels;
+    }
     const config = resolveSlideRulePreset(sourceConfig);
     const outerLabels = labelEngine
       .generate({

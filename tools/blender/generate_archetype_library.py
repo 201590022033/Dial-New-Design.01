@@ -261,19 +261,22 @@ def strap(style):
     body = ref.material(style + " strap", color, 0, rough)
     detail = ref.material(style + " strap detail", tuple(min(1, c + .09) for c in color), 0, rough)
     objects = []
+    a = ref.attachment()
     for sign, label in ((1, "12"), (-1, "6")):
         objects.append(ref.tapered_strap(f"DD_ARCH_STRAP_{label}", 22, 18, 58, 3.0, sign, body))
         for side in (-1, 1):
             x = side * 8.4
             objects.append(ref.box(f"DD_ARCH_STRAP_EDGE_{label}_{side}", (.24, 52, .10),
-                           (x, sign * 52, 1.56), detail, .08))
+                           (x, sign * (a['y'] + 29), a['z'] + 1.56), detail, .08))
         if style == "racing":
             for row in range(5):
-                y = sign * (31 + row * 8)
+                y = sign * (a['y'] + 8 + row * 8)
                 for x in (-5.0, 0, 5.0):
                     objects.append(ref.cylinder(f"DD_ARCH_RACING_HOLE_{label}_{row}_{x}", 2.6, .12,
-                                   detail, 48, z=1.6, bevel=.05))
+                                   detail, 48, z=a['z'] + 1.6, bevel=.05))
                     objects[-1].location.x, objects[-1].location.y = x, y
+    steel = ref.material('spring bar steel', (.7, .76, .84), .96, .16)
+    objects.extend(ref.spring_bars(steel))
     return objects
 
 
@@ -282,13 +285,24 @@ def pushers():
     objects = []
     for index, angle in enumerate((35, -35)):
         a = math.radians(angle)
-        radius = 23.6
-        bpy.ops.mesh.primitive_cylinder_add(vertices=96, radius=1.55, depth=3.8,
-            location=(radius * math.cos(a), radius * math.sin(a), 0), rotation=(0, math.pi / 2, a))
-        obj = bpy.context.object
-        obj.name = f"DD_ARCH_CHRONO_PUSHER_{index}"
-        ref.finish(obj, steel, .18)
-        objects.append(obj)
+        # The original button starts at radial 21.7 mm, outside the 21.2 mm
+        # case belly. Give it an embedded stem and an overlapping collar.
+        # ALL three pieces stay in this separately gated chronograph asset:
+        # never bake pusher hardware into the shared case/lug library.
+        for suffix, radial_start, radial_end, radius, bevel in (
+            ("_STEM", 19.8, 22.4, .90, .06),
+            ("_COLLAR", 20.4, 22.05, 1.20, .10),
+            ("", 21.7, 25.5, 1.55, .18),
+        ):
+            center = (radial_start + radial_end) / 2
+            bpy.ops.mesh.primitive_cylinder_add(vertices=96, radius=radius,
+                depth=radial_end - radial_start,
+                location=(center * math.cos(a), center * math.sin(a), 0),
+                rotation=(0, math.pi / 2, a))
+            obj = bpy.context.object
+            obj.name = f"DD_ARCH_CHRONO_PUSHER_{index}{suffix}"
+            ref.finish(obj, steel, bevel)
+            objects.append(obj)
     return objects
 
 
@@ -296,9 +310,22 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", required=True)
     parser.add_argument("--bezel-only", action="store_true", help="Regenerate only bezel assets; preserve the remaining library and manifest")
+    parser.add_argument("--pushers-only", action="store_true", help="Regenerate only the separately gated chronograph pusher asset")
+    parser.add_argument("--straps-only", action="store_true", help="Regenerate only the four strap attachment assets")
     args = parser.parse_args(sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else [])
     output = os.path.abspath(args.output)
     os.makedirs(output, exist_ok=True)
+    if args.straps_only:
+        for style in ('rubber', 'leather', 'canvas', 'racing'):
+            ref.clear()
+            export(strap(style), os.path.join(output, f'strap-{style}.glb'))
+        print('Generated four aligned strap assets with spring bars')
+        return
+    if args.pushers_only:
+        ref.clear()
+        export(pushers(), os.path.join(output, "pushers-chronograph.glb"))
+        print("Generated connected chronograph pushers (shared case assets unchanged)")
+        return
     if args.bezel_only:
         for style in STYLES:
             ref.clear()

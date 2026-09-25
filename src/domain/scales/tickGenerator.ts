@@ -1,4 +1,5 @@
 import type { ScaleMathContext, ScalePluginConfig, ScaleTick } from '@/domain/scales/types';
+import { isClosedScaleContext } from '@/domain/scales/minuteRingContext';
 
 export const generateTicks = (
   config: ScalePluginConfig,
@@ -12,7 +13,10 @@ export const generateTicks = (
   }
 
   const epsilon = config.minorStep / 1000;
+  const closed = isClosedScaleContext(context);
   for (let value = config.startValue; value <= config.endValue + epsilon; value += config.minorStep) {
+    // On a closed ring the terminal value occupies the same point as the first.
+    if (closed && value >= config.endValue - epsilon) break;
     const majorRatio = value / config.majorStep;
     const isMajor = Math.abs(majorRatio - Math.round(majorRatio)) <= epsilon;
 

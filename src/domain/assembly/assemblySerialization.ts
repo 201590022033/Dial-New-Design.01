@@ -5,6 +5,7 @@ import { defaultTypographyConfig } from '@/domain/generators/typographyEngine';
 import { defaultMarkerConfig } from '@/domain/generators/markerEngine';
 import { defaultDialFaceConfig } from '@/domain/generators/dialFaceGenerator';
 import type { ScaleKind, ScalePluginConfig } from '@/domain/scales/types';
+import { fullMinuteRingContext } from '@/domain/scales/minuteRingContext';
 import type { TemplateId } from '@/domain/generators/templateLibrary';
 import { createDefaultWatchAssembly, WATCH_ASSEMBLY_VERSION } from './assemblyFactory';
 import { assemblyToBands } from './assemblyAdapters';
@@ -249,10 +250,7 @@ export const exportAssemblyToLegacyProject = (assembly: WatchAssembly): DialProj
         bandOuterRadiusMm: 20,
         minimumLineWidthMm: 0.1
       },
-      context: {
-        startAngleDeg: -140,
-        endAngleDeg: 140
-      }
+      context: { ...fullMinuteRingContext }
     },
     design: {
       templateId: (assembly.templateId as TemplateId) || 'classic-dress',

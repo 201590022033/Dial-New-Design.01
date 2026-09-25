@@ -1,0 +1,11 @@
+{
+  "status": "ESTIMATED_NOMINAL",
+  "source": "Preview assembly clearance; Golden Sample #1 validation required",
+  "strapThicknessMm": 3.0,
+  "strapSideClearanceMm": 0.6,
+  "strapBoreRadiusMm": 1.05,
+  "springBarBodyRadiusMm": 0.95,
+  "springBarTipRadiusMm": 0.85,
+  "springBarTipEngagementMm": 0.9,
+  "caseClearanceMm": 0.25
+}

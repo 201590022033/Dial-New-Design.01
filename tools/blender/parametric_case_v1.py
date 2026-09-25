@@ -6,6 +6,8 @@ Blender units are millimetres (1 BU = 1 mm); this is deliberate for inspection.
 import argparse, json, math, os, sys
 import bpy
 from mathutils import Vector
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from attachment_preview import attachment
 
 SCHEMA = 'parametric-case/v1'
 QUALITY = {'preview': 64, 'normal': 128, 'high': 192}
@@ -89,6 +91,9 @@ def revolve(p, n, collection, material, polished):
     verts = [v for ring in rings for v in ring]; faces=[]
     for j in range(len(rings)-1):
         for i in range(n): faces.append((j*n+i, j*n+(i+1)%n, (j+1)*n+(i+1)%n, (j+1)*n+i))
+    # Close the inner wall before subtracting the underside strap pockets.
+    last = (len(rings) - 1) * n
+    for i in range(n): faces.append((last+i, last+(i+1)%n, (i+1)%n, i))
     ob=mesh('DD_CASE_MIDCASE', verts, faces, collection, material)
     ob.data.materials.append(polished)
     # Polished shoulders are material regions on the continuous revolved shell,
@@ -96,6 +101,23 @@ def revolve(p, n, collection, material, polished):
     for segment in (2, 7):
         for index in range(n): ob.data.polygons[segment*n+index].material_index=1
     ob['DD_SURFACE_TREATMENT']='brushed-belly/integrated-polished-shoulders'
+    if p.get('lugStyle', 'straight') not in ('wire', 'integrated'):
+        a = attachment(p)
+        for sign in (-1, 1):
+            outer = r + 5
+            bottom = -h / 2 - 2
+            bpy.ops.mesh.primitive_cube_add(location=(0, sign*(a['notch_y']+outer)/2,
+                                                       (bottom+a['notch_top'])/2))
+            cutter = bpy.context.object
+            cutter.scale = (a['gap']/2, (outer-a['notch_y'])/2, (a['notch_top']-bottom)/2)
+            modifier = ob.modifiers.new('Estimated strap-end underside clearance', 'BOOLEAN')
+            modifier.operation = 'DIFFERENCE'; modifier.solver = 'EXACT'; modifier.object = cutter
+            bpy.context.view_layer.objects.active = ob
+            bpy.ops.object.modifier_apply(modifier=modifier.name)
+            bpy.data.objects.remove(cutter, do_unlink=True)
+        ob['DD_ATTACHMENT_CLEARANCE_STATUS'] = 'ESTIMATED_NOMINAL'
+        ob['DD_ATTACHMENT_AXIS_Y_MM'] = a['y']
+        ob['DD_ATTACHMENT_AXIS_Z_MM'] = a['z']
     return ob
 def cylinder(name, radius, depth, loc, collection, material):
     bpy.ops.mesh.primitive_cylinder_add(vertices=64, radius=radius, depth=depth, location=loc, rotation=(0, math.pi/2, 0)); ob=bpy.context.object; ob.name=name; collection.objects.link(ob); [c.objects.unlink(ob) for c in list(ob.users_collection) if c != collection]; ob.data.materials.append(material); return ob
@@ -247,5 +269,5 @@ def main():
         with open(args.params, encoding='utf-8') as f: p=json.load(f)
     build(p,args.quality)
     if args.output:
-        os.makedirs(os.path.dirname(os.path.abspath(args.output)),exist_ok=True); bpy.ops.object.select_all(action='DESELECT'); [o.select_set(True) for o in bpy.data.collections['DD_PARAMETRIC_CASE'].objects]; bpy.context.view_layer.objects.active=bpy.data.collections['DD_PARAMETRIC_CASE'].objects[0]; bpy.ops.export_scene.gltf(filepath=os.path.abspath(args.output),export_format='GLB',use_selection=True)
+        os.makedirs(os.path.dirname(os.path.abspath(args.output)),exist_ok=True); bpy.ops.object.select_all(action='DESELECT'); [o.select_set(True) for o in bpy.data.collections['DD_PARAMETRIC_CASE'].objects]; bpy.context.view_layer.objects.active=bpy.data.collections['DD_PARAMETRIC_CASE'].objects[0]; bpy.ops.export_scene.gltf(filepath=os.path.abspath(args.output),export_format='GLB',use_selection=True,export_extras=True)
 if __name__ == '__main__': main()

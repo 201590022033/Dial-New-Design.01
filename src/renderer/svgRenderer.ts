@@ -60,8 +60,9 @@ export class SvgRenderer implements RendererAdapter {
         showGuides: options.showGuides,
         showSnapping: options.showSnapping,
         highlightedBandIds: options.highlightedBandIds,
-        scaleTickCount: options.scalePreview?.ticks.length ?? 0,
-        scaleLabelCount: options.scalePreview?.labels.length ?? 0,
+        // Rotation changes geometry without changing the number of marks.
+        scaleTicks: options.scalePreview?.ticks.map((tick) => [tick.angleDeg, tick.radiusMm, tick.lengthMm, tick.ringId]),
+        scaleLabels: options.scalePreview?.labels.map((label) => [label.angleDeg, label.radiusMm, label.text, label.ringId]),
         designOverlay: options.designOverlay,
         selectedHitId: options.selectedHit?.partInstanceId ?? null,
         hoveredHitId: options.hoveredHit?.partInstanceId ?? null,
@@ -435,14 +436,16 @@ export class SvgRenderer implements RendererAdapter {
         .attr('data-label', 'Bezel Scale');
 
       const { ticks, labels } = options.scalePreview;
-      const maxPreviewRadiusPx = Math.min(context.width, context.height) * 0.62;
+      const outerScaleGroup = options.scalePreview.kind === 'slide-rule'
+        ? scaleGroup.group().id('scale-outer-bezel').attr('data-band-id', 'band-outer-bezel').attr('data-ring-id', 'outer')
+        : scaleGroup;
+      const innerScaleGroup = options.scalePreview.kind === 'slide-rule'
+        ? scaleGroup.group().id('scale-chapter-ring').attr('data-band-id', 'band-chapter-ring').attr('data-ring-id', 'inner')
+        : scaleGroup;
 
       ticks.forEach((tick, index) => {
         const tickLength = mmToPixels(tick.lengthMm);
         const baseRadius = mmToPixels(tick.radiusMm);
-        if (baseRadius > maxPreviewRadiusPx) {
-          return;
-        }
 
         const directionMultiplier =
           tick.direction === 'inside' ? -1 : tick.direction === 'outside' ? 1 : 0;
@@ -459,7 +462,7 @@ export class SvgRenderer implements RendererAdapter {
         const start = polarToCartesian(startRadius, tick.angleDeg);
         const end = polarToCartesian(endRadius, tick.angleDeg);
 
-        scaleGroup
+        (tick.ringId === 'outer' ? outerScaleGroup : innerScaleGroup)
           .line(
             context.centerX + start.x,
             context.centerY + start.y,
@@ -467,7 +470,9 @@ export class SvgRenderer implements RendererAdapter {
             context.centerY + end.y
           )
           .stroke({
-            color: tick.weight === 'major' ? '#F59E0B' : '#94A3B8',
+            color: options.scalePreview?.kind === 'circular' && typeof tick.value === 'number' && tick.value <= 20
+              ? '#F59E0B'
+              : tick.weight === 'major' ? '#F8FAFC' : '#94A3B8',
             width: Math.max(1, mmToPixels(tick.widthMm))
           })
           .attr('data-scale-tick-index', String(index))
@@ -475,11 +480,8 @@ export class SvgRenderer implements RendererAdapter {
       });
 
       labels.forEach((label, index) => {
-        if (mmToPixels(label.radiusMm) > maxPreviewRadiusPx) {
-          return;
-        }
         const point = polarToCartesian(mmToPixels(label.radiusMm), label.angleDeg);
-        scaleGroup
+        (label.ringId === 'outer' ? outerScaleGroup : innerScaleGroup)
           .text(label.text)
           .font({ size: 10, family: '"IBM Plex Mono", monospace', anchor: 'middle' })
           .fill('#E2E8F0')

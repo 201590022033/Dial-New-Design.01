@@ -2,6 +2,7 @@ import type { BandEntity } from '@/domain/bands/types';
 import type { WatchAssembly } from '@/domain/assembly/assemblyTypes';
 import type { GlobalGeometryParameters } from '@/domain/geometry/types';
 import type { ScaleKind, ScaleMathContext, ScalePluginConfig } from '@/domain/scales/types';
+import { migrateLegacyMinuteRingContext } from '@/domain/scales/minuteRingContext';
 import type { TemplateId } from '@/domain/generators/templateLibrary';
 import type { MarkerEngineConfig } from '@/domain/generators/markerEngine';
 import type { TypographyConfig } from '@/domain/generators/typographyEngine';
@@ -94,6 +95,12 @@ export const deserializeDialProject = (input: string): DialProjectFile => {
   if (!parsed.version || !parsed.geometry || !parsed.bands || !parsed.scale) {
     throw new Error('Invalid .dial project payload.');
   }
+
+  parsed.scale.context = migrateLegacyMinuteRingContext(
+    parsed.scale.context,
+    parsed.scale.selectedScaleKind,
+    parsed.scale.pluginConfig
+  );
 
   return parsed;
 };

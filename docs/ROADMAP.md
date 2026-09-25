@@ -1,5 +1,21 @@
 # Dial Designer Roadmap
 
+## September 25 scale-program workflow
+
+The right-hand Advanced studio now selects Diver (full 0–60 minute ring with the first 20 marks emphasized), Chronograph (open 60–500 reciprocal tachymeter), or Aviation (paired logarithmic bezel/chapter ring). Pilot/Diver/Racing recommendations select the same engine programs. The aviation panel provides five basic PPL planning calculations, bezel alignment, selectable graduation detail, and separate real-size marking SVGs. The default minute ring and legacy saved default now close to 360° without a duplicate 0/60 mark. See [AVIATION_SCALE_PROGRAMS.md](AVIATION_SCALE_PROGRAMS.md).
+
+Next production gate: measure actual bezel and chapter-ring marking surfaces, outline the SVG fonts, prove minimum readable text and line spacing on the intended laser/material, verify ring registration and physical rotation, then flight-instructor review of calculation examples. Current artwork remains preview-only.
+
+## September 24 attachment seating repair
+
+Chronograph buttons now have overlapping stems/collars in the **separate chronograph pusher asset**, never in a shared case. Existing non-chronograph visibility protection remains unchanged.
+
+Conventional 42 mm cases now have estimated underside clearance pockets between the lugs. Rounded, bored strap ends and explicit spring bars share the existing hole axes (Y = ±20.20 mm, Z = −1.725 mm); lug shapes, hole positions and face/crystal seating are unchanged. Four archetype straps and the reference strap were regenerated. Procedural fallbacks use the same datum rules and clearance specification.
+
+All new attachment geometry is `ESTIMATED_NOMINAL`, awaiting Golden Sample #1. The common preview strap eye is 20.8 mm wide in the nominal 22 mm gap (0.6 mm side allowance to clear the twisted-lug envelope); this is **not** a supplier strap-width specification or fit approval. Wire and integrated lugs retain different attachment interfaces and are not covered by these spring-bar assembly checks.
+
+Exported-mesh regression checks cover bar-axis clearance, lug-bore access, strap bores and case/strap intersections across eight conventional lug styles plus the reference case and all five straps. Pusher tests enforce connected stems and prohibit pusher meshes in any shared case/component. No procurement or manufacturing evidence was upgraded.
+
 ## September 24 preview geometry regression repair
 
 The schematic case still had 0.7 mm lugs after its body was thickened, and its independent crystal offset left the glass above the bezel. Procedural lugs now use a six-section tapered solid derived from the existing nominal case envelope (4.5 mm thickness at 42 mm). Dial, hands, chapter ring, bezel and crystal share a single presentation stack, including the mixed GLB/fallback path. Fallback geometry uses the parametric midcase height where available rather than treating total watch thickness as midcase height.

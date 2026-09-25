@@ -3,6 +3,7 @@ import { CircleDot, DraftingCompass, SlidersHorizontal } from 'lucide-react';
 import { Panel } from '@/components/ui/Panel';
 import { CollapsibleCard } from '@/components/ui/CollapsibleCard';
 import { Button } from '@/components/ui/Button';
+import { AviationSlideRulePanel } from '@/components/configurator/AviationSlideRulePanel';
 import { listScalePlugins } from '@/domain/scales/scaleRegistry';
 import {
   buildProfileDefaults,
@@ -1469,6 +1470,9 @@ export const RightInspector = () => {
       </h2>
 
       <div className="min-h-0 flex-1 space-y-3 overflow-auto pr-1">
+        <CollapsibleCard title="Aviation Slide Rule Designer" accent="teal" defaultOpen>
+          <AviationSlideRulePanel />
+        </CollapsibleCard>
         <CollapsibleCard title="Reference Profiles" accent="amber" defaultOpen>
           <div className="grid grid-cols-2 gap-2">
             <label className="col-span-2 rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">

@@ -5,6 +5,7 @@ import type { BandEntity } from '@/domain/bands/types';
 import { defaultGeometryParameters } from '@/domain/geometry/geometryEngine';
 import type { GlobalGeometryParameters } from '@/domain/geometry/types';
 import type { ScaleKind, ScaleMathContext, ScalePluginConfig } from '@/domain/scales/types';
+import { fullMinuteRingContext } from '@/domain/scales/minuteRingContext';
 import { defaultTypographyConfig } from '@/domain/generators/typographyEngine';
 import { defaultMarkerConfig } from '@/domain/generators/markerEngine';
 import { defaultDialFaceConfig } from '@/domain/generators/dialFaceGenerator';
@@ -121,10 +122,7 @@ const defaultScaleConfig: ScalePluginConfig = {
   minimumLineWidthMm: 0.1
 };
 
-const defaultScaleContext: ScaleMathContext = {
-  startAngleDeg: -140,
-  endAngleDeg: 140
-};
+const defaultScaleContext: ScaleMathContext = fullMinuteRingContext;
 
 export const useProjectStore = create<ProjectStoreState>((set, get) => ({
   info: createDefaultProjectInfo(),

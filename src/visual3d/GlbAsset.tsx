@@ -18,7 +18,13 @@ type AssetAppearance = {
 };
 
 export const LoadedGlbAsset = ({ descriptor, appearance }: { descriptor: VisualAssetDescriptor; appearance?: AssetAppearance }) => {
-  const gltf = useThreeLoader(GLTFLoader, descriptor.assetPath!);
+  // New attachment meshes must not reuse an older in-memory/browser GLB cache.
+  // Keep registry file paths intact for export/file validation consumers.
+  const attachmentAsset = descriptor.assetId.startsWith('lug-case-') ||
+    descriptor.assetId.startsWith('archetype-strap-') || descriptor.assetId === 'archetype-pushers-chronograph' ||
+    ['reference-42-case-preview', 'reference-42-strap-preview'].includes(descriptor.assetId);
+  const url = descriptor.assetPath! + (attachmentAsset ? '?v=attachment-seating-1' : '');
+  const gltf = useThreeLoader(GLTFLoader, url);
   const dialColor = appearance?.dialColor;
   const strapColor = appearance?.strapColor;
   const bezelColor = appearance?.bezelColor;

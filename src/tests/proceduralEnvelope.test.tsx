@@ -4,7 +4,8 @@ import { createDefaultWatchAssembly } from '@/domain/assembly';
 import { createStarterBuild } from '@/domain/configurator/defaultBuilds';
 import { applyReference42Preview } from '@/domain/presets/reference3d';
 import { watchAssemblyToVisualModel } from '@/visual3d/watchAssemblyToVisualModel';
-import { createPreviewLugGeometry } from '@/visual3d/proceduralEnvelope';
+import { createPreviewCaseGeometry, createPreviewLugGeometry, createPreviewStrapGeometry } from '@/visual3d/proceduralEnvelope';
+import { DoubleSide, Mesh, MeshBasicMaterial, Raycaster, Vector3 } from 'three';
 import { ProceduralComponent } from '@/visual3d/VisualWatchScene';
 import { componentPlacement } from '@/visual3d/componentPlacement';
 
@@ -48,6 +49,28 @@ describe('assembled preview envelope regressions', () => {
     expect(placement.anchor.positionMm[2] + placement.descriptorOffset[2]).toBeCloseTo(4.25);
     expect(model.previewEnvelope.crystalZ).toBe(6.25);
     expect(model.previewEnvelope.dialZ).toBe(3.7);
+  });
+
+  it.each(cases)('%s keeps strap bores and bars on the lug datum with underside clearance', (_, assembly) => {
+    const model = watchAssemblyToVisualModel(assembly);
+    const a = model.previewEnvelope.attachment;
+    expect(a.strapWidth).toBeLessThan(a.gap);
+    expect(a.bodyRadius).toBeLessThan(a.boreRadius);
+    expect(a.notchY).toBeLessThan(a.barY - a.strapThickness / 2);
+    expect(a.notchTop).toBeGreaterThan(a.barZ + a.strapThickness / 2);
+    const material = new MeshBasicMaterial({ side: DoubleSide });
+    const caseGeometry = createPreviewCaseGeometry(model.caseDiameterMm / 2, model.caseThicknessMm, a);
+    const midcase = new Mesh(caseGeometry, material);
+    for (const sign of [-1, 1]) {
+      const strapGeometry = createPreviewStrapGeometry(a, sign);
+      const strap = new Mesh(strapGeometry, material);
+      const ray = new Raycaster(new Vector3(-a.gap, sign * a.barY, a.barZ), new Vector3(1, 0, 0), 0, 2 * a.gap);
+      expect(ray.intersectObject(strap)).toHaveLength(0);
+      expect(ray.intersectObject(midcase)).toHaveLength(0);
+      expect(strapGeometry.boundingBox!.min.z).toBeCloseTo(a.barZ - a.strapThickness / 2);
+      strapGeometry.dispose();
+    }
+    caseGeometry.dispose(); material.dispose();
   });
 
   it('places failed watch-axis GLBs at the same fallback height as procedural descriptors', () => {

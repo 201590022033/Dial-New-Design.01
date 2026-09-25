@@ -4,6 +4,7 @@ import type {
   TickGenerator
 } from '@/domain/scales/framework/interfaces';
 import type { ScaleTick } from '@/domain/scales/types';
+import { isClosedScaleContext } from '@/domain/scales/minuteRingContext';
 
 interface TickEngineOptions {
   maxTickCount?: number;
@@ -38,12 +39,14 @@ export const createTickGenerationEngine = (options?: TickEngineOptions): TickGen
       const densityFactor = Math.max(1, Math.ceil(baseTickCount / maxTickCount));
       const effectiveMinorStep = config.minorStep * densityFactor;
       const epsilon = effectiveMinorStep / 1000;
+      const closed = isClosedScaleContext(context);
 
       for (
         let value = config.startValue;
         value <= config.endValue + epsilon;
         value += effectiveMinorStep
       ) {
+        if (closed && value >= config.endValue - epsilon) break;
         const major = isMajorValue(value, config.startValue, config.majorStep);
 
         const tick: ScaleTick = {

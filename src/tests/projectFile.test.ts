@@ -5,6 +5,7 @@ import {
   deserializeDialProject,
   serializeDialProject
 } from '@/services/projectFileService';
+import { fullMinuteRingContext } from '@/domain/scales/minuteRingContext';
 
 describe('.dial project file format', () => {
   it('serializes and deserializes project payload', () => {
@@ -133,5 +134,6 @@ describe('.dial project file format', () => {
     expect(parsed.version).toBe(DIAL_FILE_VERSION);
     expect(parsed.info.id).toBe(info.id);
     expect(parsed.geometry.caseDiameterMm).toBe(42);
+    expect(parsed.scale.context).toEqual(fullMinuteRingContext);
   });
 });

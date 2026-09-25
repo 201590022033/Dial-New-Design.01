@@ -65,7 +65,7 @@ const componentSchemas: Record<string, ComponentInspectorSchema> = {
   'inner-slide-rule': {
     id: 'inner-slide-rule',
     title: 'Inner Slide Rule',
-    linkedBandKinds: ['inner-bezel'],
+    linkedBandKinds: ['chapter-ring'],
     sections: [
       { id: 'inner-scale-type', title: 'Scale Type', kind: 'scale', defaultOpen: true },
       { id: 'inner-log-math', title: 'Logarithmic Mathematics', kind: 'mathematics', defaultOpen: true },

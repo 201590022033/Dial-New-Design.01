@@ -176,3 +176,11 @@ The controlled ordering record is implemented in
 baselines with source, uncertainty, and warning status, and generates only the
 one fixed NMK901 BOM. The physical measurement list is maintained in
 [NMK901_GOLDEN_SAMPLE_BACKLOG.md](NMK901_GOLDEN_SAMPLE_BACKLOG.md).
+
+## Attachment preview construction (September 24)
+
+`ESTIMATED_NOMINAL` only: underside strap-clearance pockets and shared strap/spring-bar datums were added for visual assembly. The existing spring-bar hole coordinates remain unchanged (Y = ±20.20 mm, Z = −1.725 mm in the 42 mm watch frame). Pocket limits are |Y| ≥ 18.45 mm, Z ≤ 0.025 mm between the lugs. These are inferred presentation clearances, not supplier drawings or measurements.
+
+The common strap eye uses 0.6 mm side allowance per side to clear all eight conventional preview lug styles; that makes a 20.8 mm presentation eye in the 22 mm gap, not a revised nominal lug width or qualified off-the-shelf strap. Radius values: eye 1.05 mm, bar body 0.95 mm, tips 0.85 mm; estimated tip engagement 0.9 mm. Reference strap thickness stays 3.2 mm, archetype straps 3.0 mm. See `tools/blender/attachment_preview.json` and the Golden Sample backlog. Geometric intersection checks are not evidence of machining fit, structural integrity, articulation or water resistance. Wire/integrated interfaces remain outside this check.
+
+Chronograph-only pusher stems/collars overlap the existing buttons and midcase in the presentation asset; no pusher hardware was added to the NMK901 shared case or promoted to an orderable interface.

@@ -10,7 +10,7 @@ import { useConfiguratorUIStore } from '@/stores/configuratorUIStore';
 import { useWatchAssemblyStore } from '@/stores/watchAssemblyStore';
 import { useGlobalSettingsStore } from '@/stores/globalSettingsStore';
 import { useScaleStore } from '@/stores/scaleStore';
-import type { ScaleKind } from '@/domain/scales/types';
+import { AviationSlideRulePanel } from '@/components/configurator/AviationSlideRulePanel';
 
 export const AdvancedModePanel: React.FC = () => {
   const overlays = useConfiguratorUIStore((s) => s.overlays);
@@ -24,8 +24,6 @@ export const AdvancedModePanel: React.FC = () => {
   const laserKerfMm = useGlobalSettingsStore((s) => s.laserKerfMm);
 
   // Scale store
-  const selectedScaleKind = useScaleStore((s) => s.selectedScaleKind);
-  const setSelectedScaleKind = useScaleStore((s) => s.setSelectedScaleKind);
   const scalePreviewEnabled = useScaleStore((s) => s.previewEnabled);
   const setScalePreviewEnabled = useScaleStore((s) => s.setPreviewEnabled);
 
@@ -162,20 +160,7 @@ export const AdvancedModePanel: React.FC = () => {
           <Sparkles className="h-3.5 w-3.5 text-teal-400" /> Slide-Rule & Scales Engine
         </h4>
         <div className="p-2.5 rounded-lg bg-slate-900 border border-slate-800 space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-slate-300">Scale Type:</span>
-            <select
-              value={selectedScaleKind}
-              onChange={(e) => setSelectedScaleKind(e.target.value as ScaleKind)}
-              className="bg-slate-950 border border-slate-700 rounded px-2 py-1 text-slate-200 text-xs focus:outline-none focus:border-teal-400"
-            >
-              <option value="tachymeter">Tachymeter</option>
-              <option value="slide-rule">E6B Slide Rule</option>
-              <option value="telemetre">Telemeter</option>
-              <option value="pulsometer">Pulsometer</option>
-              <option value="decimal">Decimal Hours</option>
-            </select>
-          </div>
+          <AviationSlideRulePanel />
           <label className="flex items-center gap-2 cursor-pointer pt-1">
             <input
               type="checkbox"

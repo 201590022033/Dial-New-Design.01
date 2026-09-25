@@ -53,16 +53,11 @@ const buildCacheKey = (input: EngineeringExportInput): string => {
     scale: input.scalePreview
       ? {
           kind: input.scalePreview.kind,
-          tickCount: input.scalePreview.ticks.length,
-          labelCount: input.scalePreview.labels.length
+          ticks: input.scalePreview.ticks,
+          labels: input.scalePreview.labels
         }
       : null,
-    overlay: input.designOverlay
-      ? {
-          markerCount: input.designOverlay.markers.length,
-          textCount: input.designOverlay.typography.length
-        }
-      : null,
+    overlay: input.designOverlay,
     metadata: input.metadata
   });
 };
@@ -125,13 +120,10 @@ const renderOverlaySvg = (
   overlay: DesignOverlay | null,
   scalePreview: ScaleRunResult | null,
   centerX: number,
-  centerY: number
+  centerY: number,
+  target: EngineeringExportTarget
 ): string => {
-  if (!overlay) {
-    return '';
-  }
-
-  const markerLines = overlay.markers
+  const markerLines = (overlay?.markers ?? [])
     .map((entry) => {
       const start = polarToCartesianPx(entry.marker.innerRadiusMm, entry.marker.angleDeg);
       const end = polarToCartesianPx(entry.marker.outerRadiusMm, entry.marker.angleDeg);
@@ -146,15 +138,21 @@ const renderOverlaySvg = (
     })
     .join('');
 
-  const text = overlay.typography
+  const text = (overlay?.typography ?? [])
     .map((entry) => {
       const point = polarToCartesianPx(entry.radiusMm, entry.angleDeg);
       return `<text x="${centerX + point.x}" y="${centerY + point.y}" fill="${entry.color}" font-size="${Math.max(8, entry.fontSizeMm * 10)}" text-anchor="middle" font-family="${entry.fontFamily}">${entry.text}</text>`;
     })
     .join('');
 
+  const includeMark = (ringId?: 'outer' | 'inner') => {
+    if (scalePreview?.kind !== 'slide-rule') return true;
+    if (target === 'outer-bezel') return ringId === 'outer';
+    if (target === 'chapter-ring' || target === 'inner-bezel') return ringId === 'inner';
+    return true;
+  };
   const ticks = scalePreview
-    ? scalePreview.ticks
+    ? scalePreview.ticks.filter((tick) => includeMark(tick.ringId))
         .map((tick) => {
           const start = polarToCartesianPx(tick.radiusMm, tick.angleDeg);
           const end = polarToCartesianPx(
@@ -173,7 +171,14 @@ const renderOverlaySvg = (
         .join('')
     : '';
 
-  return `<g id="engineering-overlay">${markerLines}${text}${ticks}</g>`;
+  const scaleLabels = scalePreview
+    ? scalePreview.labels.filter((label) => includeMark(label.ringId)).map((label) => {
+      const point = polarToCartesianPx(label.radiusMm, label.angleDeg);
+      const safeText = label.text.replace(/[<>&"']/g, (character) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&apos;' })[character] ?? character);
+      return `<text x="${centerX + point.x}" y="${centerY + point.y}" fill="#E2E8F0" font-size="8" text-anchor="middle" dominant-baseline="central" font-family="sans-serif">${safeText}</text>`;
+    }).join('') : '';
+
+  return `<g id="engineering-overlay">${markerLines}${text}${ticks}${scaleLabels}</g>`;
 };
 
 const renderMetadataComment = (metadata?: ExportMetadata): string => {
@@ -198,7 +203,7 @@ export const generateEngineeringSvg = (input: EngineeringExportInput): string =>
   const centerY = height / 2;
 
   const content = renderBandGeometrySvg(scoped, centerX, centerY);
-  const overlays = renderOverlaySvg(input.designOverlay, input.scalePreview, centerX, centerY);
+  const overlays = renderOverlaySvg(input.designOverlay, input.scalePreview, centerX, centerY, input.target);
 
   const result = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">${renderMetadataComment(input.metadata)}${content}${overlays}</svg>`;
   exportSvgCache.set(cacheKey, result);

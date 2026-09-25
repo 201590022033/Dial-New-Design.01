@@ -3,6 +3,8 @@ import { generateTicks } from '@/domain/scales/tickGenerator';
 import { generateLabels } from '@/domain/scales/labelGenerator';
 import { linearToAngle } from '@/domain/scales/math';
 import type { ScalePluginConfig } from '@/domain/scales/types';
+import { fullMinuteRingContext, migrateLegacyMinuteRingContext } from '@/domain/scales/minuteRingContext';
+import { runScalePlugin } from '@/services/scaleEngineService';
 
 const config: ScalePluginConfig = {
   startValue: 0,
@@ -31,6 +33,25 @@ const config: ScalePluginConfig = {
 };
 
 describe('scale generation', () => {
+  it('covers the full minute ring without stacking 60 on top of zero', () => {
+    const ticks = generateTicks({ ...config, minorStep: 1, majorStep: 5 }, fullMinuteRingContext, linearToAngle);
+    expect(ticks).toHaveLength(60);
+    expect(ticks[0]?.angleDeg).toBe(0);
+    expect(ticks.at(-1)?.angleDeg).toBe(354);
+    expect(ticks.some(tick => tick.label === '60')).toBe(false);
+    const preview = runScalePlugin('circular', { ...config, minorStep: 1, majorStep: 5 }, fullMinuteRingContext);
+    expect(preview?.ticks).toHaveLength(60);
+    expect(preview?.labels.some(label => label.text === '60')).toBe(false);
+    expect(preview?.ticks.map(tick => ((tick.angleDeg % 360) + 360) % 360).filter((angle, index, all) => all.indexOf(angle) !== index)).toHaveLength(0);
+  });
+
+  it('migrates only the legacy default minute arc and preserves edited arcs', () => {
+    const legacy = { startAngleDeg: -140, endAngleDeg: 140 };
+    expect(migrateLegacyMinuteRingContext(legacy, 'circular', config)).toEqual(fullMinuteRingContext);
+    expect(migrateLegacyMinuteRingContext(legacy, 'countdown', config)).toEqual(fullMinuteRingContext);
+    expect(migrateLegacyMinuteRingContext({ startAngleDeg: -120, endAngleDeg: 140 }, 'circular', config)).toEqual({ startAngleDeg: -120, endAngleDeg: 140 });
+    expect(migrateLegacyMinuteRingContext(legacy, 'slide-rule', config)).toEqual(legacy);
+  });
   it('generates major and minor ticks', () => {
     const ticks = generateTicks(config, { startAngleDeg: -120, endAngleDeg: 120 }, linearToAngle);
     expect(ticks.length).toBeGreaterThan(0);
