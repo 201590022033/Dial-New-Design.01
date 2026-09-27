@@ -60,8 +60,13 @@ export type VisualWatchModel = {
   dialColor: string;
   dial: DialVisualDescriptor;
   bezelMaterial: string;
+  bezelProfile: 'smooth' | 'coin-edge' | 'knurled' | 'scalloped';
   crystalMaterial: string;
-  hands: { style: 'baton' | 'mercedes' | 'needle'; material: string };
+  hands: {
+    style: 'baton' | 'mercedes' | 'needle'; material: string;
+    hourLengthMm: number; minuteLengthMm: number; secondLengthMm: number;
+    hourWidthMm: number; minuteWidthMm: number; secondWidthMm: number;
+  };
   crown: { diameterMm: number; lengthMm: number; material: string; parameters?: ParametricCrownV1; provisional: boolean };
   pushers: PusherVisualDescriptor;
   finishes: Record<VisualCategory, FinishProfile>;
@@ -161,7 +166,8 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
   const referenceIsCurrent = assembly.globalDimensions.caseDiameterMm === 42 && matchesReference42Parameters(assembly);
   for (const category of visualCategories) {
     const part = find(category);
-    const id = archetypeAssets[category] ?? part?.visual?.assetId ?? part?.customProperties?.visualAssetId;
+    const explicitOverride = visualReferences.componentAssetOverrides?.[category];
+    const id = explicitOverride ?? archetypeAssets[category] ?? part?.visual?.assetId ?? part?.customProperties?.visualAssetId;
     const fallbackId = category === 'hands' ? `visual-hands-${style === 'mercedes' ? 'mercedes' : 'baton'}` : `visual-${category}-default`;
     const resolved = resolveVisualAssetByCategory(typeof id === 'string' ? id : undefined, category, visualAssetRegistry[fallbackId]!);
     const referenceOnly = resolved.assetId.startsWith('reference-42-');
@@ -260,8 +266,24 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
       }
     },
     bezelMaterial: materialProfile(bezelPart, 'polished-steel'),
+    bezelProfile: (() => {
+      const profile = bezelPart?.customProperties?.visualBezelProfile;
+      return profile === 'coin-edge' || profile === 'knurled' || profile === 'scalloped' ? profile : 'smooth';
+    })(),
     crystalMaterial: 'sapphire',
-    hands: { style, material: materialProfile(handsPart, 'polished-steel') },
+    hands: {
+      style,
+      material: materialProfile(handsPart, 'polished-steel'),
+      // Procedural hands are sized to the visible dial, not the case. This is
+      // especially important for NH05 watches, where a 24.5 mm dial sits in a
+      // nominal 34 mm case and NH35-sized preview hands look oversized.
+      hourLengthMm: dialDiameter * 0.25,
+      minuteLengthMm: dialDiameter * 0.36,
+      secondLengthMm: dialDiameter * 0.39,
+      hourWidthMm: movement?.id === 'nh05' ? 0.55 : style === 'mercedes' ? 1.1 : style === 'needle' ? 0.45 : 0.85,
+      minuteWidthMm: movement?.id === 'nh05' ? 0.35 : style === 'needle' ? 0.28 : 0.58,
+      secondWidthMm: movement?.id === 'nh05' ? 0.12 : 0.2
+    },
     crown: {
       diameterMm: positive(crownParams?.headDiameterMm, positive(crownPart?.dimensions.diameterMm, 6.5)),
       lengthMm: positive(crownParams?.headLengthMm, positive(crownPart?.dimensions.thicknessMm, 3.5)),

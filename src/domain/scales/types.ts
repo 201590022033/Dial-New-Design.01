@@ -173,6 +173,7 @@ export interface ScalePluginConfig {
   labelFrequency: number;
   labelOrientation: 'radial' | 'horizontal' | 'curved';
   labelPlacement: LabelPlacement;
+  labelOffsetMm?: number;
   labelRotationOffsetDeg: number;
   rotationOffsetDeg: number;
   color: string;
@@ -183,6 +184,7 @@ export interface ScalePluginConfig {
   bandInnerRadiusMm: number;
   bandOuterRadiusMm: number;
   minimumLineWidthMm: number;
+  placementTargetBandId?: string;
   logarithmicBase?: number;
   tickDensityProfile?: 'ultra-dense' | 'dense' | 'balanced' | 'sparse' | 'engineering';
   includeMinorLabels?: boolean;

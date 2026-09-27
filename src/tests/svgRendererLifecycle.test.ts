@@ -45,4 +45,12 @@ describe('engineering renderer lifecycle', () => {
     renderer.renderBands([], { ...context, zoom: 2 }, { ...options, assembly: { ...options.assembly!, metadata: { ...options.assembly!.metadata, name: 'Changed' } } });
     expect(svg.clear).toHaveBeenCalledTimes(2);
   });
+
+  it('does not draw the old partial crystal-reflection crescent in Engineering mode', () => {
+    const renderer = new SvgRenderer();
+    renderer.mount({} as HTMLElement);
+    renderer.renderBands([], context, options);
+
+    expect(svg.path).not.toHaveBeenCalled();
+  });
 });

@@ -58,6 +58,7 @@ export interface ConfiguratorUIStoreState {
   previewCandidateItem: ComponentCatalogueItem | null;
   previewPartInstanceId: string | null;
   previewStatus: 'none' | 'previewing' | 'applied';
+  previewError: string | null;
   archetypePreviewAssembly: WatchAssembly | null;
 
   // Locks
@@ -150,6 +151,7 @@ export const useConfiguratorUIStore = create<ConfiguratorUIStoreState>((set, get
   previewCandidateItem: null,
   previewPartInstanceId: null,
   previewStatus: 'none',
+  previewError: null,
   archetypePreviewAssembly: null,
 
   lockedPartIds: new Set<string>(),
@@ -210,7 +212,8 @@ export const useConfiguratorUIStore = create<ConfiguratorUIStoreState>((set, get
     const sourcingPlan = useSourcingStore.getState().sourcingPlan.selections;
     const compatibility = evaluateAssembly(assembly);
 
-    return calculateBuildReadiness(assembly, catalogueItems, sourcingPlan, compatibility);
+    const supplierListings = useCatalogueStore.getState().supplierListings;
+    return calculateBuildReadiness(assembly, catalogueItems, sourcingPlan, compatibility, supplierListings);
   },
 
   getPracticalSensitivities: () => {
@@ -289,7 +292,8 @@ export const useConfiguratorUIStore = create<ConfiguratorUIStoreState>((set, get
       previewAssembly: assembly,
       previewPartInstanceId: partInstanceId,
       previewCandidateItem: candidateItem,
-      previewStatus: 'previewing'
+      previewStatus: 'previewing',
+      previewError: null
     });
   },
 
@@ -298,18 +302,29 @@ export const useConfiguratorUIStore = create<ConfiguratorUIStoreState>((set, get
   applyPreview: () => {
     const { previewAssembly, previewCandidateItem, previewPartInstanceId, lockedPartIds } = get();
     if (!previewAssembly || !previewPartInstanceId || !previewCandidateItem) {
+      set({ previewError: 'There is no active component preview to apply.' });
       return false;
     }
 
     // Check physical lock
     if (lockedPartIds.has(previewPartInstanceId)) {
-      console.warn(`[configurator] Component ${previewPartInstanceId} is physically locked.`);
+      set({ previewError: 'This component is physically locked. Unlock it before applying a replacement.' });
       return false;
     }
 
     const watchAssemblyStore = useWatchAssemblyStore.getState();
     const currentAssembly = watchAssemblyStore.assembly;
     const currentSourcing = useSourcingStore.getState().sourcingPlan.selections;
+    const newEval = evaluateCandidate({
+      assembly: currentAssembly,
+      targetPartInstanceId: previewPartInstanceId,
+      candidateCatalogueItemId: previewCandidateItem.id,
+      candidateItem: previewCandidateItem
+    });
+    if (newEval.status === 'red') {
+      set({ previewError: `Cannot apply an incompatible part. ${newEval.summary}` });
+      return false;
+    }
 
     // Snapshot for Undo
     const lastCommittedSnapshot = {
@@ -322,15 +337,8 @@ export const useConfiguratorUIStore = create<ConfiguratorUIStoreState>((set, get
 
     // Evaluate compatibility before commit
     const prevEval = evaluateAssembly(currentAssembly);
-    const newEval = evaluateCandidate({
-      assembly: currentAssembly,
-      targetPartInstanceId: previewPartInstanceId,
-      candidateCatalogueItemId: previewCandidateItem.id,
-      candidateItem: previewCandidateItem
-    });
-
     // If change degrades a healthy green build into yellow/red, trigger automatic safety checkpoint
-    if (prevEval.status === 'green' && (newEval.status === 'red' || newEval.status === 'yellow')) {
+    if (prevEval.status === 'green' && newEval.status === 'yellow') {
       get().createAutomaticCheckpoint(
         `Pre-degrade safety checkpoint before applying ${previewCandidateItem.displayName}`
       );
@@ -364,8 +372,6 @@ export const useConfiguratorUIStore = create<ConfiguratorUIStoreState>((set, get
       costPulse = 'improvement';
     } else if (newEval.status === 'yellow') {
       costPulse = 'caution';
-    } else if (newEval.status === 'red') {
-      costPulse = 'incompatibility';
     }
 
     set((state) => ({
@@ -373,6 +379,7 @@ export const useConfiguratorUIStore = create<ConfiguratorUIStoreState>((set, get
       previewCandidateItem: null,
       previewPartInstanceId: null,
       previewStatus: 'applied',
+      previewError: null,
       lastCommittedSnapshot,
       costPulseStatus: costPulse,
       committedDecisionsHistory: [...state.committedDecisionsHistory, decision]
@@ -391,7 +398,8 @@ export const useConfiguratorUIStore = create<ConfiguratorUIStoreState>((set, get
       previewAssembly: null,
       previewCandidateItem: null,
       previewPartInstanceId: null,
-      previewStatus: 'none'
+      previewStatus: 'none',
+      previewError: null
     });
   },
 

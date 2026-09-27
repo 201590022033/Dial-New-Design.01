@@ -18,7 +18,8 @@ export const getScaleProgram = (program: ScaleProgram, bands: BandEntity[]): Sca
     config: {
       startValue: 0, endValue: 60, majorStep: 5, minorStep: 1,
       radiusMm: outer?.innerRadius ?? 18.5, majorTickLengthMm: 0.7,
-      minorTickLengthMm: 0.35, tickDirection: 'outside', labelPlacement: 'outside'
+      minorTickLengthMm: 0.35, tickDirection: 'outside', labelPlacement: 'outside',
+      labelOffsetMm: 0.7, scaleFontSizeMm: 0.7
     },
     context: { startAngleDeg: 0, endAngleDeg: 360 },
     bezel: { type: 'dive', rotating: true }

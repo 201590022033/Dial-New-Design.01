@@ -20,16 +20,41 @@ afterEach(() => {
 
 describe('archetype rendering and dashboard routing', () => {
   it('creates visually distinct starter assemblies for every exposed archetype', () => {
-    const types: StarterBuildType[] = ['diver', 'pilot', 'dress', 'field', 'chronograph'];
+    const types: StarterBuildType[] = ['diver', 'pilot', 'dress', 'ladies-dress', 'field', 'chronograph'];
     const builds = types.map((type) => createStarterBuild(type));
-    expect(new Set(builds.map((build) => build.assembly.designConfig?.visualReferenceConfig?.archetypeId)).size).toBe(5);
-    expect(new Set(builds.map((build) => build.assembly.parts['inst-dial-blank']?.color)).size).toBe(5);
+    expect(new Set(builds.map((build) => build.assembly.designConfig?.visualReferenceConfig?.archetypeId)).size).toBe(6);
+    expect(new Set(builds.map((build) => build.assembly.parts['inst-dial-blank']?.color)).size).toBe(6);
     expect(builds.map((build) => build.assembly.designConfig?.markerConfig?.kind)).toEqual([
-      'round', 'arabic-numeral', 'roman-numeral', 'arabic-numeral', 'baton'
+      'round', 'arabic-numeral', 'roman-numeral', 'roman-numeral', 'arabic-numeral', 'baton'
     ]);
     expect(builds.at(-1)?.assembly).toMatchObject({ metadata: { movement: 'vk63' }, parts: { 'inst-pushers': { visible: true } } });
     expect(builds.at(-1)?.status).toBe('PRESENTATION_ONLY');
     expect(builds.at(-1)?.partExplanations[0]?.componentName).toBe('TMI VK63A Meca-Quartz Movement');
+  });
+
+  it('creates a separate provisional NH05 ladies dress platform', () => {
+    const source = createDefaultWatchAssembly();
+    source.designConfig!.assemblyAnchors = {
+      'crown-interface': { positionMm: [25, 0, 0], rotationRad: [0, 0, 0], provenance: { status: 'provisional', source: 'stale source platform' } }
+    };
+    const build = createStarterBuild('ladies-dress', source);
+    const model = watchAssemblyToVisualModel(build.assembly);
+    expect(build.status).toBe('PRESENTATION_ONLY');
+    expect(build.assembly).toMatchObject({
+      metadata: { movement: 'nh05' },
+      globalDimensions: { caseDiameterMm: 34, totalThicknessMm: 10.5 },
+      designConfig: { visualReferenceConfig: { archetypeId: 'archetype-ladies-dress-nh05' } }
+    });
+    expect(build.assembly.parts['inst-dial-blank']?.dimensions.diameterMm).toBe(24.5);
+    expect(build.assembly.parts['inst-midcase']?.parametricGeometry).toBeUndefined();
+    expect(build.assembly.parts['inst-crown']?.dimensions).toMatchObject({ diameterMm: 5, thicknessMm: 2.5 });
+    expect(build.assembly.parts['inst-crown']?.parametricGeometry).toBeUndefined();
+    expect(build.assembly.parts['inst-crystal']?.dimensions.diameterMm).toBe(28);
+    expect(build.assembly.designConfig?.assemblyAnchors).toBeUndefined();
+    expect(model.assets).toMatchObject({
+      case: { assetType: 'procedural' }, dial: { assetType: 'procedural' }, hands: { assetType: 'procedural' }
+    });
+    expect(model.hands).toMatchObject({ hourWidthMm: 0.55, minuteWidthMm: 0.35, secondWidthMm: 0.12 });
   });
 
   it('restyles the current high-detail assembly without discarding its visual asset bindings', () => {

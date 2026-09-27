@@ -47,8 +47,10 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode, visua
   useWatchAssemblyStore((s) => s.assembly);
   const activeAssembly = useConfiguratorUIStore((s) => s.getActiveAssembly());
   const workMode = useConfiguratorUIStore((s) => s.workMode);
+  const advancedOverlays = useConfiguratorUIStore((s) => s.overlays);
   const showDiagnostics = workMode === 'advanced';
   const previewStatus = useConfiguratorUIStore((s) => s.previewStatus);
+  const previewError = useConfiguratorUIStore((s) => s.previewError);
   const previewCandidateItem = useConfiguratorUIStore((s) => s.previewCandidateItem);
   const applyPreview = useConfiguratorUIStore((s) => s.applyPreview);
   const cancelPreview = useConfiguratorUIStore((s) => s.cancelPreview);
@@ -317,11 +319,13 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode, visua
               <button
                 type="button"
                 onClick={applyPreview}
-                className="px-3 py-0.5 rounded-full text-xs font-semibold text-slate-950 bg-teal-400 hover:bg-teal-300 transition-colors shadow-sm"
+                disabled={Boolean(previewError)}
+                className="px-3 py-0.5 rounded-full text-xs font-semibold text-slate-950 bg-teal-400 hover:bg-teal-300 transition-colors shadow-sm disabled:cursor-not-allowed disabled:bg-slate-600 disabled:text-slate-300"
               >
                 Apply
               </button>
             </div>
+            {previewError && <span role="alert" className="max-w-xs text-[11px] text-rose-300">{previewError}</span>}
           </div>
         )}
 
@@ -335,10 +339,15 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode, visua
           </div>
         )}
 
-        {workMode === 'advanced' && !presentationMode ? (
+        {workMode === 'advanced' && !presentationMode && advancedOverlays.radii ? (
           <>
-            <div className="pointer-events-none absolute left-1/2 top-1/2 h-[88%] w-[88%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-engineering-amber/8" />
-            <div className="pointer-events-none absolute left-1/2 top-1/2 h-[72%] w-[72%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-engineering-teal/8" />
+            <div className="pointer-events-none absolute left-1/2 top-1/2 h-[88%] aspect-square -translate-x-1/2 -translate-y-1/2 rounded-full border border-engineering-amber/20" />
+            <div className="pointer-events-none absolute left-1/2 top-1/2 h-[72%] aspect-square -translate-x-1/2 -translate-y-1/2 rounded-full border border-engineering-teal/20" />
+          </>
+        ) : null}
+
+        {workMode === 'advanced' && !presentationMode && advancedOverlays.datums ? (
+          <>
             <div className="pointer-events-none absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-engineering-teal/8" />
             <div className="pointer-events-none absolute left-0 top-1/2 h-px w-full -translate-y-1/2 bg-engineering-teal/8" />
           </>

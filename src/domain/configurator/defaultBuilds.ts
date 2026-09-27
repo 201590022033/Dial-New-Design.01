@@ -1,8 +1,9 @@
 import type { WatchAssembly } from '@/domain/assembly/assemblyTypes';
 import { createDefaultWatchAssembly } from '@/domain/assembly/assemblyFactory';
 import { applyArchetypeVisualProfile } from './archetypeProfiles';
+import { applyCatalogueVisualSelection, visualVariantCatalogueItems } from '@/domain/catalogue';
 
-export type StarterBuildType = 'diver' | 'pilot' | 'dress' | 'field' | 'chronograph';
+export type StarterBuildType = 'diver' | 'pilot' | 'dress' | 'ladies-dress' | 'field' | 'chronograph';
 
 export interface StarterPartExplanation {
   partInstanceId: string;
@@ -26,20 +27,58 @@ export const createStarterBuild = (
 ): StarterBuildDefinition => {
   const archetypeIds: Record<StarterBuildType, string> = {
     diver: 'archetype-dive', pilot: 'archetype-pilot', dress: 'archetype-dress-formal',
-    field: 'archetype-field', chronograph: 'archetype-chronograph'
+    'ladies-dress': 'archetype-ladies-dress-nh05', field: 'archetype-field', chronograph: 'archetype-chronograph'
   };
   const titles: Record<StarterBuildType, string> = {
     diver: 'Dive watch baseline', pilot: 'Pilot watch baseline', dress: 'Dress watch baseline',
-    field: 'Field watch baseline', chronograph: 'Chronograph baseline'
+    'ladies-dress': 'NH05 ladies dress baseline', field: 'Field watch baseline', chronograph: 'Chronograph baseline'
   };
   const descriptions: Record<StarterBuildType, string> = {
     diver: 'High-lume dial, rotating dive bezel and high-contrast tool-watch composition.',
     pilot: 'Large Arabic markers, restrained bezel and high-legibility aviation composition.',
     dress: 'Light minimal dial, fine markers and polished formal-watch composition.',
+    'ladies-dress': 'Compact 34 mm dress-watch platform using the published NH05 movement interfaces and provisional aftermarket case geometry.',
     field: 'Matte utility dial, Arabic markers and subdued outdoor color palette.',
     chronograph: 'Two-tone timing dial, tachymeter reference and chronograph movement layout.'
   };
   let base = applyArchetypeVisualProfile(sourceAssembly, archetypeIds[buildType]);
+  if (buildType === 'ladies-dress') {
+    const variant = (id: string) => visualVariantCatalogueItems.find((item) => item.id === id)!;
+    base = applyCatalogueVisualSelection(base, 'inst-midcase', variant('cat-case-nh05-ladies-dress-34'));
+    base = applyCatalogueVisualSelection(base, 'inst-dial-blank', variant('cat-dial-nh05-245-champagne-sunburst'));
+    base = applyCatalogueVisualSelection(base, 'inst-hour-hand', variant('cat-hands-nh05-dress-baton'));
+    const parts = { ...base.parts };
+    const midcase = parts['inst-midcase'];
+    if (midcase) parts['inst-midcase'] = { ...midcase, parametricGeometry: undefined, geometryProvenance: undefined };
+    for (const id of ['inst-minute-hand', 'inst-central-seconds']) {
+      const part = parts[id];
+      if (part) parts[id] = { ...part, dimensions: { ...part.dimensions, diameterMm: id === 'inst-minute-hand' ? 8.82 : 9.555 } };
+    }
+    const strap = parts['inst-strap-integration'];
+    if (strap) parts['inst-strap-integration'] = { ...strap, dimensions: { ...strap.dimensions, widthMm: 16 } };
+    const crown = parts['inst-crown'];
+    if (crown) parts['inst-crown'] = {
+      ...crown,
+      dimensions: { ...crown.dimensions, diameterMm: 5, thicknessMm: 2.5 },
+      parametricGeometry: undefined,
+      geometryProvenance: undefined
+    };
+    const crystal = parts['inst-crystal'];
+    if (crystal) parts['inst-crystal'] = { ...crystal, dimensions: { ...crystal.dimensions, diameterMm: 28, widthMm: 28 } };
+    const chapterRing = parts['inst-chapter-ring'];
+    if (chapterRing) parts['inst-chapter-ring'] = { ...chapterRing, dimensions: { ...chapterRing.dimensions, diameterMm: 27, widthMm: 1.1 } };
+    const rotatingBezel = parts['inst-rotating-bezel'];
+    if (rotatingBezel) parts['inst-rotating-bezel'] = { ...rotatingBezel, visible: false };
+    const fixedBezel = parts['inst-fixed-bezel'];
+    if (fixedBezel) parts['inst-fixed-bezel'] = { ...fixedBezel, visible: true, dimensions: { ...fixedBezel.dimensions, diameterMm: 32 } };
+    base = {
+      ...base,
+      metadata: { ...base.metadata, movement: 'nh05', notes: 'NH05 ladies dress preview. TMI movement interfaces published; supplier case interfaces require verification.' },
+      globalDimensions: { ...base.globalDimensions, caseDiameterMm: 34, totalThicknessMm: 10.5 },
+      designConfig: { ...base.designConfig, assemblyAnchors: undefined },
+      parts
+    };
+  }
   if (buildType === 'chronograph') {
     const pushers = base.parts['inst-pushers'];
     base = {
@@ -177,12 +216,31 @@ export const createStarterBuild = (
     }
   ];
 
+  const nh05PartExplanations: StarterPartExplanation[] = [
+    {
+      partInstanceId: 'inst-movement', catalogueItemId: 'cat-movement-nh05', componentName: 'TMI NH05B Automatic Movement',
+      reasons: ['Official TMI drawing: 17.50 mm movement OD and 17.20 mm casing diameter', 'Published 5.92 mm movement height and Type M hand stack', '3H date with published 1.10/0.656/0.213 mm hand fittings']
+    },
+    {
+      partInstanceId: 'inst-midcase', catalogueItemId: 'cat-case-nh05-ladies-dress-34', componentName: '34 mm NH05 Ladies Dress Case Preview',
+      reasons: ['Matches the researched 34 mm / 24.5 mm aftermarket format', 'Case cavity, stem axis, crystal seat and gasket geometry remain supplier-unverified', 'Golden sample is required before manufacturing approval']
+    },
+    {
+      partInstanceId: 'inst-dial-blank', catalogueItemId: 'cat-dial-nh05-245-champagne-sunburst', componentName: '24.5 mm NH05 Champagne Dress Dial',
+      reasons: ['NH05-specific marketplace format', 'Uses the official 1.65 mm dial centre opening', 'Feet and 3H date aperture still require listing-specific confirmation']
+    },
+    {
+      partInstanceId: 'inst-hour-hand', catalogueItemId: 'cat-hands-nh05-dress-baton', componentName: 'Compact NH05 Dress Baton Hand Set',
+      reasons: ['Procedural lengths are constrained inside the 24.5 mm dial', 'Bore metadata follows the TMI hand-fitting drawing', 'Supplier tube heights and broach tolerances remain unverified']
+    }
+  ];
+
   return {
     buildType,
     title: titles[buildType],
     description: descriptions[buildType],
-    status: buildType === 'chronograph' ? 'PRESENTATION_ONLY' : 'VERIFIED_SPEC',
+    status: buildType === 'chronograph' || buildType === 'ladies-dress' ? 'PRESENTATION_ONLY' : 'VERIFIED_SPEC',
     assembly: base,
-    partExplanations: buildType === 'chronograph' ? chronographPartExplanations : nh35PartExplanations
+    partExplanations: buildType === 'chronograph' ? chronographPartExplanations : buildType === 'ladies-dress' ? nh05PartExplanations : nh35PartExplanations
   };
 };

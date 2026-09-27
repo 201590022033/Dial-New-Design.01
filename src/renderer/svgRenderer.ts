@@ -432,25 +432,40 @@ export class SvgRenderer implements RendererAdapter {
 
     // 3. Procedural Scale Preview (e.g. Slide Rule or Dive Scale)
     if (options.scalePreview) {
+      const placementTargetBandId = options.scalePreview.placementTargetBandId ?? 'band-inner-bezel';
+      const placementTargetMetadata = {
+        'band-outer-bezel': ['inst-rotating-bezel', 'cat-rotating-bezel', 'Rotating Bezel Scale'],
+        'band-inner-bezel': ['inst-inner-bezel', 'cat-inner-bezel', 'Fixed Bezel Scale'],
+        'band-chapter-ring': ['inst-chapter-ring', 'cat-chapter-ring', 'Chapter Ring Scale'],
+        'band-dial-face': ['inst-dial-blank', 'cat-dial-blank', 'Dial Edge Scale']
+      }[placementTargetBandId] ?? [placementTargetBandId, placementTargetBandId, 'Scale'];
       const scaleGroup = layer
         .group()
         .id('scale-preview')
-        .attr('data-part-instance-id', 'inst-inner-bezel')
-        .attr('data-catalogue-item-id', 'cat-inner-bezel')
+        .attr('data-part-instance-id', placementTargetMetadata[0])
+        .attr('data-catalogue-item-id', placementTargetMetadata[1])
         .attr('data-part-category', 'rings')
         .attr('data-interaction-role', 'content-group')
         .attr('data-sub-element-id', 'bezel-scale')
         .attr('data-sub-element-kind', 'scale')
         .attr('data-z-layer', '210')
-        .attr('data-band-id', 'band-inner-bezel')
-        .attr('data-label', 'Bezel Scale');
+        .attr('data-band-id', placementTargetBandId)
+        .attr('data-label', placementTargetMetadata[2]);
+
+      // The selected component's physical OD is a hard artwork envelope. This
+      // clip is a final renderer safeguard in addition to the geometry clamp.
+      const envelopeRadiusPx = mmToPixels(options.scalePreview.placementEnvelope.outerRadiusMm);
+      const envelopeClip = layer.clip().add(
+        layer.circle(envelopeRadiusPx * 2).center(context.centerX, context.centerY)
+      );
+      scaleGroup.clipWith(envelopeClip);
 
       const { ticks, labels } = options.scalePreview;
       const outerScaleGroup = options.scalePreview.kind === 'slide-rule'
-        ? scaleGroup.group().id('scale-outer-bezel').attr('data-band-id', 'band-outer-bezel').attr('data-ring-id', 'outer')
+        ? scaleGroup.group().id('scale-outer-ring').attr('data-band-id', placementTargetBandId).attr('data-ring-id', 'outer')
         : scaleGroup;
       const innerScaleGroup = options.scalePreview.kind === 'slide-rule'
-        ? scaleGroup.group().id('scale-chapter-ring').attr('data-band-id', 'band-chapter-ring').attr('data-ring-id', 'inner')
+        ? scaleGroup.group().id('scale-inner-ring').attr('data-band-id', placementTargetBandId).attr('data-ring-id', 'inner')
         : scaleGroup;
 
       ticks.forEach((tick, index) => {
@@ -636,7 +651,7 @@ export class SvgRenderer implements RendererAdapter {
     // 5. Crystal layer: transparent overlay by default (pointer-events: none), selectable in crystal mode
     const crystalSelectionMode = Boolean(options.crystalSelectionMode);
     const crystalRadiusPx = mmToPixels(assembly.globalDimensions.caseDiameterMm / 2 - 1.5);
-    const crystalGroup = layer
+    layer
       .group()
       .id('part-crystal')
       .attr('data-part-instance-id', 'inst-crystal')
@@ -648,17 +663,6 @@ export class SvgRenderer implements RendererAdapter {
       .attr('data-z-layer', '800')
       .attr('data-label', 'Crystal')
       .css('pointer-events', crystalSelectionMode ? 'auto' : 'none');
-
-    // Specular sapphire curved reflection arc
-    const glareStart = polarToCartesian(crystalRadiusPx * 0.88, 220);
-    const glareEnd = polarToCartesian(crystalRadiusPx * 0.88, 320);
-    crystalGroup
-      .path(
-        `M ${context.centerX + glareStart.x} ${context.centerY + glareStart.y} A ${crystalRadiusPx * 0.88} ${crystalRadiusPx * 0.88} 0 0 1 ${context.centerX + glareEnd.x} ${context.centerY + glareEnd.y}`
-      )
-      .fill('none')
-      .stroke({ color: '#BAE6FD', width: 1.8, opacity: 0.35, linecap: 'round' })
-      .attr('data-interaction-role', 'rendering-primitive');
 
     // 6. Preview-only Non-Destructive Selection & Hover Highlight Overlays
     const highlightGroup = layer.group().id('interaction-highlights').css('pointer-events', 'none');

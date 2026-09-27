@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import {
   defaultCatalogueItems,
   defaultSupplierListings,
+  researchedSupplierListings,
+  visualVariantCatalogueItems,
   type ComponentCatalogueItem,
   type SupplierListing,
   type CatalogueItemCategory,
@@ -26,8 +28,8 @@ export interface CatalogueStoreState {
 }
 
 export const useCatalogueStore = create<CatalogueStoreState>((set, get) => ({
-  items: [...defaultCatalogueItems],
-  supplierListings: [...defaultSupplierListings],
+  items: [...defaultCatalogueItems, ...visualVariantCatalogueItems],
+  supplierListings: [...defaultSupplierListings, ...researchedSupplierListings],
   categoryFilter: 'all',
   searchQuery: '',
 

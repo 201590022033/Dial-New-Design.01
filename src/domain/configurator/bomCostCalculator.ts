@@ -2,6 +2,7 @@ import type { WatchAssembly } from '@/domain/assembly/assemblyTypes';
 import type { ComponentCatalogueItem, SupplierListing } from '@/domain/catalogue/types';
 import type { AssemblyCompatibilityEvaluation } from '@/domain/compatibility/compatibilityTypes';
 import type { BuildReadiness, CostBreakdown } from './configuratorTypes';
+import { listingPriceZar, listingShippingZar } from '@/domain/catalogue/pricing';
 
 export const calculateBomCost = (
   assembly: WatchAssembly,
@@ -10,6 +11,8 @@ export const calculateBomCost = (
   sourcingSelections: Record<string, string | null>
 ): CostBreakdown => {
   let partsTotal = 0;
+  let shippingEstimate = 0;
+  let shippingUnknownCount = 0;
   const customFabrication = 0;
 
   const parts = Object.values(assembly.parts);
@@ -18,8 +21,12 @@ export const calculateBomCost = (
     const selectedListingId = sourcingSelections[part.instanceId];
     if (selectedListingId) {
       const listing = supplierListings.find((l) => l.id === selectedListingId);
-      if (listing && typeof listing.unitPrice === 'number' && !isNaN(listing.unitPrice)) {
-        partsTotal += listing.unitPrice;
+      const priceZar = listing ? listingPriceZar(listing) : null;
+      if (listing && priceZar !== null) {
+        partsTotal += priceZar;
+        const shippingZar = listingShippingZar(listing);
+        if (shippingZar === null) shippingUnknownCount++;
+        else shippingEstimate += shippingZar;
         continue;
       }
     }
@@ -29,13 +36,19 @@ export const calculateBomCost = (
       (l) => l.catalogueItemId === part.catalogueItemId && typeof l.unitPrice === 'number'
     );
     const firstListing = fallbackListings[0];
-    if (firstListing && typeof firstListing.unitPrice === 'number') {
-      partsTotal += firstListing.unitPrice;
+    if (firstListing) {
+      const priceZar = listingPriceZar(firstListing);
+      if (priceZar !== null) partsTotal += priceZar;
+      const shippingZar = listingShippingZar(firstListing);
+      if (shippingZar === null) shippingUnknownCount++;
+      else shippingEstimate += shippingZar;
     }
   }
 
-  const shippingEstimate = parts.length > 0 ? 120 : 0;
-  const dutiesAndTaxesEstimate = Math.round(partsTotal * 0.14);
+  // Import VAT reserve: SARS applies 15% to an added-tax value that includes a
+  // 10% uplift for imports from outside the customs union. Product-specific
+  // customs duty is deliberately excluded until the tariff heading is known.
+  const dutiesAndTaxesEstimate = Math.round(partsTotal * 1.1 * 0.15);
   const watchmakerLabourEstimate = parts.length > 5 ? 450 : 200;
 
   const grandTotal =
@@ -48,6 +61,7 @@ export const calculateBomCost = (
   return {
     partsTotal,
     shippingEstimate,
+    shippingUnknownCount,
     dutiesAndTaxesEstimate,
     customFabricationEstimate: customFabrication,
     watchmakerLabourEstimate,

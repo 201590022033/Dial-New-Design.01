@@ -1,0 +1,58 @@
+import { describe, expect, it } from 'vitest';
+import { createDefaultWatchAssembly } from '@/domain/assembly/assemblyFactory';
+import { applyCatalogueVisualSelection, visualVariantCatalogueItems } from '@/domain/catalogue';
+import { parseAliExpressCapture, supplierListingFromCapture } from '@/domain/sourcing';
+import { watchAssemblyToVisualModel } from '@/visual3d/watchAssemblyToVisualModel';
+import { isListingPriceStale, listingKnownLandedZar } from '@/domain/catalogue/pricing';
+import { validateAssemblyCatalogueReferences } from '@/domain/catalogue/catalogueValidation';
+
+const variant = (id: string) => visualVariantCatalogueItems.find((item) => item.id === id)!;
+
+describe('catalogue visual selections', () => {
+  it('overrides an archetype with the selected 42mm knurled bezel GLB', () => {
+    const base = createDefaultWatchAssembly();
+    base.globalDimensions.caseDiameterMm = 42;
+    base.designConfig = { ...base.designConfig, visualReferenceConfig: { archetypeId: 'archetype-dive' } };
+    const selected = applyCatalogueVisualSelection(base, 'inst-rotating-bezel', variant('cat-bezel-knurled-42'));
+    const model = watchAssemblyToVisualModel(selected);
+    expect(model.assets.bezel.assetId).toBe('bezel-knurled-42mm-v1');
+    expect(model.bezelProfile).toBe('knurled');
+    expect(validateAssemblyCatalogueReferences(selected).valid).toBe(true);
+  });
+
+  it('selects the Mercedes hand asset instead of the archetype hand asset', () => {
+    const base = createDefaultWatchAssembly();
+    base.globalDimensions.caseDiameterMm = 42;
+    base.designConfig = { ...base.designConfig, visualReferenceConfig: { archetypeId: 'archetype-dive' } };
+    const selected = applyCatalogueVisualSelection(base, 'inst-hour-hand', variant('cat-hands-mercedes-set-nh35'));
+    const model = watchAssemblyToVisualModel(selected);
+    expect(model.assets.hands.assetId).toBe('hands-mercedes-42mm-v1');
+    expect(model.hands.style).toBe('mercedes');
+  });
+
+  it('uses a procedural radial material for a selected sunburst dial', () => {
+    const selected = applyCatalogueVisualSelection(createDefaultWatchAssembly(), 'inst-dial-blank', variant('cat-dial-sunburst-blue-285'));
+    const model = watchAssemblyToVisualModel(selected);
+    expect(model.assets.dial.assetId).toBe('visual-dial-default');
+    expect(model.dial.textureKind).toBe('sunburst');
+  });
+});
+
+describe('AliExpress capture import', () => {
+  it('keeps item and shipping prices separate with capture provenance', () => {
+    const capture = parseAliExpressCapture({
+      schema: 'dial-designer/aliexpress-capture/v1', source: 'aliexpress',
+      sourceUrl: 'https://www.aliexpress.com/item/1005000000000000.html', itemId: '1005000000000000',
+      title: 'Watch case', sellerName: 'Example Store', variant: '42mm black', destination: 'South Africa',
+      itemPrice: { amount: 399, currency: 'zar' }, shipping: { amount: 210, currency: 'zar' },
+      capturedAtIso: '2026-09-26T12:00:00+02:00'
+    });
+    const listing = supplierListingFromCapture(capture, 'cat-case-skx007');
+    expect(listing.unitPrice).toBe(399);
+    expect(listing.shippingPrice).toBe(210);
+    expect(listing.lastCheckedIso).toBe('2026-09-26T12:00:00+02:00');
+    expect(listing.verificationStatus).toBe('unverified');
+    expect(listingKnownLandedZar(listing)).toBe(609);
+    expect(isListingPriceStale(listing, new Date('2026-10-11T12:00:01+02:00'))).toBe(true);
+  });
+});

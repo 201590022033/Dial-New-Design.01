@@ -21,6 +21,13 @@ describe('movement-owned subdial library', () => {
     expect(movement.subdials ?? []).toHaveLength(0);
   });
 
+  it('models NH05 as a distinct compact ladies calibre rather than an NH35 alias', () => {
+    const nh05 = movementLibrary.find((movement) => movement.id === 'nh05')!;
+    expect(nh05).toMatchObject({ dialDiameterMm: 24.5, centerHoleMm: 1.65, stemPosition: '3h', datePosition: '3:00' });
+    expect(nh05.handSizesMm).toEqual({ hour: 1.1, minute: 0.656, second: 0.213 });
+    expect(nh05.handSizesMm).not.toEqual(movementLibrary.find((movement) => movement.id === 'nh35')!.handSizesMm);
+  });
+
   it('keeps VK63 ordering blocked until commercial and hand-bore mappings are verified', () => {
     expect(getMovementSupplierReadiness('vk63')).toMatchObject({ orderable: false, dialListingStatus: 'MISSING' });
   });

@@ -17,6 +17,7 @@ export interface ArchetypeVisualProfile {
 }
 
 const PROFILE_BY_ID: Record<string, ArchetypeVisualProfile> = {
+  'archetype-ladies-dress-nh05': { archetypeId: 'archetype-ladies-dress-nh05', templateId: 'classic-dress', dialColor: '#e8dfca', strapColor: '#8a5c4a', bezelId: 'bezel-smooth', typographyContent: 'AUTOMATIC', dialAssetId: 'visual-dial-default', bezelAssetId: 'visual-bezel-default', handsAssetId: 'visual-hands-baton', strapStyleId: 'leather' },
   'archetype-dress-formal': { archetypeId: 'archetype-dress-formal', templateId: 'classic-dress', dialColor: '#e7e1d3', strapColor: '#352219', bezelId: 'bezel-smooth', typographyContent: 'AUTOMATIC', dialAssetId: 'archetype-dial-dress', bezelAssetId: 'archetype-bezel-dress', handsAssetId: 'archetype-hands-dress', strapStyleId: 'leather' },
   'archetype-business': { archetypeId: 'archetype-business', templateId: 'classic-dress', dialColor: '#d9dde2', strapColor: '#1f2933', bezelId: 'bezel-fluted', typographyContent: 'AUTOMATIC', dialAssetId: 'archetype-dial-dress', bezelAssetId: 'archetype-bezel-dress', handsAssetId: 'archetype-hands-dress', strapStyleId: 'leather' },
   'archetype-field': { archetypeId: 'archetype-field', templateId: 'field', dialColor: '#263329', strapColor: '#4a4a32', bezelId: 'bezel-smooth', typographyContent: 'FIELD', dialAssetId: 'archetype-dial-field', bezelAssetId: 'archetype-bezel-field', handsAssetId: 'archetype-hands-field', strapStyleId: 'canvas' },
@@ -29,6 +30,7 @@ const PROFILE_BY_ID: Record<string, ArchetypeVisualProfile> = {
 };
 
 export const RENDER_GALLERY_ARCHETYPES = [
+  { id: 'archetype-ladies-dress-nh05', label: 'Ladies Dress', status: getArchetypeKit('archetype-ladies-dress-nh05')!.status },
   { id: 'archetype-dress-formal', label: 'Dress', status: getArchetypeKit('archetype-dress-formal')!.status },
   { id: 'archetype-field', label: 'Field', status: getArchetypeKit('archetype-field')!.status },
   { id: 'archetype-dive', label: 'Diver', status: getArchetypeKit('archetype-dive')!.status },

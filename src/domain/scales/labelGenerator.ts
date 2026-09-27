@@ -12,7 +12,10 @@ export const generateLabels = (ticks: ScaleTick[], config: ScalePluginConfig): S
       return;
     }
 
-    const offset = config.labelPlacement === 'inside' ? -config.majorTickLengthMm - 1.4 : 1.4;
+    const configuredOffset = Math.max(0.2, config.labelOffsetMm ?? 1.4);
+    const offset = config.labelPlacement === 'inside'
+      ? -config.majorTickLengthMm - configuredOffset
+      : configuredOffset;
 
     labels.push({
       text: tick.label,

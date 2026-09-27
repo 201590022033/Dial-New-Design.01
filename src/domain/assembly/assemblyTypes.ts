@@ -4,7 +4,7 @@ import type { TypographyConfig } from '@/domain/generators/typographyEngine';
 import type { TextureEngineConfig } from '@/domain/generators/textureEngine';
 import type { DialFaceConfig } from '@/domain/generators/dialFaceGenerator';
 import type { GlobalGeometryParameters } from '@/domain/geometry/types';
-import type { AssemblyAnchors, AssemblyFitEvidence, ComponentVisualBinding, GeometryProvenance, LugGeometryStyle, ParametricCaseV1, ParametricCrownV1, ParametricDialV1, ParametricHandSetV1 } from '@/domain/geometry/parametric';
+import type { AssemblyAnchors, AssemblyFitEvidence, ComponentCategory, ComponentVisualBinding, GeometryProvenance, LugGeometryStyle, ParametricCaseV1, ParametricCrownV1, ParametricDialV1, ParametricHandSetV1 } from '@/domain/geometry/parametric';
 
 /**
  * WatchAssemblyPartInstance
@@ -100,6 +100,8 @@ export interface WatchAssemblyDesignConfig {
     renderPreset?: 'studio' | 'face' | 'detail';
     renderRotation?: [number, number, number];
     renderDistance?: number;
+    /** Explicit component choices override the broad archetype presentation. */
+    componentAssetOverrides?: Partial<Record<ComponentCategory, string>>;
   };
   visualReferenceId?: string;
   /** Optional deterministic procurement preset bound to a reviewed fixture. */

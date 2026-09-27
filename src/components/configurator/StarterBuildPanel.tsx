@@ -9,6 +9,7 @@ export const StarterBuildPanel: React.FC = () => {
   const [selectedType, setSelectedType] = useState<StarterBuildType>(() => {
     const archetype = useWatchAssemblyStore.getState().assembly.designConfig?.visualReferenceConfig?.archetypeId;
     return archetype === 'archetype-chronograph' ? 'chronograph'
+      : archetype === 'archetype-ladies-dress-nh05' ? 'ladies-dress'
       : archetype === 'archetype-pilot' ? 'pilot'
       : archetype === 'archetype-field' ? 'field'
       : archetype === 'archetype-dress-formal' ? 'dress' : 'diver';
@@ -67,7 +68,7 @@ export const StarterBuildPanel: React.FC = () => {
           Select Watch Archetype
         </label>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-          {(['diver', 'pilot', 'dress', 'field', 'chronograph'] as StarterBuildType[]).map((type) => (
+          {(['diver', 'pilot', 'dress', 'ladies-dress', 'field', 'chronograph'] as StarterBuildType[]).map((type) => (
             <button
               key={type}
               type="button"
@@ -78,7 +79,7 @@ export const StarterBuildPanel: React.FC = () => {
                   : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
               }`}
             >
-              {type}
+              {type === 'ladies-dress' ? 'Ladies Dress' : type}
             </button>
           ))}
         </div>

@@ -61,6 +61,7 @@ export interface SavedDesignVersion {
 export interface CostBreakdown {
   partsTotal: number;
   shippingEstimate: number;
+  shippingUnknownCount: number;
   dutiesAndTaxesEstimate: number;
   customFabricationEstimate: number;
   watchmakerLabourEstimate: number;

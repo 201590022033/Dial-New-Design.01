@@ -93,6 +93,27 @@ const vkRegister = (
 
 export const movementLibrary: MovementTemplate[] = [
   {
+    id: 'nh05',
+    name: 'NH05',
+    manufacturer: 'Seiko/TMI',
+    // 24.5 mm is the supported aftermarket dial ecosystem for this platform;
+    // the movement itself is 17.50 mm OD (19.80 mm with its dial support).
+    dialDiameterMm: 24.5,
+    centerHoleMm: 1.65,
+    stemPosition: '3h',
+    subdialPositionsDeg: [],
+    datePosition: '3:00',
+    handSizesMm: { hour: 1.1, minute: 0.656, second: 0.213 },
+    clearancesMm: { dialToHands: 0.15, handsToCrystal: 0.3 },
+    recommendedChapterRingDiameterMm: 27,
+    recommendedBezelDiameterMm: 32,
+    // Supplier dial drawing is still required before foot-position validation.
+    feetPositionsDeg: [],
+    dateWindowSupported: true,
+    pusherCount: 0,
+    pusherPositionsDeg: []
+  },
+  {
     id: 'vk63',
     name: 'VK63',
     manufacturer: 'Seiko/TMI',

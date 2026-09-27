@@ -3,6 +3,7 @@ import {
   archetypeKitLibrary,
   assessArchetypeKitForPlatform,
   NMK901_PLATFORM_ID,
+  NH05_LADIES_DRESS_PLATFORM_ID,
   watchPlatformLibrary
 } from '@/domain/library/watchPlatformLibrary';
 
@@ -16,6 +17,12 @@ describe('watch platform and archetype kit library', () => {
       expect(assessArchetypeKitForPlatform(id)).toMatchObject({ compatible: true, status: 'COMPATIBLE_KIT' });
       expect(archetypeKitLibrary[id]?.movementIds).toEqual(['nh35']);
     }
+  });
+
+  it('keeps the NH05 ladies dress platform provisional until a physical sample is measured', () => {
+    expect(watchPlatformLibrary[NH05_LADIES_DRESS_PLATFORM_ID]).toMatchObject({
+      evidenceStatus: 'GOLDEN_SAMPLE_PENDING', movementIds: ['nh05'], caseDiameterMm: 34, lugWidthMm: 16
+    });
   });
 
   it('keeps movement-specific layouts presentation-only until platform and supplier mapping exist', () => {

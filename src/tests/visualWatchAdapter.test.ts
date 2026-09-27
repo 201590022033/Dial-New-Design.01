@@ -14,6 +14,21 @@ const withHand = (assembly: ReturnType<typeof createDefaultWatchAssembly>, patch
 };
 
 describe('WatchAssembly visual adapter', () => {
+  it.each([
+    ['archetype-dive', 'archetype-hands-diver'],
+    ['archetype-field', 'archetype-hands-field'],
+    ['archetype-pilot', 'archetype-hands-pilot'],
+    ['archetype-dress-formal', 'archetype-hands-dress'],
+    ['archetype-business', 'archetype-hands-dress'],
+    ['archetype-chronograph', 'archetype-hands-chronograph']
+  ])('binds a visible authored hand GLB for %s', (archetypeId, expectedAssetId) => {
+    const assembly = createDefaultWatchAssembly();
+    assembly.globalDimensions.caseDiameterMm = 42;
+    assembly.designConfig = { ...assembly.designConfig, visualReferenceConfig: { archetypeId } };
+    const model = watchAssemblyToVisualModel(assembly);
+    expect(model.visible.hands).toBe(true);
+    expect(model.assets.hands).toMatchObject({ assetId: expectedAssetId, assetType: 'glb', category: 'hands' });
+  });
   it.each(['archetype-dive', 'archetype-field', 'archetype-pilot', 'archetype-dress-formal'])('unmounts chronograph pushers after switching to %s, including saved legacy bindings', (archetypeId) => {
     for (const size of ['basic40', 'mixed42', 'reference42']) {
       let base = createDefaultWatchAssembly();

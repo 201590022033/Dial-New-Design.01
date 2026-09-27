@@ -1,5 +1,5 @@
-import React from 'react';
-import { Store, Check, ShieldCheck, HelpCircle } from 'lucide-react';
+import React, { useState } from 'react';
+import { Store, Check, ShieldCheck, HelpCircle, FileUp } from 'lucide-react';
 import { useConfiguratorUIStore } from '@/stores/configuratorUIStore';
 import { useWatchAssemblyStore } from '@/stores/watchAssemblyStore';
 import { useCatalogueStore } from '@/stores/catalogueStore';
@@ -7,13 +7,34 @@ import { useSourcingStore } from '@/stores/sourcingStore';
 import { cn } from '@/utils/cn';
 import { getMovementSupplierReadiness } from '@/domain/movements/movementSupplierReadiness';
 import { getCatalogueItem } from '@/domain/catalogue/catalogueRegistry';
+import { formatListingPrice, isListingPriceStale, listingKnownLandedZar, listingPriceZar, listingShippingZar } from '@/domain/catalogue/pricing';
+import { parseAliExpressCapture, supplierListingFromCapture } from '@/domain/sourcing';
 
 export const SuppliersTab: React.FC = () => {
   const activePartInstanceId = useConfiguratorUIStore((s) => s.activePartInstanceId);
   const assembly = useWatchAssemblyStore((s) => s.assembly);
   const supplierListings = useCatalogueStore((s) => s.supplierListings);
+  const addSupplierListing = useCatalogueStore((s) => s.addSupplierListing);
   const sourcingSelections = useSourcingStore((s) => s.sourcingPlan.selections);
   const setSupplierSelection = useSourcingStore((s) => s.setSupplierSelection);
+  const [captureStatus, setCaptureStatus] = useState<string | null>(null);
+
+  const handleCaptureImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file || !activePartInstanceId) return;
+    const part = assembly.parts[activePartInstanceId];
+    if (!part) return;
+    try {
+      const capture = parseAliExpressCapture(JSON.parse(await file.text()));
+      const listing = supplierListingFromCapture(capture, part.catalogueItemId);
+      addSupplierListing(listing);
+      setSupplierSelection(activePartInstanceId, listing.id);
+      setCaptureStatus(`Imported ${capture.sellerName}; item and shipping were timestamped ${new Date(capture.capturedAtIso).toLocaleString()}.`);
+    } catch (error) {
+      setCaptureStatus(`Import failed: ${error instanceof Error ? error.message : 'invalid capture file'}`);
+    }
+  };
 
   if (!activePartInstanceId) {
     return (
@@ -26,7 +47,14 @@ export const SuppliersTab: React.FC = () => {
   const activePart = assembly.parts[activePartInstanceId];
   const relevantListings = supplierListings.filter(
     (l) => l.catalogueItemId === activePart?.catalogueItemId
-  );
+  ).sort((left, right) => {
+    const leftLanded = listingKnownLandedZar(left);
+    const rightLanded = listingKnownLandedZar(right);
+    if (leftLanded !== null && rightLanded !== null) return leftLanded - rightLanded;
+    if (leftLanded !== null) return -1;
+    if (rightLanded !== null) return 1;
+    return (listingPriceZar(left) ?? Number.POSITIVE_INFINITY) - (listingPriceZar(right) ?? Number.POSITIVE_INFINITY);
+  });
 
   const selectedListingId = sourcingSelections[activePartInstanceId] ?? null;
   const movementReadiness = getCatalogueItem(activePart?.catalogueItemId ?? '')?.kind === 'movement'
@@ -42,6 +70,20 @@ export const SuppliersTab: React.FC = () => {
         <p className="text-[11px] text-slate-400 mt-0.5">
           Selecting a seller updates procurement records and BOM pricing with zero mutation to CAD geometry.
         </p>
+      </div>
+
+      <div className="rounded-lg border border-slate-700 bg-slate-900/70 p-3 text-[11px] text-slate-300">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <p className="font-semibold text-slate-200">AliExpress price snapshot</p>
+            <p className="mt-0.5 text-slate-400">Import a capture JSON from the item-page helper. It remains unverified and keeps shipping separate.</p>
+          </div>
+          <label className="inline-flex cursor-pointer items-center gap-1.5 rounded border border-teal-700 bg-teal-950/40 px-2 py-1.5 text-teal-200 hover:border-teal-500">
+            <FileUp className="h-3.5 w-3.5" /> Import
+            <input type="file" accept="application/json,.json" className="hidden" onChange={(event) => { void handleCaptureImport(event); }} />
+          </label>
+        </div>
+        {captureStatus && <p role="status" className="mt-2 text-amber-200">{captureStatus}</p>}
       </div>
 
       {movementReadiness && !movementReadiness.orderable && (
@@ -90,7 +132,7 @@ export const SuppliersTab: React.FC = () => {
 
                   <div className="text-right">
                     <span className="text-xs font-bold text-slate-100">
-                      {listing.unitPrice !== null ? `R${listing.unitPrice}` : 'Quote required'}
+                      {formatListingPrice(listing)}
                     </span>
                     <span className="block text-[10px] text-emerald-400 font-medium">
                       {listing.stockStatus.toUpperCase()}
@@ -102,6 +144,7 @@ export const SuppliersTab: React.FC = () => {
                   <span className="flex items-center gap-1">
                     <ShieldCheck className="h-3 w-3 text-teal-400" />
                     {listing.verificationStatus}
+                    {isListingPriceStale(listing) && <span className="ml-1 rounded bg-amber-950 px-1 text-amber-300">stale / re-check</span>}
                   </span>
                   {isSelected ? (
                     <span className="text-teal-400 font-semibold flex items-center gap-1">
@@ -111,6 +154,51 @@ export const SuppliersTab: React.FC = () => {
                     <span className="text-slate-400 group-hover:text-slate-300">Click to Select</span>
                   )}
                 </div>
+                <div className="mt-1 flex items-center justify-between text-[10px] text-slate-400">
+                  <span>{listing.lastCheckedIso ? `Checked ${new Date(listing.lastCheckedIso).toLocaleString()}` : 'Price timestamp unavailable'}</span>
+                  <span className={listingShippingZar(listing) === null ? 'text-amber-300' : 'text-slate-300'}>
+                    {listingShippingZar(listing) === null
+                      ? `Shipping to ${listing.shippingDestination ?? 'South Africa'}: verify at checkout`
+                      : `Shipping ≈R${Math.round(listingShippingZar(listing) ?? 0).toLocaleString()}`}
+                  </span>
+                </div>
+                {listing.engineeringEvidence && (
+                  <div className="mt-2 rounded border border-slate-800 bg-slate-950/60 px-2 py-1.5 text-[10px] text-slate-400">
+                    <div className="flex items-center justify-between gap-2">
+                      <span>
+                        <span className={listing.engineeringEvidence.glbReadiness === 'supplier-exact-ready' ? 'text-emerald-300' : 'text-amber-300'}>
+                          GLB: {listing.engineeringEvidence.glbReadiness.replaceAll('-', ' ')}
+                        </span>
+                        <span className="mx-1">·</span>
+                        <span>{listing.engineeringEvidence.level.replaceAll('-', ' ')}</span>
+                      </span>
+                      <span className="flex shrink-0 items-center gap-2">
+                        {listing.engineeringEvidence.drawingUrl && (
+                          <a
+                            href={listing.engineeringEvidence.drawingUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            onClick={(event) => event.stopPropagation()}
+                            className="text-emerald-300 underline decoration-emerald-700 underline-offset-2 hover:text-emerald-200"
+                          >
+                            Open drawing
+                          </a>
+                        )}
+                        {listing.productUrl && (
+                          <a
+                            href={listing.productUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            onClick={(event) => event.stopPropagation()}
+                            className="text-cyan-300 underline decoration-cyan-700 underline-offset-2 hover:text-cyan-200"
+                          >
+                            Open listing
+                          </a>
+                        )}
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
             );
           })}

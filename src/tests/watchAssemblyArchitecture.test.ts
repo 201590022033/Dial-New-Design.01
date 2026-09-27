@@ -37,6 +37,7 @@ import { useSourcingStore } from '@/stores/sourcingStore';
 import '@/stores/storeSync';
 import { defaultMarkerConfig } from '@/domain/generators/markerEngine';
 import { defaultTypographyConfig } from '@/domain/generators/typographyEngine';
+import { visualVariantCatalogueItems } from '@/domain/catalogue/visualVariantCatalogue';
 
 describe('Watch Designer Foundation: Authoritative Architecture & Decoupled Domain', () => {
   // Test 1: Every existing default component maps to a valid catalogue item
@@ -65,7 +66,7 @@ describe('Watch Designer Foundation: Authoritative Architecture & Decoupled Doma
   // Test 2: Catalogue items exist independently from WatchAssembly
   it('ensures catalogue items exist independently from WatchAssembly', () => {
     const catalogueStore = useCatalogueStore.getState();
-    expect(catalogueStore.items.length).toBe(44);
+    expect(catalogueStore.items.length).toBe(defaultCatalogueItems.length + visualVariantCatalogueItems.length);
 
     const item = catalogueStore.getItem('cat-hour-hand');
     expect(item).toBeDefined();

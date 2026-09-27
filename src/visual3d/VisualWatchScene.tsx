@@ -7,7 +7,7 @@ import { componentPlacement } from './componentPlacement';
 import { MM_TO_SCENE } from './assemblyAnchors';
 import { finishProfiles, type FinishProfile } from './finishProfiles';
 import { createPreviewCaseGeometry, createPreviewLugGeometry, createPreviewStrapGeometry } from './proceduralEnvelope';
-import { ACESFilmicToneMapping, CanvasTexture, LinearFilter, PerspectiveCamera, PMREMGenerator, SRGBColorSpace, Vector2 } from 'three';
+import { ACESFilmicToneMapping, CanvasTexture, Color, LinearFilter, PerspectiveCamera, PMREMGenerator, SRGBColorSpace, Vector2 } from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import type { ScaleRunResult } from '@/services/scaleEngineService';
 import { ScaleArtwork3D } from './ScaleArtwork3D';
@@ -25,6 +25,11 @@ const physicalFinish = (profile: FinishProfile, color?: string) => ({
   emissive: profile.emissive ?? '#000000',
   emissiveIntensity: profile.emissiveIntensity ?? 0
 });
+
+const handContrastColor = (dialColor: string) => {
+  const face = new Color(dialColor);
+  return face.r * 0.2126 + face.g * 0.7152 + face.b * 0.0722 > 0.55 ? '#26313d' : '#dbe4ec';
+};
 
 const Cylinder = ({ radius, depth, position = [0, 0, 0], axis = 'Z', material }: {
   radius: number; depth: number; position?: [number, number, number]; axis?: 'X' | 'Z'; material: FinishProfile;
@@ -146,6 +151,42 @@ export const DialArtwork = ({ model }: { model: VisualWatchModel }) => {
   </mesh>;
 };
 
+const DialSurfaceMaterial = ({ model }: { model: VisualWatchModel }) => {
+  const sunburstMap = useMemo(() => {
+    if (model.dial.textureKind !== 'sunburst' || typeof document === 'undefined') return null;
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = 512;
+    const context = canvas.getContext('2d');
+    if (!context) return null;
+    context.fillStyle = '#777';
+    context.fillRect(0, 0, 512, 512);
+    for (let index = 0; index < 360; index++) {
+      const start = (index * Math.PI) / 180;
+      const end = ((index + 1.2) * Math.PI) / 180;
+      context.beginPath();
+      context.moveTo(256, 256);
+      context.arc(256, 256, 362, start, end);
+      context.closePath();
+      const lightness = 82 + Math.sin(index * 0.47) * 36;
+      context.fillStyle = `rgb(${lightness}, ${lightness}, ${lightness})`;
+      context.fill();
+    }
+    const texture = new CanvasTexture(canvas);
+    texture.minFilter = LinearFilter;
+    texture.magFilter = LinearFilter;
+    texture.needsUpdate = true;
+    return texture;
+  }, [model.dial.textureKind]);
+  useEffect(() => () => sunburstMap?.dispose(), [sunburstMap]);
+  return <meshPhysicalMaterial
+    {...physicalFinish(model.finishes.dial, model.dialColor)}
+    metalness={model.dial.textureKind === 'sunburst' ? 0.38 : model.finishes.dial.metalness}
+    roughness={model.dial.textureKind === 'matte' ? 0.58 : Math.max(0.2, 0.45 - model.dial.textureIntensity * 0.2)}
+    roughnessMap={sunburstMap ?? undefined}
+    envMapIntensity={model.dial.textureKind === 'sunburst' ? 1.7 : 1.1}
+  />;
+};
+
 /** Schematic shapes in engineering mm. These are explicitly provisional previews. */
 const PreviewLug = ({ model, side, end }: { model: VisualWatchModel; side: number; end: number }) => {
   const geometry = useMemo(() => createPreviewLugGeometry(model.previewEnvelope.lugs, side, end), [model.previewEnvelope.lugs, side, end]);
@@ -211,6 +252,15 @@ export const ProceduralComponent = ({ category, model }: { category: VisualCateg
           new Vector2(envelope.bezelInnerRadius + 0.2, -0.02)
         ], 96]} /><meshStandardMaterial {...finish(model.finishes.bezel, insertColor)} />
       </mesh>
+      {(model.bezelProfile === 'knurled' || model.bezelProfile === 'coin-edge') && Array.from({ length: model.bezelProfile === 'knurled' ? 96 : 72 }, (_, index) => {
+        const count = model.bezelProfile === 'knurled' ? 96 : 72;
+        const theta = (index / count) * Math.PI * 2;
+        const radial = envelope.bezelOuterRadius + 0.12;
+        return <mesh key={`bezel-edge-${index}`} position={[radial * Math.cos(theta), radial * Math.sin(theta), 0]} rotation={[0, 0, theta]}>
+          <boxGeometry args={[model.bezelProfile === 'knurled' ? 0.18 : 0.24, 0.55, envelope.bezelHeight * 0.78]} />
+          <meshStandardMaterial {...finish(model.finishes.bezel)} />
+        </mesh>;
+      })}
     </group>;
     }
     case 'chapter-ring': return <mesh position={[0, 0, localZ(envelope.chapterZ)]}>
@@ -218,7 +268,7 @@ export const ProceduralComponent = ({ category, model }: { category: VisualCateg
     </mesh>;
     case 'dial': return <group position={[0, 0, localZ(envelope.dialZ)]}>
       <mesh rotation={[Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[model.dial.outerDiameterMm / 2, model.dial.outerDiameterMm / 2, model.dial.thicknessMm, 128]} /><meshPhysicalMaterial {...physicalFinish(model.finishes.dial, model.dialColor)} roughness={model.dial.textureKind === 'matte' ? 0.58 : Math.max(0.2, 0.45 - model.dial.textureIntensity * 0.2)} />
+        <cylinderGeometry args={[model.dial.outerDiameterMm / 2, model.dial.outerDiameterMm / 2, model.dial.thicknessMm, 128]} /><DialSurfaceMaterial model={model} />
       </mesh>
       {model.dial.markers.map((marker, index) => {
         if (marker.text) return null;
@@ -270,12 +320,16 @@ export const ProceduralComponent = ({ category, model }: { category: VisualCateg
       }) : <mesh visible={false}><boxGeometry args={[0.01, 0.01, 0.01]} /></mesh>}
     </group>;
     case 'hands': return <group position={[0, 0, localZ(envelope.handsZ)]}>
-      {[{ length: radius * 0.5, width: 1.1, angle: 0.5 }, { length: radius * 0.72, width: 0.7, angle: -0.9 }, { length: radius * 0.78, width: 0.2, angle: 2 }].map((hand, index) =>
+      {[
+        { length: model.hands.hourLengthMm, width: model.hands.hourWidthMm, angle: 0.5 },
+        { length: model.hands.minuteLengthMm, width: model.hands.minuteWidthMm, angle: -0.9 },
+        { length: model.hands.secondLengthMm, width: model.hands.secondWidthMm, angle: 2 }
+      ].map((hand, index) =>
         <group key={index} rotation={[0, 0, hand.angle]} position={[0, 0, index * 0.2]}>
           <mesh position={[0, hand.length / 2, 0]}>
             <boxGeometry args={[hand.width, hand.length, 0.15]} />
             <meshPhysicalMaterial
-              color={index === 2 ? model.archetypeAppearance.accentColor : '#dbe4ec'}
+              color={index === 2 ? model.archetypeAppearance.accentColor : handContrastColor(model.dialColor)}
               metalness={index === 2 ? 0.55 : 0.88}
               roughness={index === 2 ? 0.24 : 0.14}
               clearcoat={0.32}
@@ -289,7 +343,7 @@ export const ProceduralComponent = ({ category, model }: { category: VisualCateg
         </group>)}
       <mesh rotation={[Math.PI / 2, 0, 0]}>
         <cylinderGeometry args={[0.6, 0.6, 0.5, 48]} />
-        <meshPhysicalMaterial color="#dbe4ec" metalness={0.9} roughness={0.12} clearcoat={0.35} clearcoatRoughness={0.06} envMapIntensity={2.1} />
+        <meshPhysicalMaterial color={handContrastColor(model.dialColor)} metalness={0.9} roughness={0.12} clearcoat={0.35} clearcoatRoughness={0.06} envMapIntensity={2.1} />
       </mesh>
     </group>;
   }

@@ -52,7 +52,7 @@ export const CostBomSummary: React.FC = () => {
             Build Cost:
           </span>
           <span className={cn('text-sm font-mono tracking-tight transition-colors', pulseClass)}>
-            R{cost.grandTotal.toLocaleString()}
+            R{Math.round(cost.grandTotal).toLocaleString()}
           </span>
         </div>
 
@@ -189,11 +189,15 @@ export const CostBomSummary: React.FC = () => {
               <span>R{cost.partsTotal.toLocaleString()}</span>
             </div>
             <div className="flex justify-between text-slate-400">
-              <span>Estimated Shipping:</span>
-              <span>R{cost.shippingEstimate.toLocaleString()}</span>
+              <span>Known Shipping:</span>
+              <span>R{Math.round(cost.shippingEstimate).toLocaleString()}</span>
             </div>
+            {cost.shippingUnknownCount > 0 && <div className="flex justify-between gap-3 text-amber-300">
+              <span>Shipping still to verify:</span>
+              <span>{cost.shippingUnknownCount} listing{cost.shippingUnknownCount === 1 ? '' : 's'}</span>
+            </div>}
             <div className="flex justify-between text-slate-400">
-              <span>Import Duties & Taxes:</span>
+              <span>Import VAT Reserve (duty excl.):</span>
               <span>R{cost.dutiesAndTaxesEstimate.toLocaleString()}</span>
             </div>
             {cost.customFabricationEstimate > 0 && (

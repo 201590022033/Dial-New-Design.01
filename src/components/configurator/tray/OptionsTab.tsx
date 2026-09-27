@@ -15,13 +15,14 @@ import {
 } from '@/domain/compatibility/compatibilityEngine';
 import type { ComponentCatalogueItem, CatalogueItemCategory } from '@/domain/catalogue/types';
 import type { CompatibilityStatus, ReverseCandidateResult } from '@/domain/compatibility/compatibilityTypes';
-import type { WatchAssembly } from '@/domain/assembly/assemblyTypes';
+import { applyCatalogueVisualSelection } from '@/domain/catalogue';
 import { rankCandidatesBySensitivity } from '@/domain/configurator/practicalSensitivities';
 import { cn } from '@/utils/cn';
 import { useDesignEngineStore } from '@/stores/designEngineStore';
 import { applyArchetypeVisualProfile, getArchetypeVisualProfile } from '@/domain/configurator/archetypeProfiles';
 import { defaultMarkerConfig, type MarkerKind } from '@/domain/generators/markerEngine';
 import type { TypographyFontCategory } from '@/domain/generators/typographyEngine';
+import { formatListingPrice } from '@/domain/catalogue/pricing';
 
 const indexChoices: Array<{ id: 'auto' | 'dots' | 'arabic' | 'roman' | 'ticks'; label: string; kind?: MarkerKind }> = [
   { id: 'auto', label: 'Archetype default' },
@@ -81,6 +82,7 @@ export const OptionsTab: React.FC = () => {
   const setPreview = useConfiguratorUIStore((s) => s.setPreview);
   const applyPreview = useConfiguratorUIStore((s) => s.applyPreview);
   const cancelPreview = useConfiguratorUIStore((s) => s.cancelPreview);
+  const previewError = useConfiguratorUIStore((s) => s.previewError);
   const startGuidedFix = useConfiguratorUIStore((s) => s.startGuidedFix);
   const getPracticalSensitivities = useConfiguratorUIStore((s) => s.getPracticalSensitivities);
 
@@ -164,27 +166,7 @@ export const OptionsTab: React.FC = () => {
   const handlePreviewCandidate = (item: ComponentCatalogueItem) => {
     if (!activePartInstanceId) return;
 
-    // Create provisional assembly with the candidate
-    const provisional: WatchAssembly = JSON.parse(JSON.stringify(assembly)) as WatchAssembly;
-    const currentPart = provisional.parts[activePartInstanceId];
-
-    if (currentPart) {
-      currentPart.catalogueItemId = item.id;
-      currentPart.name = item.displayName;
-      currentPart.dimensions = {
-        diameterMm: item.nominalDimensions.diameterMm,
-        thicknessMm: item.nominalDimensions.thicknessMm,
-        widthMm: item.nominalDimensions.widthMm,
-        offsetXmm: currentPart.dimensions?.offsetXmm ?? 0,
-        offsetYmm: currentPart.dimensions?.offsetYmm ?? 0
-      };
-      if (item.defaultMaterial) {
-        currentPart.material = item.defaultMaterial;
-      }
-      if (item.defaultTexture) {
-        currentPart.texture = item.defaultTexture;
-      }
-    }
+    const provisional = applyCatalogueVisualSelection(assembly, activePartInstanceId, item);
 
     setPreview(provisional, activePartInstanceId, item);
   };
@@ -280,7 +262,7 @@ export const OptionsTab: React.FC = () => {
                   (l) => l.catalogueItemId === item.id && typeof l.unitPrice === 'number'
                 );
                 const priceText = itemListing?.unitPrice
-                  ? `from R${itemListing.unitPrice}`
+                  ? `from ${formatListingPrice(itemListing)}`
                   : 'Estimate';
                 const itemListingsCount = supplierListings.filter((l) => l.catalogueItemId === item.id).length;
                 const supplierText = itemListingsCount > 0
@@ -325,6 +307,9 @@ export const OptionsTab: React.FC = () => {
                       <span className="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 font-medium">
                         {item.status}
                       </span>
+                      {item.visual && <span className="rounded bg-cyan-950/60 px-1.5 py-0.5 font-medium text-cyan-200">
+                        {item.visual.representation === 'glb' ? 'HD GLB' : 'Procedural visual'} · {item.visual.status}
+                      </span>}
                       <span>{supplierText}</span>
                       <span>·</span>
                       <span className="font-semibold text-slate-200">{priceText}</span>
@@ -378,7 +363,7 @@ export const OptionsTab: React.FC = () => {
                     {isPreviewing && (
                       <div className="mt-2.5 pt-2 border-t border-slate-700/60 flex items-center justify-between">
                         <span className="text-[10px] text-teal-400 font-mono">
-                          Live Preview Active
+                          {isIncompatible ? 'Incompatible preview — choose a Fix action' : 'Live Preview Active'}
                         </span>
                         <div className="flex items-center gap-1.5">
                           <button
@@ -393,17 +378,19 @@ export const OptionsTab: React.FC = () => {
                           </button>
                           <button
                             type="button"
+                            disabled={isIncompatible}
                             onClick={(e) => {
                               e.stopPropagation();
                               applyPreview();
                             }}
-                            className="px-2.5 py-1 rounded bg-teal-500 hover:bg-teal-400 text-slate-950 font-semibold text-[11px]"
+                            className="px-2.5 py-1 rounded bg-teal-500 hover:bg-teal-400 text-slate-950 font-semibold text-[11px] disabled:cursor-not-allowed disabled:bg-slate-700 disabled:text-slate-400"
                           >
                             Apply
                           </button>
                         </div>
                       </div>
                     )}
+                    {isPreviewing && previewError && <p role="alert" className="mt-1.5 text-[10px] text-rose-300">{previewError}</p>}
                   </div>
                 );
               })}

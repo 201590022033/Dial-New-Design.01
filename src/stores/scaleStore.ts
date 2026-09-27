@@ -93,7 +93,11 @@ export const useScaleStore = create<ScaleState>((set, get) => ({
         ...defaults, ...selection.config,
         fontFamily: state.pluginConfig.fontFamily,
         scaleFontSizeMm: state.pluginConfig.scaleFontSizeMm ?? 0.8,
-        scaleTickLengthFactor: state.pluginConfig.scaleTickLengthFactor ?? 1
+        scaleTickLengthFactor: state.pluginConfig.scaleTickLengthFactor ?? 1,
+        placementTargetBandId: state.pluginConfig.placementTargetBandId,
+        bandInnerRadiusMm: state.pluginConfig.bandInnerRadiusMm,
+        bandOuterRadiusMm: state.pluginConfig.bandOuterRadiusMm,
+        minimumLineWidthMm: state.pluginConfig.minimumLineWidthMm
       },
       context: selection.context,
       previewEnabled: true
@@ -171,9 +175,12 @@ export const useScaleStore = create<ScaleState>((set, get) => ({
       pluginConfig: {
         ...state.pluginConfig,
         radiusMm: (innerRadius + outerRadius) / 2,
+        outerRadiusMm: Math.max(innerRadius, outerRadius - 0.2),
+        innerRadiusMm: Math.max(innerRadius, (innerRadius + outerRadius) / 2 - 0.45),
         bandInnerRadiusMm: innerRadius,
         bandOuterRadiusMm: outerRadius,
-        minimumLineWidthMm
+        minimumLineWidthMm,
+        placementTargetBandId: band.id
       }
     }));
 

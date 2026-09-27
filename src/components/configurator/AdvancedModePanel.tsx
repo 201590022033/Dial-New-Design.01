@@ -20,6 +20,7 @@ export const AdvancedModePanel: React.FC = () => {
 
   // Global settings
   const caseDiameterMm = useGlobalSettingsStore((s) => s.caseDiameterMm);
+  const setCaseDiameter = useGlobalSettingsStore((s) => s.setCaseDiameter);
   const manufacturingToleranceMm = useGlobalSettingsStore((s) => s.manufacturingToleranceMm);
   const laserKerfMm = useGlobalSettingsStore((s) => s.laserKerfMm);
 
@@ -139,10 +140,25 @@ export const AdvancedModePanel: React.FC = () => {
           <Ruler className="h-3.5 w-3.5 text-teal-400" /> Global Engineering Context
         </h4>
         <div className="p-2.5 rounded-lg bg-slate-900 border border-slate-800 space-y-1.5 text-xs">
-          <div className="flex justify-between text-slate-300">
+          <label className="flex items-center justify-between gap-3 text-slate-300">
             <span>Case Diameter:</span>
-            <span className="font-mono text-slate-200">{caseDiameterMm} mm</span>
-          </div>
+            <span className="flex items-center gap-1 font-mono text-slate-200">
+              <input
+                type="number"
+                min="20"
+                max="60"
+                step="0.1"
+                aria-label="Case diameter in millimetres"
+                className="w-20 rounded border border-slate-700 bg-slate-950 px-2 py-1 text-right font-mono text-slate-100 focus:border-teal-400 focus:outline-none"
+                value={caseDiameterMm}
+                onChange={(event) => setCaseDiameter(Number(event.target.value))}
+              />
+              mm
+            </span>
+          </label>
+          <p className="text-[10px] leading-relaxed text-slate-400">
+            This is the master case size. Fixed-size HD GLBs are used only at their authored diameter; other sizes switch to the scalable procedural preview.
+          </p>
           <div className="flex justify-between text-slate-300">
             <span>Manufacturing Tolerance:</span>
             <span className="font-mono text-slate-200">±{manufacturingToleranceMm} mm</span>

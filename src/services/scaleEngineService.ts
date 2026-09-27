@@ -1,5 +1,6 @@
 import { getScalePlugin } from '@/domain/scales/scaleRegistry';
 import { styleScaleTicks } from '@/domain/scales/markingStyle';
+import { constrainScaleToPlacementEnvelope } from '@/domain/scales/placementEnvelope';
 import type {
   ScaleGeometryOutput,
   ScaleKind,
@@ -24,6 +25,13 @@ export interface ScaleRunResult {
   svg: string;
   preview: string;
   manufacturingMetadata?: ScaleManufacturingMetadata;
+  placementTargetBandId?: string;
+  placementEnvelope: {
+    innerRadiusMm: number;
+    outerRadiusMm: number;
+    contentOuterRadiusMm: number;
+    safetyMarginMm: number;
+  };
 }
 
 const resultCache = new Map<string, ScaleRunResult>();
@@ -48,8 +56,11 @@ export const runScalePlugin = (
     return null;
   }
 
-  const ticks = styleScaleTicks(plugin.tickGenerator(config, context), config);
-  const labels = plugin.labelGenerator(ticks, config);
+  const generatedTicks = styleScaleTicks(plugin.tickGenerator(config, context), config);
+  const generatedLabels = plugin.labelGenerator(generatedTicks, config);
+  const constrained = constrainScaleToPlacementEnvelope(generatedTicks, generatedLabels, config);
+  const ticks = constrained.ticks;
+  const labels = constrained.labels;
   const geometry = plugin.geometryGenerator(ticks, labels);
   const validation = plugin.validate(config, ticks, labels);
 
@@ -65,7 +76,9 @@ export const runScalePlugin = (
     validation,
     svg: plugin.svgOutput(ticks, labels),
     preview: plugin.previewGenerator(config, context),
-    manufacturingMetadata: plugin.manufacturingMetadata?.(ticks, labels, config)
+    manufacturingMetadata: plugin.manufacturingMetadata?.(ticks, labels, config),
+    placementTargetBandId: config.placementTargetBandId,
+    placementEnvelope: constrained.envelope
   };
 
   resultCache.set(cacheKey, result);

@@ -13,6 +13,7 @@ import { generateMarkers } from '@/domain/generators/markerEngine';
 import { useScaleStore } from '@/stores/scaleStore';
 import { useConfiguratorUIStore } from '@/stores/configuratorUIStore';
 import { watchAssemblyToVisualModel } from '@/visual3d/watchAssemblyToVisualModel';
+import { createBand } from '@/domain/bands/bandRegistry';
 
 const initialScale = useScaleStore.getState();
 const initialUi = useConfiguratorUIStore.getState();
@@ -57,6 +58,14 @@ describe('archetype scale guard', () => {
     const original = useScaleStore.getState().preview?.ticks[0]?.lengthMm ?? 0;
     store.updatePluginConfig({ scaleTickLengthFactor: 1.5 });
     expect(useScaleStore.getState().preview?.ticks[0]?.lengthMm).toBeCloseTo(original * 1.5);
+  });
+
+  it('keeps diver labels inside the nominal case envelope', () => {
+    const diver = getScaleProgram('diver', [
+      createBand('band-outer-bezel', 'outer-bezel', { innerRadius: 18.5, outerRadius: 20 })
+    ]);
+    expect(diver.config.labelOffsetMm).toBe(0.7);
+    expect((diver.config.radiusMm ?? 0) + (diver.config.labelOffsetMm ?? 0) + (diver.config.scaleFontSizeMm ?? 0) / 2).toBeLessThan(20);
   });
 
   it('clears a temporary archetype preview when returning to Build', () => {

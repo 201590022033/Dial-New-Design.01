@@ -1,4 +1,6 @@
 import type { ComponentEngineeringSpecs } from '@/domain/compatibility/compatibilityTypes';
+import type { ComponentCategory } from '@/domain/geometry/parametric';
+import type { TextureKind } from '@/domain/generators/textureEngine';
 
 export type CatalogueItemCategory =
   | 'hands'
@@ -42,6 +44,18 @@ export interface CatalogueNominalDimensions {
   offsetYmm?: number;
 }
 
+export interface CatalogueVisualMetadata {
+  category: ComponentCategory;
+  /** Stable registry ID. Procedural IDs are valid and deliberately avoid a GLB explosion. */
+  assetId: string;
+  representation: 'glb' | 'procedural';
+  status: 'available' | 'provisional' | 'planned';
+  handStyle?: 'baton' | 'mercedes' | 'needle';
+  bezelProfile?: 'smooth' | 'coin-edge' | 'knurled' | 'scalloped';
+  dialFinish?: TextureKind;
+  note?: string;
+}
+
 /**
  * ComponentCatalogueItem
  * Reusable definition of a physical watch component.
@@ -65,6 +79,7 @@ export interface ComponentCatalogueItem {
     notes: string;
   };
   engineeringSpecs?: ComponentEngineeringSpecs;
+  visual?: CatalogueVisualMetadata;
   exportEnabled: boolean;
 }
 
@@ -72,6 +87,17 @@ export type SupplierListingVerificationStatus = 'unverified' | 'verified' | 'dis
 export type SupplierListingStatus = 'active' | 'stale' | 'discontinued';
 export type StockStatus = 'in-stock' | 'out-of-stock' | 'backorder' | 'unknown';
 export type SupplierSourceType = 'demo-fixture' | 'manual-entry' | 'supplier-api' | 'web-scrape';
+
+export type EngineeringEvidenceLevel = 'headline-only' | 'partial-dimensions' | 'dimensioned-drawing';
+export type GlbReadiness = 'blocked' | 'provisional-only' | 'visual-glb-ready' | 'supplier-exact-ready';
+
+export interface SupplierEngineeringEvidence {
+  level: EngineeringEvidenceLevel;
+  glbReadiness: GlbReadiness;
+  checkedAtIso: string;
+  drawingUrl?: string | null;
+  notes: string;
+}
 
 export interface SupplierListingProvenance {
   dataSource: string;
@@ -95,6 +121,9 @@ export interface SupplierListing {
   productUrl?: string | null;
   unitPrice: number | null; // Nullable: never invent prices if unverified
   currency: string;
+  shippingPrice?: number | null;
+  shippingCurrency?: string | null;
+  shippingDestination?: string | null;
   stockStatus: StockStatus;
   status: SupplierListingStatus;
   verificationStatus: SupplierListingVerificationStatus;
@@ -102,5 +131,6 @@ export interface SupplierListing {
   lastCheckedIso?: string | null;
   provenance: SupplierListingProvenance;
   directOrderCapability?: boolean;
+  engineeringEvidence?: SupplierEngineeringEvidence;
   notes?: string;
 }
