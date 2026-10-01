@@ -301,6 +301,8 @@ describe('Phase 3: 2.5D Cylindrical Geometry & Boundary Resolver', () => {
     const currentAssembly = useWatchAssemblyStore.getState().assembly;
     const bands = assemblyToBands(currentAssembly);
     const outerBezel = bands.find((b) => b.kind === 'outer-bezel');
-    expect(outerBezel?.geometry.outerRadius).toBe(21);
+    // The bezel retains its own 38 mm physical OD when the case grows to
+    // 42 mm; scale artwork must not inherit the larger case radius.
+    expect(outerBezel?.geometry.outerRadius).toBe(19);
   });
 });

@@ -61,6 +61,7 @@ export type VisualWatchModel = {
   dial: DialVisualDescriptor;
   bezelMaterial: string;
   bezelProfile: 'smooth' | 'coin-edge' | 'knurled' | 'scalloped';
+  bezelEnvelope: { innerRadiusMm: number; outerRadiusMm: number };
   crystalMaterial: string;
   hands: {
     style: VisualHandStyle; material: string;
@@ -269,6 +270,11 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
       }
     },
     bezelMaterial: materialProfile(bezelPart, 'polished-steel'),
+    bezelEnvelope: (() => {
+      const outerRadiusMm = positive(bezelPart?.dimensions.diameterMm, positive(assembly.globalDimensions.caseDiameterMm, 40)) / 2;
+      const widthMm = positive(bezelPart?.dimensions.widthMm, Math.max(1, outerRadiusMm * 0.16));
+      return { innerRadiusMm: Math.max(0, outerRadiusMm - widthMm), outerRadiusMm };
+    })(),
     bezelProfile: (() => {
       const profile = bezelPart?.customProperties?.visualBezelProfile;
       return profile === 'coin-edge' || profile === 'knurled' || profile === 'scalloped' ? profile : 'smooth';

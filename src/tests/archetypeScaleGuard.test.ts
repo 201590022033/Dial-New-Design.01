@@ -68,6 +68,20 @@ describe('archetype scale guard', () => {
     expect((diver.config.radiusMm ?? 0) + (diver.config.labelOffsetMm ?? 0) + (diver.config.scaleFontSizeMm ?? 0) / 2).toBeLessThan(20);
   });
 
+  it('replaces a stale scale envelope with the current rotating-bezel band', () => {
+    useScaleStore.setState((state) => ({
+      ...state,
+      activeArchetypeId: 'archetype-dive',
+      pluginConfig: { ...state.pluginConfig, bandInnerRadiusMm: 18.5, bandOuterRadiusMm: 21 }
+    }));
+    const bands = [createBand('band-outer-bezel', 'outer-bezel', { innerRadius: 15.5, outerRadius: 19 })];
+    expect(useScaleStore.getState().applyScaleProgram('diver', bands)).toBe(true);
+    expect(useScaleStore.getState().pluginConfig).toMatchObject({
+      placementTargetBandId: 'band-outer-bezel', bandInnerRadiusMm: 15.5, bandOuterRadiusMm: 19
+    });
+    expect(useScaleStore.getState().preview?.placementEnvelope.outerRadiusMm).toBe(19);
+  });
+
   it('clears a temporary archetype preview when returning to Build', () => {
     const preview = createDefaultWatchAssembly();
     useConfiguratorUIStore.getState().setWorkMode('style');

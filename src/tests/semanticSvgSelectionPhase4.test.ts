@@ -207,8 +207,9 @@ describe('Phase 4: Semantic SVG Rendering & Deterministic Direct-Selection', () 
     expect(chapterHit?.partInstanceId).toBe('inst-chapter-ring');
     expect(chapterHit?.category).toBe('rings');
 
-    // Outer bezel is around radius 19.2mm (192px) at top (y = 250 - 192 = 58)
-    const bezelHit = resolveCanvasHit(null, 250, 58, assembly, viewport);
+    // Outer bezel is inside its 19mm physical OD (188px radius here), not the
+    // larger case perimeter.
+    const bezelHit = resolveCanvasHit(null, 250, 62, assembly, viewport);
     expect(bezelHit).not.toBeNull();
     expect(bezelHit?.partInstanceId).toBe('inst-rotating-bezel');
     expect(bezelHit?.category).toBe('rings');

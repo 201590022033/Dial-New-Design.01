@@ -514,7 +514,9 @@ export const resolveAssemblyGeometry = (
   const r1 = dialSlot.outerRadiusMm;
   const r2 = chapterSlot ? chapterSlot.outerRadiusMm : r1 + 2.5;
   const r3 = bezelSlot ? bezelSlot.innerRadiusMm : r2 + 1.5;
-  const r4 = caseRadiusMm > 0 ? caseRadiusMm : r3 + 2.0;
+  // The rotating/fixed bezel owns its marking envelope.  Using the case OD
+  // here allowed scale artwork to occupy the shoulder outside a smaller bezel.
+  const r4 = bezelSlot?.outerRadiusMm ?? (caseRadiusMm > 0 ? caseRadiusMm : r3 + 2.0);
 
   const projected2DBands: Record<string, DonutGeometry> = {
     'dial-face': { innerRadius: r0, outerRadius: r1 },

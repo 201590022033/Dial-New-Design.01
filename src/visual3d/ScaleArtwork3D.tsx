@@ -3,8 +3,9 @@ import { CanvasTexture, LinearFilter, SRGBColorSpace } from 'three';
 import type { ScaleRunResult } from '@/services/scaleEngineService';
 import type { ScaleTick, ScaleLabel } from '@/domain/scales/types';
 import type { VisualWatchModel } from './watchAssemblyToVisualModel';
+import { scaleArtworkClipEnvelope, type ScaleArtworkRing } from './scaleArtworkEnvelope';
 
-type Ring = 'outer' | 'inner';
+type Ring = ScaleArtworkRing;
 
 const polar = (radius: number, angle: number, pxPerMm: number, centre: number): [number, number] => {
   const radians = angle * Math.PI / 180;
@@ -27,6 +28,13 @@ const RingArtwork = ({ preview, model, ring }: { preview: ScaleRunResult; model:
     if (!context) return null;
     const pxPerMm = canvas.width / model.caseDiameterMm;
     const centre = canvas.width / 2;
+    const clip = scaleArtworkClipEnvelope(preview, model, ring);
+    const outerClipPx = Math.max(0, clip.outerRadiusMm * pxPerMm);
+    const innerClipPx = Math.max(0, Math.min(clip.innerRadiusMm * pxPerMm, outerClipPx));
+    context.beginPath();
+    context.arc(centre, centre, outerClipPx, 0, Math.PI * 2);
+    if (innerClipPx > 0) context.arc(centre, centre, innerClipPx, 0, Math.PI * 2, true);
+    context.clip('evenodd');
     const color = preview.color || '#f8fafc';
     context.strokeStyle = color;
     context.fillStyle = color;
@@ -60,7 +68,7 @@ const RingArtwork = ({ preview, model, ring }: { preview: ScaleRunResult; model:
     result.magFilter = LinearFilter;
     result.needsUpdate = true;
     return result;
-  }, [model.caseDiameterMm, preview, ring]);
+  }, [model, preview, ring]);
   useEffect(() => () => texture?.dispose(), [texture]);
   if (!texture) return null;
   const envelope = model.previewEnvelope;

@@ -7,7 +7,7 @@ import { useRenderer } from '@/renderer/useRenderer';
 import { isBrowserZoomGesture, nextZoomValue } from '@/renderer/services/zoomService';
 import { createPanState, resolvePan, type PanState } from '@/renderer/services/panService';
 import { resolveHighlightBandIds } from '@/features/shared/objectInspectorSchemas';
-import { useBandsStore, useDesignEngineStore, useScaleStore, useSelectionStore, useViewportStore, useConfiguratorUIStore, useWatchAssemblyStore } from '@/stores';
+import { useBandsStore, useDesignEngineStore, useGlobalSettingsStore, useScaleStore, useSelectionStore, useViewportStore, useConfiguratorUIStore, useWatchAssemblyStore } from '@/stores';
 import { mmToPixels } from '@/utils/math';
 const VisualWatchRenderer = lazy(() => import('@/visual3d/VisualWatchRenderer').then((module) => ({ default: module.VisualWatchRenderer })));
 
@@ -31,6 +31,8 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode, visua
   const scalePreview = useScaleStore((s) => s.preview);
   const selectedScaleKind = useScaleStore((s) => s.selectedScaleKind);
   const engineeringReadout = useScaleStore((s) => s.engineeringReadout);
+  const syncScaleFromBand = useScaleStore((s) => s.syncFromBand);
+  const minimumLineWidthMm = useGlobalSettingsStore((s) => s.minimumLineWidthMm);
   const designOverlay = useDesignEngineStore((s) => s.overlay);
   const setZoom = useViewportStore((s) => s.setZoom);
   const selectedBandId = useSelectionStore((s) => s.selectedBandId);
@@ -69,6 +71,12 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode, visua
   useEffect(() => {
     lastPan.current = { x: panX, y: panY };
   }, [panX, panY]);
+
+  useEffect(() => {
+    if (!selectedBandId) return;
+    const selectedBand = bands.find((band) => band.id === selectedBandId);
+    if (selectedBand) syncScaleFromBand(selectedBand, minimumLineWidthMm);
+  }, [bands, minimumLineWidthMm, selectedBandId, syncScaleFromBand]);
 
   useEffect(() => {
     return () => {

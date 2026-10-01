@@ -87,6 +87,7 @@ export const useScaleStore = create<ScaleState>((set, get) => ({
     if (!state.crossArchetypeUnlocked && !scalePolicyForArchetype(state.activeArchetypeId).allowed.includes(program)) return false;
     const selection = getScaleProgram(program, bands);
     const defaults = getScalePlugin(selection.kind)?.defaultConfig ?? state.pluginConfig;
+    const targetBand = bands.find((band) => band.kind === 'outer-bezel');
     set({
       selectedScaleKind: selection.kind,
       pluginConfig: {
@@ -94,9 +95,9 @@ export const useScaleStore = create<ScaleState>((set, get) => ({
         fontFamily: state.pluginConfig.fontFamily,
         scaleFontSizeMm: state.pluginConfig.scaleFontSizeMm ?? 0.8,
         scaleTickLengthFactor: state.pluginConfig.scaleTickLengthFactor ?? 1,
-        placementTargetBandId: state.pluginConfig.placementTargetBandId,
-        bandInnerRadiusMm: state.pluginConfig.bandInnerRadiusMm,
-        bandOuterRadiusMm: state.pluginConfig.bandOuterRadiusMm,
+        placementTargetBandId: targetBand?.id ?? state.pluginConfig.placementTargetBandId,
+        bandInnerRadiusMm: targetBand?.geometry.innerRadius ?? state.pluginConfig.bandInnerRadiusMm,
+        bandOuterRadiusMm: targetBand?.geometry.outerRadius ?? state.pluginConfig.bandOuterRadiusMm,
         minimumLineWidthMm: state.pluginConfig.minimumLineWidthMm
       },
       context: selection.context,
