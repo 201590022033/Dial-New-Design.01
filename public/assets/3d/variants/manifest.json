@@ -1,0 +1,221 @@
+{
+  "schema": "dial-designer/component-variants/v1",
+  "assets": [
+    {
+      "assetId": "hands-baton-42",
+      "category": "hands",
+      "path": "public/assets/3d/variants/hands/hands-baton-42.glb",
+      "meshCount": 6
+    },
+    {
+      "assetId": "hands-mercedes-42",
+      "category": "hands",
+      "path": "public/assets/3d/variants/hands/hands-mercedes-42.glb",
+      "meshCount": 6
+    },
+    {
+      "assetId": "hands-sword-42",
+      "category": "hands",
+      "path": "public/assets/3d/variants/hands/hands-sword-42.glb",
+      "meshCount": 6
+    },
+    {
+      "assetId": "hands-dauphine-42",
+      "category": "hands",
+      "path": "public/assets/3d/variants/hands/hands-dauphine-42.glb",
+      "meshCount": 4
+    },
+    {
+      "assetId": "hands-syringe-42",
+      "category": "hands",
+      "path": "public/assets/3d/variants/hands/hands-syringe-42.glb",
+      "meshCount": 6
+    },
+    {
+      "assetId": "hands-cathedral-42",
+      "category": "hands",
+      "path": "public/assets/3d/variants/hands/hands-cathedral-42.glb",
+      "meshCount": 6
+    },
+    {
+      "assetId": "hands-pencil-42",
+      "category": "hands",
+      "path": "public/assets/3d/variants/hands/hands-pencil-42.glb",
+      "meshCount": 6
+    },
+    {
+      "assetId": "hands-broad-arrow-42",
+      "category": "hands",
+      "path": "public/assets/3d/variants/hands/hands-broad-arrow-42.glb",
+      "meshCount": 6
+    },
+    {
+      "assetId": "hands-skeleton-42",
+      "category": "hands",
+      "path": "public/assets/3d/variants/hands/hands-skeleton-42.glb",
+      "meshCount": 4
+    },
+    {
+      "assetId": "hands-baton-nh05-34",
+      "category": "hands",
+      "path": "public/assets/3d/variants/hands/hands-baton-nh05-34.glb",
+      "meshCount": 6
+    },
+    {
+      "assetId": "bezel-dive-coin-edge-42",
+      "category": "bezel",
+      "path": "public/assets/3d/variants/bezels/bezel-dive-coin-edge-42.glb",
+      "meshCount": 134
+    },
+    {
+      "assetId": "bezel-dive-scalloped-42",
+      "category": "bezel",
+      "path": "public/assets/3d/variants/bezels/bezel-dive-scalloped-42.glb",
+      "meshCount": 110
+    },
+    {
+      "assetId": "bezel-pilot-smooth-42",
+      "category": "bezel",
+      "path": "public/assets/3d/variants/bezels/bezel-pilot-smooth-42.glb",
+      "meshCount": 1
+    },
+    {
+      "assetId": "bezel-dress-fluted-42",
+      "category": "bezel",
+      "path": "public/assets/3d/variants/bezels/bezel-dress-fluted-42.glb",
+      "meshCount": 73
+    },
+    {
+      "assetId": "bezel-tachymeter-fixed-42",
+      "category": "bezel",
+      "path": "public/assets/3d/variants/bezels/bezel-tachymeter-fixed-42.glb",
+      "meshCount": 110
+    },
+    {
+      "assetId": "bezel-gmt-42",
+      "category": "bezel",
+      "path": "public/assets/3d/variants/bezels/bezel-gmt-42.glb",
+      "meshCount": 122
+    },
+    {
+      "assetId": "bezel-slide-rule-42",
+      "category": "bezel",
+      "path": "public/assets/3d/variants/bezels/bezel-slide-rule-42.glb",
+      "meshCount": 218
+    },
+    {
+      "assetId": "dial-sterile-285",
+      "category": "dial",
+      "path": "public/assets/3d/variants/dials/dial-sterile-285.glb",
+      "meshCount": 1
+    },
+    {
+      "assetId": "dial-diver-285",
+      "category": "dial",
+      "path": "public/assets/3d/variants/dials/dial-diver-285.glb",
+      "meshCount": 73
+    },
+    {
+      "assetId": "dial-pilot-a-285",
+      "category": "dial",
+      "path": "public/assets/3d/variants/dials/dial-pilot-a-285.glb",
+      "meshCount": 74
+    },
+    {
+      "assetId": "dial-pilot-b-285",
+      "category": "dial",
+      "path": "public/assets/3d/variants/dials/dial-pilot-b-285.glb",
+      "meshCount": 74
+    },
+    {
+      "assetId": "dial-field-285",
+      "category": "dial",
+      "path": "public/assets/3d/variants/dials/dial-field-285.glb",
+      "meshCount": 73
+    },
+    {
+      "assetId": "dial-dress-sector-285",
+      "category": "dial",
+      "path": "public/assets/3d/variants/dials/dial-dress-sector-285.glb",
+      "meshCount": 74
+    },
+    {
+      "assetId": "dial-gmt-285",
+      "category": "dial",
+      "path": "public/assets/3d/variants/dials/dial-gmt-285.glb",
+      "meshCount": 97
+    },
+    {
+      "assetId": "dial-chronograph-285",
+      "category": "dial",
+      "path": "public/assets/3d/variants/dials/dial-chronograph-285.glb",
+      "meshCount": 64
+    },
+    {
+      "assetId": "dial-nh05-mother-of-pearl-245",
+      "category": "dial",
+      "path": "public/assets/3d/variants/dials/dial-nh05-mother-of-pearl-245.glb",
+      "meshCount": 1
+    },
+    {
+      "assetId": "dial-nh05-champagne-sunburst-245",
+      "category": "dial",
+      "path": "public/assets/3d/variants/dials/dial-nh05-champagne-sunburst-245.glb",
+      "meshCount": 1
+    },
+    {
+      "assetId": "dial-nh05-silver-roman-245",
+      "category": "dial",
+      "path": "public/assets/3d/variants/dials/dial-nh05-silver-roman-245.glb",
+      "meshCount": 74
+    },
+    {
+      "assetId": "dial-nh05-black-sunburst-245",
+      "category": "dial",
+      "path": "public/assets/3d/variants/dials/dial-nh05-black-sunburst-245.glb",
+      "meshCount": 1
+    },
+    {
+      "assetId": "case-nh05-ladies-dress-34",
+      "category": "case",
+      "path": "public/assets/3d/variants/cases/case-nh05-ladies-dress-34.glb",
+      "meshCount": 7
+    },
+    {
+      "assetId": "case-tandorio-pilot-40",
+      "category": "case",
+      "path": "public/assets/3d/variants/cases/case-tandorio-pilot-40.glb",
+      "meshCount": 7
+    },
+    {
+      "assetId": "case-namoki-nmk920-tuna-47",
+      "category": "case",
+      "path": "public/assets/3d/variants/cases/case-namoki-nmk920-tuna-47.glb",
+      "meshCount": 8
+    },
+    {
+      "assetId": "case-feiyashi-samurai-438",
+      "category": "case",
+      "path": "public/assets/3d/variants/cases/case-feiyashi-samurai-438.glb",
+      "meshCount": 8
+    },
+    {
+      "assetId": "case-tandorio-bronze-diver-44",
+      "category": "case",
+      "path": "public/assets/3d/variants/cases/case-tandorio-bronze-diver-44.glb",
+      "meshCount": 8
+    },
+    {
+      "assetId": "case-wr-skx-sandblasted-42",
+      "category": "case",
+      "path": "public/assets/3d/variants/cases/case-wr-skx-sandblasted-42.glb",
+      "meshCount": 7
+    },
+    {
+      "assetId": "case-tandorio-willard-41",
+      "category": "case",
+      "path": "public/assets/3d/variants/cases/case-tandorio-willard-41.glb",
+      "meshCount": 8
+    }
+  ]
+}

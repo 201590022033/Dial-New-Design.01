@@ -18,7 +18,7 @@ describe('large diver, pilot and chronograph case research', () => {
       const item = catalogueItemById.get(id);
       expect(item, id).toBeDefined();
       expect(item?.category).toBe('case');
-      expect(item?.visual).toMatchObject({ representation: 'procedural', status: 'provisional' });
+      expect(item?.visual).toMatchObject({ representation: 'glb', status: 'provisional' });
       expect(item?.exportEnabled).toBe(false);
     }
   });

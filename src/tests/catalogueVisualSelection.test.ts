@@ -26,15 +26,33 @@ describe('catalogue visual selections', () => {
     base.designConfig = { ...base.designConfig, visualReferenceConfig: { archetypeId: 'archetype-dive' } };
     const selected = applyCatalogueVisualSelection(base, 'inst-hour-hand', variant('cat-hands-mercedes-set-nh35'));
     const model = watchAssemblyToVisualModel(selected);
-    expect(model.assets.hands.assetId).toBe('hands-mercedes-42mm-v1');
+    expect(model.assets.hands.assetId).toBe('hands-mercedes-42');
     expect(model.hands.style).toBe('mercedes');
   });
 
   it('uses a procedural radial material for a selected sunburst dial', () => {
     const selected = applyCatalogueVisualSelection(createDefaultWatchAssembly(), 'inst-dial-blank', variant('cat-dial-sunburst-blue-285'));
     const model = watchAssemblyToVisualModel(selected);
-    expect(model.assets.dial.assetId).toBe('visual-dial-default');
+    expect(model.assets.dial.assetId).toBe('dial-sterile-285');
     expect(model.dial.textureKind).toBe('sunburst');
+  });
+
+  it('registers every independent hand, bezel and dial family as a GLB option', () => {
+    const families = {
+      hands: visualVariantCatalogueItems.filter((item) => item.id.startsWith('cat-hands-') && item.id !== 'cat-hands-nh05-dress-baton'),
+      bezels: visualVariantCatalogueItems.filter((item) => item.id.startsWith('cat-bezel-') && item.id.endsWith('-42')),
+      dials: visualVariantCatalogueItems.filter((item) => item.id.startsWith('cat-dial-') && item.id.endsWith('-285'))
+    };
+    expect(families.hands).toHaveLength(9);
+    expect(families.bezels).toHaveLength(8);
+    expect(families.dials).toHaveLength(9);
+    expect(Object.values(families).flat().every((item) => item.visual?.representation === 'glb')).toBe(true);
+  });
+
+  it('updates the master case envelope when a dedicated case GLB is applied', () => {
+    const selected = applyCatalogueVisualSelection(createDefaultWatchAssembly(), 'inst-midcase', variant('cat-case-namoki-nmk920-tuna-47'));
+    expect(selected.globalDimensions).toMatchObject({ caseDiameterMm: 47, totalThicknessMm: 11.3 });
+    expect(watchAssemblyToVisualModel(selected).assets.case.assetId).toBe('case-namoki-nmk920-tuna-47');
   });
 });
 

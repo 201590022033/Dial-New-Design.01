@@ -23,6 +23,11 @@ export const applyCatalogueVisualSelection = (
   part.material = item.defaultMaterial || part.material;
   part.texture = item.defaultTexture || part.texture;
 
+  if (item.visual?.category === 'case') {
+    provisional.globalDimensions.caseDiameterMm = item.nominalDimensions.diameterMm;
+    provisional.globalDimensions.totalThicknessMm = item.nominalDimensions.thicknessMm;
+  }
+
   if (!item.visual) return provisional;
 
   part.visual = { category: item.visual.category, assetId: item.visual.assetId };

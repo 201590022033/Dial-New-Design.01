@@ -57,8 +57,8 @@ export const visualVariantCatalogueItems: ComponentCatalogueItem[] = [
       }
     },
     visual: {
-      category: 'case', assetId: 'visual-case-default', representation: 'procedural', status: 'provisional',
-      note: 'Proportional preview, not supplier-exact case geometry.'
+      category: 'case', assetId: 'case-nh05-ladies-dress-34', representation: 'glb', status: 'provisional',
+      note: 'Dedicated 34 mm presentation GLB; supplier interfaces still require exact-variant confirmation.'
     },
     exportEnabled: false
   },
@@ -113,8 +113,8 @@ export const visualVariantCatalogueItems: ComponentCatalogueItem[] = [
     status: 'draft',
     metadata: { tags: [...entry.tags], revision: 'P1', notes: entry.note },
     visual: {
-      category: 'case', assetId: 'visual-case-default', representation: 'procedural', status: 'provisional',
-      note: 'Procedural fallback constrained by the exact seller item’s dimensioned drawing; dedicated GLB is not generated yet.'
+      category: 'case', assetId: entry.id.replace('cat-', ''), representation: 'glb', status: 'provisional',
+      note: 'Dedicated dimension-envelope GLB. Interface and manufacturing details remain gated by the linked drawing evidence.'
     },
     exportEnabled: false
   })),
@@ -150,7 +150,7 @@ export const visualVariantCatalogueItems: ComponentCatalogueItem[] = [
       }
     },
     visual: {
-      category: 'dial', assetId: 'visual-dial-default', representation: 'procedural', status: 'provisional',
+      category: 'dial', assetId: `dial-nh05-${id}-245`, representation: 'glb', status: 'provisional',
       dialFinish: finish
     },
     exportEnabled: false
@@ -173,7 +173,7 @@ export const visualVariantCatalogueItems: ComponentCatalogueItem[] = [
       notes: 'Movement-aware procedural preview using published NH05 1.10/0.656/0.213 mm fittings. Confirm actual hand lengths, pipes and stack height from the chosen set.'
     },
     visual: {
-      category: 'hands', assetId: 'visual-hands-baton', representation: 'procedural', status: 'provisional',
+      category: 'hands', assetId: 'hands-baton-nh05-34', representation: 'glb', status: 'provisional',
       handStyle: 'baton', note: 'Compact NH05 proportions are generated from the 24.5 mm dial; no supplier-exact GLB is claimed.'
     },
     exportEnabled: false
@@ -207,7 +207,7 @@ export const visualVariantCatalogueItems: ComponentCatalogueItem[] = [
     softStyles: ['sunburst', 'dress', 'nh35-compatible'],
     status: 'draft',
     metadata: { tags: ['dial', 'sunburst', 'blue', '28.5mm', 'visual-variant'], revision: 'P1', notes: 'Procedural radial finish; colour and interfaces remain independently configurable.' },
-    visual: { category: 'dial', assetId: 'visual-dial-default', representation: 'procedural', status: 'available', dialFinish: 'sunburst' },
+    visual: { category: 'dial', assetId: 'dial-sterile-285', representation: 'glb', status: 'provisional', dialFinish: 'sunburst', note: 'GLB substrate with runtime radial sunburst material.' },
     exportEnabled: true
   },
   {
@@ -223,7 +223,34 @@ export const visualVariantCatalogueItems: ComponentCatalogueItem[] = [
     softStyles: ['mercedes', 'diver', 'nh35-compatible'],
     status: 'draft',
     metadata: { tags: ['hands', 'mercedes', 'nh35', 'visual-variant'], revision: 'P1', notes: 'Reviewed presentation silhouette; bore and stack evidence must come from the selected supplier listing.' },
-    visual: { category: 'hands', assetId: 'hands-mercedes-42mm-v1', representation: 'glb', status: 'provisional', handStyle: 'mercedes' },
+    visual: { category: 'hands', assetId: 'hands-mercedes-42', representation: 'glb', status: 'provisional', handStyle: 'mercedes' },
     exportEnabled: false
-  }
+  },
+  ...([['baton', 'Baton'], ['sword', 'Sword'], ['dauphine', 'Dauphine'], ['syringe', 'Syringe'], ['cathedral', 'Cathedral'], ['pencil', 'Pencil'], ['broad-arrow', 'Broad Arrow'], ['skeleton', 'Skeleton']] as const).map(([id, label]): ComponentCatalogueItem => ({
+    id: `cat-hands-${id}-set`, kind: 'hand-set', displayName: `${label} Hand Set`, category: 'hands',
+    defaultMaterial: 'steel', defaultTexture: id === 'skeleton' ? 'skeletonized' : 'polished', linkedBandKind: 'hands',
+    nominalDimensions: { diameterMm: 14, widthMm: 1.4, thicknessMm: 0.6 }, manufacturing: handManufacturing,
+    softStyles: [id, 'visual-variant'], status: 'draft',
+    metadata: { tags: ['hands', id, 'independent-glb'], revision: 'P1', notes: 'Independent presentation GLB. Confirm movement post bores, lengths and stack height for the selected supplier set.' },
+    visual: { category: 'hands', assetId: `hands-${id}-42`, representation: 'glb', status: 'provisional', handStyle: id },
+    exportEnabled: false
+  })),
+  ...([['dive-coin-edge', 'Dive Coin-Edge', 'coin-edge'], ['dive-scalloped', 'Dive Scalloped', 'scalloped'], ['pilot-smooth', 'Pilot Smooth', 'smooth'], ['dress-fluted', 'Dress Fluted', 'coin-edge'], ['tachymeter-fixed', 'Fixed Tachymeter', 'smooth'], ['gmt', 'GMT 24-Hour', 'coin-edge'], ['slide-rule', 'Slide-Rule', 'coin-edge']] as const).map(([id, label, profile]): ComponentCatalogueItem => ({
+    id: `cat-bezel-${id}-42`, kind: id.includes('dive') || id === 'gmt' || id === 'slide-rule' ? 'rotating-bezel' : 'fixed-bezel',
+    displayName: `42mm ${label} Bezel`, category: 'rings', defaultMaterial: 'steel', defaultTexture: profile,
+    linkedBandKind: 'outer-bezel', nominalDimensions: { diameterMm: 41, widthMm: 4.75, thicknessMm: 2.8 }, manufacturing: cnc,
+    softStyles: [id, 'bezel', 'visual-variant'], status: 'draft',
+    metadata: { tags: ['bezel', id, '42mm', 'independent-glb'], revision: 'P1', notes: 'Independent presentation GLB with separate carrier and insert meshes; verify the selected case interface before manufacture.' },
+    visual: { category: 'bezel', assetId: `bezel-${id}-42`, representation: 'glb', status: 'provisional', bezelProfile: profile },
+    exportEnabled: false
+  })),
+  ...([['sterile', 'Sterile'], ['diver', 'Diver'], ['pilot-a', 'Pilot Type A'], ['pilot-b', 'Pilot Type B'], ['field', 'Field'], ['dress-sector', 'Dress Sector'], ['gmt', 'GMT'], ['chronograph', 'Chronograph']] as const).map(([id, label]): ComponentCatalogueItem => ({
+    id: `cat-dial-${id}-285`, kind: 'dial-blank', displayName: `28.5mm ${label} Dial`, category: 'dial',
+    defaultMaterial: 'brass', defaultTexture: id === 'dress-sector' ? 'sunburst' : 'matte', linkedBandKind: 'dial-face',
+    nominalDimensions: { diameterMm: 28.5, widthMm: 28.5, thicknessMm: 0.42 }, manufacturing: dialManufacturing,
+    softStyles: [id, 'dial', 'visual-variant'], status: 'draft',
+    metadata: { tags: ['dial', id, '28.5mm', 'independent-glb'], revision: 'P1', notes: 'Independent presentation GLB. Confirm feet, date aperture, indices and movement clearance for the chosen physical dial.' },
+    visual: { category: 'dial', assetId: `dial-${id}-285`, representation: 'glb', status: 'provisional', dialFinish: id === 'dress-sector' ? 'sunburst' : 'matte' },
+    exportEnabled: false
+  }))
 ];

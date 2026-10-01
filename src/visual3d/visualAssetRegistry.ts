@@ -1,5 +1,6 @@
 import type { AnchorId, ComponentCategory } from '@/domain/geometry/parametric';
 export type VisualCategory = ComponentCategory;
+export type VisualHandStyle = 'baton' | 'mercedes' | 'needle' | 'sword' | 'dauphine' | 'syringe' | 'cathedral' | 'pencil' | 'broad-arrow' | 'skeleton';
 export const visualCategories: VisualCategory[] = ['strap', 'caseback', 'case', 'dial', 'chapter-ring', 'bezel', 'hands', 'crystal', 'crown', 'pushers'];
 export const categoryAnchor: Record<VisualCategory, AnchorId> = {
   case: 'watch-axis', caseback: 'watch-axis', strap: 'watch-axis', bezel: 'dial-seat', dial: 'dial-seat', 'chapter-ring': 'dial-seat', crystal: 'dial-seat', hands: 'hand-stack', crown: 'crown-interface', pushers: 'watch-axis'
@@ -11,7 +12,7 @@ export type VisualAssetDescriptor = {
   assetType: 'procedural' | 'glb';
   assetPath?: string;
   materialProfile?: string;
-  handStyle?: 'baton' | 'mercedes' | 'needle';
+  handStyle?: VisualHandStyle;
   scale?: [number, number, number];
   rotation?: [number, number, number];
   offset?: [number, number, number];
@@ -26,7 +27,39 @@ export type VisualAssetDescriptor = {
   referenceCaseDiameterMm?: number;
 };
 
+const variantRoot = '/assets/3d/variants';
+const handVariantIds: VisualHandStyle[] = ['baton', 'mercedes', 'sword', 'dauphine', 'syringe', 'cathedral', 'pencil', 'broad-arrow', 'skeleton'];
+const generatedHandAssets = Object.fromEntries(handVariantIds.map((style) => {
+  const assetId = `hands-${style}-42`;
+  return [assetId, { assetId, category: 'hands', assetType: 'glb', assetPath: `${variantRoot}/hands/${assetId}.glb`, handStyle: style, anchor: 'watch-axis', offset: [0, 0, 4.25], units: 'millimetres', upAxis: 'Y' } satisfies VisualAssetDescriptor];
+}));
+const generatedBezelAssets = Object.fromEntries(['dive-coin-edge', 'dive-scalloped', 'pilot-smooth', 'dress-fluted', 'tachymeter-fixed', 'gmt', 'slide-rule'].map((style) => {
+  const assetId = `bezel-${style}-42`;
+  return [assetId, { assetId, category: 'bezel', assetType: 'glb', assetPath: `${variantRoot}/bezels/${assetId}.glb`, anchor: 'watch-axis', offset: [0, 0, 5.65], units: 'millimetres', upAxis: 'Y', referenceCaseDiameterMm: 42 } satisfies VisualAssetDescriptor];
+}));
+const generatedDialAssets = Object.fromEntries(['sterile', 'diver', 'pilot-a', 'pilot-b', 'field', 'dress-sector', 'gmt', 'chronograph'].map((style) => {
+  const assetId = `dial-${style}-285`;
+  return [assetId, { assetId, category: 'dial', assetType: 'glb', assetPath: `${variantRoot}/dials/${assetId}.glb`, anchor: 'watch-axis', offset: [0, 0, 3.7], units: 'millimetres', upAxis: 'Y' } satisfies VisualAssetDescriptor];
+}));
+const generatedNh05DialAssets = Object.fromEntries(['mother-of-pearl', 'champagne-sunburst', 'silver-roman', 'black-sunburst'].map((style) => {
+  const assetId = `dial-nh05-${style}-245`;
+  return [assetId, { assetId, category: 'dial', assetType: 'glb', assetPath: `${variantRoot}/dials/${assetId}.glb`, anchor: 'watch-axis', offset: [0, 0, 3.7], units: 'millimetres', upAxis: 'Y' } satisfies VisualAssetDescriptor];
+}));
+const generatedCaseAssets: Record<string, VisualAssetDescriptor> = Object.fromEntries(([
+  ['nh05-ladies-dress-34', 34], ['tandorio-pilot-40', 40.2], ['namoki-nmk920-tuna-47', 47],
+  ['feiyashi-samurai-438', 43.8], ['tandorio-bronze-diver-44', 44], ['wr-skx-sandblasted-42', 42], ['tandorio-willard-41', 41]
+] as const).map(([style, diameter]) => {
+  const assetId = `case-${style}`;
+  return [assetId, { assetId, category: 'case', assetType: 'glb', assetPath: `${variantRoot}/cases/${assetId}.glb`, anchor: 'watch-axis', units: 'millimetres', upAxis: 'Y', referenceCaseDiameterMm: diameter } satisfies VisualAssetDescriptor];
+}));
+
 export const visualAssetRegistry: Record<string, VisualAssetDescriptor> = {
+  ...generatedHandAssets,
+  ...generatedBezelAssets,
+  ...generatedDialAssets,
+  ...generatedNh05DialAssets,
+  ...generatedCaseAssets,
+  'hands-baton-nh05-34': { assetId: 'hands-baton-nh05-34', category: 'hands', assetType: 'glb', assetPath: `${variantRoot}/hands/hands-baton-nh05-34.glb`, handStyle: 'baton', anchor: 'watch-axis', offset: [0, 0, 4.25], units: 'millimetres', upAxis: 'Y' },
   'reference-42-case-preview': { assetId: 'reference-42-case-preview', category: 'case', assetType: 'glb', assetPath: '/assets/3d/reference-42/case.glb', anchor: 'watch-axis', units: 'millimetres', upAxis: 'Y', referenceCaseDiameterMm: 42 },
   'reference-42-caseback-preview': { assetId: 'reference-42-caseback-preview', category: 'caseback', assetType: 'glb', assetPath: '/assets/3d/reference-42/caseback.glb', anchor: 'watch-axis', offset: [0, 0, -5.65], units: 'millimetres', upAxis: 'Y', referenceCaseDiameterMm: 42 },
   'reference-42-strap-preview': { assetId: 'reference-42-strap-preview', category: 'strap', assetType: 'glb', assetPath: '/assets/3d/reference-42/strap.glb', anchor: 'watch-axis', units: 'millimetres', upAxis: 'Y', referenceCaseDiameterMm: 42 },

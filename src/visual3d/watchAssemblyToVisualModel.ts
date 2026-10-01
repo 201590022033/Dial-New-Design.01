@@ -2,7 +2,7 @@ import type { WatchAssembly, WatchAssemblyPartInstance } from '@/domain/assembly
 import { getCatalogueItem } from '@/domain/catalogue/catalogueRegistry';
 import type { AssemblyAnchors, ComponentTransform, ParametricCrownV1 } from '@/domain/geometry/parametric';
 import { validateParametricCrownV1 } from '@/domain/geometry/parametric';
-import { visualAssetRegistry, resolveVisualAssetByCategory, visualCategories, type VisualCategory, type VisualAssetDescriptor } from './visualAssetRegistry';
+import { visualAssetRegistry, resolveVisualAssetByCategory, visualCategories, type VisualCategory, type VisualAssetDescriptor, type VisualHandStyle } from './visualAssetRegistry';
 import { resolveAssemblyAnchors } from './assemblyAnchors';
 import { matchesReference42Parameters } from '@/domain/presets/reference3d';
 import { resolveFinishProfile, type FinishProfile, type FinishProfileId } from './finishProfiles';
@@ -63,7 +63,7 @@ export type VisualWatchModel = {
   bezelProfile: 'smooth' | 'coin-edge' | 'knurled' | 'scalloped';
   crystalMaterial: string;
   hands: {
-    style: 'baton' | 'mercedes' | 'needle'; material: string;
+    style: VisualHandStyle; material: string;
     hourLengthMm: number; minuteLengthMm: number; secondLengthMm: number;
     hourWidthMm: number; minuteWidthMm: number; secondWidthMm: number;
   };
@@ -134,7 +134,10 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
   const casePart = find('case'), dialPart = find('dial'), bezelPart = find('bezel'), handsPart = find('hands'), crownPart = find('crown'), pushersPart = find('pushers');
   const handValue = `${handsPart?.name ?? ''} ${handsPart?.texture ?? ''}`.toLowerCase();
   const declaredStyle = handsPart?.customProperties?.visualHandStyle;
-  const style = declaredStyle === 'mercedes' || handValue.includes('mercedes') ? 'mercedes' : declaredStyle === 'needle' || handValue.includes('needle') ? 'needle' : 'baton';
+  const registeredHandStyles: VisualHandStyle[] = ['baton', 'mercedes', 'needle', 'sword', 'dauphine', 'syringe', 'cathedral', 'pencil', 'broad-arrow', 'skeleton'];
+  const style = registeredHandStyles.includes(declaredStyle as VisualHandStyle)
+    ? declaredStyle as VisualHandStyle
+    : registeredHandStyles.find((candidate) => handValue.includes(candidate)) ?? 'baton';
   const movement = movementLibrary.find((item) => item.id === assembly.metadata.movement);
   const visualReferences = assembly.designConfig?.visualReferenceConfig ?? {};
   const archetypeProfile = getArchetypeVisualProfile(visualReferences.archetypeId);

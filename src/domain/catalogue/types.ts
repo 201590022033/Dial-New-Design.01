@@ -50,7 +50,7 @@ export interface CatalogueVisualMetadata {
   assetId: string;
   representation: 'glb' | 'procedural';
   status: 'available' | 'provisional' | 'planned';
-  handStyle?: 'baton' | 'mercedes' | 'needle';
+  handStyle?: 'baton' | 'mercedes' | 'needle' | 'sword' | 'dauphine' | 'syringe' | 'cathedral' | 'pencil' | 'broad-arrow' | 'skeleton';
   bezelProfile?: 'smooth' | 'coin-edge' | 'knurled' | 'scalloped';
   dialFinish?: TextureKind;
   note?: string;

@@ -1,6 +1,6 @@
 # HD GLB component-variant plan
 
-Status: proposed implementation plan, started 2026-09-26.
+Status: independent presentation library implemented 2026-09-28; supplier-exact interface validation remains ongoing.
 
 ## Goal
 
@@ -56,3 +56,12 @@ An asset is registrable only when it passes: correct real-world bounds, correct 
 3. Sterile, diver, and dress-sector dials.
 4. Independent selectors plus project persistence.
 5. Nine-asset automated render/contact-sheet review and regression tests.
+
+## Implemented library
+
+- 36 independently selectable GLBs: nine 42 mm hand families, one compact NH05 hand set, seven 42 mm bezel families, eight 28.5 mm dial families, four 24.5 mm NH05 dress dials, and seven researched case envelopes.
+- Every generated asset is recorded in `public/assets/3d/variants/manifest.json` and cross-checked against the runtime visual registry by automated tests.
+- Generated meshes use millimetres, named component meshes, stable watch-axis placement, and provisional provenance metadata.
+- Catalogue Preview and Apply now carry the selected GLB into Visual mode; applying a case also updates the master case diameter and thickness.
+
+These assets complete the presentation workload. They do not turn incomplete supplier evidence into machining claims: hand bores, dial feet, bezel retention interfaces, gasket seats, stem height and internal case clearances remain gated until exact drawings or measured samples are available.

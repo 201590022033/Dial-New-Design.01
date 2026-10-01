@@ -52,7 +52,7 @@ describe('archetype rendering and dashboard routing', () => {
     expect(build.assembly.parts['inst-crystal']?.dimensions.diameterMm).toBe(28);
     expect(build.assembly.designConfig?.assemblyAnchors).toBeUndefined();
     expect(model.assets).toMatchObject({
-      case: { assetType: 'procedural' }, dial: { assetType: 'procedural' }, hands: { assetType: 'procedural' }
+      case: { assetType: 'glb' }, dial: { assetType: 'glb' }, hands: { assetType: 'glb' }
     });
     expect(model.hands).toMatchObject({ hourWidthMm: 0.55, minuteWidthMm: 0.35, secondWidthMm: 0.12 });
   });

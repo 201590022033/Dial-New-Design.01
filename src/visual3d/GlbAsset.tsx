@@ -95,6 +95,7 @@ export const LoadedGlbAsset = ({ descriptor, appearance }: { descriptor: VisualA
           name.includes('dial textured surface') ||
           objectName === 'DD_REF42_DIAL' ||
           objectName === 'DD_DIAL_FACE' ||
+          objectName === 'DD_DIAL_SUBSTRATE' ||
           objectName === 'DD_ARCH_DIAL_FACE'
         ) {
           material.color = new Color(dialColor ?? '#07182d');
