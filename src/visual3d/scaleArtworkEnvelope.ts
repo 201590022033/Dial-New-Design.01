@@ -17,3 +17,12 @@ export const scaleArtworkClipEnvelope = (
   }
   return { innerRadiusMm: target.innerRadiusMm, outerRadiusMm: target.outerRadiusMm };
 };
+
+export const scaleArtworkSurfaceZ = (model: VisualWatchModel, ring: ScaleArtworkRing): number => {
+  const envelope = model.previewEnvelope;
+  if (ring === 'inner') return envelope.crystalZ + envelope.crystalThickness / 2 + 0.025;
+  // Authored inserts and raised pip/scale details extend above the carrier.
+  // The procedural insert also sits 0.08 mm above its carrier top.
+  const faceOffset = model.assets.bezel.scaleArtworkFaceOffsetMm ?? envelope.bezelHeight / 2 + 0.08;
+  return envelope.bezelZ + faceOffset + 0.06;
+};

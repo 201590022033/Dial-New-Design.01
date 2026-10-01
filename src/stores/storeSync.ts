@@ -39,6 +39,18 @@ export const syncAssemblyDownstream = (assembly: WatchAssembly): void => {
     const bands = assemblyToBands(assembly);
     useBandsStore.setState({ bands });
     useScaleStore.getState().syncArchetypeScale(assembly.designConfig?.visualReferenceConfig?.archetypeId, bands);
+    const scale = useScaleStore.getState();
+    const targetBand = bands.find((band) => band.id === scale.pluginConfig.placementTargetBandId);
+    if (targetBand && (
+      scale.pluginConfig.bandInnerRadiusMm !== targetBand.geometry.innerRadius ||
+      scale.pluginConfig.bandOuterRadiusMm !== targetBand.geometry.outerRadius
+    )) {
+      scale.syncFromBand(targetBand, useGlobalSettingsStore.getState().minimumLineWidthMm);
+    } else if (!scale.preview && scale.previewEnabled && !scale.activeArchetypeId && scale.selectedScaleKind === 'circular') {
+      // The initial UI advertises the diver program before a user selects an
+      // archetype. Build its preview against the current bezel on first load.
+      scale.applyScaleProgram('diver', bands);
+    }
 
     // 3. Sync watchComponentStore (DERIVED / ADAPTER)
     try {

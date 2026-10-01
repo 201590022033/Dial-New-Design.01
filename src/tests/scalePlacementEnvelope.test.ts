@@ -9,7 +9,10 @@ import { runScalePlugin } from '@/services/scaleEngineService';
 import { createDefaultWatchAssembly } from '@/domain/assembly/assemblyFactory';
 import { assemblyToBands } from '@/domain/assembly/assemblyAdapters';
 import { watchAssemblyToVisualModel } from '@/visual3d/watchAssemblyToVisualModel';
-import { scaleArtworkClipEnvelope } from '@/visual3d/scaleArtworkEnvelope';
+import { scaleArtworkClipEnvelope, scaleArtworkSurfaceZ } from '@/visual3d/scaleArtworkEnvelope';
+import { visualAssetRegistry } from '@/visual3d/visualAssetRegistry';
+import { useScaleStore } from '@/stores/scaleStore';
+import { syncAssemblyDownstream } from '@/stores/storeSync';
 
 const targetBands = [
   { id: 'band-outer-bezel', inner: 18.5, outer: 20 },
@@ -86,5 +89,37 @@ describe('scale placement envelope', () => {
     }, { startAngleDeg: 0, endAngleDeg: 360 })!;
     const clip = scaleArtworkClipEnvelope(preview, watchAssemblyToVisualModel(assembly), 'outer');
     expect(clip).toEqual({ innerRadiusMm: 18.5, outerRadiusMm: 19 });
+  });
+
+  it('places front-view artwork above authored bezel inserts and raised markings', () => {
+    const model = watchAssemblyToVisualModel(createDefaultWatchAssembly());
+    model.assets.bezel = visualAssetRegistry['reference-42-bezel-preview']!;
+    expect(scaleArtworkSurfaceZ(model, 'outer')).toBeGreaterThan(model.previewEnvelope.bezelZ + 2.09);
+    model.assets.bezel = visualAssetRegistry['archetype-bezel-diver']!;
+    expect(scaleArtworkSurfaceZ(model, 'outer')).toBeGreaterThan(model.previewEnvelope.bezelZ + 1.79);
+    model.assets.bezel = visualAssetRegistry['bezel-dive-coin-edge-42']!;
+    expect(scaleArtworkSurfaceZ(model, 'outer')).toBeGreaterThan(model.previewEnvelope.bezelZ + 1.79);
+  });
+
+  it('builds the visible diver preview against the bezel on initial assembly sync', () => {
+    const previous = useScaleStore.getState();
+    try {
+      useScaleStore.setState({
+        activeArchetypeId: undefined,
+        preview: null,
+        previewEnabled: true,
+        selectedScaleKind: 'circular',
+        pluginConfig: { ...previous.pluginConfig, placementTargetBandId: undefined, bandOuterRadiusMm: 21 }
+      });
+      const assembly = createDefaultWatchAssembly();
+      assembly.globalDimensions.caseDiameterMm = 42;
+      syncAssemblyDownstream(assembly);
+      const scale = useScaleStore.getState();
+      expect(scale.preview?.ticks.length).toBeGreaterThan(0);
+      expect(scale.preview?.placementTargetBandId).toBe('band-outer-bezel');
+      expect(scale.preview?.placementEnvelope.outerRadiusMm).toBe(19);
+    } finally {
+      useScaleStore.setState(previous);
+    }
   });
 });

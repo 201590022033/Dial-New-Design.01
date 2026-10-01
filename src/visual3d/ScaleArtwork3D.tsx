@@ -3,7 +3,7 @@ import { CanvasTexture, LinearFilter, SRGBColorSpace } from 'three';
 import type { ScaleRunResult } from '@/services/scaleEngineService';
 import type { ScaleTick, ScaleLabel } from '@/domain/scales/types';
 import type { VisualWatchModel } from './watchAssemblyToVisualModel';
-import { scaleArtworkClipEnvelope, type ScaleArtworkRing } from './scaleArtworkEnvelope';
+import { scaleArtworkClipEnvelope, scaleArtworkSurfaceZ, type ScaleArtworkRing } from './scaleArtworkEnvelope';
 
 type Ring = ScaleArtworkRing;
 
@@ -71,12 +71,9 @@ const RingArtwork = ({ preview, model, ring }: { preview: ScaleRunResult; model:
   }, [model, preview, ring]);
   useEffect(() => () => texture?.dispose(), [texture]);
   if (!texture) return null;
-  const envelope = model.previewEnvelope;
   // Runtime artwork follows the same physical scale radii as the engineering view.
   // It is a preview decal, not an engraved or dimensionally certified GLB surface.
-  const z = ring === 'outer'
-    ? envelope.bezelZ + envelope.bezelHeight / 2 + 0.09
-    : envelope.crystalZ + envelope.crystalThickness / 2 + 0.025;
+  const z = scaleArtworkSurfaceZ(model, ring);
   return <mesh name={`scale-artwork-${ring}`} position={[0, 0, z]}>
     <planeGeometry args={[model.caseDiameterMm, model.caseDiameterMm]} />
     <meshBasicMaterial map={texture} transparent depthWrite={false} toneMapped={false} />
