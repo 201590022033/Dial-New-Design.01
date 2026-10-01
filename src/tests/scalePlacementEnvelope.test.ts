@@ -9,7 +9,7 @@ import { runScalePlugin } from '@/services/scaleEngineService';
 import { createDefaultWatchAssembly } from '@/domain/assembly/assemblyFactory';
 import { assemblyToBands } from '@/domain/assembly/assemblyAdapters';
 import { watchAssemblyToVisualModel } from '@/visual3d/watchAssemblyToVisualModel';
-import { scaleArtworkClipEnvelope, scaleArtworkSurfaceZ } from '@/visual3d/scaleArtworkEnvelope';
+import { scaleArtworkClipEnvelope, scaleArtworkRadialShiftMm, scaleArtworkSurfaceZ } from '@/visual3d/scaleArtworkEnvelope';
 import { visualAssetRegistry } from '@/visual3d/visualAssetRegistry';
 import { useScaleStore } from '@/stores/scaleStore';
 import { syncAssemblyDownstream } from '@/stores/storeSync';
@@ -99,6 +99,24 @@ describe('scale placement envelope', () => {
     expect(scaleArtworkSurfaceZ(model, 'outer')).toBeGreaterThan(model.previewEnvelope.bezelZ + 1.79);
     model.assets.bezel = visualAssetRegistry['bezel-dive-coin-edge-42']!;
     expect(scaleArtworkSurfaceZ(model, 'outer')).toBeGreaterThan(model.previewEnvelope.bezelZ + 1.79);
+  });
+
+  it('insets Visual artwork onto the authored bezel insert instead of the carrier shoulder', () => {
+    const assembly = createDefaultWatchAssembly();
+    assembly.globalDimensions.caseDiameterMm = 42;
+    assembly.parts['inst-rotating-bezel']!.dimensions.diameterMm = 41;
+    assembly.designConfig = { ...assembly.designConfig, visualReferenceConfig: { archetypeId: 'archetype-dive' } };
+    const defaults = getScalePlugin('circular')!.defaultConfig;
+    const preview = runScalePlugin('circular', {
+      ...defaults,
+      bandInnerRadiusMm: 15.75,
+      bandOuterRadiusMm: 20.5,
+      placementTargetBandId: 'band-outer-bezel'
+    }, { startAngleDeg: 0, endAngleDeg: 360 })!;
+    const model = watchAssemblyToVisualModel(assembly);
+    expect(model.assets.bezel.assetId).toBe('archetype-bezel-diver');
+    expect(scaleArtworkClipEnvelope(preview, model, 'outer').outerRadiusMm).toBe(19.6);
+    expect(scaleArtworkRadialShiftMm(preview, model, 'outer')).toBeCloseTo(0.9);
   });
 
   it('builds the visible diver preview against the bezel on initial assembly sync', () => {

@@ -3,6 +3,7 @@ import { useLoader as useThreeLoader } from '@react-three/fiber';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { Color, Material, Mesh, MeshPhysicalMaterial, MeshStandardMaterial } from 'three';
 import type { VisualAssetDescriptor } from './visualAssetRegistry';
+import { glbLoadUrl } from './glbLoadUrl';
 
 type AssetAppearance = {
   archetypeId?: string;
@@ -17,21 +18,24 @@ type AssetAppearance = {
   lumeColor: string;
 };
 
+let handSelectionInstance = 0;
+
 export const LoadedGlbAsset = ({ descriptor, appearance }: { descriptor: VisualAssetDescriptor; appearance?: AssetAppearance }) => {
+  const instanceId = useMemo(() => ++handSelectionInstance, []);
   // New attachment meshes must not reuse an older in-memory/browser GLB cache.
   // Keep registry file paths intact for export/file validation consumers.
-  const attachmentAsset = descriptor.assetId.startsWith('lug-case-') ||
-    descriptor.assetId.startsWith('archetype-strap-') || descriptor.assetId === 'archetype-pushers-chronograph' ||
-    ['reference-42-case-preview', 'reference-42-strap-preview'].includes(descriptor.assetId);
-  const url = descriptor.assetPath! + (attachmentAsset ? '?v=attachment-seating-1' : '');
+  // R3F disposes an unmounted hand scene; a cached GLTFLoader scene can then
+  // remount without visible meshes when the user returns to a previous style.
+  // Hand GLBs are tiny, so load a fresh source for each style selection.
+  const url = glbLoadUrl(descriptor, instanceId);
   const gltf = useThreeLoader(GLTFLoader, url);
   const dialColor = appearance?.dialColor;
   const strapColor = appearance?.strapColor;
   const bezelColor = appearance?.bezelColor;
   const scene = useMemo(() => {
     let hasMesh = false;
-    // Geometry may be shared safely, but presentation material adjustments must
-    // never mutate GLTFLoader's cached source scene or another component instance.
+    // Presentation material adjustments must not mutate GLTFLoader's cached
+    // source scene or another component instance.
     const clone = gltf.scene.clone(true);
     clone.traverse((object) => {
       if (!(object instanceof Mesh)) return;

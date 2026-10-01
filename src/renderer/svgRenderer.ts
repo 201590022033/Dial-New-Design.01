@@ -13,6 +13,7 @@ import { renderGuides } from '@/renderer/services/guideService';
 import { resolveCanvasHit } from '@/renderer/services/canvasHitResolver';
 import { useWatchAssemblyStore } from '@/stores/watchAssemblyStore';
 import type { WatchAssembly } from '@/domain/assembly/assemblyTypes';
+import { watchAssemblyToVisualModel } from '@/visual3d/watchAssemblyToVisualModel';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -528,11 +529,44 @@ export class SvgRenderer implements RendererAdapter {
       .attr('data-part-category', 'hands')
       .attr('data-interaction-role', 'physical-part')
       .attr('data-z-layer', '700');
+    const handStyle = watchAssemblyToVisualModel(assembly).hands.style;
+    handsLayer.attr('data-hand-style', handStyle);
+    const drawHand = (group: ReturnType<typeof handsLayer.group>, angleDeg: number, lengthPx: number, widthPx: number) => {
+      const point = (radial: number, lateral: number) => {
+        const along = polarToCartesian(radial, angleDeg);
+        const across = polarToCartesian(lateral, angleDeg + 90);
+        return `${context.centerX + along.x + across.x},${context.centerY + along.y + across.y}`;
+      };
+      const base = widthPx / 2;
+      const blade = handStyle === 'needle' ? base * 0.38 : handStyle === 'pencil' || handStyle === 'baton' ? base : base * 1.35;
+      const shoulder = handStyle === 'sword' || handStyle === 'dauphine' || handStyle === 'broad-arrow' ? lengthPx * 0.54 : lengthPx * 0.72;
+      group.polygon([
+        point(-lengthPx * 0.12, -base), point(shoulder, -blade), point(lengthPx, 0),
+        point(shoulder, blade), point(-lengthPx * 0.12, base)
+      ].join(' ')).fill('#E2E8F0').stroke({ color: '#94A3B8', width: 0.45 })
+        .attr('data-interaction-role', 'rendering-primitive');
+      if (handStyle === 'mercedes') {
+        const hub = polarToCartesian(lengthPx * 0.58, angleDeg);
+        group.circle(widthPx * 2.4).center(context.centerX + hub.x, context.centerY + hub.y)
+          .fill('#A7F3D0').stroke({ color: '#E2E8F0', width: 1.1 })
+          .attr('data-interaction-role', 'rendering-primitive');
+      } else if (handStyle === 'skeleton') {
+        const start = polarToCartesian(lengthPx * 0.25, angleDeg);
+        const end = polarToCartesian(lengthPx * 0.77, angleDeg);
+        group.line(context.centerX + start.x, context.centerY + start.y, context.centerX + end.x, context.centerY + end.y)
+          .stroke({ color: '#07111D', width: Math.max(1, base * 0.8) }).attr('data-interaction-role', 'rendering-primitive');
+      } else if (handStyle !== 'needle' && handStyle !== 'dauphine') {
+        const start = polarToCartesian(lengthPx * 0.28, angleDeg);
+        const end = polarToCartesian(lengthPx * 0.79, angleDeg);
+        group.line(context.centerX + start.x, context.centerY + start.y, context.centerX + end.x, context.centerY + end.y)
+          .stroke({ color: '#A7F3D0', width: Math.max(0.8, base * 0.7), linecap: 'round' })
+          .attr('data-interaction-role', 'rendering-primitive');
+      }
+    };
 
     // Hour Hand: 10:10 presentation angle ~ 305° (10 o'clock)
     const hourAngleDeg = 305;
     const hourHandLengthPx = mmToPixels(10.2);
-    const hourHandTip = polarToCartesian(hourHandLengthPx, hourAngleDeg);
     const hourGroup = handsLayer
       .group()
       .id('part-hour-hand')
@@ -546,34 +580,11 @@ export class SvgRenderer implements RendererAdapter {
       .attr('data-band-id', 'band-hands')
       .attr('data-label', 'Hour Hand');
 
-    // Hour hand sword blade
-    hourGroup
-      .line(
-        context.centerX,
-        context.centerY,
-        context.centerX + hourHandTip.x,
-        context.centerY + hourHandTip.y
-      )
-      .stroke({ color: '#F1F5F9', width: 3.2, linecap: 'round' })
-      .attr('data-interaction-role', 'rendering-primitive');
-
-    // Hour hand lumen inlay
-    const hourLumenStart = polarToCartesian(mmToPixels(3.5), hourAngleDeg);
-    const hourLumenEnd = polarToCartesian(hourHandLengthPx - 3, hourAngleDeg);
-    hourGroup
-      .line(
-        context.centerX + hourLumenStart.x,
-        context.centerY + hourLumenStart.y,
-        context.centerX + hourLumenEnd.x,
-        context.centerY + hourLumenEnd.y
-      )
-      .stroke({ color: '#A7F3D0', width: 1.6, linecap: 'round' })
-      .attr('data-interaction-role', 'rendering-primitive');
+    drawHand(hourGroup, hourAngleDeg, hourHandLengthPx, 3.2);
 
     // Minute Hand: 10:10 presentation angle ~ 60° (2 o'clock)
     const minuteAngleDeg = 60;
     const minuteHandLengthPx = mmToPixels(13.6);
-    const minuteHandTip = polarToCartesian(minuteHandLengthPx, minuteAngleDeg);
     const minuteGroup = handsLayer
       .group()
       .id('part-minute-hand')
@@ -587,29 +598,7 @@ export class SvgRenderer implements RendererAdapter {
       .attr('data-band-id', 'band-hands')
       .attr('data-label', 'Minute Hand');
 
-    // Minute hand blade
-    minuteGroup
-      .line(
-        context.centerX,
-        context.centerY,
-        context.centerX + minuteHandTip.x,
-        context.centerY + minuteHandTip.y
-      )
-      .stroke({ color: '#E2E8F0', width: 2.4, linecap: 'round' })
-      .attr('data-interaction-role', 'rendering-primitive');
-
-    // Minute hand lumen inlay
-    const minuteLumenStart = polarToCartesian(mmToPixels(4.0), minuteAngleDeg);
-    const minuteLumenEnd = polarToCartesian(minuteHandLengthPx - 3, minuteAngleDeg);
-    minuteGroup
-      .line(
-        context.centerX + minuteLumenStart.x,
-        context.centerY + minuteLumenStart.y,
-        context.centerX + minuteLumenEnd.x,
-        context.centerY + minuteLumenEnd.y
-      )
-      .stroke({ color: '#A7F3D0', width: 1.2, linecap: 'round' })
-      .attr('data-interaction-role', 'rendering-primitive');
+    drawHand(minuteGroup, minuteAngleDeg, minuteHandLengthPx, 2.4);
 
     // Central Seconds Hand: angle ~ 210°, needle tip with accent color and counterweight disc
     const secondAngleDeg = 210;

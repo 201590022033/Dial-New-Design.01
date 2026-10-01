@@ -7,6 +7,7 @@ import { createDefaultWatchAssembly } from '@/domain/assembly/assemblyFactory';
 import { watchAssemblyToVisualModel } from '@/visual3d/watchAssemblyToVisualModel';
 import { ProceduralComponent, VisualComponent, VisualWatchScene } from '@/visual3d/VisualWatchScene';
 import { GlbAsset, LoadedGlbAsset } from '@/visual3d/GlbAsset';
+import { glbLoadUrl } from '@/visual3d/glbLoadUrl';
 import { createPreviewCaseGeometry } from '@/visual3d/proceduralEnvelope';
 import { categoryAnchor, visualCategories, type VisualAssetDescriptor } from '@/visual3d/visualAssetRegistry';
 
@@ -23,6 +24,12 @@ const descriptor: VisualAssetDescriptor = { assetId: 'test', category: 'crown', 
 describe('P4 scene integration and GLB failure boundaries', () => {
   beforeEach(() => { vi.spyOn(console, 'error').mockImplementation(() => {}); });
   afterEach(() => { vi.restoreAllMocks(); loader.load.mockReset(); });
+
+  it('reloads a previously selected hand style instead of reusing a disposed GLB', () => {
+    const baton: VisualAssetDescriptor = { assetId: 'hands-baton-42', category: 'hands', assetType: 'glb', assetPath: '/hands-baton-42.glb' };
+    expect(glbLoadUrl(baton, 1)).toBe('/hands-baton-42.glb?selection=1');
+    expect(glbLoadUrl(baton, 3)).toBe('/hands-baton-42.glb?selection=3');
+  });
 
   it('keeps exactly one demand-driven canvas with all supported categories', () => {
     const model = watchAssemblyToVisualModel(createDefaultWatchAssembly());

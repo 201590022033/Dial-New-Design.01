@@ -3,7 +3,7 @@ import { CanvasTexture, LinearFilter, SRGBColorSpace } from 'three';
 import type { ScaleRunResult } from '@/services/scaleEngineService';
 import type { ScaleTick, ScaleLabel } from '@/domain/scales/types';
 import type { VisualWatchModel } from './watchAssemblyToVisualModel';
-import { scaleArtworkClipEnvelope, scaleArtworkSurfaceZ, type ScaleArtworkRing } from './scaleArtworkEnvelope';
+import { scaleArtworkClipEnvelope, scaleArtworkRadialShiftMm, scaleArtworkSurfaceZ, type ScaleArtworkRing } from './scaleArtworkEnvelope';
 
 type Ring = ScaleArtworkRing;
 
@@ -29,6 +29,7 @@ const RingArtwork = ({ preview, model, ring }: { preview: ScaleRunResult; model:
     const pxPerMm = canvas.width / model.caseDiameterMm;
     const centre = canvas.width / 2;
     const clip = scaleArtworkClipEnvelope(preview, model, ring);
+    const inwardShiftMm = scaleArtworkRadialShiftMm(preview, model, ring);
     const outerClipPx = Math.max(0, clip.outerRadiusMm * pxPerMm);
     const innerClipPx = Math.max(0, Math.min(clip.innerRadiusMm * pxPerMm, outerClipPx));
     context.beginPath();
@@ -41,8 +42,8 @@ const RingArtwork = ({ preview, model, ring }: { preview: ScaleRunResult; model:
     context.lineCap = 'round';
     for (const tick of marks.ticks) {
       const length = tick.direction === 'bidirectional' ? tick.lengthMm / 2 : tick.lengthMm;
-      const startRadius = tick.radiusMm - (tick.direction === 'bidirectional' ? length : 0);
-      const endRadius = tick.radiusMm + (tick.direction === 'inside' ? -length : length);
+      const startRadius = tick.radiusMm - inwardShiftMm - (tick.direction === 'bidirectional' ? length : 0);
+      const endRadius = tick.radiusMm - inwardShiftMm + (tick.direction === 'inside' ? -length : length);
       const start = polar(startRadius, tick.angleDeg, pxPerMm, centre);
       const end = polar(endRadius, tick.angleDeg, pxPerMm, centre);
       context.lineWidth = Math.max(1.4, tick.widthMm * pxPerMm);
@@ -55,7 +56,7 @@ const RingArtwork = ({ preview, model, ring }: { preview: ScaleRunResult; model:
     context.textBaseline = 'middle';
     context.font = `600 ${preview.fontSizeMm * pxPerMm}px ${preview.fontFamily}`;
     for (const label of marks.labels) {
-      const [x, y] = polar(label.radiusMm, label.angleDeg, pxPerMm, centre);
+      const [x, y] = polar(label.radiusMm - inwardShiftMm, label.angleDeg, pxPerMm, centre);
       context.save();
       context.translate(x, y);
       if (label.orientation !== 'horizontal') context.rotate((label.angleDeg + label.rotationDeg) * Math.PI / 180);

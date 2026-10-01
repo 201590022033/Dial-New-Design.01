@@ -5,7 +5,7 @@ import type { RendererOptions } from '@/renderer/types';
 
 const svg = vi.hoisted(() => {
   const node: Record<string, unknown> = { node: { setAttribute: vi.fn() } };
-  for (const method of ['addTo', 'size', 'clear', 'remove', 'group', 'id', 'attr', 'css', 'line', 'stroke', 'circle', 'center', 'fill', 'path', 'front']) {
+  for (const method of ['addTo', 'size', 'clear', 'remove', 'group', 'id', 'attr', 'css', 'line', 'stroke', 'circle', 'polygon', 'center', 'fill', 'path', 'front']) {
     node[method] = vi.fn(() => node);
   }
   node.findOne = vi.fn(() => null);
@@ -52,5 +52,15 @@ describe('engineering renderer lifecycle', () => {
     renderer.renderBands([], context, options);
 
     expect(svg.path).not.toHaveBeenCalled();
+  });
+
+  it('uses the selected hand-set style for Engineering hand geometry', () => {
+    const renderer = new SvgRenderer();
+    const assembly = createDefaultWatchAssembly();
+    assembly.designConfig = { ...assembly.designConfig, visualReferenceConfig: { componentAssetOverrides: { hands: 'hands-mercedes-42' } } };
+    renderer.mount({} as HTMLElement);
+    renderer.renderBands([], context, { ...options, assembly });
+    expect(svg.attr).toHaveBeenCalledWith('data-hand-style', 'mercedes');
+    expect(svg.polygon).toHaveBeenCalled();
   });
 });

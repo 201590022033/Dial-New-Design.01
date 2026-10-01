@@ -208,6 +208,8 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
   }
   const markerConfig: MarkerEngineConfig = assembly.designConfig?.markerConfig ?? defaultMarkerConfig;
   const dialConfig = assembly.designConfig?.dialFaceConfig;
+  const effectiveDialColor = dialConfig?.color ?? dialPart?.color ?? assembly.selectedColorPalette.primary;
+  const effectiveHandStyle = assets.hands.handStyle ?? style;
   const dialTexture = dialConfig?.texture ?? defaultDialFaceConfig.texture;
   const typography = assembly.designConfig?.typographyConfig ?? defaultTypographyConfig;
   const lumeReference = getLumeReferenceById(visualReferences.lumeId ?? '');
@@ -232,7 +234,7 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
     caseThicknessMm: caseHeight,
     previewEnvelope: resolveProceduralEnvelope(positive(assembly.globalDimensions.caseDiameterMm, 40), caseHeight, caseParams, hasFixedFaceFrame ? 10.2 : caseHeight),
     caseMaterial: materialProfile(casePart, 'brushed-steel'),
-    dialColor: dialPart?.color ?? assembly.selectedColorPalette.primary,
+    dialColor: effectiveDialColor,
     dial: {
       outerDiameterMm: dialDiameter,
       thicknessMm: positive(dialPart?.dimensions.thicknessMm, 0.4),
@@ -281,7 +283,7 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
     })(),
     crystalMaterial: 'sapphire',
     hands: {
-      style,
+      style: effectiveHandStyle,
       material: materialProfile(handsPart, 'polished-steel'),
       // Procedural hands are sized to the visible dial, not the case. This is
       // especially important for NH05 watches, where a 24.5 mm dial sits in a
@@ -289,8 +291,8 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
       hourLengthMm: dialDiameter * 0.25,
       minuteLengthMm: dialDiameter * 0.36,
       secondLengthMm: dialDiameter * 0.39,
-      hourWidthMm: movement?.id === 'nh05' ? 0.55 : style === 'mercedes' ? 1.1 : style === 'needle' ? 0.45 : 0.85,
-      minuteWidthMm: movement?.id === 'nh05' ? 0.35 : style === 'needle' ? 0.28 : 0.58,
+      hourWidthMm: movement?.id === 'nh05' ? 0.55 : effectiveHandStyle === 'mercedes' ? 1.1 : effectiveHandStyle === 'needle' ? 0.45 : 0.85,
+      minuteWidthMm: movement?.id === 'nh05' ? 0.35 : effectiveHandStyle === 'needle' ? 0.28 : 0.58,
       secondWidthMm: movement?.id === 'nh05' ? 0.12 : 0.2
     },
     crown: {
@@ -320,7 +322,7 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
     },
     archetypeAppearance: {
       archetypeId: visualReferences.archetypeId,
-      dialColor: archetypeProfile?.dialColor ?? dialPart?.color ?? assembly.selectedColorPalette.primary,
+      dialColor: effectiveDialColor,
       strapColor: archetypeProfile?.strapColor ?? '#080b10',
       bezelColor: visualReferences.bezelId === 'bezel-gmt-24-hour' ? '#173e77' : visualReferences.bezelId === 'bezel-tachymeter' ? '#16191d' : visualReferences.bezelId === 'bezel-smooth' ? '#7f8791' : '#05080d',
       accentColor: assembly.selectedColorPalette.accent,

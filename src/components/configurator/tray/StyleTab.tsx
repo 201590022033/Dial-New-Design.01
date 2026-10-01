@@ -34,6 +34,8 @@ const SUBDIAL_HAND_STYLES = [
   { id: 'syringe', label: 'Syringe', note: 'Tapered instrument register hand' }
 ] as const;
 
+const MAIN_HAND_STYLES = ['baton', 'mercedes', 'sword', 'dauphine', 'syringe', 'cathedral', 'pencil', 'broad-arrow', 'skeleton'] as const;
+
 const LUG_STYLES = [
   'straight', 'curved', 'twisted', 'hooded', 'integrated',
   'drilled', 'wire', 'teardrop', 'faceted', 'skeleton'
@@ -46,6 +48,13 @@ export const StyleTab: React.FC = () => {
   const updateDialFaceConfig = useDesignEngineStore((s) => s.updateDialFaceConfig);
   const visualReferenceConfig = useDesignEngineStore((s) => s.visualReferenceConfig);
   const updateVisualReferenceConfig = useDesignEngineStore((s) => s.updateVisualReferenceConfig);
+  const selectedMainHandAsset = visualReferenceConfig?.componentAssetOverrides?.hands;
+  const selectMainHands = (style: typeof MAIN_HAND_STYLES[number] | 'archetype') => {
+    const overrides = { ...visualReferenceConfig?.componentAssetOverrides };
+    if (style === 'archetype') delete overrides.hands;
+    else overrides.hands = `hands-${style}-42`;
+    updateVisualReferenceConfig({ componentAssetOverrides: overrides });
+  };
 
   const activePart = activePartInstanceId ? assembly.parts[activePartInstanceId] : null;
 
@@ -197,8 +206,20 @@ export const StyleTab: React.FC = () => {
       </div>
 
       <div className="space-y-2 pt-2 border-t border-slate-800">
-        <h4 className="text-[11px] font-mono text-slate-400 uppercase tracking-wider">Subdial Hands</h4>
-        <p className="text-[10px] text-slate-400">Shown for movement-owned registers. Supplier bore verification is still required.</p>
+        <h4 className="text-[11px] font-mono text-slate-400 uppercase tracking-wider">Main Hour &amp; Minute Hands</h4>
+        <p className="text-[10px] text-slate-400">Changes both Engineering and HD Visual. The GLBs are presentation shapes; confirm supplier bores and lengths.</p>
+        <div className="grid grid-cols-3 gap-2">
+          <button type="button" aria-pressed={!selectedMainHandAsset} onClick={() => selectMainHands('archetype')}
+            className={cn('rounded-lg border p-2 text-left text-xs', !selectedMainHandAsset ? 'border-teal-400 bg-slate-800' : 'border-slate-800 bg-slate-900')}>Archetype default</button>
+          {MAIN_HAND_STYLES.map((style) => <button key={style} type="button" aria-pressed={selectedMainHandAsset === `hands-${style}-42`}
+            onClick={() => selectMainHands(style)}
+            className={cn('rounded-lg border p-2 text-left text-xs capitalize', selectedMainHandAsset === `hands-${style}-42` ? 'border-teal-400 bg-slate-800' : 'border-slate-800 bg-slate-900')}>{style.replace('-', ' ')}</button>)}
+        </div>
+      </div>
+
+      <div className="space-y-2 pt-2 border-t border-slate-800">
+        <h4 className="text-[11px] font-mono text-slate-400 uppercase tracking-wider">Chronograph Subdial Hands</h4>
+        <p className="text-[10px] text-slate-400">Controls only chronograph registers, not the main hour/minute hand set. Supplier bore verification is still required.</p>
         <div className="grid grid-cols-3 gap-2">
           {SUBDIAL_HAND_STYLES.map((style) => <button key={style.id} type="button" title={style.note}
             onClick={() => updateVisualReferenceConfig({ subdialHandStyle: style.id })}

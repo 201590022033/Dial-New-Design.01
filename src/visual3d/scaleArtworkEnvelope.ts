@@ -10,13 +10,23 @@ export const scaleArtworkClipEnvelope = (
 ) => {
   const target = preview.placementEnvelope;
   if (ring === 'outer' && preview.placementTargetBandId === 'band-outer-bezel') {
+    const markingSurfaceRadiusMm = model.assets.bezel.scaleArtworkOuterRadiusMm ??
+      (model.assets.bezel.assetType === 'procedural' ? model.previewEnvelope.bezelOuterRadius - 0.7 : model.bezelEnvelope.outerRadiusMm);
     return {
       innerRadiusMm: Math.max(target.innerRadiusMm, model.bezelEnvelope.innerRadiusMm),
-      outerRadiusMm: Math.min(target.outerRadiusMm, model.bezelEnvelope.outerRadiusMm)
+      outerRadiusMm: Math.min(target.outerRadiusMm, model.bezelEnvelope.outerRadiusMm, markingSurfaceRadiusMm)
     };
   }
   return { innerRadiusMm: target.innerRadiusMm, outerRadiusMm: target.outerRadiusMm };
 };
+
+export const scaleArtworkRadialShiftMm = (
+  preview: ScaleRunResult,
+  model: VisualWatchModel,
+  ring: ScaleArtworkRing
+): number => ring === 'outer' && preview.placementTargetBandId === 'band-outer-bezel'
+  ? Math.max(0, preview.placementEnvelope.outerRadiusMm - scaleArtworkClipEnvelope(preview, model, ring).outerRadiusMm)
+  : 0;
 
 export const scaleArtworkSurfaceZ = (model: VisualWatchModel, ring: ScaleArtworkRing): number => {
   const envelope = model.previewEnvelope;
