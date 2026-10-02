@@ -11,6 +11,7 @@ import { ACESFilmicToneMapping, CanvasTexture, Color, LinearFilter, PerspectiveC
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import type { ScaleRunResult } from '@/services/scaleEngineService';
 import { ScaleArtwork3D } from './ScaleArtwork3D';
+import { useScaleArtworkTexture } from './useScaleArtworkTexture';
 
 const finish = (profile: FinishProfile, color?: string) => ({ color: color ?? profile.color, metalness: profile.metalness, roughness: profile.roughness });
 const physicalFinish = (profile: FinishProfile, color?: string) => ({
@@ -363,6 +364,21 @@ export const VisualComponent = ({ category, model }: { category: VisualCategory;
   </group>;
 };
 
+const ScaledVisualComponent = ({ category, model, preview }: { category: VisualCategory; model: VisualWatchModel; preview: ScaleRunResult | null }) => {
+  const ring = model.assets[category].scaleArtworkSurface;
+  const texture = useScaleArtworkTexture(ring ? preview : null, model, ring ?? 'outer', '#080d14');
+  if (!ring) return <VisualComponent category={category} model={model} />;
+  if (!model.visible[category]) return null;
+  const placement = componentPlacement(model, category);
+  const descriptor = model.assets[category];
+  return <group name={category} position={placement.anchor.positionMm} rotation={placement.anchor.rotationRad}>
+    <group position={placement.offset} rotation={placement.rotation}>
+      <GlbAsset key={descriptor.assetId + ':' + descriptor.assetPath} descriptor={descriptor} appearance={model.archetypeAppearance}
+        scaleTexture={texture} fallback={<ProceduralComponent category={category} model={model} />} />
+    </group>
+  </group>;
+};
+
 const DarkDramaticEnvironment = () => {
   const { gl, scene, invalidate } = useThree();
   useEffect(() => {
@@ -443,7 +459,7 @@ export const VisualWatchScene = ({ model, rotation, cameraDistance, scalePreview
     <directionalLight position={[1, 6, 4]} intensity={1.0} color="#ffb477" />
     <pointLight position={[0, -4, 5]} intensity={1.1} color="#ffffff" distance={18} decay={2} />
     <group rotation={rotation} scale={MM_TO_SCENE}>
-      {visualCategories.map((category) => <VisualComponent key={category} category={category} model={model} />)}
+      {visualCategories.map((category) => <ScaledVisualComponent key={category} category={category} model={model} preview={scalePreview ?? null} />)}
       <ScaleArtwork3D preview={scalePreview ?? null} model={model} />
     </group>
   </Canvas>

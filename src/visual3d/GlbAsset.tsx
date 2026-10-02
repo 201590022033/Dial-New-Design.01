@@ -1,7 +1,7 @@
-import React, { Suspense, useMemo } from 'react';
-import { useLoader as useThreeLoader } from '@react-three/fiber';
+import React, { Suspense, useEffect, useMemo } from 'react';
+import { useLoader as useThreeLoader, useThree } from '@react-three/fiber';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { Color, Material, Mesh, MeshPhysicalMaterial, MeshStandardMaterial } from 'three';
+import { Color, Material, Mesh, MeshPhysicalMaterial, MeshStandardMaterial, type Texture } from 'three';
 import type { VisualAssetDescriptor } from './visualAssetRegistry';
 import { glbLoadUrl } from './glbLoadUrl';
 
@@ -18,17 +18,13 @@ type AssetAppearance = {
   lumeColor: string;
 };
 
-let handSelectionInstance = 0;
-
-export const LoadedGlbAsset = ({ descriptor, appearance }: { descriptor: VisualAssetDescriptor; appearance?: AssetAppearance }) => {
-  const instanceId = useMemo(() => ++handSelectionInstance, []);
-  // New attachment meshes must not reuse an older in-memory/browser GLB cache.
-  // Keep registry file paths intact for export/file validation consumers.
-  // R3F disposes an unmounted hand scene; a cached GLTFLoader scene can then
-  // remount without visible meshes when the user returns to a previous style.
-  // Hand GLBs are tiny, so load a fresh source for each style selection.
-  const url = glbLoadUrl(descriptor, instanceId);
+export const LoadedGlbAsset = ({ descriptor, appearance, scaleTexture }: { descriptor: VisualAssetDescriptor; appearance?: AssetAppearance; scaleTexture?: Texture | null }) => {
+  // Suspense discards initial useMemo state when a load suspends. A per-mount
+  // URL therefore restarts the request on every retry and never reveals the GLB.
+  // Stable URLs + isolated clones (dispose=null below) support repeated swaps.
+  const url = glbLoadUrl(descriptor);
   const gltf = useThreeLoader(GLTFLoader, url);
+  const invalidate = useThree((state) => state.invalidate);
   const dialColor = appearance?.dialColor;
   const strapColor = appearance?.strapColor;
   const bezelColor = appearance?.bezelColor;
@@ -41,6 +37,9 @@ export const LoadedGlbAsset = ({ descriptor, appearance }: { descriptor: VisualA
       if (!(object instanceof Mesh)) return;
       hasMesh = true;
       const objectName = object.name.toUpperCase();
+      // GLBs include authored default relief for standalone Blender review.
+      // The live surface print replaces it so edits do not double the artwork.
+      if (descriptor.scaleArtworkSurface && objectName.startsWith('DD_PILOT_SCALE_')) object.visible = false;
       object.castShadow = true;
       object.receiveShadow = true;
       const sourceMaterials = (Array.isArray(object.material) ? object.material : [object.material]) as Material[];
@@ -62,7 +61,7 @@ export const LoadedGlbAsset = ({ descriptor, appearance }: { descriptor: VisualA
         if (name.includes('sapphire') || objectName.includes('CRYSTAL')) {
           material.color = new Color('#e8f7ff');
           material.transparent = true;
-          material.opacity = 1;
+          material.opacity = 0.26;
           material.depthWrite = false;
           material.roughness = 0.025;
           material.envMapIntensity = 2.25;
@@ -116,7 +115,7 @@ export const LoadedGlbAsset = ({ descriptor, appearance }: { descriptor: VisualA
           material.color = new Color('#05070a');
           material.metalness = 0;
           material.roughness = 0.48;
-        } else if (objectName.includes('DIAL_MARKER') || objectName.includes('_INDEX_') || objectName.includes('NUMERAL') || objectName.includes('HAND_LUME') || objectName.includes('BEZEL_PIP_LUME')) {
+        } else if (objectName.includes('DIAL_MARKER') || objectName.includes('_INDEX_') || objectName.includes('NUMERAL') || objectName.includes('HAND_LUME') || (objectName.includes('HAND_') && objectName.endsWith('_LUME')) || objectName.includes('BEZEL_PIP_LUME')) {
           material.color = new Color(appearance?.lumeEnabled ? appearance.lumeColor : '#e8e5dc');
           material.emissive = new Color(appearance?.lumeEnabled ? appearance.lumeColor : '#000000');
           material.emissiveIntensity = appearance?.lumeEnabled ? 0.42 : 0;
@@ -130,8 +129,8 @@ export const LoadedGlbAsset = ({ descriptor, appearance }: { descriptor: VisualA
           const face = new Color(dialColor ?? '#07182d');
           const faceLuminance = face.r * 0.2126 + face.g * 0.7152 + face.b * 0.0722;
           material.color = new Color(faceLuminance > 0.55 ? '#26313d' : '#d7dde3');
-          material.metalness = 1;
-          material.roughness = 0.09;
+          material.metalness = 0.58;
+          material.roughness = 0.25;
           material.envMapIntensity = 1.95;
         } else if (name.includes('rubber') || name.includes('leather') || name.includes('canvas') || objectName.includes('STRAP') || objectName.includes('RACING')) {
           const materialStrapColor = new Color(strapColor ?? '#080b10');
@@ -142,12 +141,27 @@ export const LoadedGlbAsset = ({ descriptor, appearance }: { descriptor: VisualA
           material.roughness = appearance?.strapStyleId === 'canvas' ? 0.88 : appearance?.strapStyleId === 'leather' || appearance?.strapStyleId === 'racing' ? 0.46 : 0.62;
           material.envMapIntensity = appearance?.strapStyleId === 'canvas' ? 0.35 : 0.7;
         }
+        if (objectName.startsWith('DD_SCALE_SURFACE_')) {
+          // Printing belongs to the authored annulus below/around the crystal.
+          // Its PBR material receives the same studio lighting as the carrier.
+          material.map = scaleTexture ?? null;
+          material.color = new Color(scaleTexture ? '#ffffff' : '#080d14');
+          material.metalness = 0.08;
+          material.roughness = 0.48;
+          material.transparent = false;
+          material.opacity = 1;
+        }
         material.needsUpdate = true;
       }
     });
     if (!hasMesh) throw new Error('GLB has no mesh');
     return clone;
-  }, [appearance?.dialTextureIntensity, appearance?.dialTextureKind, appearance?.lumeColor, appearance?.lumeEnabled, appearance?.strapStyleId, bezelColor, dialColor, gltf, strapColor]);
+  }, [appearance?.dialTextureIntensity, appearance?.dialTextureKind, appearance?.lumeColor, appearance?.lumeEnabled, appearance?.strapStyleId, bezelColor, descriptor.scaleArtworkSurface, dialColor, gltf, scaleTexture, strapColor]);
+  // Loading can complete after the frame triggered by a Style click. Demand
+  // rendering must capture the new mesh (including sapphire transmission).
+  useEffect(() => {
+    invalidate();
+  }, [descriptor.assetId, descriptor.category, invalidate, scene]);
   return <group position={descriptor.offset} rotation={descriptor.rotation} scale={descriptor.scale}>
     <group rotation={descriptor.upAxis === 'Z' ? [0, 0, 0] : [Math.PI / 2, 0, 0]} scale={descriptor.units === 'metres' ? 1000 : 1}>
       <primitive object={scene} dispose={null} />
@@ -155,11 +169,11 @@ export const LoadedGlbAsset = ({ descriptor, appearance }: { descriptor: VisualA
   </group>;
 };
 
-export class GlbAsset extends React.Component<{ descriptor: VisualAssetDescriptor; fallback: React.ReactNode; appearance?: AssetAppearance }, { failed: boolean }> {
+export class GlbAsset extends React.Component<{ descriptor: VisualAssetDescriptor; fallback: React.ReactNode; appearance?: AssetAppearance; scaleTexture?: Texture | null }, { failed: boolean }> {
   state = { failed: false };
   static getDerivedStateFromError() { return { failed: true }; }
   componentDidCatch(error: unknown) { console.warn('[visual3d] GLB unavailable; using procedural fallback.', error); }
   render() {
-    return this.state.failed ? this.props.fallback : <Suspense fallback={this.props.fallback}><LoadedGlbAsset descriptor={this.props.descriptor} appearance={this.props.appearance} /></Suspense>;
+    return this.state.failed ? this.props.fallback : <Suspense fallback={this.props.fallback}><LoadedGlbAsset descriptor={this.props.descriptor} appearance={this.props.appearance} scaleTexture={this.props.scaleTexture} /></Suspense>;
   }
 }

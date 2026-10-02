@@ -217,7 +217,7 @@ export const StyleTab: React.FC = () => {
         </div>
       </div>
 
-      <div className="space-y-2 pt-2 border-t border-slate-800">
+      {visualReferenceConfig?.archetypeId === 'archetype-chronograph' && <div className="space-y-2 pt-2 border-t border-slate-800">
         <h4 className="text-[11px] font-mono text-slate-400 uppercase tracking-wider">Chronograph Subdial Hands</h4>
         <p className="text-[10px] text-slate-400">Controls only chronograph registers, not the main hour/minute hand set. Supplier bore verification is still required.</p>
         <div className="grid grid-cols-3 gap-2">
@@ -227,7 +227,7 @@ export const StyleTab: React.FC = () => {
             <span className="block text-xs text-slate-200">{style.label}</span>
           </button>)}
         </div>
-      </div>
+      </div>}
 
       <div className="space-y-2 pt-2 border-t border-slate-800">
         <h4 className="text-[11px] font-mono text-slate-400 uppercase tracking-wider">Custom Dial Artwork</h4>

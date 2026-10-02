@@ -45,9 +45,15 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode, visua
   const selectHit = useSelectionStore((s) => s.selectHit);
   const hoverHit = useSelectionStore((s) => s.hoverHit);
   const setCrystalSelectionMode = useSelectionStore((s) => s.setCrystalSelectionMode);
-  // Subscribe to canonical changes so visual-only settings refresh immediately.
-  useWatchAssemblyStore((s) => s.assembly);
-  const activeAssembly = useConfiguratorUIStore((s) => s.getActiveAssembly());
+  // A selector in the UI store cannot observe changes in the assembly store.
+  // Select only actual preview snapshots there; consume canonical edits from
+  // their own subscription so HD and Engineering receive the same new object.
+  const canonicalAssembly = useWatchAssemblyStore((s) => s.assembly);
+  const previewAssembly = useConfiguratorUIStore((s) => {
+    const version = s.previewingVersionId ? s.savedVersions.find((item) => item.id === s.previewingVersionId) : undefined;
+    return version?.assembly ?? s.previewAssembly ?? s.archetypePreviewAssembly;
+  });
+  const activeAssembly = previewAssembly ?? canonicalAssembly;
   const workMode = useConfiguratorUIStore((s) => s.workMode);
   const advancedOverlays = useConfiguratorUIStore((s) => s.overlays);
   const showDiagnostics = workMode === 'advanced';

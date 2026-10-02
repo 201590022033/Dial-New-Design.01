@@ -330,6 +330,8 @@ def main():
         for style in STYLES:
             ref.clear()
             export(bezel(style), os.path.join(output, f"bezel-{style}.glb"))
+        from generate_pilot_scale_surfaces import generate
+        generate(output)
         print(f"Generated {len(STYLES)} seated bezel assets")
         return
     assets = []
@@ -352,6 +354,9 @@ def main():
     ref.clear()
     export(pushers(), os.path.join(output, "pushers-chronograph.glb"))
     assets.append("pushers-chronograph.glb")
+    from generate_pilot_scale_surfaces import generate
+    generate(output)
+    assets.append("chapter-ring-pilot.glb")
     with open(os.path.join(output, "manifest.json"), "w", encoding="utf-8") as target:
         json.dump({"status": "provisional-presentation", "caseEnvelopeMm": 42, "assets": assets}, target, indent=2)
     print(f"Generated {len(assets)} archetype assets")

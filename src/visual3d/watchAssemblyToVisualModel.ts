@@ -62,6 +62,7 @@ export type VisualWatchModel = {
   bezelMaterial: string;
   bezelProfile: 'smooth' | 'coin-edge' | 'knurled' | 'scalloped';
   bezelEnvelope: { innerRadiusMm: number; outerRadiusMm: number };
+  chapterRingEnvelope: { innerRadiusMm: number; outerRadiusMm: number };
   crystalMaterial: string;
   hands: {
     style: VisualHandStyle; material: string;
@@ -132,7 +133,7 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
     const matching = parts.filter((part) => visualCategoryForPart(part) === category);
     return matching.find((part) => part.visible && (part.visual?.assetId || part.customProperties?.visualAssetId)) ?? matching.find((part) => part.visible) ?? matching[0];
   };
-  const casePart = find('case'), dialPart = find('dial'), bezelPart = find('bezel'), handsPart = find('hands'), crownPart = find('crown'), pushersPart = find('pushers');
+  const casePart = find('case'), dialPart = find('dial'), bezelPart = find('bezel'), chapterRingPart = find('chapter-ring'), handsPart = find('hands'), crownPart = find('crown'), pushersPart = find('pushers');
   const handValue = `${handsPart?.name ?? ''} ${handsPart?.texture ?? ''}`.toLowerCase();
   const declaredStyle = handsPart?.customProperties?.visualHandStyle;
   const registeredHandStyles: VisualHandStyle[] = ['baton', 'mercedes', 'needle', 'sword', 'dauphine', 'syringe', 'cathedral', 'pencil', 'broad-arrow', 'skeleton'];
@@ -149,6 +150,9 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
     pushers: archetypeProfile.pusherAssetId,
     strap: `archetype-strap-${visualReferences.strapStyleId ?? archetypeProfile.strapStyleId}`
   } : {};
+  if (visualReferences.archetypeId === 'archetype-pilot') {
+    archetypeAssets['chapter-ring'] = 'archetype-chapter-ring-pilot';
+  }
   if (visualReferences.archetypeId === 'archetype-chronograph' && visualReferences.subdialHandStyle) {
     archetypeAssets.hands = `archetype-hands-chronograph-${visualReferences.subdialHandStyle}`;
   }
@@ -275,6 +279,11 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
     bezelEnvelope: (() => {
       const outerRadiusMm = positive(bezelPart?.dimensions.diameterMm, positive(assembly.globalDimensions.caseDiameterMm, 40)) / 2;
       const widthMm = positive(bezelPart?.dimensions.widthMm, Math.max(1, outerRadiusMm * 0.16));
+      return { innerRadiusMm: Math.max(0, outerRadiusMm - widthMm), outerRadiusMm };
+    })(),
+    chapterRingEnvelope: (() => {
+      const outerRadiusMm = positive(chapterRingPart?.dimensions.diameterMm, dialDiameter + 2) / 2;
+      const widthMm = positive(chapterRingPart?.dimensions.widthMm, 1.8);
       return { innerRadiusMm: Math.max(0, outerRadiusMm - widthMm), outerRadiusMm };
     })(),
     bezelProfile: (() => {

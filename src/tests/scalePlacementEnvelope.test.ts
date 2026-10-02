@@ -13,6 +13,7 @@ import { scaleArtworkClipEnvelope, scaleArtworkRadialShiftMm, scaleArtworkSurfac
 import { visualAssetRegistry } from '@/visual3d/visualAssetRegistry';
 import { useScaleStore } from '@/stores/scaleStore';
 import { syncAssemblyDownstream } from '@/stores/storeSync';
+import { getScaleProgram } from '@/domain/scales/scalePrograms';
 
 const targetBands = [
   { id: 'band-outer-bezel', inner: 18.5, outer: 20 },
@@ -117,6 +118,47 @@ describe('scale placement envelope', () => {
     expect(model.assets.bezel.assetId).toBe('archetype-bezel-diver');
     expect(scaleArtworkClipEnvelope(preview, model, 'outer').outerRadiusMm).toBe(19.6);
     expect(scaleArtworkRadialShiftMm(preview, model, 'outer')).toBeCloseTo(0.9);
+  });
+
+  it('clips the aviation inner scale to the chapter ring rather than the outer bezel', () => {
+    const assembly = createDefaultWatchAssembly();
+    const bands = assemblyToBands(assembly);
+    const program = getScaleProgram('aviation', bands);
+    const outer = bands.find((band) => band.id === 'band-outer-bezel')!;
+    const defaults = getScalePlugin('slide-rule')!.defaultConfig;
+    const preview = runScalePlugin('slide-rule', {
+      ...defaults, ...program.config,
+      placementTargetBandId: outer.id,
+      bandInnerRadiusMm: outer.geometry.innerRadius,
+      bandOuterRadiusMm: outer.geometry.outerRadius
+    }, program.context)!;
+    const model = watchAssemblyToVisualModel(assembly);
+    const inner = scaleArtworkClipEnvelope(preview, model, 'inner');
+    expect(inner).toEqual({ innerRadiusMm: 13.45, outerRadiusMm: 15.25 });
+    expect(preview.ticks.filter((tick) => tick.ringId === 'inner').every((tick) => tick.radiusMm <= inner.outerRadiusMm && tick.radiusMm - tick.lengthMm >= inner.innerRadiusMm)).toBe(true);
+    expect(preview.labels.filter((label) => label.ringId === 'inner').every((label) => label.radiusMm + preview.fontSizeMm / 2 <= inner.outerRadiusMm && label.radiusMm - preview.fontSizeMm / 2 >= inner.innerRadiusMm)).toBe(true);
+  });
+
+  it('keeps the fixed aviation ring on the chapter ring after a rotating bezel resize', () => {
+    const previous = useScaleStore.getState();
+    try {
+      const bands = assemblyToBands(createDefaultWatchAssembly());
+      useScaleStore.setState({ activeArchetypeId: 'archetype-pilot', crossArchetypeUnlocked: false });
+      useScaleStore.getState().applyScaleProgram('aviation', bands);
+      const innerRadius = useScaleStore.getState().pluginConfig.innerRadiusMm;
+      const outer = bands.find((band) => band.kind === 'outer-bezel')!;
+      useScaleStore.getState().syncFromBand({ ...outer, geometry: { ...outer.geometry, outerRadius: 21 } }, 0.1);
+      expect(useScaleStore.getState().pluginConfig.innerRadiusMm).toBe(innerRadius);
+      expect(useScaleStore.getState().preview!.ticks.filter((tick) => tick.ringId === 'inner').every((tick) => tick.radiusMm < 15.25)).toBe(true);
+    } finally {
+      useScaleStore.setState(previous);
+    }
+  });
+
+  it('places the inner ring on the chapter surface underneath the sapphire', () => {
+    const model = watchAssemblyToVisualModel(createDefaultWatchAssembly());
+    expect(scaleArtworkSurfaceZ(model, 'inner')).toBeLessThan(model.previewEnvelope.crystalZ - model.previewEnvelope.crystalThickness / 2);
+    expect(scaleArtworkSurfaceZ(model, 'inner')).toBeCloseTo(model.previewEnvelope.chapterZ + 0.708);
   });
 
   it('builds the visible diver preview against the bezel on initial assembly sync', () => {

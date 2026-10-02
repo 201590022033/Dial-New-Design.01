@@ -466,7 +466,7 @@ export class SvgRenderer implements RendererAdapter {
         ? scaleGroup.group().id('scale-outer-ring').attr('data-band-id', placementTargetBandId).attr('data-ring-id', 'outer')
         : scaleGroup;
       const innerScaleGroup = options.scalePreview.kind === 'slide-rule'
-        ? scaleGroup.group().id('scale-inner-ring').attr('data-band-id', placementTargetBandId).attr('data-ring-id', 'inner')
+        ? scaleGroup.group().id('scale-inner-ring').attr('data-band-id', 'band-chapter-ring').attr('data-ring-id', 'inner')
         : scaleGroup;
 
       ticks.forEach((tick, index) => {

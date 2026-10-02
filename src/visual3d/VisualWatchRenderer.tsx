@@ -95,6 +95,7 @@ export const VisualWatchRenderer = ({ assembly, presentationMode, onTogglePresen
     setExportStatus('Exported render package: PNG, project and review manifest');
   };
   return <div
+    data-visual-hand-asset={model.assets.hands.assetId}
     className="relative h-full w-full overflow-hidden rounded-panel bg-[#05070b]"
     onWheel={(event) => {
       // Browser/page zoom gestures must not also alter and persist the 3D camera.

@@ -160,6 +160,18 @@ def build_hands(style, compact=False):
                         (-inlay_radius * math.sin(hand_angle), inlay_radius * math.cos(hand_angle), index * .20 + .10),
                         lume, .02, hand_angle)
     cylinder("DD_HAND_HUB", 1.35 * scale, .52, .35, steel, 64, .08)
+    if style == "mercedes":
+        angle = math.radians(-32)
+        distance = 9 * scale * .58
+        cx, cy = -distance * math.sin(angle), distance * math.cos(angle)
+        disc = cylinder("DD_HAND_HOUR_MERCEDES_LUME", 1.9 * scale, .035, .13, lume, 64, .015)
+        disc.location.x, disc.location.y = cx, cy
+        rim = annulus("DD_HAND_HOUR_MERCEDES_RIM", 2.2 * scale, 1.78 * scale, .08, .155, steel, 64)
+        rim.location.x, rim.location.y = cx, cy
+        for index in range(3):
+            spoke_angle = angle + index * 2 * math.pi / 3
+            box(f"DD_HAND_HOUR_MERCEDES_SPOKE_{index}", (.16 * scale, .98 * scale, .055),
+                (cx - .42 * scale * math.sin(spoke_angle), cy + .42 * scale * math.cos(spoke_angle), .19), steel, .015, spoke_angle)
 
 
 def add_edge_teeth(style, outer_diameter, height, steel):
@@ -289,8 +301,21 @@ def export_asset(output_path, asset_id, category):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", required=True)
+    parser.add_argument("--hand-style", choices=HAND_STYLES, help="Regenerate one hand set and its manifest entry")
     parsed = parser.parse_args(args_after_dash())
     root = os.path.abspath(parsed.output)
+    if parsed.hand_style:
+        clear_scene()
+        build_hands(parsed.hand_style)
+        asset_id = f"hands-{parsed.hand_style}-42"
+        entry = export_asset(os.path.join(root, "hands", f"{asset_id}.glb"), asset_id, "hands")
+        manifest_path = os.path.join(root, "manifest.json")
+        with open(manifest_path, encoding="utf-8") as handle:
+            manifest = json.load(handle)
+        manifest["assets"] = [entry if asset["assetId"] == asset_id else asset for asset in manifest["assets"]]
+        with open(manifest_path, "w", encoding="utf-8") as handle:
+            json.dump(manifest, handle, indent=2)
+        return
     manifest = []
     for style in HAND_STYLES:
         clear_scene(); build_hands(style)

@@ -52,7 +52,7 @@ export const getScaleProgram = (program: ScaleProgram, bands: BandEntity[]): Sca
     config: {
       engineeringPreset: 'aviation-slide-rule', startValue: 10, endValue: 100,
       outerRadiusMm: outer ? outer.innerRadius + 0.5 : 18.7,
-      innerRadiusMm: chapter ? chapter.innerRadius + 1.2 : 16.3,
+      innerRadiusMm: chapter ? chapter.outerRadius - 0.25 : 15,
       outerRotationOffsetDeg: 0, innerRotationOffsetDeg: 0,
       ringSyncMode: 'independent', tickDensityProfile: 'sparse',
       includeMinorLabels: false, calculationMode: 'division', direction: 'clockwise',

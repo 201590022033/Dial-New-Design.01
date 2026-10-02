@@ -29,6 +29,9 @@ export type VisualAssetDescriptor = {
   scaleArtworkFaceOffsetMm?: number;
   /** Outer radius of the flat marking surface, which can be smaller than the carrier OD. */
   scaleArtworkOuterRadiusMm?: number;
+  /** Blender-authored annulus with planar watch-axis UVs for live scale printing. */
+  scaleArtworkSurface?: 'outer' | 'inner';
+  scaleArtworkInnerRadiusMm?: number;
 };
 
 const variantRoot = '/assets/3d/variants';
@@ -99,7 +102,8 @@ export const visualAssetRegistry: Record<string, VisualAssetDescriptor> = {
   , 'archetype-dial-dress': { assetId: 'archetype-dial-dress', category: 'dial', assetType: 'glb', assetPath: '/assets/3d/archetypes/dial-dress.glb', anchor: 'watch-axis', offset: [0, 0, 3.7], units: 'millimetres', upAxis: 'Y', referenceCaseDiameterMm: 42 }
   , 'archetype-dial-chronograph': { assetId: 'archetype-dial-chronograph', category: 'dial', assetType: 'glb', assetPath: '/assets/3d/archetypes/dial-chronograph.glb', anchor: 'watch-axis', offset: [0, 0, 3.7], units: 'millimetres', upAxis: 'Y', referenceCaseDiameterMm: 42 }
   , 'archetype-bezel-diver': { assetId: 'archetype-bezel-diver', category: 'bezel', assetType: 'glb', assetPath: '/assets/3d/archetypes/bezel-diver.glb', anchor: 'watch-axis', offset: [0, 0, 5.65], units: 'millimetres', upAxis: 'Y', referenceCaseDiameterMm: 42, scaleArtworkFaceOffsetMm: 1.79, scaleArtworkOuterRadiusMm: 19.6 }
-  , 'archetype-bezel-pilot': { assetId: 'archetype-bezel-pilot', category: 'bezel', assetType: 'glb', assetPath: '/assets/3d/archetypes/bezel-pilot.glb', anchor: 'watch-axis', offset: [0, 0, 5.65], units: 'millimetres', upAxis: 'Y', referenceCaseDiameterMm: 42, scaleArtworkFaceOffsetMm: 1.4 }
+  , 'archetype-bezel-pilot': { assetId: 'archetype-bezel-pilot', category: 'bezel', assetType: 'glb', assetPath: '/assets/3d/archetypes/bezel-pilot.glb', anchor: 'watch-axis', offset: [0, 0, 5.65], units: 'millimetres', upAxis: 'Y', referenceCaseDiameterMm: 42, scaleArtworkFaceOffsetMm: 1.69, scaleArtworkOuterRadiusMm: 19.6, scaleArtworkInnerRadiusMm: 15.9, scaleArtworkSurface: 'outer' }
+  , 'archetype-chapter-ring-pilot': { assetId: 'archetype-chapter-ring-pilot', category: 'chapter-ring', assetType: 'glb', assetPath: '/assets/3d/archetypes/chapter-ring-pilot.glb', anchor: 'watch-axis', offset: [0, 0, 4.3], units: 'millimetres', upAxis: 'Y', referenceCaseDiameterMm: 42, scaleArtworkFaceOffsetMm: 1.158, scaleArtworkOuterRadiusMm: 15.25, scaleArtworkInnerRadiusMm: 13.45, scaleArtworkSurface: 'inner' }
   , 'archetype-bezel-field': { assetId: 'archetype-bezel-field', category: 'bezel', assetType: 'glb', assetPath: '/assets/3d/archetypes/bezel-field.glb', anchor: 'watch-axis', offset: [0, 0, 5.65], units: 'millimetres', upAxis: 'Y', referenceCaseDiameterMm: 42, scaleArtworkFaceOffsetMm: 1.4 }
   , 'archetype-bezel-dress': { assetId: 'archetype-bezel-dress', category: 'bezel', assetType: 'glb', assetPath: '/assets/3d/archetypes/bezel-dress.glb', anchor: 'watch-axis', offset: [0, 0, 5.65], units: 'millimetres', upAxis: 'Y', referenceCaseDiameterMm: 42, scaleArtworkFaceOffsetMm: 1.4 }
   , 'archetype-bezel-chronograph': { assetId: 'archetype-bezel-chronograph', category: 'bezel', assetType: 'glb', assetPath: '/assets/3d/archetypes/bezel-chronograph.glb', anchor: 'watch-axis', offset: [0, 0, 5.65], units: 'millimetres', upAxis: 'Y', referenceCaseDiameterMm: 42, scaleArtworkFaceOffsetMm: 1.79, scaleArtworkOuterRadiusMm: 19.6 }

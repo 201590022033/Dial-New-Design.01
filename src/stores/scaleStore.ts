@@ -177,7 +177,11 @@ export const useScaleStore = create<ScaleState>((set, get) => ({
         ...state.pluginConfig,
         radiusMm: (innerRadius + outerRadius) / 2,
         outerRadiusMm: Math.max(innerRadius, outerRadius - 0.2),
-        innerRadiusMm: Math.max(innerRadius, (innerRadius + outerRadius) / 2 - 0.45),
+        // Aviation has a separate fixed chapter-ring scale. Updating its
+        // rotating bezel must never pull that inner ring out onto the bezel.
+        innerRadiusMm: state.selectedScaleKind === 'slide-rule'
+          ? state.pluginConfig.innerRadiusMm
+          : Math.max(innerRadius, (innerRadius + outerRadius) / 2 - 0.45),
         bandInnerRadiusMm: innerRadius,
         bandOuterRadiusMm: outerRadius,
         minimumLineWidthMm,

@@ -12,7 +12,7 @@ import { createPreviewCaseGeometry } from '@/visual3d/proceduralEnvelope';
 import { categoryAnchor, visualCategories, type VisualAssetDescriptor } from '@/visual3d/visualAssetRegistry';
 
 const loader = vi.hoisted(() => ({ load: vi.fn() }));
-vi.mock('@react-three/fiber', () => ({ Canvas: () => null, useLoader: loader.load }));
+vi.mock('@react-three/fiber', () => ({ Canvas: () => null, useLoader: loader.load, useThree: () => vi.fn() }));
 
 const child = (element: ReactElement) => (element.props as { children: ReactElement }).children;
 const glbChild = (element: ReactElement) => {
@@ -25,10 +25,25 @@ describe('P4 scene integration and GLB failure boundaries', () => {
   beforeEach(() => { vi.spyOn(console, 'error').mockImplementation(() => {}); });
   afterEach(() => { vi.restoreAllMocks(); loader.load.mockReset(); });
 
-  it('reloads a previously selected hand style instead of reusing a disposed GLB', () => {
+  it('uses stable hand URLs across Suspense retries and distinct URLs for different styles', () => {
     const baton: VisualAssetDescriptor = { assetId: 'hands-baton-42', category: 'hands', assetType: 'glb', assetPath: '/hands-baton-42.glb' };
-    expect(glbLoadUrl(baton, 1)).toBe('/hands-baton-42.glb?selection=1');
-    expect(glbLoadUrl(baton, 3)).toBe('/hands-baton-42.glb?selection=3');
+    expect(glbLoadUrl(baton)).toBe('/hands-baton-42.glb?v=main-hand-library-3');
+    expect(glbLoadUrl(baton)).toBe(glbLoadUrl(baton));
+    expect(glbLoadUrl({ ...baton, assetId: 'hands-mercedes-42', assetPath: '/hands-mercedes-42.glb' })).not.toBe(glbLoadUrl(baton));
+  });
+
+  it('retries a suspended main hand load at the same URL until its mesh is available', () => {
+    const hands: VisualAssetDescriptor = { assetId: 'hands-baton-42', category: 'hands', assetType: 'glb', assetPath: '/hands-baton-42.glb' };
+    const scene = new Group();
+    scene.add(new Mesh(new BoxGeometry()));
+    loader.load.mockImplementationOnce(() => {
+      // eslint-disable-next-line @typescript-eslint/only-throw-error
+      throw new Promise(() => {});
+    }).mockReturnValue({ scene });
+    renderToStaticMarkup(<GlbAsset descriptor={hands} fallback={<span>loading</span>} />);
+    renderToStaticMarkup(<GlbAsset descriptor={hands} fallback={<span>loading</span>} />);
+    expect(loader.load.mock.calls[0]![1]).toBe(loader.load.mock.calls[1]![1]);
+    expect(scene.parent).toBeNull();
   });
 
   it('keeps exactly one demand-driven canvas with all supported categories', () => {
