@@ -138,6 +138,12 @@ export const LoadedGlbAsset = ({ descriptor, appearance, scaleTexture }: { descr
           material.emissiveIntensity = 0;
           material.metalness = 0.8;
           material.roughness = 0.24;
+        } else if (descriptor.assetId === 'dial-namoki-108-silver-285' && (objectName.includes('_INDEX_') || objectName.includes('NUMERAL') || objectName.includes('DIAL_TEXT'))) {
+          material.color = new Color('#171b20');
+          material.emissive = new Color('#000000');
+          material.emissiveIntensity = 0;
+          material.metalness = 0;
+          material.roughness = 0.6;
         } else if (descriptor.assetId === 'dial-nh05-white-matte-245' && objectName.includes('_INDEX_')) {
           material.color = new Color('#a6adb6');
           material.metalness = 0.88;

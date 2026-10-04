@@ -56,6 +56,9 @@ export interface CatalogueVisualMetadata {
   /** Presentation dimensions only; not supplier bore/clearance verification. */
   handLengthsMm?: { hour: number; minute: number; second: number };
   dialColor?: string;
+  caseFinish?: 'steel' | 'rose-gold' | 'black-pvd';
+  /** Schematic angle, degrees from 3h; never a verified stem interface. */
+  crownAngleDeg?: number;
   note?: string;
 }
 

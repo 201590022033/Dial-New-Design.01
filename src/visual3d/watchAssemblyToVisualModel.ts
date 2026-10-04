@@ -207,6 +207,9 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
   if (visualReferences.caseFinish === 'rose-gold') {
     for (const category of ['case', 'caseback', 'crown', 'pushers', 'bezel'] as const) finishes[category] = resolveFinishProfile('rose-gold', 'rose-gold');
   }
+  if (visualReferences.caseFinish === 'black-pvd') {
+    for (const category of ['case', 'caseback', 'crown', 'pushers', 'bezel'] as const) finishes[category] = resolveFinishProfile('black-pvd', 'black-pvd');
+  }
   if (visualReferences.handsFinish === 'rose-gold') finishes.hands = resolveFinishProfile('rose-gold', 'rose-gold');
   if (visualReferences.bezelFinish) finishes.bezel = resolveFinishProfile(visualReferences.bezelFinish === 'rose-gold' ? 'rose-gold' : 'polished-steel', 'polished-steel');
   const crownParams = candidate?.schema === 'parametric-crown/v1' && validateParametricCrownV1(candidate).status !== 'invalid' ? candidate : undefined;
@@ -350,7 +353,7 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
       lumeColor: lumeReference?.visualColor
     },
     archetypeAppearance: {
-      caseColor: visualReferences.caseFinish === 'rose-gold' ? finishes.case.color : undefined,
+      caseColor: visualReferences.caseFinish === 'rose-gold' || visualReferences.caseFinish === 'black-pvd' ? finishes.case.color : undefined,
       handsColor: visualReferences.handsColor ?? (visualReferences.handsFinish === 'rose-gold' ? finishes.hands.color : undefined),
       markerColor: visualReferences.markerColor,
       bezelMetalColor: visualReferences.bezelFinish ? finishes.bezel.color : undefined,

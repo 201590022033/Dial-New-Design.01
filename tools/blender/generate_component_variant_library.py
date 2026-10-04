@@ -410,17 +410,107 @@ def generate_nh05_research(root):
     return entries
 
 
+def build_namoki_case():
+    build_case("namoki-nmk903-black-38", dict(diameter=38, thickness=10, lug_width=20, lug_to_lug=44.5, shape="skx"))
+    black = material("DD_CASE_PVD_MATTE_BLACK", (.018, .021, .026), .65, .48)
+    # Headline envelope is published; bore positions and guard contours are
+    # photo-derived presentation assumptions, not machining dimensions.
+    for obj in list(bpy.context.scene.objects):
+        if obj.type != "MESH" or obj.name == "DD_CASE_FLOOR":
+            continue
+        obj.data.materials.clear(); obj.data.materials.append(black)
+        if obj.name.startswith("DD_CASE_LUG_"):
+            end, side = (int(value) for value in obj.name.split("_")[-2:])
+            cutter = cylinder("LUG_DRILL_CUTTER", 1.15, 12, 0, black, 32)
+            cutter.rotation_euler.y = math.pi / 2
+            cutter.location = (side * 12.0, end * 20.0, -.5)
+            modifier = obj.modifiers.new("Provisional drilled springbar bore", "BOOLEAN")
+            modifier.operation = "DIFFERENCE"; modifier.object = cutter
+            bpy.context.view_layer.objects.active = obj
+            bpy.ops.object.modifier_apply(modifier=modifier.name)
+            bpy.data.objects.remove(cutter, do_unlink=True)
+            obj["DD_DRILLED_LUG"] = True
+        if obj.name == "DD_CASE_CROWN_PREVIEW":
+            # Body-only product: the application's separate crown component
+            # is positioned at the photo-derived 4h anchor, not baked twice.
+            bpy.data.objects.remove(obj, do_unlink=True)
+    for angle in (-math.pi / 6 - .16, -math.pi / 6 + .16):
+        box("DD_CASE_CROWN_GUARD", (3.6, 2.2, 4.5), (18.7 * math.cos(angle), 18.7 * math.sin(angle), -.1), black, .5, angle)
+
+
+def dial_text(name, body, x, y, size, ink, rotation=0):
+    bpy.ops.object.text_add(location=(x, y, .225))
+    obj = bpy.context.object; obj.name = name
+    obj.data.body = body; obj.data.align_x = "CENTER"; obj.data.align_y = "CENTER"
+    obj.data.size = size; obj.data.extrude = .003; obj.rotation_euler.z = rotation
+    obj.data.materials.append(ink); bpy.ops.object.convert(target="MESH")
+
+
+def build_namoki_sector_dial():
+    silver = material("DD_DIAL_FACE_SUNBURST_SILVER", (.62, .65, .69), .65, .32)
+    ink = material("DD_DIAL_SECTOR_INK", (.015, .018, .021), 0, .6)
+    face = annulus("DD_DIAL_SUBSTRATE", 28.5, 1.65, .4, 0, silver, 192)
+    # Embed radial brushing in the GLB's PBR roughness channel. It survives
+    # live dial recolouring; this is not a flat image laid over the crystal.
+    uv = face.data.uv_layers.new(name="SunburstUV")
+    for loop in face.data.loops:
+        vertex = face.data.vertices[loop.vertex_index].co
+        uv.data[loop.index].uv = (vertex.x / 28.5 + .5, vertex.y / 28.5 + .5)
+    image = bpy.data.images.new("DD_SILVER_RADIAL_BRUSHING", width=256, height=256)
+    pixels = []
+    for y in range(256):
+        for x in range(256):
+            angle = math.atan2(y - 127.5, x - 127.5)
+            value = .68 + .14 * math.sin(angle * 480) + .08 * math.cos(angle * 7)
+            pixels.extend((value, value, value, 1))
+    image.pixels = pixels; image.colorspace_settings.name = "Non-Color"; image.pack()
+    node = silver.node_tree.nodes.new("ShaderNodeTexImage"); node.image = image
+    silver.node_tree.links.new(node.outputs["Color"], silver.node_tree.nodes.get("Principled BSDF").inputs["Roughness"])
+    face["DD_OUTER_DIAMETER_MM"] = 28.5
+    face["DD_ARTWORK_STATUS"] = "photo-derived-approximation-no-brand-logo"
+    for radius in (11.05, 12.35):
+        annulus("DD_DIAL_INDEX_SECTOR_RING", radius * 2 + .08, radius * 2 - .08, .012, .218, ink, 192)
+    for index in range(60):
+        angle = index * math.pi / 30
+        major = index % 5 == 0
+        length = 2.1 if major else 1.3
+        radius = 11.7 if not major else 11.35
+        box(f"DD_DIAL_INDEX_TRACK_{index:02d}", (.16 if major else .07, length, .012),
+            (radius * math.sin(angle), radius * math.cos(angle), .22), ink, 0, -angle)
+    # Fine outer 300-division track and minute labels visible in the supplier photo.
+    for index in range(300):
+        angle = index * math.pi / 150
+        box(f"DD_DIAL_INDEX_FINE_{index:03d}", (.025, .32, .01),
+            (13.55 * math.sin(angle), 13.55 * math.cos(angle), .22), ink, 0, -angle)
+    for index in range(12):
+        angle = index * math.pi / 6
+        dial_text(f"DD_DIAL_NUMERAL_MINUTE_{index:02d}", str(index * 5 if index else 60),
+                  12.9 * math.sin(angle), 12.9 * math.cos(angle), .56, ink, -angle)
+    for value, x, y in (("12", 0, 8.9), ("3", 9.1, 0), ("6", 0, -9), ("9", -9.1, 0)):
+        dial_text(f"DD_DIAL_NUMERAL_{value}", value, x, y, 2.4, ink)
+    dial_text("DD_DIAL_TEXT_AUTOMATIC", "AUTOMATIC", 0, -6.1, .7, ink)
+
+
+def generate_namoki_research(root):
+    clear_scene(); build_namoki_case()
+    case = export_asset(os.path.join(root, "cases", "case-namoki-nmk903-black-38.glb"), "case-namoki-nmk903-black-38", "case")
+    clear_scene(); build_namoki_sector_dial()
+    dial = export_asset(os.path.join(root, "dials", "dial-namoki-108-silver-285.glb"), "dial-namoki-108-silver-285", "dial")
+    return [case, dial]
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", required=True)
     parser.add_argument("--hand-style", choices=HAND_STYLES, help="Regenerate one hand set and its manifest entry")
     parser.add_argument("--cases-only", action="store_true")
     parser.add_argument("--nh05-research-only", action="store_true", help="Generate only the three researched NH05 previews")
+    parser.add_argument("--namoki-research-only", action="store_true", help="Generate only the NMK903 and 108 sector previews")
     parser.add_argument("--bezel-style", choices=BEZEL_STYLES)
     parsed = parser.parse_args(args_after_dash())
     root = os.path.abspath(parsed.output)
-    if parsed.nh05_research_only:
-        entries = generate_nh05_research(root)
+    if parsed.nh05_research_only or parsed.namoki_research_only:
+        entries = generate_namoki_research(root) if parsed.namoki_research_only else generate_nh05_research(root)
         manifest_path = os.path.join(root, "manifest.json")
         with open(manifest_path, encoding="utf-8") as handle:
             manifest = json.load(handle)
@@ -481,6 +571,7 @@ def main():
         clear_scene(); build_case(case_id, spec)
         manifest.append(export_asset(os.path.join(root, "cases", f"case-{case_id}.glb"), f"case-{case_id}", "case"))
     manifest.extend(generate_nh05_research(root))
+    manifest.extend(generate_namoki_research(root))
     os.makedirs(root, exist_ok=True)
     with open(os.path.join(root, "manifest.json"), "w", encoding="utf-8") as handle:
         json.dump({"schema": "dial-designer/component-variants/v1", "assets": manifest}, handle, indent=2)

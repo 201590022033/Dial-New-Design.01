@@ -61,6 +61,8 @@ const generatedCaseAssets: Record<string, VisualAssetDescriptor> = Object.fromEn
 }));
 
 export const visualAssetRegistry: Record<string, VisualAssetDescriptor> = {
+  'case-namoki-nmk903-black-38': { assetId: 'case-namoki-nmk903-black-38', category: 'case', assetType: 'glb', assetPath: `${variantRoot}/cases/case-namoki-nmk903-black-38.glb`, anchor: 'watch-axis', units: 'millimetres', upAxis: 'Y', referenceCaseDiameterMm: 38, materialProfile: 'black-pvd' },
+  'dial-namoki-108-silver-285': { assetId: 'dial-namoki-108-silver-285', category: 'dial', assetType: 'glb', assetPath: `${variantRoot}/dials/dial-namoki-108-silver-285.glb`, anchor: 'watch-axis', offset: [0, 0, 3.7], units: 'millimetres', upAxis: 'Y' },
   'case-tandorio-nh05-research-34': { assetId: 'case-tandorio-nh05-research-34', category: 'case', assetType: 'glb', assetPath: `${variantRoot}/cases/case-tandorio-nh05-research-34.glb`, anchor: 'watch-axis', units: 'millimetres', upAxis: 'Y', referenceCaseDiameterMm: 34 },
   'dial-nh05-white-matte-245': { assetId: 'dial-nh05-white-matte-245', category: 'dial', assetType: 'glb', assetPath: `${variantRoot}/dials/dial-nh05-white-matte-245.glb`, anchor: 'watch-axis', offset: [0, 0, 3.7], units: 'millimetres', upAxis: 'Y' },
   'hands-nh05-luminous-588': { assetId: 'hands-nh05-luminous-588', category: 'hands', assetType: 'glb', assetPath: `${variantRoot}/hands/hands-nh05-luminous-588.glb`, handStyle: 'baton', anchor: 'watch-axis', offset: [0, 0, 4.35], units: 'millimetres', upAxis: 'Y' },

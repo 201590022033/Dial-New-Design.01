@@ -6,6 +6,7 @@ import { useConfiguratorUIStore } from '@/stores/configuratorUIStore';
 import { createDefaultWatchAssembly } from '@/domain/assembly/assemblyFactory';
 import { applyCatalogueVisualSelection } from '@/domain/catalogue/applyCatalogueVisualSelection';
 import { listingKnownLandedZar } from '@/domain/catalogue/pricing';
+import { watchAssemblyToVisualModel } from '@/visual3d/watchAssemblyToVisualModel';
 
 describe('Supplier expansion evidence and safe catalogue integration', () => {
   it('registers all five distinct products and timestamped non-demo offers', () => {
@@ -47,9 +48,23 @@ describe('Supplier expansion evidence and safe catalogue integration', () => {
     const assembly = createDefaultWatchAssembly();
     const dial = items.find(i => i.kind === 'dial-blank')!;
     const next = applyCatalogueVisualSelection(assembly, 'inst-dial-blank', dial);
-    expect(next.designConfig?.visualReferenceConfig?.componentAssetOverrides?.dial).toBe('visual-dial-default');
+    expect(next.designConfig?.visualReferenceConfig?.componentAssetOverrides?.dial).toBe('dial-namoki-108-silver-285');
     expect(next.designConfig?.dialFaceConfig?.color).toBe('#c4c8cd');
     expect(next.designConfig?.dialFaceConfig?.texture?.kind).toBe('sunburst');
     expect(next.parts['inst-dial-blank']?.dimensions.diameterMm).toBe(28.5);
+    expect(watchAssemblyToVisualModel(next).assets.dial.assetType).toBe('glb');
+  });
+  it('applies the NMK903 GLB and black finish without changing hand or dial colours', () => {
+    const assembly = createDefaultWatchAssembly();
+    const item = items.find(i => i.kind === 'midcase')!;
+    const caseId = Object.values(assembly.parts).find(p => ['case', 'midcase'].includes(getCatalogueItem(p.catalogueItemId)?.kind ?? ''))!.instanceId;
+    const next = applyCatalogueVisualSelection(assembly, caseId, item);
+    const model = watchAssemblyToVisualModel(next);
+    expect(model.assets.case.assetId).toBe('case-namoki-nmk903-black-38');
+    expect(model.caseDiameterMm).toBe(38);
+    expect(model.archetypeAppearance.caseColor).toBeDefined();
+    expect(model.anchors['crown-interface'].rotationRad[2]).toBeCloseTo(-Math.PI / 6);
+    expect(next.designConfig?.visualReferenceConfig?.handsFinish).toBe(assembly.designConfig?.visualReferenceConfig?.handsFinish);
+    expect(next.parts['inst-dial-blank']?.color).toBe(assembly.parts['inst-dial-blank']?.color);
   });
 });

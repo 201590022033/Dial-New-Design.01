@@ -130,8 +130,8 @@ export const StyleTab: React.FC = () => {
         <p className="text-[10px] text-slate-400">Mix a silver dial with a rose-gold case. Plain or diamond-set bezels can have either metal colour. Custom marker colour replaces the marker lume appearance, not hand lume.</p>
         <label className="block text-xs text-slate-300">Case &amp; crown
           <select aria-label="Case metal colour" className="ml-2 bg-slate-900" value={visualReferenceConfig?.caseFinish ?? 'steel'}
-            onChange={(event) => updateVisualReferenceConfig({ caseFinish: event.target.value as 'steel' | 'rose-gold' })}>
-            <option value="steel">Steel / original</option><option value="rose-gold">Rose gold</option>
+            onChange={(event) => updateVisualReferenceConfig({ caseFinish: event.target.value as 'steel' | 'rose-gold' | 'black-pvd' })}>
+            <option value="steel">Steel / original</option><option value="rose-gold">Rose gold</option><option value="black-pvd">Matte black PVD</option>
           </select>
         </label>
         <label className="block text-xs text-slate-300">Main hands

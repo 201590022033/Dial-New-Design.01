@@ -24,7 +24,7 @@ export const applyCatalogueVisualSelection = (
   part.material = item.defaultMaterial || part.material;
   part.texture = item.defaultTexture || part.texture;
   // A replacement cannot inherit the previous component's mating dimensions.
-  part.customProperties = { ...part.customProperties, engineeringSpecs: item.engineeringSpecs };
+  part.customProperties = { ...part.customProperties, engineeringSpecs: item.engineeringSpecs, visualCrownAngleDeg: item.visual?.crownAngleDeg };
   part.parametricGeometry = undefined;
   part.geometryProvenance = undefined;
 
@@ -84,7 +84,7 @@ export const applyCatalogueVisualSelection = (
           dialFaceConfig: { ...previousDesign.dialFaceConfig, texture: nextTexture, ...(item.visual.dialColor ? { color: item.visual.dialColor } : {}) }
         }
       : {}),
-    visualReferenceConfig: { ...previousReferences, componentAssetOverrides }
+    visualReferenceConfig: { ...previousReferences, componentAssetOverrides, ...(item.visual.caseFinish ? { caseFinish: item.visual.caseFinish } : {}) }
   };
   return provisional;
 };

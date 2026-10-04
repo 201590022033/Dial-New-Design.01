@@ -37,9 +37,9 @@ describe('all-archetype lug and rose-gold regressions', () => {
     expect(model.assets.case.assetId).toBe('case-nh05-ladies-dress-34');
   });
 
-  it('records connected root envelopes on all eight supplier case GLBs', () => {
+  it('records connected root envelopes on all nine supplier case GLBs', () => {
     const cases = Object.values(visualAssetRegistry).filter(asset => asset.category === 'case' && asset.assetPath?.includes('/variants/cases/'));
-    expect(cases).toHaveLength(8);
+    expect(cases).toHaveLength(9);
     for (const asset of cases) {
       const lugs = glb(asset.assetPath!).nodes.filter(node => node.name.startsWith('DD_CASE_LUG_'));
       expect(lugs).toHaveLength(4);

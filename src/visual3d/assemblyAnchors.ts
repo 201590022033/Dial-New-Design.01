@@ -35,6 +35,12 @@ export const resolveAssemblyAnchors = (assembly: WatchAssembly, caseParams?: Par
     'pusher-4h': preview([radius * Math.cos(-Math.PI / 3), radius * Math.sin(-Math.PI / 3), 0])
   };
   const tubeEnd = caseParams && caseCrownInterfacePosition(caseParams);
+  const casePart = Object.values(assembly.parts).find(part => part.visual?.category === 'case');
+  const crownAngle = casePart?.customProperties?.visualCrownAngleDeg;
+  if (!tubeEnd && typeof crownAngle === 'number' && Number.isFinite(crownAngle)) {
+    const angle = crownAngle * Math.PI / 180;
+    anchors['crown-interface'] = { ...preview([radius * Math.cos(angle), radius * Math.sin(angle), 0]), rotationRad: [0, 0, angle] };
+  }
   if (tubeEnd) anchors['crown-interface'] = { ...preview(tubeEnd), provenance: { status: 'specified', source: 'parametric-case/v1 tube end; supplied parameters, not manufacturing verification' } };
   if (caseParams && caseParams.pusherCount > 0) {
     const pusher2h = casePusherInterfacePosition(caseParams, 60 + (typeof caseParams.pusherAngularOffsetDeg === 'number' ? caseParams.pusherAngularOffsetDeg : 0));

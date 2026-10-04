@@ -246,6 +246,18 @@
       "category": "hands",
       "path": "public/assets/3d/variants/hands/hands-nh05-luminous-588.glb",
       "meshCount": 6
+    },
+    {
+      "assetId": "case-namoki-nmk903-black-38",
+      "category": "case",
+      "path": "public/assets/3d/variants/cases/case-namoki-nmk903-black-38.glb",
+      "meshCount": 8
+    },
+    {
+      "assetId": "dial-namoki-108-silver-285",
+      "category": "dial",
+      "path": "public/assets/3d/variants/dials/dial-namoki-108-silver-285.glb",
+      "meshCount": 380
     }
   ]
 }

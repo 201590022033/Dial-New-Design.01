@@ -95,7 +95,7 @@ export interface WatchAssemblyDesignConfig {
     /** Provisional 42 mm case-lug presentation variant. */
     lugStyleId?: LugGeometryStyle;
     /** Presentation finishes; not a material or plating procurement claim. */
-    caseFinish?: 'steel' | 'rose-gold';
+    caseFinish?: 'steel' | 'rose-gold' | 'black-pvd';
     handsFinish?: 'auto' | 'rose-gold';
     /** Independent presentation overrides; gemstone geometry is unchanged. */
     bezelFinish?: 'steel' | 'rose-gold';
