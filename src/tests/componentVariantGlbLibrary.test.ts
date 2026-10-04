@@ -11,7 +11,7 @@ describe('component variant GLB library', () => {
 
   it('contains the complete generated workload with non-empty meshes', () => {
     expect(manifest.schema).toBe('dial-designer/component-variants/v1');
-    expect(manifest.assets).toHaveLength(36);
+    expect(manifest.assets).toHaveLength(41);
     for (const asset of manifest.assets) {
       const path = resolve(process.cwd(), asset.path);
       expect(existsSync(path), asset.assetId).toBe(true);

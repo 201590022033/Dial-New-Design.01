@@ -117,7 +117,8 @@ export class SvgRenderer implements RendererAdapter {
           ? Math.max(0.25, band.style.opacity * 0.72)
           : band.style.opacity;
       const strokeWidth = isHighlighted ? band.style.strokeWidth + 0.35 : band.style.strokeWidth;
-      const strokeColor = isHighlighted ? '#E2E8F0' : band.style.stroke;
+      const bezelFinish = assembly.designConfig?.visualReferenceConfig?.bezelFinish ?? assembly.designConfig?.visualReferenceConfig?.caseFinish;
+      const strokeColor = isHighlighted ? '#E2E8F0' : band.kind === 'outer-bezel' && bezelFinish ? bezelFinish === 'rose-gold' ? '#c08a76' : '#e2e8f0' : band.style.stroke;
 
       // Group for semantic identification
       const bandGroup = layer.group().id(`band-group-${band.id}`);
@@ -308,7 +309,7 @@ export class SvgRenderer implements RendererAdapter {
         const innerRadiusMm = Math.max(0, outerRadiusMm - markerLengthMm);
         const inner = polarToCartesian(mmToPixels(innerRadiusMm), marker.angleDeg);
         const outer = polarToCartesian(mmToPixels(outerRadiusMm), marker.angleDeg);
-        const color = entry.lumed ? '#C7F9CC' : '#E2E8F0';
+        const color = assembly.designConfig?.visualReferenceConfig?.markerColor ?? (entry.lumed ? '#C7F9CC' : '#E2E8F0');
 
         if (marker.text) {
           const midpoint = polarToCartesian(mmToPixels((innerRadiusMm + outerRadiusMm) / 2), marker.angleDeg);
@@ -423,7 +424,7 @@ export class SvgRenderer implements RendererAdapter {
             context.centerX + outer.x,
             context.centerY + outer.y
           )
-          .stroke({ color: '#F59E0B', width: Math.max(1, mmToPixels(marker.widthMm)) })
+          .stroke({ color: assembly.designConfig?.visualReferenceConfig?.markerColor ?? '#F59E0B', width: Math.max(1, mmToPixels(marker.widthMm)) })
           .attr('data-chapter-marker-index', String(index))
           .attr('data-interaction-role', 'rendering-primitive');
       });
@@ -496,9 +497,9 @@ export class SvgRenderer implements RendererAdapter {
             context.centerY + end.y
           )
           .stroke({
-            color: options.scalePreview?.kind === 'circular' && typeof tick.value === 'number' && tick.value <= 20
+            color: options.scalePreview?.color ?? (options.scalePreview?.kind === 'circular' && typeof tick.value === 'number' && tick.value <= 20
               ? '#F59E0B'
-              : tick.weight === 'major' ? '#F8FAFC' : '#94A3B8',
+              : tick.weight === 'major' ? '#F8FAFC' : '#94A3B8'),
             width: Math.max(1, mmToPixels(tick.widthMm))
           })
           .attr('data-scale-tick-index', String(index))
@@ -510,7 +511,7 @@ export class SvgRenderer implements RendererAdapter {
         (label.ringId === 'outer' ? outerScaleGroup : innerScaleGroup)
           .text(label.text)
           .font({ size: mmToPixels(options.scalePreview?.fontSizeMm ?? 0.8), family: options.scalePreview?.fontFamily ?? 'sans-serif', anchor: 'middle' })
-          .fill('#E2E8F0')
+          .fill(options.scalePreview?.color ?? '#E2E8F0')
           .center(context.centerX + point.x, context.centerY + point.y)
           .rotate(
             label.orientation === 'horizontal' ? label.rotationDeg : label.angleDeg + label.rotationDeg,
@@ -532,6 +533,7 @@ export class SvgRenderer implements RendererAdapter {
     const handStyle = watchAssemblyToVisualModel(assembly).hands.style;
     handsLayer.attr('data-hand-style', handStyle);
     const drawHand = (group: ReturnType<typeof handsLayer.group>, angleDeg: number, lengthPx: number, widthPx: number) => {
+      const handMetalColor = assembly.designConfig?.visualReferenceConfig?.handsColor ?? (assembly.designConfig?.visualReferenceConfig?.handsFinish === 'rose-gold' ? '#c08a76' : '#E2E8F0');
       const point = (radial: number, lateral: number) => {
         const along = polarToCartesian(radial, angleDeg);
         const across = polarToCartesian(lateral, angleDeg + 90);
@@ -543,12 +545,12 @@ export class SvgRenderer implements RendererAdapter {
       group.polygon([
         point(-lengthPx * 0.12, -base), point(shoulder, -blade), point(lengthPx, 0),
         point(shoulder, blade), point(-lengthPx * 0.12, base)
-      ].join(' ')).fill('#E2E8F0').stroke({ color: '#94A3B8', width: 0.45 })
+      ].join(' ')).fill(handMetalColor).stroke({ color: '#94A3B8', width: 0.45 })
         .attr('data-interaction-role', 'rendering-primitive');
       if (handStyle === 'mercedes') {
         const hub = polarToCartesian(lengthPx * 0.58, angleDeg);
         group.circle(widthPx * 2.4).center(context.centerX + hub.x, context.centerY + hub.y)
-          .fill('#A7F3D0').stroke({ color: '#E2E8F0', width: 1.1 })
+          .fill('#A7F3D0').stroke({ color: handMetalColor, width: 1.1 })
           .attr('data-interaction-role', 'rendering-primitive');
       } else if (handStyle === 'skeleton') {
         const start = polarToCartesian(lengthPx * 0.25, angleDeg);
@@ -626,7 +628,7 @@ export class SvgRenderer implements RendererAdapter {
         context.centerX + secondHandTip.x,
         context.centerY + secondHandTip.y
       )
-      .stroke({ color: '#EF4444', width: 1.0, linecap: 'round' })
+      .stroke({ color: assembly.designConfig?.visualReferenceConfig?.handsColor ?? (assembly.designConfig?.visualReferenceConfig?.handsFinish === 'rose-gold' ? '#c08a76' : '#EF4444'), width: 1.0, linecap: 'round' })
       .attr('data-interaction-role', 'rendering-primitive');
 
     // Center Collet & Pin Cap

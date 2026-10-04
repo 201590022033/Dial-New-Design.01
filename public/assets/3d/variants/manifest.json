@@ -176,6 +176,18 @@
       "meshCount": 1
     },
     {
+      "assetId": "bezel-diamond-rose-gold-34",
+      "category": "bezel",
+      "path": "public/assets/3d/variants/bezels/bezel-diamond-rose-gold-34.glb",
+      "meshCount": 142
+    },
+    {
+      "assetId": "bezel-diamond-rose-gold-42",
+      "category": "bezel",
+      "path": "public/assets/3d/variants/bezels/bezel-diamond-rose-gold-42.glb",
+      "meshCount": 175
+    },
+    {
       "assetId": "case-nh05-ladies-dress-34",
       "category": "case",
       "path": "public/assets/3d/variants/cases/case-nh05-ladies-dress-34.glb",
@@ -216,6 +228,24 @@
       "category": "case",
       "path": "public/assets/3d/variants/cases/case-tandorio-willard-41.glb",
       "meshCount": 8
+    },
+    {
+      "assetId": "case-tandorio-nh05-research-34",
+      "category": "case",
+      "path": "public/assets/3d/variants/cases/case-tandorio-nh05-research-34.glb",
+      "meshCount": 7
+    },
+    {
+      "assetId": "dial-nh05-white-matte-245",
+      "category": "dial",
+      "path": "public/assets/3d/variants/dials/dial-nh05-white-matte-245.glb",
+      "meshCount": 14
+    },
+    {
+      "assetId": "hands-nh05-luminous-588",
+      "category": "hands",
+      "path": "public/assets/3d/variants/hands/hands-nh05-luminous-588.glb",
+      "meshCount": 6
     }
   ]
 }

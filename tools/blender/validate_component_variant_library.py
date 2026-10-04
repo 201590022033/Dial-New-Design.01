@@ -7,6 +7,7 @@ import sys
 
 import bpy
 from mathutils import Vector
+from mathutils.bvhtree import BVHTree
 
 
 def script_args():
@@ -50,6 +51,16 @@ def main():
         missing = [obj.name for obj in meshes if not obj.data.materials]
         if missing:
             raise ValueError(f"Meshes without material for {entry['assetId']}: {missing}")
+        if entry["category"] == "case":
+            def tree(obj):
+                return BVHTree.FromPolygons([obj.matrix_world @ v.co for v in obj.data.vertices], [list(p.vertices) for p in obj.data.polygons])
+            midcase = next(obj for obj in meshes if obj.name.startswith("DD_CASE_MIDCASE"))
+            lugs = [obj for obj in meshes if obj.name.startswith("DD_CASE_LUG_")]
+            if len(lugs) != 4:
+                raise ValueError(f"Expected four supplier lugs: {entry['assetId']}")
+            for lug in lugs:
+                if not tree(midcase).overlap(tree(lug)):
+                    raise ValueError(f"Disconnected lug root: {entry['assetId']} / {lug.name}")
         reports.append({"assetId": entry["assetId"], "meshCount": len(meshes), "boundsMm": [round(value, 3) for value in bounds]})
     print("COMPONENT_VARIANT_VALIDATION=" + json.dumps({"validated": len(reports), "assets": reports}), flush=True)
 

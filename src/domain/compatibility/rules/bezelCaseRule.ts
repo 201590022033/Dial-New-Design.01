@@ -2,6 +2,7 @@ import type { CompatibilityCheckResult } from '../compatibilityTypes';
 import type { WatchAssembly } from '@/domain/assembly/assemblyTypes';
 import type { ResolvedAssemblyGeometry } from '@/domain/geometry/boundaryResolver';
 import type { ComponentCatalogueItem } from '@/domain/catalogue/types';
+import { getCaseEngineeringSpecs, getActiveMovement } from '../compatibilityHelpers';
 
 /**
  * Checks physical mating compatibility between Bezel carrier and Case shoulder.
@@ -15,7 +16,7 @@ export const checkBezelCaseCompatibility = (
 
   const bezelPart = Object.values(assembly.parts).find(
     (p) =>
-      p.category === 'rings' &&
+      p.visible && p.category === 'rings' &&
       !p.instanceId.includes('inner') &&
       !p.catalogueItemId.includes('inner') &&
       (p.instanceId.includes('bezel') || p.name.toLowerCase().includes('bezel'))
@@ -35,12 +36,13 @@ export const checkBezelCaseCompatibility = (
 
   // Case bezel shoulder interface
   const shoulderInterface = geometry.interfaces.find((i) => i.kind === 'bezel-shoulder');
-  const candidateCaseSpec = candidateItem?.engineeringSpecs?.case;
+  const candidateCaseSpec = getCaseEngineeringSpecs(assembly, candidateItem);
 
   const caseShoulderDiameterMm =
     candidateCaseSpec?.bezelCarrierInnerMm ??
-    (shoulderInterface ? shoulderInterface.radialSeatMm.innerRadiusMm * 2 : undefined) ??
-    (geometry.regions.bezel ? geometry.regions.bezel.innerRadiusMm * 2 : undefined);
+    (getActiveMovement(assembly)?.id === 'nh05' ? undefined :
+      (shoulderInterface ? shoulderInterface.radialSeatMm.innerRadiusMm * 2 : undefined) ??
+      (geometry.regions.bezel ? geometry.regions.bezel.innerRadiusMm * 2 : undefined));
 
   if (typeof bezelInnerMm !== 'number' || isNaN(bezelInnerMm) || bezelInnerMm <= 0) {
     results.push({

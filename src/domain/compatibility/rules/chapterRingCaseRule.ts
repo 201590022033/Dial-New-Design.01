@@ -2,7 +2,7 @@ import type { CompatibilityCheckResult } from '../compatibilityTypes';
 import type { WatchAssembly } from '@/domain/assembly/assemblyTypes';
 import type { ResolvedAssemblyGeometry } from '@/domain/geometry/boundaryResolver';
 import type { ComponentCatalogueItem } from '@/domain/catalogue/types';
-import { findCaseBodyPart } from '../compatibilityHelpers';
+import { findCaseBodyPart, getCaseEngineeringSpecs, getActiveMovement } from '../compatibilityHelpers';
 
 /**
  * Checks physical mating compatibility for Chapter Ring vs Case rehaut and Dial.
@@ -15,7 +15,7 @@ export const checkChapterRingCaseCompatibility = (
   const results: CompatibilityCheckResult[] = [];
 
   const chapterPart = Object.values(assembly.parts).find(
-    (p) => p.category === 'rings' && (p.instanceId.includes('chapter') || p.name.toLowerCase().includes('chapter'))
+    (p) => p.visible && p.category === 'rings' && (p.instanceId.includes('chapter') || p.name.toLowerCase().includes('chapter'))
   );
 
   const candidateSpec = candidateItem?.engineeringSpecs?.chapterRing;
@@ -32,13 +32,14 @@ export const checkChapterRingCaseCompatibility = (
 
   // Case rehaut rebate interface
   const casePart = findCaseBodyPart(assembly);
-  const candidateCaseSpec = candidateItem?.engineeringSpecs?.case;
+  const candidateCaseSpec = getCaseEngineeringSpecs(assembly, candidateItem);
   const rehautInterface = geometry.interfaces.find((i) => i.kind === 'rehaut-rebate');
 
   const maxRehautDiameterMm =
     candidateCaseSpec?.rehautDiameterMm ??
-    (casePart?.dimensions.diameterMm && casePart.dimensions.diameterMm > 30 ? 30.5 : undefined) ??
-    (rehautInterface ? rehautInterface.radialSeatMm.outerRadiusMm * 2 + 2.0 : undefined);
+    (getActiveMovement(assembly)?.id === 'nh05' ? undefined :
+      (casePart?.dimensions.diameterMm && casePart.dimensions.diameterMm > 30 ? 30.5 : undefined) ??
+      (rehautInterface ? rehautInterface.radialSeatMm.outerRadiusMm * 2 + 2.0 : undefined));
 
   if (typeof outerDiameterMm !== 'number' || isNaN(outerDiameterMm) || outerDiameterMm <= 0) {
     results.push({

@@ -9,7 +9,11 @@ const moneySchema = z.object({
 export const aliExpressCaptureSchema = z.object({
   schema: z.literal('dial-designer/aliexpress-capture/v1'),
   source: z.literal('aliexpress'),
-  sourceUrl: z.string().url(),
+  sourceUrl: z.string().url().refine((value) => {
+    const url = new URL(value);
+    return url.protocol === 'https:' && !url.username && !url.password
+      && (url.hostname === 'aliexpress.com' || url.hostname.endsWith('.aliexpress.com') || url.hostname === 'aliexpress.us' || url.hostname.endsWith('.aliexpress.us'));
+  }, 'Use an HTTPS AliExpress product URL without credentials'),
   itemId: z.string().trim().min(3),
   title: z.string().trim().min(1),
   sellerName: z.string().trim().min(1).default('AliExpress seller'),

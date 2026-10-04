@@ -22,6 +22,10 @@ export const applyCatalogueVisualSelection = (
   };
   part.material = item.defaultMaterial || part.material;
   part.texture = item.defaultTexture || part.texture;
+  // A replacement cannot inherit the previous component's mating dimensions.
+  part.customProperties = { ...part.customProperties, engineeringSpecs: item.engineeringSpecs };
+  part.parametricGeometry = undefined;
+  part.geometryProvenance = undefined;
 
   if (item.visual?.category === 'case') {
     provisional.globalDimensions.caseDiameterMm = item.nominalDimensions.diameterMm;
@@ -29,6 +33,27 @@ export const applyCatalogueVisualSelection = (
   }
 
   if (!item.visual) return provisional;
+
+  // A complete set replaces the three central hands, never subdial hands.
+  // Clearing stale fit evidence is as important as updating visible lengths.
+  if (item.kind === 'hand-set' && item.visual.category === 'hands') {
+    const dialDiameter = provisional.parts['inst-dial-blank']?.dimensions.diameterMm ?? 24.5;
+    const lengths = item.visual.handLengthsMm ?? { hour: dialDiameter * .25, minute: dialDiameter * .36, second: dialDiameter * .39 };
+    for (const [id, role] of [['inst-hour-hand', 'hour'], ['inst-minute-hand', 'minute'], ['inst-central-seconds', 'second']] as const) {
+      const hand = provisional.parts[id];
+      if (!hand) continue;
+      hand.catalogueItemId = item.id;
+      hand.name = `${item.displayName} (${role})`;
+      hand.dimensions = { ...hand.dimensions, diameterMm: lengths[role] };
+      hand.material = item.defaultMaterial;
+      hand.texture = item.defaultTexture;
+      hand.visual = { category: 'hands', assetId: item.visual.assetId };
+      hand.customProperties = { ...hand.customProperties, engineeringSpecs: item.engineeringSpecs, visualHandStyle: item.visual.handStyle };
+      hand.parametricGeometry = undefined;
+      hand.geometryProvenance = undefined;
+    }
+  }
+  if (item.visual.dialColor) part.color = item.visual.dialColor;
 
   part.visual = { category: item.visual.category, assetId: item.visual.assetId };
   part.customProperties = {
@@ -55,7 +80,7 @@ export const applyCatalogueVisualSelection = (
     ...(nextTexture
       ? {
           textureConfig: nextTexture,
-          dialFaceConfig: { ...previousDesign.dialFaceConfig, texture: nextTexture }
+          dialFaceConfig: { ...previousDesign.dialFaceConfig, texture: nextTexture, ...(item.visual.dialColor ? { color: item.visual.dialColor } : {}) }
         }
       : {}),
     visualReferenceConfig: { ...previousReferences, componentAssetOverrides }

@@ -2,6 +2,7 @@ import type { WatchAssembly, WatchAssemblyPartInstance } from '@/domain/assembly
 import type { DonutGeometry } from '@/types/geometry';
 import type { ScalePluginConfig } from '@/domain/scales/types';
 import type { MarkerEngineConfig } from '@/domain/generators/markerEngine';
+import { nh05EngineeringReference } from '@/domain/movements/nh05EngineeringReference';
 import {
   AXIAL_DATUM_DIAL_SEAT_Z,
   checkCylindricalInterference,
@@ -107,7 +108,8 @@ export const resolveAssemblyGeometry = (
       });
       insufficientDataReasons.push(`Dial thickness missing on ${dialPart.instanceId}`);
     } else {
-      const centerHoleMm = assembly.designConfig?.geometryParameters?.movementCentreHoleMm ?? 1.5;
+      const centerHoleMm = assembly.metadata.movement === 'nh05' ? nh05EngineeringReference.dial.centreHoleDiameterMm
+        : assembly.designConfig?.geometryParameters?.movementCentreHoleMm ?? 1.5;
       const innerRadiusMm = centerHoleMm / 2;
       const outerRadiusMm = dDim.diameterMm / 2;
 
@@ -136,8 +138,9 @@ export const resolveAssemblyGeometry = (
   const dialOuterRadius = dialExtent?.outerRadiusMm ?? (caseRadiusMm > 5 ? caseRadiusMm - 5 : 14);
 
   // 3. Resolve Movement / Casing Ring Envelope
-  const movementDiameter = assembly.designConfig?.geometryParameters?.movementDiameterMm ?? 27.4;
-  const movementThickness = 5.32; // Standard calibre thickness (e.g. NH35)
+  const movementDiameter = assembly.metadata.movement === 'nh05' ? nh05EngineeringReference.movement.outsideDiameterMm
+    : assembly.designConfig?.geometryParameters?.movementDiameterMm ?? 27.4;
+  const movementThickness = assembly.metadata.movement === 'nh05' ? nh05EngineeringReference.movement.movementHeightWithDialSupportMm : 5.32;
   const movementRadius = movementDiameter / 2;
 
   const movementExtent: CylindricalExtent = {

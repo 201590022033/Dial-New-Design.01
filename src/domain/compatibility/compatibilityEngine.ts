@@ -42,6 +42,13 @@ export const runCompatibilityRules = (
   if (candidateItem) {
     checks.push(...checkCatalogueVerificationState(candidateItem));
   }
+  // Applied provisional parts do not become verified merely by leaving Preview.
+  for (const part of Object.values(assembly.parts).filter((part) => part.visible)) {
+    const item = getCatalogueItem(part.catalogueItemId);
+    if (item && item.id !== candidateItem?.id && (item.status === 'draft' || item.status === 'ai-extracted')) {
+      checks.push(...checkCatalogueVerificationState(item));
+    }
+  }
 
   // 3. Physical & Mating interface rules
   checks.push(...checkMovementCaseCompatibility(assembly, geometry, candidateItem));

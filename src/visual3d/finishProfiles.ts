@@ -1,5 +1,5 @@
 /** Registered surface finishes shared by procedural fallbacks and authored GLB metadata. */
-export type FinishProfileId = 'brushed-steel' | 'polished-steel' | 'blasted-steel' | 'black-pvd' | 'brass' | 'dial' | 'sapphire' | 'lume' | 'rubber' | 'leather' | 'canvas';
+export type FinishProfileId = 'brushed-steel' | 'polished-steel' | 'blasted-steel' | 'black-pvd' | 'brass' | 'rose-gold' | 'dial' | 'sapphire' | 'lume' | 'rubber' | 'leather' | 'canvas';
 
 export interface FinishProfile {
   id: FinishProfileId;
@@ -21,6 +21,7 @@ export interface FinishProfile {
 }
 
 export const finishProfiles: Record<FinishProfileId, FinishProfile> = {
+  'rose-gold': { id: 'rose-gold', label: 'Rose gold', color: '#c08a76', metalness: 1, roughness: 0.18, clearcoat: 0.25, provenance: 'provisional' },
   'brushed-steel': { id: 'brushed-steel', label: 'Brushed steel', color: '#aeb8c4', metalness: 1, roughness: 0.3, clearcoat: 0.18, clearcoatRoughness: 0.22, provenance: 'provisional' },
   'polished-steel': { id: 'polished-steel', label: 'Polished steel', color: '#d4d9df', metalness: 1, roughness: 0.075, clearcoat: 0.35, clearcoatRoughness: 0.06, provenance: 'provisional' },
   'blasted-steel': { id: 'blasted-steel', label: 'Bead-blasted steel', color: '#aeb6bf', metalness: 0.82, roughness: 0.5, provenance: 'provisional' },

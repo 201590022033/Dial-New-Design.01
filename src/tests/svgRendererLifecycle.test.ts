@@ -2,10 +2,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { SvgRenderer } from '@/renderer/svgRenderer';
 import { createDefaultWatchAssembly } from '@/domain/assembly';
 import type { RendererOptions } from '@/renderer/types';
+import { getScalePlugin } from '@/domain/scales/scaleRegistry';
+import { runScalePlugin } from '@/services/scaleEngineService';
 
 const svg = vi.hoisted(() => {
   const node: Record<string, unknown> = { node: { setAttribute: vi.fn() } };
-  for (const method of ['addTo', 'size', 'clear', 'remove', 'group', 'id', 'attr', 'css', 'line', 'stroke', 'circle', 'polygon', 'center', 'fill', 'path', 'front']) {
+  for (const method of ['addTo', 'size', 'clear', 'remove', 'group', 'id', 'attr', 'css', 'line', 'stroke', 'circle', 'polygon', 'center', 'fill', 'path', 'front', 'clip', 'add', 'clipWith', 'text', 'font', 'rotate']) {
     node[method] = vi.fn(() => node);
   }
   node.findOne = vi.fn(() => null);
@@ -62,5 +64,14 @@ describe('engineering renderer lifecycle', () => {
     renderer.renderBands([], context, { ...options, assembly });
     expect(svg.attr).toHaveBeenCalledWith('data-hand-style', 'mercedes');
     expect(svg.polygon).toHaveBeenCalled();
+  });
+
+  it('uses the same selected colour for scale ticks and numerals in Engineering mode', () => {
+    const renderer = new SvgRenderer();
+    const scalePreview = runScalePlugin('circular', { ...getScalePlugin('circular')!.defaultConfig, color: '#a37db5' }, { startAngleDeg: 0, endAngleDeg: 360 });
+    renderer.mount({} as HTMLElement);
+    renderer.renderBands([], context, { ...options, scalePreview });
+    expect(svg.stroke).toHaveBeenCalledWith(expect.objectContaining({ color: '#a37db5' }));
+    expect(svg.fill).toHaveBeenCalledWith('#a37db5');
   });
 });

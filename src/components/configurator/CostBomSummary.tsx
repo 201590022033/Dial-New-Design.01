@@ -185,7 +185,7 @@ export const CostBomSummary: React.FC = () => {
 
           <div className="space-y-1.5 font-mono text-[11px]">
             <div className="flex justify-between text-slate-300">
-              <span>Verified Components:</span>
+              <span>Selected components (estimates):</span>
               <span>R{cost.partsTotal.toLocaleString()}</span>
             </div>
             <div className="flex justify-between text-slate-400">

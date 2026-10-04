@@ -37,9 +37,9 @@ export const checkDateWindowMovementCompatibility = (
 
   // Determine date window angle/position
   let dateWindowPosition = '3:00';
-  if (candidateItem?.metadata?.notes?.includes('4.5') || candidateItem?.metadata?.notes?.includes('4:30')) {
+  if (isCandidateDateWindow && (candidateItem?.metadata?.notes?.includes('4.5') || candidateItem?.metadata?.notes?.includes('4:30'))) {
     dateWindowPosition = '4:30';
-  } else if (candidateItem?.metadata?.notes?.includes('6')) {
+  } else if (isCandidateDateWindow && candidateItem?.metadata?.notes?.includes('6')) {
     dateWindowPosition = '6:00';
   } else if (typeof dateWindowPart?.customProperties?.position === 'string') {
     dateWindowPosition = dateWindowPart.customProperties.position;

@@ -94,6 +94,13 @@ export interface WatchAssemblyDesignConfig {
     dialMarkerMode?: 'auto' | 'dots' | 'arabic' | 'roman' | 'ticks';
     /** Provisional 42 mm case-lug presentation variant. */
     lugStyleId?: LugGeometryStyle;
+    /** Presentation finishes; not a material or plating procurement claim. */
+    caseFinish?: 'steel' | 'rose-gold';
+    handsFinish?: 'auto' | 'rose-gold';
+    /** Independent presentation overrides; gemstone geometry is unchanged. */
+    bezelFinish?: 'steel' | 'rose-gold';
+    handsColor?: string;
+    markerColor?: string;
     artworkDataUrl?: string;
     artworkName?: string;
     /** Saved presentation choices. These are authored render settings, not viewport session state. */

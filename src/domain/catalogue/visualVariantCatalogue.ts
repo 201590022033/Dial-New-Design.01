@@ -29,6 +29,15 @@ const handManufacturing: CatalogueManufacturingMetadata = {
  * creation does not instantiate every option as a physical watch part.
  */
 export const visualVariantCatalogueItems: ComponentCatalogueItem[] = [
+  ...([34, 42] as const).map((size): ComponentCatalogueItem => ({
+    id: `cat-bezel-diamond-rose-gold-${size}`, kind: 'fixed-bezel', displayName: `${size}mm Diamond-set Rose-gold Bezel Preview`,
+    category: 'rings', defaultMaterial: 'rose-gold', defaultTexture: 'polished', linkedBandKind: 'outer-bezel',
+    nominalDimensions: { diameterMm: size - 1, widthMm: (size - 1 - size * .75) / 2, thicknessMm: 3.4 }, manufacturing: cnc,
+    softStyles: ['dress', 'ladies', 'gem-set', 'presentation'], status: 'draft',
+    metadata: { tags: ['bezel', 'rose-gold', 'diamond', 'independent-glb'], revision: 'P1', notes: 'Blender-authored presentation only. No supplier SKU, price, gemstone grade, plating or case-fit approval. Radial resizing is visual only.' },
+    visual: { category: 'bezel', assetId: `bezel-diamond-rose-gold-${size}`, representation: 'glb', status: 'provisional', bezelProfile: 'smooth' },
+    exportEnabled: false
+  })),
   {
     id: 'cat-case-nh05-ladies-dress-34',
     kind: 'midcase',

@@ -17,7 +17,7 @@ import bpy
 
 
 HAND_STYLES = ("baton", "mercedes", "sword", "dauphine", "syringe", "cathedral", "pencil", "broad-arrow", "skeleton")
-BEZEL_STYLES = ("dive-coin-edge", "dive-scalloped", "pilot-smooth", "dress-fluted", "tachymeter-fixed", "gmt", "slide-rule")
+BEZEL_STYLES = ("dive-coin-edge", "dive-scalloped", "pilot-smooth", "dress-fluted", "tachymeter-fixed", "gmt", "slide-rule", "diamond-rose-gold")
 DIAL_STYLES = ("sterile", "diver", "pilot-a", "pilot-b", "field", "dress-sector", "gmt", "chronograph")
 CASE_SPECS = {
     "nh05-ladies-dress-34": dict(diameter=34.0, thickness=10.5, lug_width=16.0, lug_to_lug=40.0, shape="dress"),
@@ -143,16 +143,21 @@ def hand_outline(style, length, width):
     return [(-width / 2, -tail), (width / 2, -tail), (width * .42, length * .9), (0, length), (-width * .42, length * .9)]
 
 
-def build_hands(style, compact=False):
+def build_hands(style, compact=False, lengths=None):
     steel = material("DD_HAND_STEEL", (.74, .79, .86), .92, .13)
     lume = material("DD_HAND_LUME", (.66, .95, .67), .04, .28)
     scale = .72 if compact else 1.0
     for index, (role, length, width, angle) in enumerate((("HOUR", 9.0, 1.35, -32), ("MINUTE", 12.7, .88, 48), ("SECONDS", 13.8, .20, 137))):
+        if lengths:
+            length = lengths[index]
+            scale = 1.0
+            width = (.55, .35, .12)[index]
         width *= scale
         obj = prism(f"DD_HAND_{role}", hand_outline(style, length * scale, width), .15 if index < 2 else .10, index * .20, steel, .035)
         obj.rotation_euler.z = math.radians(angle)
         obj["DD_HAND_STYLE"] = style
         obj["DD_ROLE"] = role.lower()
+        obj["DD_TIP_LENGTH_MM"] = length * scale
         if index < 2 and style not in ("dauphine", "skeleton"):
             hand_angle = math.radians(angle)
             inlay_radius = length * scale * .46
@@ -187,7 +192,38 @@ def add_edge_teeth(style, outer_diameter, height, steel):
             (radius * math.sin(angle), radius * math.cos(angle), 0), steel, .035, -angle)
 
 
-def build_bezel(style):
+def build_bezel(style, case_diameter=42):
+    if style == "diamond-rose-gold":
+        gold = material("DD_ROSE_GOLD", (.72, .40, .31), 1, .16)
+        diamond = material("DD_DIAMOND", (.96, .98, 1), 0, .035)
+        shader = diamond.node_tree.nodes.get("Principled BSDF")
+        shader.inputs["Transmission Weight"].default_value = .92
+        shader.inputs["IOR"].default_value = 2.417
+        outer, inner = case_diameter - 1, case_diameter * .75
+        annulus("DD_BEZEL_CARRIER_ROSE_GOLD", outer, inner, 2.8, 0, gold)
+        radius = (outer + inner) / 4
+        stone_radius = min(.88, (outer - inner) / 4 - .30)
+        count = int(2 * math.pi * radius / (stone_radius * 2.22))
+        for index in range(count):
+            angle = 2 * math.pi * index / count
+            cx, cy = radius * math.sin(angle), radius * math.cos(angle)
+            vertices = []
+            for r, z in ((stone_radius * .48, 2.0), (stone_radius, 1.65), (stone_radius, 1.53)):
+                vertices.extend((cx + r * math.cos(i * math.pi / 8), cy + r * math.sin(i * math.pi / 8), z) for i in range(16))
+            vertices.append((cx, cy, .85))
+            faces = [tuple(range(16))]
+            for i in range(16):
+                n = (i + 1) % 16
+                faces.extend(((i, 16 + i, 16 + n), (i, 16 + n, n), (16 + i, 32 + i, 32 + n, 16 + n), (32 + i, 48, 32 + n)))
+            mesh = bpy.data.meshes.new(f"DD_DIAMOND_{index:03d}_MESH")
+            mesh.from_pydata(vertices, [], faces); mesh.update()
+            obj = bpy.data.objects.new(f"DD_DIAMOND_{index:03d}", mesh)
+            bpy.context.collection.objects.link(obj); finish(obj, diamond)
+            for side in (-1, 1):
+                prong_radius = radius + side * stone_radius
+                prong = cylinder(f"DD_BEZEL_PRONG_{index:03d}_{side}", .30, .42, 1.75, gold, 12, .04)
+                prong.location.x, prong.location.y = prong_radius * math.sin(angle), prong_radius * math.cos(angle)
+        return
     steel = material("DD_BEZEL_STEEL", (.60, .66, .74), .94, .16)
     dark = material("DD_BEZEL_INSERT", (.012, .025, .045), .16, .24)
     accent = material("DD_BEZEL_MARKINGS", (.83, .88, .86), .08, .30)
@@ -248,15 +284,45 @@ def lug_pair(lug_width, lug_to_lug, body_diameter, height, steel, style):
     # Seat each lug just inside the midcase and terminate exactly at the
     # recorded lug-to-lug envelope.  This prevents a visual-only lug block
     # from silently making a supplier case longer than its source drawing.
-    inner_y = body_diameter / 2 - 1.4
-    outer_y = lug_to_lug / 2
-    length = max(1.0, outer_y - inner_y)
-    y = (inner_y + outer_y) / 2
     flare = 1.25 if style in ("samurai", "willard") else 1.0
+    lug_each *= flare
+    # Use the OUTER root corner, not the centreline or 12h tangent. Even the
+    # widest root must penetrate the circular shoulder after edge beveling.
+    root_radius = body_diameter / 2 - .8
+    outer_y = lug_to_lug / 2
     for end in (-1, 1):
         for side in (-1, 1):
-            x = side * (gap / 2 + lug_each / 2)
-            box(f"DD_CASE_LUG_{end}_{side}", (lug_each * flare, length, height * .58), (x, end * y, -.15), steel, .45)
+            vertices, faces = [], []
+            sections = (0, .22, .5, .78, 1)
+            for t in sections:
+                eased = t * t * (3 - 2 * t)
+                width = lug_each * (1 - .28 * eased)
+                for edge, level in ((0, -1), (1, -1), (1, 1), (0, 1)):
+                    x = side * (gap / 2 + edge * width)
+                    # Follow the shoulder at both root corners. No floating
+                    # outer corner and no rectangular post glued onto 12h.
+                    root_y = math.sqrt(max(0, root_radius ** 2 - (gap / 2 + edge * lug_each) ** 2))
+                    y = end * (root_y * (1 - t) + outer_y * t)
+                    z = -.15 - height * .12 * eased + level * height * .29
+                    vertices.append((x, y, z))
+            faces = [(0, 3, 2, 1), (16, 17, 18, 19)]
+            for section in range(4):
+                for edge in range(4):
+                    a, b = section * 4 + edge, section * 4 + (edge + 1) % 4
+                    faces.append((a, b, b + 4, a + 4))
+            mesh = bpy.data.meshes.new(f"DD_CASE_LUG_{end}_{side}_MESH")
+            mesh.from_pydata(vertices, [], faces); mesh.update()
+            lug = bpy.data.objects.new(f"DD_CASE_LUG_{end}_{side}", mesh)
+            bpy.context.collection.objects.link(lug)
+            finish(lug, steel, .18)
+            # Recalculate outward winding identically for all four mirrored lugs.
+            bpy.context.view_layer.objects.active = lug
+            lug.select_set(True)
+            bpy.ops.object.mode_set(mode="EDIT"); bpy.ops.mesh.select_all(action="SELECT")
+            bpy.ops.mesh.normals_make_consistent(inside=False); bpy.ops.object.mode_set(mode="OBJECT")
+            lug.select_set(False)
+            lug["DD_ROOT_OUTER_RADIUS_MM"] = root_radius
+            lug["DD_LUG_GAP_MM"] = gap
 
 
 def build_case(case_id, spec):
@@ -298,12 +364,90 @@ def export_asset(output_path, asset_id, category):
     return {"assetId": asset_id, "category": category, "path": relative_path, "meshCount": len(objects)}
 
 
+def build_nh05_white_dial():
+    # Supplier OD; interfaces and marker layout remain presentation assumptions.
+    face = material("DD_DIAL_FACE", (.95, .95, .93), .03, .72)
+    metal = material("DD_DIAL_MARKINGS", (.65, .68, .72), .88, .22)
+    substrate = annulus("DD_DIAL_SUBSTRATE", 24.5, 1.65, .4, 0, face, 160)
+    cutter = box("DATE_WINDOW_CUTTER", (1.85, 1.30, 2), (6.825, 0, 0), metal)
+    modifier = substrate.modifiers.new("Provisional TMI reference date opening", "BOOLEAN")
+    modifier.operation = "DIFFERENCE"
+    modifier.object = cutter
+    bpy.context.view_layer.objects.active = substrate
+    bpy.ops.object.modifier_apply(modifier=modifier.name)
+    bpy.data.objects.remove(cutter, do_unlink=True)
+    date_card = material("DD_DATE_CARD", (.98, .98, .95), 0, .65)
+    date_ink = material("DD_DATE_NUMERAL", (.02, .02, .025), 0, .55)
+    box("DD_DATE_CARD", (2.1, 1.55, .05), (6.825, 0, -.24), date_card)
+    bpy.ops.object.text_add(location=(6.825, 0, -.20))
+    text = bpy.context.object
+    text.name = "DD_DATE_NUMERAL_PREVIEW_18"
+    text.data.body = "18"
+    text.data.align_x = "CENTER"; text.data.align_y = "CENTER"
+    text.data.size = .85
+    text.data.extrude = .002
+    text.data.materials.append(date_ink)
+    bpy.ops.object.convert(target="MESH")
+    for index in range(12):
+        if index == 3:
+            continue
+        angle = index * math.pi / 6
+        box(f"DD_DIAL_INDEX_{index:02d}", (.28, .85, .10),
+            (10.7 * math.sin(angle), 10.7 * math.cos(angle), .26), metal, .02, -angle)
+    substrate["DD_OUTER_DIAMETER_MM"] = 24.5
+    substrate["DD_INTERFACE_STATUS"] = "TMI-reference-preview-not-supplier-measurement"
+
+
+def generate_nh05_research(root):
+    entries = []
+    clear_scene()
+    build_case("tandorio-nh05-research-34", dict(diameter=34, thickness=12, lug_width=16, lug_to_lug=40, shape="dress"))
+    entries.append(export_asset(os.path.join(root, "cases", "case-tandorio-nh05-research-34.glb"), "case-tandorio-nh05-research-34", "case"))
+    clear_scene(); build_nh05_white_dial()
+    entries.append(export_asset(os.path.join(root, "dials", "dial-nh05-white-matte-245.glb"), "dial-nh05-white-matte-245", "dial"))
+    clear_scene(); build_hands("baton", lengths=(5, 8, 8))
+    entries.append(export_asset(os.path.join(root, "hands", "hands-nh05-luminous-588.glb"), "hands-nh05-luminous-588", "hands"))
+    return entries
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", required=True)
     parser.add_argument("--hand-style", choices=HAND_STYLES, help="Regenerate one hand set and its manifest entry")
+    parser.add_argument("--cases-only", action="store_true")
+    parser.add_argument("--nh05-research-only", action="store_true", help="Generate only the three researched NH05 previews")
+    parser.add_argument("--bezel-style", choices=BEZEL_STYLES)
     parsed = parser.parse_args(args_after_dash())
     root = os.path.abspath(parsed.output)
+    if parsed.nh05_research_only:
+        entries = generate_nh05_research(root)
+        manifest_path = os.path.join(root, "manifest.json")
+        with open(manifest_path, encoding="utf-8") as handle:
+            manifest = json.load(handle)
+        replacement_ids = {entry["assetId"] for entry in entries}
+        manifest["assets"] = [entry for entry in manifest["assets"] if entry["assetId"] not in replacement_ids] + entries
+        with open(manifest_path, "w", encoding="utf-8") as handle:
+            json.dump(manifest, handle, indent=2)
+        return
+    if parsed.cases_only or parsed.bezel_style:
+        entries = []
+        if parsed.cases_only:
+            for case_id, spec in CASE_SPECS.items():
+                clear_scene(); build_case(case_id, spec)
+                entries.append(export_asset(os.path.join(root, "cases", f"case-{case_id}.glb"), f"case-{case_id}", "case"))
+        if parsed.bezel_style:
+            for diameter in ((34, 42) if parsed.bezel_style == "diamond-rose-gold" else (42,)):
+                clear_scene(); build_bezel(parsed.bezel_style, diameter)
+                asset_id = f"bezel-{parsed.bezel_style}-{diameter}"
+                entries.append(export_asset(os.path.join(root, "bezels", asset_id + ".glb"), asset_id, "bezel"))
+        manifest_path = os.path.join(root, "manifest.json")
+        with open(manifest_path, encoding="utf-8") as handle:
+            manifest = json.load(handle)
+        replacement_ids = {entry["assetId"] for entry in entries}
+        manifest["assets"] = [entry for entry in manifest["assets"] if entry["assetId"] not in replacement_ids] + entries
+        with open(manifest_path, "w", encoding="utf-8") as handle:
+            json.dump(manifest, handle, indent=2)
+        return
     if parsed.hand_style:
         clear_scene()
         build_hands(parsed.hand_style)
@@ -325,6 +469,8 @@ def main():
     for style in BEZEL_STYLES:
         clear_scene(); build_bezel(style)
         manifest.append(export_asset(os.path.join(root, "bezels", f"bezel-{style}-42.glb"), f"bezel-{style}-42", "bezel"))
+    clear_scene(); build_bezel("diamond-rose-gold", 34)
+    manifest.append(export_asset(os.path.join(root, "bezels", "bezel-diamond-rose-gold-34.glb"), "bezel-diamond-rose-gold-34", "bezel"))
     for style in DIAL_STYLES:
         clear_scene(); build_dial(style)
         manifest.append(export_asset(os.path.join(root, "dials", f"dial-{style}-285.glb"), f"dial-{style}-285", "dial"))
@@ -334,6 +480,7 @@ def main():
     for case_id, spec in CASE_SPECS.items():
         clear_scene(); build_case(case_id, spec)
         manifest.append(export_asset(os.path.join(root, "cases", f"case-{case_id}.glb"), f"case-{case_id}", "case"))
+    manifest.extend(generate_nh05_research(root))
     os.makedirs(root, exist_ok=True)
     with open(os.path.join(root, "manifest.json"), "w", encoding="utf-8") as handle:
         json.dump({"schema": "dial-designer/component-variants/v1", "assets": manifest}, handle, indent=2)

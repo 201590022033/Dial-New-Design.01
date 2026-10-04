@@ -184,6 +184,7 @@ export const useProjectStore = create<ProjectStoreState>((set, get) => ({
       historyCounts: snapshot.historyCounts,
       info: {
         ...state.info,
+        movement: snapshot.assembly?.metadata.movement ?? state.info.movement,
         updatedAtIso: new Date().toISOString()
       },
       dirty: true

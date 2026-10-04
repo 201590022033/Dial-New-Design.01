@@ -2,7 +2,8 @@ import type { CompatibilityCheckResult } from '../compatibilityTypes';
 import type { WatchAssembly } from '@/domain/assembly/assemblyTypes';
 import type { ResolvedAssemblyGeometry } from '@/domain/geometry/boundaryResolver';
 import type { ComponentCatalogueItem } from '@/domain/catalogue/types';
-import { getActiveMovement } from '../compatibilityHelpers';
+import { getActiveMovement, getCaseEngineeringSpecs } from '../compatibilityHelpers';
+import { nh05EngineeringReference } from '@/domain/movements/nh05EngineeringReference';
 
 /**
  * Checks physical mating compatibility between movement calibre and case cavity.
@@ -24,16 +25,19 @@ export const checkMovementCaseCompatibility = (
   const candidateMovSpec = candidateItem?.engineeringSpecs?.movement;
 
   const movementName = candidateMovSpec?.calibreId ?? activeMovement?.name ?? assembly.metadata.movement;
-  const movementDiameter = candidateMovSpec?.diameterMm ?? 27.4;
+  const isNh05 = activeMovement?.id === 'nh05';
+  const movementDiameter = candidateMovSpec?.diameterMm ?? (isNh05
+    ? nh05EngineeringReference.movement.outsideDiameterMm
+    : activeMovement?.id === 'nh35' ? 27.4 : undefined);
   const movementStemPos = candidateMovSpec?.stemPosition ?? activeMovement?.stemPosition ?? '3h';
 
   // 2. Identify case specifications
-  const candidateCaseSpec = candidateItem?.engineeringSpecs?.case;
+  const candidateCaseSpec = getCaseEngineeringSpecs(assembly, candidateItem);
 
   // Case cavity from explicit specs or standard casing diameter for the assembly
   const caseCavityDiameter =
     candidateCaseSpec?.cavityDiameterMm ??
-    (assembly.globalDimensions.caseDiameterMm > 0 ? 29.2 : undefined);
+    (activeMovement?.id === 'nh35' && assembly.globalDimensions.caseDiameterMm > 0 ? 29.2 : undefined);
 
   const caseStemPos = candidateCaseSpec?.stemPosition ?? '3h';
 

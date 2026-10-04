@@ -4,6 +4,7 @@ import { useWatchAssemblyStore } from '@/stores/watchAssemblyStore';
 import { useDesignEngineStore } from '@/stores/designEngineStore';
 import type { WatchAssembly } from '@/domain/assembly/assemblyTypes';
 import { cn } from '@/utils/cn';
+import { useScaleStore } from '@/stores/scaleStore';
 
 const FINISH_PRESETS = [
   { id: 'matte', name: 'Matte Finish', texture: 'matte', description: 'Non-reflective micro-bead blasted surface' },
@@ -18,7 +19,8 @@ const COLOR_PALETTES = [
   { name: 'Emerald Sunburst', primary: '#064e3b', secondary: '#047857', accent: '#34d399' },
   { name: 'Onyx Black', primary: '#020617', secondary: '#0f172a', accent: '#f59e0b' },
   { name: 'Arctic Silver', primary: '#e2e8f0', secondary: '#cbd5e1', accent: '#0284c7' },
-  { name: 'Vintage Gilt', primary: '#1c1917', secondary: '#292524', accent: '#d97706' }
+  { name: 'Vintage Gilt', primary: '#1c1917', secondary: '#292524', accent: '#d97706' },
+  { name: 'Rose Gold', primary: '#c08a76', secondary: '#e6b8af', accent: '#fff1e8' }
 ];
 
 const STRAP_STYLES = [
@@ -49,6 +51,9 @@ export const StyleTab: React.FC = () => {
   const visualReferenceConfig = useDesignEngineStore((s) => s.visualReferenceConfig);
   const updateVisualReferenceConfig = useDesignEngineStore((s) => s.updateVisualReferenceConfig);
   const selectedMainHandAsset = visualReferenceConfig?.componentAssetOverrides?.hands;
+  const scaleColor = useScaleStore((s) => s.pluginConfig.color);
+  const updateScale = useScaleStore((s) => s.updatePluginConfig);
+  const dialColor = useDesignEngineStore((s) => s.dialFaceConfig.color);
   const selectMainHands = (style: typeof MAIN_HAND_STYLES[number] | 'archetype') => {
     const overrides = { ...visualReferenceConfig?.componentAssetOverrides };
     if (style === 'archetype') delete overrides.hands;
@@ -119,6 +124,48 @@ export const StyleTab: React.FC = () => {
       </div>
 
       {/* Surface Textures */}
+      <div className="space-y-2">
+        <h4 className="text-[11px] font-mono text-slate-400 uppercase">Independent Colours &amp; Bezel</h4>
+        <p className="text-[10px] text-slate-400">Presentation only; no plating, gemstone or supplier-fit claim.</p>
+        <p className="text-[10px] text-slate-400">Mix a silver dial with a rose-gold case. Plain or diamond-set bezels can have either metal colour. Custom marker colour replaces the marker lume appearance, not hand lume.</p>
+        <label className="block text-xs text-slate-300">Case &amp; crown
+          <select aria-label="Case metal colour" className="ml-2 bg-slate-900" value={visualReferenceConfig?.caseFinish ?? 'steel'}
+            onChange={(event) => updateVisualReferenceConfig({ caseFinish: event.target.value as 'steel' | 'rose-gold' })}>
+            <option value="steel">Steel / original</option><option value="rose-gold">Rose gold</option>
+          </select>
+        </label>
+        <label className="block text-xs text-slate-300">Main hands
+          <select aria-label="Main hand metal colour" className="ml-2 bg-slate-900" value={visualReferenceConfig?.handsFinish ?? 'auto'}
+            onChange={(event) => updateVisualReferenceConfig({ handsFinish: event.target.value as 'auto' | 'rose-gold', handsColor: undefined })}>
+            <option value="auto">Automatic contrast</option><option value="rose-gold">Rose gold</option>
+          </select>
+        </label>
+        <label className="block text-xs text-slate-300">Bezel metal
+          <select aria-label="Bezel metal colour" className="ml-2 bg-slate-900" value={visualReferenceConfig?.bezelFinish ?? 'case'}
+            onChange={(event) => updateVisualReferenceConfig({ bezelFinish: event.target.value === 'case' ? undefined : event.target.value as 'steel' | 'rose-gold' })}>
+            <option value="case">Follow case / original asset</option><option value="steel">Silver steel</option><option value="rose-gold">Rose gold</option>
+          </select>
+        </label>
+        {([
+          { label: 'Dial surface', value: dialColor, apply: (color: string) => updateDialFaceConfig({ color, secondaryColor: color }) },
+          { label: 'Main hand colour', value: visualReferenceConfig?.handsColor ?? (visualReferenceConfig?.handsFinish === 'rose-gold' ? '#c08a76' : '#e2e8f0'), apply: (color: string) => updateVisualReferenceConfig({ handsColor: color }) },
+          { label: 'Hour markers / numerals', value: visualReferenceConfig?.markerColor ?? '#e2e8f0', apply: (color: string) => updateVisualReferenceConfig({ markerColor: color }) },
+          { label: 'Scale ticks / numerals', value: scaleColor, apply: (color: string) => updateScale({ color }) }
+        ]).map((control) => <div key={control.label} className="flex flex-wrap items-center gap-1 text-xs text-slate-300">
+          <label className="mr-auto">{control.label}<input type="color" aria-label={control.label} value={control.value} onChange={(event) => control.apply(event.target.value)} className="ml-2 h-6 w-8 bg-transparent align-middle" /></label>
+          {['#e2e8f0', '#c08a76', '#d4af37', '#111827'].map((color) => <button key={color} type="button" aria-label={`${control.label}: ${color === '#c08a76' ? 'rose gold' : color === '#e2e8f0' ? 'silver' : color === '#d4af37' ? 'gold' : 'black'}`} onClick={() => control.apply(color)} className="h-5 w-5 rounded border border-slate-600" style={{ backgroundColor: color }} />)}
+        </div>)}
+        <button type="button" className="text-xs text-slate-400" onClick={() => updateVisualReferenceConfig({ markerColor: undefined, handsColor: undefined, handsFinish: 'auto' })}>Restore automatic hands &amp; marker lume</button>
+        <button type="button" className="rounded border border-slate-700 p-2 text-xs"
+          onClick={() => updateVisualReferenceConfig({ componentAssetOverrides: { ...visualReferenceConfig?.componentAssetOverrides,
+            bezel: `bezel-diamond-rose-gold-${assembly.globalDimensions.caseDiameterMm <= 36 ? 34 : 42}` } })}>
+          Diamond-set bezel (choose metal above)
+        </button>
+        <button type="button" className="ml-2 text-xs text-slate-400" onClick={() => {
+          const overrides = { ...visualReferenceConfig?.componentAssetOverrides }; delete overrides.bezel;
+          updateVisualReferenceConfig({ componentAssetOverrides: overrides });
+        }}>Restore archetype bezel</button>
+      </div>
       <div className="space-y-2">
         <h4 className="text-[11px] font-mono text-slate-400 uppercase tracking-wider">
           Surface Finish Presets
@@ -195,11 +242,14 @@ export const StyleTab: React.FC = () => {
 
       <div className="space-y-2 pt-2 border-t border-slate-800">
         <h4 className="text-[11px] font-mono text-slate-400 uppercase tracking-wider">Case Lug Geometry</h4>
-        <p className="text-[10px] text-slate-400">42 mm presentation variants. Each shape needs separate physical validation before ordering.</p>
+        <p className="text-[10px] text-slate-400">{assembly.globalDimensions.caseDiameterMm === 42
+          ? '42 mm presentation variants. Each shape needs separate physical validation before ordering.'
+          : 'This watch uses its selected case lugs. The separate lug-shape library is currently 42 mm only.'}</p>
         <div className="grid grid-cols-2 gap-2">
           {LUG_STYLES.map((style) => <button key={style} type="button"
+            disabled={assembly.globalDimensions.caseDiameterMm !== 42}
             onClick={() => updateVisualReferenceConfig({ lugStyleId: style })}
-            className={cn('rounded-lg border p-2 text-left capitalize', (visualReferenceConfig?.lugStyleId ?? 'straight') === style ? 'border-teal-400 bg-slate-800' : 'border-slate-800 bg-slate-900')}>
+            className={cn('rounded-lg border p-2 text-left capitalize disabled:opacity-40', assembly.globalDimensions.caseDiameterMm === 42 && (visualReferenceConfig?.lugStyleId ?? 'straight') === style ? 'border-teal-400 bg-slate-800' : 'border-slate-800 bg-slate-900')}>
             <span className="text-xs text-slate-200">{style}</span>
           </button>)}
         </div>

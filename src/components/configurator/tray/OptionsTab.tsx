@@ -70,6 +70,16 @@ const DialIndexOptions = () => {
   </section>;
 };
 
+const Nh05PartShortcuts: React.FC = () => {
+  const assembly = useWatchAssemblyStore((s) => s.assembly);
+  const selectPartContext = useConfiguratorUIStore((s) => s.selectPartContext);
+  if (assembly.metadata.movement !== 'nh05') return null;
+  return <div className="flex flex-wrap gap-2 text-[11px]" aria-label="NH05 part selection">
+    {([['inst-midcase', 'Case options'], ['inst-dial-blank', 'Dial options'], ['inst-hour-hand', 'Main hand sets']] as const).map(([id, label]) =>
+      assembly.parts[id] && <button key={id} type="button" className="rounded border border-teal-700 px-2 py-1 text-teal-200" onClick={() => selectPartContext(id)}>{label}</button>)}
+  </div>;
+};
+
 export const OptionsTab: React.FC = () => {
   const activePartInstanceId = useConfiguratorUIStore((s) => s.activePartInstanceId);
   const activeCategory = useConfiguratorUIStore((s) => s.activeCategory);
@@ -204,6 +214,7 @@ export const OptionsTab: React.FC = () => {
   if (!activePartInstanceId) {
     return (
       <div className="space-y-3 overflow-y-auto p-3 text-slate-400 text-xs">
+        <Nh05PartShortcuts />
         <DialIndexOptions />
         <p>Click a component on the watch preview to browse physical part options.</p>
       </div>
@@ -212,6 +223,7 @@ export const OptionsTab: React.FC = () => {
 
   return (
     <div className="flex flex-col h-full overflow-hidden p-3 gap-3" data-testid="options-tab">
+      <Nh05PartShortcuts />
       <DialIndexOptions />
       {/* Search Header */}
       <div className="flex flex-col gap-1.5">
@@ -363,7 +375,7 @@ export const OptionsTab: React.FC = () => {
                     {isPreviewing && (
                       <div className="mt-2.5 pt-2 border-t border-slate-700/60 flex items-center justify-between">
                         <span className="text-[10px] text-teal-400 font-mono">
-                          {isIncompatible ? 'Incompatible preview — choose a Fix action' : 'Live Preview Active'}
+                          {isIncompatible ? 'Incompatible preview — review Details before replacing' : 'Live Preview Active'}
                         </span>
                         <div className="flex items-center gap-1.5">
                           <button
@@ -378,7 +390,7 @@ export const OptionsTab: React.FC = () => {
                           </button>
                           <button
                             type="button"
-                            disabled={isIncompatible}
+                            disabled={isIncompatible || Boolean(previewError)}
                             onClick={(e) => {
                               e.stopPropagation();
                               applyPreview();

@@ -16,8 +16,26 @@ export const calculateBomCost = (
   const customFabrication = 0;
 
   const parts = Object.values(assembly.parts);
+  const countedHandSets = new Set<string>();
+  const centralHandIds = ['inst-hour-hand', 'inst-minute-hand', 'inst-central-seconds'];
 
   for (const part of parts) {
+    const setListings = supplierListings.filter(l => l.catalogueItemId === part.catalogueItemId && l.purchaseUnit === 'central-hand-set');
+    if (centralHandIds.includes(part.instanceId) && setListings.length) {
+      if (countedHandSets.has(part.catalogueItemId)) continue;
+      countedHandSets.add(part.catalogueItemId);
+      // One commercial set supplies three engineering parts. An explicitly
+      // selected unknown-price finish must not inherit another finish's price.
+      const selection = centralHandIds.map(id => assembly.parts[id]?.catalogueItemId === part.catalogueItemId ? sourcingSelections[id] : null).find(Boolean);
+      const listing = selection ? setListings.find(l => l.id === selection) : setListings.find(l => l.unitPrice !== null);
+      if (listing) {
+        partsTotal += listingPriceZar(listing) ?? 0;
+        const shipping = listingShippingZar(listing);
+        if (shipping === null) shippingUnknownCount++;
+        else shippingEstimate += shipping;
+      }
+      continue;
+    }
     const selectedListingId = sourcingSelections[part.instanceId];
     if (selectedListingId) {
       const listing = supplierListings.find((l) => l.id === selectedListingId);

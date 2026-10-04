@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { CircleHelp, Redo2, Settings, Undo2, Watch } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
+import { useWatchAssemblyStore } from '@/stores/watchAssemblyStore';
 import { ProjectWorkflowDialog } from '@/components/layout/ProjectWorkflowDialog';
 import { defaultGeometryParameters } from '@/domain/geometry/geometryEngine';
 import { createBand } from '@/domain/bands/bandRegistry';
@@ -34,8 +35,10 @@ export const TopToolbar = () => {
   const resetPan = useViewportStore((state) => state.resetPan);
 
   const historyPush = useHistoryStore((state) => state.pushSnapshot);
-  const historyUndo = useHistoryStore((state) => state.undo);
-  const historyRedo = useHistoryStore((state) => state.redo);
+  const undoAssembly = useWatchAssemblyStore((state) => state.undoAssembly);
+  const redoAssembly = useWatchAssemblyStore((state) => state.redoAssembly);
+  const canUndo = useWatchAssemblyStore((state) => state.historyPast.length > 0);
+  const canRedo = useWatchAssemblyStore((state) => state.historyFuture.length > 0);
 
   const projectOpenInputRef = useRef<HTMLInputElement | null>(null);
   const projectImportInputRef = useRef<HTMLInputElement | null>(null);
@@ -77,12 +80,8 @@ export const TopToolbar = () => {
           <Button
             variant="toolbar"
             size="sm"
-            onClick={() => {
-              const snapshot = historyUndo();
-              if (typeof snapshot === 'string') {
-                importProjectJson(snapshot);
-              }
-            }}
+            disabled={!canUndo}
+            onClick={undoAssembly}
           >
             <Undo2 className="ds-icon-sm" /> Undo
           </Button>
@@ -90,12 +89,8 @@ export const TopToolbar = () => {
           <Button
             variant="toolbar"
             size="sm"
-            onClick={() => {
-              const snapshot = historyRedo();
-              if (typeof snapshot === 'string') {
-                importProjectJson(snapshot);
-              }
-            }}
+            disabled={!canRedo}
+            onClick={redoAssembly}
           >
             <Redo2 className="ds-icon-sm" /> Redo
           </Button>

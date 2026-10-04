@@ -1,7 +1,7 @@
 import type { CompatibilityCheckResult } from '../compatibilityTypes';
 import type { WatchAssembly } from '@/domain/assembly/assemblyTypes';
 import type { ComponentCatalogueItem } from '@/domain/catalogue/types';
-import { getActiveMovement } from '../compatibilityHelpers';
+import { getActiveMovement, getPartEngineeringSpecs } from '../compatibilityHelpers';
 
 export interface HandColletSpec {
   handType: 'hour' | 'minute' | 'second';
@@ -12,7 +12,7 @@ export interface HandColletSpec {
  * Extracts collet diameters for a hands candidate item or assembly hand instances.
  */
 export const extractHandColletSpec = (
-  itemOrPart: ComponentCatalogueItem | { catalogueItemId?: string; kind?: string; name?: string; dimensions?: { thicknessMm: number; widthMm: number; diameterMm: number } },
+  itemOrPart: ComponentCatalogueItem | { catalogueItemId?: string; kind?: string; name?: string; engineeringSpecs?: ComponentCatalogueItem['engineeringSpecs']; dimensions?: { thicknessMm: number; widthMm: number; diameterMm: number } },
   kindHint?: string
 ): HandColletSpec | undefined => {
   const name = ('displayName' in itemOrPart ? itemOrPart.displayName : itemOrPart.name ?? '').toLowerCase();
@@ -149,14 +149,25 @@ export const checkMovementHandsCompatibility = (
   }
 
   // Otherwise, evaluate all hands present in the assembly
-  const handParts = Object.values(assembly.parts).filter((p) => p.category === 'hands');
+  const handParts = Object.values(assembly.parts).filter((p) => p.visible && p.category === 'hands');
   if (handParts.length === 0) {
     return results;
   }
 
   for (const handPart of handParts) {
-    const handSpec = extractHandColletSpec(handPart, handPart.name);
-    if (!handSpec) continue;
+    const specs = getPartEngineeringSpecs(handPart);
+    const handSpec = specs?.hands ? extractHandColletSpec({
+      ...handPart,
+      engineeringSpecs: specs
+    }, handPart.instanceId) : extractHandColletSpec(handPart, handPart.instanceId);
+    if (!handSpec) {
+      if (['inst-hour-hand', 'inst-minute-hand', 'inst-central-seconds'].includes(handPart.instanceId)) results.push({
+        status: 'unknown', code: 'MISSING_REQUIRED_DIMENSION', category: 'movement-hands',
+        summary: `Supplier collet measurement is unknown for ${handPart.name}; ${movement.name} requires confirmation.`,
+        affectedPartIds: [handPart.instanceId]
+      });
+      continue;
+    }
 
     const expectedArbor = arborSizes[handSpec.handType];
     const actualCollet = handSpec.colletDiameterMm;

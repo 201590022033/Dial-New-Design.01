@@ -7,6 +7,8 @@ import type {
 import type { WatchAssembly, WatchAssemblyPartInstance } from '@/domain/assembly/assemblyTypes';
 import { movementLibrary, type MovementTemplate } from '@/domain/movements/movementLibrary';
 import type { ComponentCatalogueItem } from '@/domain/catalogue/types';
+import { getCatalogueItem } from '@/domain/catalogue/catalogueRegistry';
+import type { ComponentEngineeringSpecs } from './compatibilityTypes';
 
 /**
  * Resolves the active movement template for an assembly.
@@ -31,21 +33,33 @@ export const findAssemblyPart = (
  * Finds the main case body part (excluding crystal, crown, case-back).
  */
 export const findCaseBodyPart = (assembly: WatchAssembly): WatchAssemblyPartInstance | undefined => {
+  const midcase = assembly.parts['inst-midcase'];
+  if (midcase?.visible) return midcase;
   return (
     Object.values(assembly.parts).find(
       (p) =>
         p.instanceId.includes('case-body') ||
         p.catalogueItemId.includes('case-body') ||
         (p.category === 'case' &&
+          p.visible &&
+          !/lug|spacer|movement|sapphire/i.test(`${p.instanceId} ${p.name}`) &&
           !p.instanceId.includes('crystal') &&
           !p.instanceId.includes('back') &&
           !p.instanceId.includes('crown') &&
           !p.name.toLowerCase().includes('crystal') &&
           !p.name.toLowerCase().includes('back') &&
           !p.name.toLowerCase().includes('crown'))
-    ) ?? Object.values(assembly.parts).find((p) => p.category === 'case')
+    )
   );
 };
+
+/** Selected part metadata, not the nominal dimensions of an unrelated candidate. */
+export const getPartEngineeringSpecs = (part?: WatchAssemblyPartInstance): ComponentEngineeringSpecs | undefined =>
+  part ? (part.customProperties?.engineeringSpecs as ComponentEngineeringSpecs | undefined)
+    ?? getCatalogueItem(part.catalogueItemId)?.engineeringSpecs : undefined;
+
+export const getCaseEngineeringSpecs = (assembly: WatchAssembly, candidate?: ComponentCatalogueItem) =>
+  candidate?.engineeringSpecs?.case ?? getPartEngineeringSpecs(findCaseBodyPart(assembly))?.case;
 
 /**
  * Finds the primary dial blank or face part.

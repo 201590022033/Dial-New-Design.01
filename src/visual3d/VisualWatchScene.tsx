@@ -63,7 +63,7 @@ export const DialArtwork = ({ model }: { model: VisualWatchModel }) => {
     const archetype = model.referenceProfiles.archetypeId;
     const usesArchetypeDial = model.assets.dial.assetId.startsWith('archetype-dial-');
     context.clearRect(0, 0, canvas.width, canvas.height);
-    context.fillStyle = model.archetypeAppearance.accentColor;
+    context.fillStyle = model.archetypeAppearance.markerColor ?? model.archetypeAppearance.accentColor;
     context.strokeStyle = model.archetypeAppearance.accentColor;
     context.lineWidth = Math.max(2, pixelsPerMm * 0.08);
     context.textAlign = 'center';
@@ -108,7 +108,7 @@ export const DialArtwork = ({ model }: { model: VisualWatchModel }) => {
     context.textAlign = 'center';
     context.textBaseline = 'middle';
     if (model.assets.dial.assetType === 'procedural') {
-      context.fillStyle = model.archetypeAppearance.accentColor;
+      context.fillStyle = model.archetypeAppearance.markerColor ?? model.archetypeAppearance.accentColor;
       context.font = `700 ${Math.max(22, 1.25 * pixelsPerMm)}px ${model.dial.markerKind === 'roman-numeral' ? 'Georgia, serif' : artwork.fontFamily}`;
       for (const marker of model.dial.markers) {
         if (!marker.text) continue;
@@ -117,6 +117,7 @@ export const DialArtwork = ({ model }: { model: VisualWatchModel }) => {
         context.fillText(marker.text, centre + Math.sin(theta) * r, centre - Math.cos(theta) * r);
       }
     }
+    context.fillStyle = artwork.color;
     context.font = `600 ${Math.max(18, artwork.fontSizeMm * pixelsPerMm)}px ${artwork.fontFamily}`;
     if (artwork.content && (artwork.layout === 'arc' || artwork.layout === 'circular' || artwork.layout === 'inside-circle' || artwork.layout === 'outside-circle')) {
       const characters = [...artwork.content];
@@ -276,10 +277,10 @@ export const ProceduralComponent = ({ category, model }: { category: VisualCateg
         const theta = (marker.angleDeg * Math.PI) / 180;
         const markerRadius = (marker.innerRadiusMm + marker.outerRadiusMm) / 2;
         if (model.dial.markerKind === 'round') return <mesh key={index} position={[markerRadius * Math.sin(theta), markerRadius * Math.cos(theta), 0.28]}>
-          <sphereGeometry args={[Math.max(0.36, marker.widthMm), 18, 12]} /><meshPhysicalMaterial {...physicalFinish(model.finishes.hands, model.referenceProfiles.lumeColor ?? '#e5e7eb')} />
+          <sphereGeometry args={[Math.max(0.36, marker.widthMm), 18, 12]} /><meshPhysicalMaterial {...physicalFinish(model.finishes.hands, model.archetypeAppearance.markerColor ?? model.referenceProfiles.lumeColor ?? '#e5e7eb')} />
         </mesh>;
         return <mesh key={index} position={[markerRadius * Math.sin(theta), markerRadius * Math.cos(theta), 0.28]} rotation={[0, 0, -theta]}>
-          <boxGeometry args={[marker.widthMm, Math.max(0.35, marker.outerRadiusMm - marker.innerRadiusMm), 0.14]} /><meshPhysicalMaterial {...physicalFinish(marker.lumed ? { ...finishProfiles.lume, color: model.referenceProfiles.lumeColor ?? finishProfiles.lume.color } : model.finishes.hands, marker.lumed ? model.referenceProfiles.lumeColor ?? finishProfiles.lume.color : marker.text ? '#f59e0b' : '#e5e7eb')} />
+          <boxGeometry args={[marker.widthMm, Math.max(0.35, marker.outerRadiusMm - marker.innerRadiusMm), 0.14]} /><meshPhysicalMaterial {...physicalFinish(marker.lumed && !model.archetypeAppearance.markerColor ? { ...finishProfiles.lume, color: model.referenceProfiles.lumeColor ?? finishProfiles.lume.color } : model.finishes.hands, model.archetypeAppearance.markerColor ?? (marker.lumed ? model.referenceProfiles.lumeColor ?? finishProfiles.lume.color : '#e5e7eb'))} />
         </mesh>;
       })}
       {model.dial.subdials.map((subdial, index) => {
@@ -330,7 +331,7 @@ export const ProceduralComponent = ({ category, model }: { category: VisualCateg
           <mesh position={[0, hand.length / 2, 0]}>
             <boxGeometry args={[hand.width, hand.length, 0.15]} />
             <meshPhysicalMaterial
-              color={index === 2 ? model.archetypeAppearance.accentColor : handContrastColor(model.dialColor)}
+              color={model.archetypeAppearance.handsColor ?? (index === 2 ? model.archetypeAppearance.accentColor : handContrastColor(model.dialColor))}
               metalness={index === 2 ? 0.55 : 0.88}
               roughness={index === 2 ? 0.24 : 0.14}
               clearcoat={0.32}
@@ -344,7 +345,7 @@ export const ProceduralComponent = ({ category, model }: { category: VisualCateg
         </group>)}
       <mesh rotation={[Math.PI / 2, 0, 0]}>
         <cylinderGeometry args={[0.6, 0.6, 0.5, 48]} />
-        <meshPhysicalMaterial color={handContrastColor(model.dialColor)} metalness={0.9} roughness={0.12} clearcoat={0.35} clearcoatRoughness={0.06} envMapIntensity={2.1} />
+        <meshPhysicalMaterial color={model.archetypeAppearance.handsColor ?? handContrastColor(model.dialColor)} metalness={0.9} roughness={0.12} clearcoat={0.35} clearcoatRoughness={0.06} envMapIntensity={2.1} />
       </mesh>
     </group>;
   }

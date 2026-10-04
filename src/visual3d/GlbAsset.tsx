@@ -6,6 +6,10 @@ import type { VisualAssetDescriptor } from './visualAssetRegistry';
 import { glbLoadUrl } from './glbLoadUrl';
 
 type AssetAppearance = {
+  caseColor?: string;
+  handsColor?: string;
+  markerColor?: string;
+  bezelMetalColor?: string;
   archetypeId?: string;
   dialColor: string;
   strapColor: string;
@@ -44,7 +48,7 @@ export const LoadedGlbAsset = ({ descriptor, appearance, scaleTexture }: { descr
       object.receiveShadow = true;
       const sourceMaterials = (Array.isArray(object.material) ? object.material : [object.material]) as Material[];
       const clonedMaterials = sourceMaterials.map((material) => {
-        const isCrystal = material.name.toLowerCase().includes('sapphire') || objectName.includes('CRYSTAL');
+        const isCrystal = material.name.toLowerCase().includes('sapphire') || objectName.includes('CRYSTAL') || objectName.startsWith('DD_DIAMOND_');
         if (!isCrystal || !(material instanceof MeshStandardMaterial)) return material.clone();
         return new MeshPhysicalMaterial({
           color: material.color.clone(), map: material.map, normalMap: material.normalMap,
@@ -58,7 +62,20 @@ export const LoadedGlbAsset = ({ descriptor, appearance, scaleTexture }: { descr
         if (!(material instanceof MeshStandardMaterial)) continue;
         material.envMapIntensity = 1.35;
         const name = material.name.toLowerCase();
-        if (name.includes('sapphire') || objectName.includes('CRYSTAL')) {
+        if (objectName.startsWith('DD_DIAMOND_')) {
+          material.color = new Color('#f4faff');
+          material.metalness = 0;
+          material.roughness = 0.035;
+          if (material instanceof MeshPhysicalMaterial) {
+            material.transmission = 0.92;
+            material.ior = 2.417;
+            material.thickness = 0.8;
+          }
+        } else if (name === 'dd_rose_gold') {
+          material.color = new Color('#c08a76');
+          material.metalness = 1;
+          material.roughness = 0.18;
+        } else if (name.includes('sapphire') || objectName.includes('CRYSTAL')) {
           material.color = new Color('#e8f7ff');
           material.transparent = true;
           material.opacity = 0.26;
@@ -74,17 +91,17 @@ export const LoadedGlbAsset = ({ descriptor, appearance, scaleTexture }: { descr
           }
           object.castShadow = false;
         } else if (objectName.includes('CASE_MIDCASE')) {
-          material.color = new Color('#b5bec8');
+          material.color = new Color(appearance?.caseColor ?? '#b5bec8');
           material.metalness = 1;
           material.roughness = name.includes('polished') ? 0.065 : 0.24;
           material.envMapIntensity = name.includes('polished') ? 2.4 : 1.9;
         } else if (objectName.includes('CASE_LUG')) {
-          material.color = new Color('#a6b0bb');
+          material.color = new Color(appearance?.caseColor ?? '#a6b0bb');
           material.metalness = 1;
           material.roughness = 0.32;
           material.envMapIntensity = 1.55;
         } else if (objectName.includes('CROWN') || objectName.includes('BEZEL_CARRIER') || objectName.includes('DATE_FRAME') || objectName.includes('BUCKLE')) {
-          material.color = new Color('#d5dae0');
+          material.color = new Color(appearance?.caseColor ?? '#d5dae0');
           material.metalness = 1;
           material.roughness = 0.07;
           material.envMapIntensity = 2.05;
@@ -115,6 +132,16 @@ export const LoadedGlbAsset = ({ descriptor, appearance, scaleTexture }: { descr
           material.color = new Color('#05070a');
           material.metalness = 0;
           material.roughness = 0.48;
+        } else if (appearance?.markerColor && (objectName.includes('DIAL_MARKER') || objectName.includes('_INDEX_') || objectName.includes('HOUR_MARKERS') || objectName.includes('DIAL_MINUTE') || objectName.includes('ARCH_MINUTE') || objectName.includes('NUMERAL'))) {
+          material.color = new Color(appearance.markerColor);
+          material.emissive = new Color('#000000');
+          material.emissiveIntensity = 0;
+          material.metalness = 0.8;
+          material.roughness = 0.24;
+        } else if (descriptor.assetId === 'dial-nh05-white-matte-245' && objectName.includes('_INDEX_')) {
+          material.color = new Color('#a6adb6');
+          material.metalness = 0.88;
+          material.roughness = 0.22;
         } else if (objectName.includes('DIAL_MARKER') || objectName.includes('_INDEX_') || objectName.includes('NUMERAL') || objectName.includes('HAND_LUME') || (objectName.includes('HAND_') && objectName.endsWith('_LUME')) || objectName.includes('BEZEL_PIP_LUME')) {
           material.color = new Color(appearance?.lumeEnabled ? appearance.lumeColor : '#e8e5dc');
           material.emissive = new Color(appearance?.lumeEnabled ? appearance.lumeColor : '#000000');
@@ -128,7 +155,7 @@ export const LoadedGlbAsset = ({ descriptor, appearance, scaleTexture }: { descr
         } else if (objectName.includes('HAND_') || objectName.includes('HAND_HUB')) {
           const face = new Color(dialColor ?? '#07182d');
           const faceLuminance = face.r * 0.2126 + face.g * 0.7152 + face.b * 0.0722;
-          material.color = new Color(faceLuminance > 0.55 ? '#26313d' : '#d7dde3');
+          material.color = new Color(appearance?.handsColor ?? (faceLuminance > 0.55 ? '#26313d' : '#d7dde3'));
           material.metalness = 0.58;
           material.roughness = 0.25;
           material.envMapIntensity = 1.95;
@@ -152,11 +179,15 @@ export const LoadedGlbAsset = ({ descriptor, appearance, scaleTexture }: { descr
           material.opacity = 1;
         }
         material.needsUpdate = true;
+        const metalColor = descriptor.category === 'bezel' ? appearance?.bezelMetalColor ?? appearance?.caseColor : appearance?.caseColor;
+        if (metalColor && ['case', 'caseback', 'crown', 'pushers', 'bezel'].includes(descriptor.category) && material.metalness > 0.5) {
+          material.color = new Color(metalColor);
+        }
       }
     });
     if (!hasMesh) throw new Error('GLB has no mesh');
     return clone;
-  }, [appearance?.dialTextureIntensity, appearance?.dialTextureKind, appearance?.lumeColor, appearance?.lumeEnabled, appearance?.strapStyleId, bezelColor, descriptor.scaleArtworkSurface, dialColor, gltf, scaleTexture, strapColor]);
+  }, [appearance?.caseColor, appearance?.handsColor, appearance?.markerColor, appearance?.bezelMetalColor, appearance?.dialTextureIntensity, appearance?.dialTextureKind, appearance?.lumeColor, appearance?.lumeEnabled, appearance?.strapStyleId, bezelColor, descriptor.assetId, descriptor.category, descriptor.scaleArtworkSurface, dialColor, gltf, scaleTexture, strapColor]);
   // Loading can complete after the frame triggered by a Style click. Demand
   // rendering must capture the new mesh (including sapphire transmission).
   useEffect(() => {

@@ -2,7 +2,7 @@ import type { CompatibilityCheckResult } from '../compatibilityTypes';
 import type { WatchAssembly } from '@/domain/assembly/assemblyTypes';
 import type { ResolvedAssemblyGeometry } from '@/domain/geometry/boundaryResolver';
 import type { ComponentCatalogueItem } from '@/domain/catalogue/types';
-import { getActiveMovement, findCaseBodyPart, findDialPart } from '../compatibilityHelpers';
+import { getActiveMovement, findCaseBodyPart, findDialPart, getPartEngineeringSpecs, getCaseEngineeringSpecs } from '../compatibilityHelpers';
 
 /**
  * Checks physical mating compatibility between Dial blank and Case dial-seat / rehaut aperture.
@@ -17,21 +17,22 @@ export const checkCaseDialCompatibility = (
   // 1. Resolve dial diameter and specs
   const dialPart = findDialPart(assembly);
 
-  const candidateDialSpec = candidateItem?.engineeringSpecs?.dial;
+  const candidateDialSpec = candidateItem?.engineeringSpecs?.dial ?? getPartEngineeringSpecs(dialPart)?.dial;
   const dialDiameter =
-    candidateDialSpec?.outerDiameterMm ??
+    (candidateItem?.category === 'dial' ? candidateDialSpec?.outerDiameterMm : undefined) ??
     (candidateItem?.category === 'dial' ? candidateItem.nominalDimensions.diameterMm : undefined) ??
     dialPart?.dimensions.diameterMm;
 
   // 2. Resolve case dial seat diameter
   const dialSeatInterface = geometry.interfaces.find((i) => i.kind === 'dial-seat');
   const casePart = findCaseBodyPart(assembly);
-  const candidateCaseSpec = candidateItem?.engineeringSpecs?.case;
+  const candidateCaseSpec = getCaseEngineeringSpecs(assembly, candidateItem);
 
   const dialSeatDiameter =
     candidateCaseSpec?.dialSeatDiameterMm ??
-    (casePart?.dimensions.diameterMm && casePart.dimensions.diameterMm > 30 ? 29.5 : undefined) ??
-    (dialSeatInterface ? dialSeatInterface.radialSeatMm.outerRadiusMm * 2 + 2.1 : undefined);
+    (getActiveMovement(assembly)?.id === 'nh05' ? undefined :
+      (casePart?.dimensions.diameterMm && casePart.dimensions.diameterMm > 30 ? 29.5 : undefined) ??
+      (dialSeatInterface ? dialSeatInterface.radialSeatMm.outerRadiusMm * 2 + 2.1 : undefined));
 
   // Check 1: Missing dimensions
   if (typeof dialSeatDiameter !== 'number' || isNaN(dialSeatDiameter) || dialSeatDiameter <= 0) {

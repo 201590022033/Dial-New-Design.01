@@ -4,6 +4,7 @@ import { useConfiguratorUIStore } from '@/stores/configuratorUIStore';
 import { useWatchAssemblyStore } from '@/stores/watchAssemblyStore';
 import { createStarterBuild, type StarterBuildType } from '@/domain/configurator/defaultBuilds';
 import { syncAssemblyDownstream } from '@/stores/storeSync';
+import { useSourcingStore } from '@/stores/sourcingStore';
 
 export const StarterBuildPanel: React.FC = () => {
   const [selectedType, setSelectedType] = useState<StarterBuildType>(() => {
@@ -42,6 +43,10 @@ export const StarterBuildPanel: React.FC = () => {
   const handleApplyStarter = () => {
     // Snapshot current before loading
     saveVersion(`Pre-starter backup`);
+    // A listing for the previous part must not price/certify a new platform.
+    for (const id of Object.keys(useSourcingStore.getState().sourcingPlan.selections)) {
+      useSourcingStore.getState().setSupplierSelection(id, null);
+    }
     useWatchAssemblyStore.getState().setAssembly(starter.assembly);
     setArchetypePreview(null);
     setWorkMode('parts');
@@ -84,7 +89,7 @@ export const StarterBuildPanel: React.FC = () => {
           ))}
         </div>
       </div>
-      <p className="text-[11px] text-slate-400">Opening Build keeps the current watch. Choose an archetype to preview it, then use Load to apply it.</p>
+      <p className="text-[11px] text-slate-400">Opening Build keeps the current watch. Choose an archetype to preview it. Load replaces physical parts and styling with the starter platform and saves a backup first. Verify fit and suppliers afterwards.</p>
 
       {/* Best-Value Starter Description */}
       <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800 space-y-3">
@@ -102,7 +107,7 @@ export const StarterBuildPanel: React.FC = () => {
         {/* Why this part? Explanations */}
         <div className="space-y-1.5 pt-2 border-t border-slate-800/80">
           <span className="text-[11px] font-mono text-slate-300 block">
-            Component Breakdown & Reasoning:
+            Reference kit & reasoning (see BOM for actual parts):
           </span>
           {starter.partExplanations.map((exp) => {
             const isExpanded = expandedPartId === exp.partInstanceId;

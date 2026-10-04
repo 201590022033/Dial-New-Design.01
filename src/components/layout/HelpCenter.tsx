@@ -41,12 +41,12 @@ export const HelpCenter = () => {
 
       {open ? (
         <div className="fixed inset-0 z-50 grid grid-cols-1 bg-slate-950/55 backdrop-blur-[2px] xl:grid-cols-[330px_1fr]">
-          <aside className="border-r border-engineering-border bg-engineering-bg p-4">
+          <aside className="flex min-h-0 flex-col border-r border-engineering-border bg-engineering-bg p-4">
             <div className="mb-3 flex items-center justify-between">
               <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-engineering-muted">
                 Engineering Help
               </h2>
-              <Button variant="icon" size="sm" onClick={() => setOpen(false)}>
+              <Button variant="icon" size="sm" aria-label="Close Engineering Help" onClick={() => setOpen(false)}>
                 <X className="ds-icon-sm" />
               </Button>
             </div>
@@ -69,16 +69,19 @@ export const HelpCenter = () => {
             </div>
           </aside>
 
-          <section className="p-5 xl:p-8">
+          <section className="min-h-0 overflow-y-auto p-5 xl:p-8">
             {selectedDoc ? (
               <article className="mx-auto max-w-4xl rounded-panel border border-engineering-border bg-engineering-panel/80 p-6 shadow-panel">
                 <p className="ds-label-inspector">{selectedDoc.category}</p>
                 <h3 className="mt-2 text-2xl font-semibold text-engineering-text">{selectedDoc.title}</h3>
                 <p className="mt-3 text-sm leading-relaxed text-engineering-muted">{selectedDoc.summary}</p>
                 <div className="ds-divider my-5" />
-                <p className="text-sm text-engineering-muted">
-                  Detailed calculations and manufacturing procedures will be introduced in later prompt phases. This
-                  page is intentionally scaffolded for future engineering documentation integration.
+                <h4 className="text-sm font-semibold text-engineering-text">How to use and check</h4>
+                <ol className="mt-3 list-decimal space-y-3 pl-5 text-sm text-engineering-muted">
+                  {selectedDoc.steps.map((step) => <li key={step}>{step}</li>)}
+                </ol>
+                <p className="mt-5 rounded-md border border-engineering-amber/40 p-3 text-sm text-engineering-muted">
+                  <strong>Limits: </strong>{selectedDoc.limitation}
                 </p>
                 <div className="mt-4 rounded-md border border-engineering-border bg-engineering-bg/35 p-3">
                   <p className="ds-label-inspector">Linked Engineering Features</p>

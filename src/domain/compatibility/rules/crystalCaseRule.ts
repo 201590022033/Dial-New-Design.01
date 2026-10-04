@@ -2,6 +2,7 @@ import type { CompatibilityCheckResult } from '../compatibilityTypes';
 import type { WatchAssembly } from '@/domain/assembly/assemblyTypes';
 import type { ResolvedAssemblyGeometry } from '@/domain/geometry/boundaryResolver';
 import type { ComponentCatalogueItem } from '@/domain/catalogue/types';
+import { getCaseEngineeringSpecs, getActiveMovement } from '../compatibilityHelpers';
 
 /**
  * Checks physical mating compatibility between Crystal and Case crystal seat.
@@ -31,12 +32,13 @@ export const checkCrystalCaseCompatibility = (
 
   // Case crystal seat interface
   const crystalSeatInterface = geometry.interfaces.find((i) => i.kind === 'crystal-seat');
-  const candidateCaseSpec = candidateItem?.engineeringSpecs?.case;
+  const candidateCaseSpec = getCaseEngineeringSpecs(assembly, candidateItem);
 
   const caseCrystalSeatDiameterMm =
     candidateCaseSpec?.crystalSeatDiameterMm ??
-    (crystalSeatInterface ? crystalSeatInterface.radialSeatMm.outerRadiusMm * 2 : undefined) ??
-    (geometry.regions.crystal ? geometry.regions.crystal.outerRadiusMm * 2 : undefined);
+    (getActiveMovement(assembly)?.id === 'nh05' ? undefined :
+      (crystalSeatInterface ? crystalSeatInterface.radialSeatMm.outerRadiusMm * 2 : undefined) ??
+      (geometry.regions.crystal ? geometry.regions.crystal.outerRadiusMm * 2 : undefined));
 
   if (typeof crystalDiameterMm !== 'number' || isNaN(crystalDiameterMm) || crystalDiameterMm <= 0) {
     results.push({

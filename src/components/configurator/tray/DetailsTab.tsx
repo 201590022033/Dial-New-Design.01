@@ -3,7 +3,8 @@ import { Ruler, ShieldCheck, FileText } from 'lucide-react';
 import { useConfiguratorUIStore } from '@/stores/configuratorUIStore';
 import { useWatchAssemblyStore } from '@/stores/watchAssemblyStore';
 import { useCatalogueStore } from '@/stores/catalogueStore';
-import { evaluateCandidate } from '@/domain/compatibility/compatibilityEngine';
+import { evaluateAssembly } from '@/domain/compatibility/compatibilityEngine';
+import { getPartEngineeringSpecs } from '@/domain/compatibility/compatibilityHelpers';
 
 export const DetailsTab: React.FC = () => {
   const activePartInstanceId = useConfiguratorUIStore((s) => s.activePartInstanceId);
@@ -12,16 +13,12 @@ export const DetailsTab: React.FC = () => {
 
   const activePart = activePartInstanceId ? assembly.parts[activePartInstanceId] : null;
   const catItem = catalogueItems.find((c) => c.id === activePart?.catalogueItemId);
+  const engineeringSpecs = getPartEngineeringSpecs(activePart ?? undefined);
 
   const candidateEvaluation = useMemo(() => {
-    if (!activePartInstanceId || !catItem) return null;
-    return evaluateCandidate({
-      assembly,
-      targetPartInstanceId: activePartInstanceId,
-      candidateCatalogueItemId: catItem.id,
-      candidateItem: catItem
-    });
-  }, [assembly, activePartInstanceId, catItem]);
+    if (!activePartInstanceId) return null;
+    return evaluateAssembly(assembly);
+  }, [assembly, activePartInstanceId]);
 
   if (!activePart) {
     return (
@@ -43,7 +40,7 @@ export const DetailsTab: React.FC = () => {
       {/* Engineering Dimensions */}
       <div className="space-y-2">
         <h4 className="text-[11px] font-mono text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-          <Ruler className="h-3.5 w-3.5 text-teal-400" /> Nominal Geometry
+          <Ruler className="h-3.5 w-3.5 text-teal-400" /> Current Design Geometry
         </h4>
         <div className="grid grid-cols-2 gap-2 bg-slate-900 p-2.5 rounded-lg border border-slate-800 text-xs">
           <div>
@@ -74,13 +71,14 @@ export const DetailsTab: React.FC = () => {
       </div>
 
       {/* Engineering Specs */}
-      {catItem?.engineeringSpecs && (
+      <p className="text-[11px] text-slate-400">Catalogue evidence: {catItem?.status ?? 'unknown'}. Edited dimensions are design targets, not supplier measurements. Diagnostics below evaluate the current assembly.</p>
+      {engineeringSpecs && (
         <div className="space-y-2">
           <h4 className="text-[11px] font-mono text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
             <FileText className="h-3.5 w-3.5 text-teal-400" /> Calibre & Mating Specs
           </h4>
           <div className="bg-slate-900 p-2.5 rounded-lg border border-slate-800 text-xs font-mono space-y-1 text-slate-300">
-            {Object.entries(catItem.engineeringSpecs).map(([specKey, specVal]) => (
+            {Object.entries(engineeringSpecs).map(([specKey, specVal]) => (
               <div key={specKey} className="border-b border-slate-800/60 pb-1 last:border-0 last:pb-0">
                 <span className="text-[10px] text-teal-400 uppercase block">{specKey}:</span>
                 <pre className="text-[10px] text-slate-300 whitespace-pre-wrap">

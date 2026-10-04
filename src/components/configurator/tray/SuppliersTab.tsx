@@ -9,6 +9,7 @@ import { getMovementSupplierReadiness } from '@/domain/movements/movementSupplie
 import { getCatalogueItem } from '@/domain/catalogue/catalogueRegistry';
 import { formatListingPrice, isListingPriceStale, listingKnownLandedZar, listingPriceZar, listingShippingZar } from '@/domain/catalogue/pricing';
 import { parseAliExpressCapture, supplierListingFromCapture } from '@/domain/sourcing';
+import { partDiscoveryLinks, partDiscoveryQuery } from '@/domain/sourcing/partDiscovery';
 
 export const SuppliersTab: React.FC = () => {
   const activePartInstanceId = useConfiguratorUIStore((s) => s.activePartInstanceId);
@@ -18,6 +19,11 @@ export const SuppliersTab: React.FC = () => {
   const sourcingSelections = useSourcingStore((s) => s.sourcingPlan.selections);
   const setSupplierSelection = useSourcingStore((s) => s.setSupplierSelection);
   const [captureStatus, setCaptureStatus] = useState<string | null>(null);
+  const [discovery, setDiscovery] = useState<{ partId: string; query: string; cheaper: boolean; searchedAt?: string } | null>(null);
+  const beginSearch = (cheaper: boolean) => {
+    const part = activePartInstanceId && assembly.parts[activePartInstanceId];
+    if (part) setDiscovery({ partId: part.instanceId, query: partDiscoveryQuery(assembly, part), cheaper });
+  };
 
   const handleCaptureImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -72,6 +78,19 @@ export const SuppliersTab: React.FC = () => {
         </p>
       </div>
 
+      <button type="button" className="rounded border border-teal-700 p-2 text-xs text-teal-200" onClick={() => beginSearch(false)}>Find this part online</button>
+      {discovery?.partId === activePartInstanceId && <section className="rounded border border-slate-700 p-3 space-y-2 text-[11px] text-slate-300" aria-label="Online part discovery">
+        <h4>{discovery.cheaper ? 'Compare cheaper alternatives' : 'Discover a matching part'}</h4>
+        <label className="block">Search terms (edit dimensions, colour or hand style)
+          <input aria-label="Part search query" className="mt-1 w-full rounded bg-slate-950 p-2" maxLength={300} value={discovery.query} onChange={(event) => setDiscovery({ ...discovery, query: event.target.value, searchedAt: undefined })} />
+        </label>
+        <div className="flex flex-wrap gap-2">{partDiscoveryLinks(discovery.query).map((link) => <a key={link.name} href={link.url} target="_blank" rel="noopener noreferrer" className="text-cyan-300 underline" onClick={() => setDiscovery({ ...discovery, searchedAt: new Date().toISOString() })}>{link.name}</a>)}</div>
+        {discovery.searchedAt && <p role="status">Search opened {new Date(discovery.searchedAt).toLocaleString()} (not a price check).</p>}
+        <p>Results are unverified. Check the exact variant, movement, dial seat, hand bores and drawings before ordering. Colours are presentation choices, not confirmed supplier stock.</p>
+        <p>Compare item + shipping to South Africa, then taxes / duties and discounts at checkout. An unknown shipping price is not free shipping. Search engines cannot guarantee the cheapest compatible part.</p>
+        <p>Save an AliExpress price snapshot using Import below; no supplier onboarding required.</p>
+      </section>}
+
       <div className="rounded-lg border border-slate-700 bg-slate-900/70 p-3 text-[11px] text-slate-300">
         <div className="flex items-center justify-between gap-3">
           <div>
@@ -98,7 +117,7 @@ export const SuppliersTab: React.FC = () => {
       {relevantListings.length === 0 ? (
         <div className="p-4 rounded-lg bg-slate-900 border border-slate-800 text-center text-slate-400 text-xs">
           <HelpCircle className="h-6 w-6 text-slate-400 mx-auto mb-2" />
-          <p>No verified commercial listings registered for this component ID.</p>
+          <p>No saved commercial listings for this component ID.</p>
           <p className="text-[11px] text-slate-400 mt-1">
             Component is currently priced using standard catalog estimates.
           </p>
@@ -126,7 +145,7 @@ export const SuppliersTab: React.FC = () => {
                       {listing.supplierName}
                     </h4>
                     <span className="text-[10px] text-slate-400 font-mono">
-                      SKU: {listing.sku ?? 'N/A'} · Lead: {listing.leadTimeDays ?? 14} days
+                      SKU: {listing.sku ?? 'N/A'} · Lead: {listing.leadTimeDays === null || listing.leadTimeDays === undefined ? 'unknown' : `${listing.leadTimeDays} days`}
                     </span>
                   </div>
 
@@ -142,7 +161,7 @@ export const SuppliersTab: React.FC = () => {
 
                 <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-800 text-[10px] text-slate-400">
                   <span className="flex items-center gap-1">
-                    <ShieldCheck className="h-3 w-3 text-teal-400" />
+                    <ShieldCheck className={cn('h-3 w-3', listing.verificationStatus === 'verified' ? 'text-teal-400' : 'text-amber-400')} />
                     {listing.verificationStatus}
                     {isListingPriceStale(listing) && <span className="ml-1 rounded bg-amber-950 px-1 text-amber-300">stale / re-check</span>}
                   </span>
@@ -162,6 +181,11 @@ export const SuppliersTab: React.FC = () => {
                       : `Shipping ≈R${Math.round(listingShippingZar(listing) ?? 0).toLocaleString()}`}
                   </span>
                 </div>
+                <div className="mt-2 flex flex-wrap gap-3 text-[11px]">
+                  <button type="button" className="text-cyan-300 underline" onClick={(event) => { event.stopPropagation(); beginSearch(true); }}>Find a cheaper alternative online</button>
+                  {listing.productUrl && <a href={listing.productUrl} target="_blank" rel="noopener noreferrer" className="text-cyan-300 underline" onClick={(event) => event.stopPropagation()}>Open product listing</a>}
+                </div>
+                {listing.notes && <p className="mt-2 text-[10px] text-amber-200/80">{listing.notes}</p>}
                 {listing.engineeringEvidence && (
                   <div className="mt-2 rounded border border-slate-800 bg-slate-950/60 px-2 py-1.5 text-[10px] text-slate-400">
                     <div className="flex items-center justify-between gap-2">

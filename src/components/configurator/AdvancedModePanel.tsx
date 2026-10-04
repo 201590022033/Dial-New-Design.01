@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Sliders,
   Ruler,
   Layers,
-  XCircle,
   Sparkles
 } from 'lucide-react';
 import { useConfiguratorUIStore } from '@/stores/configuratorUIStore';
@@ -30,19 +29,14 @@ export const AdvancedModePanel: React.FC = () => {
 
   // Parametric adjustment state for active component
   const activePart = activePartInstanceId ? assembly.parts[activePartInstanceId] : null;
-  const [paramDiameter, setParamDiameter] = useState<number>(
-    activePart?.dimensions.diameterMm ?? 28.5
-  );
-
-  // Calculate valid limits for dial/case (e.g. dial diameter must be within 27.0mm - 29.5mm for standard 38-42mm case)
-  const isDial = activePart?.category === 'dial' || activePartInstanceId === 'inst-dial';
-  const minValidDial = 27.5;
-  const maxValidDial = 29.0;
-  const isDiameterInvalid = isDial && (paramDiameter < minValidDial || paramDiameter > maxValidDial);
-
-  const handleSetNearestValid = () => {
-    if (paramDiameter < minValidDial) setParamDiameter(minValidDial);
-    else if (paramDiameter > maxValidDial) setParamDiameter(maxValidDial);
+  const paramDiameter = activePart?.dimensions.diameterMm ?? 28.5;
+  const setParamDiameter = (diameterMm: number) => {
+    if (!activePart || !Number.isFinite(diameterMm) || diameterMm <= 0) return;
+    useWatchAssemblyStore.getState().updatePart(activePart.instanceId, {
+      dimensions: { ...activePart.dimensions, diameterMm },
+      parametricGeometry: undefined,
+      geometryProvenance: undefined
+    });
   };
 
   return (
@@ -83,6 +77,7 @@ export const AdvancedModePanel: React.FC = () => {
             >
               <input
                 type="checkbox"
+                disabled={key !== 'datums' && key !== 'radii'}
                 checked={overlays[key]}
                 onChange={() => toggleOverlay(key)}
                 className="rounded border-slate-700 text-teal-500 bg-slate-950 focus:ring-0"
@@ -91,6 +86,7 @@ export const AdvancedModePanel: React.FC = () => {
             </label>
           ))}
         </div>
+        <p className="mt-2 text-[10px] text-amber-200">Datum and radius guides are schematic, not measured fit evidence. Disabled inspection layers are not implemented yet.</p>
       </div>
 
       {/* Active Component Parametric Dimensions */}
@@ -105,9 +101,11 @@ export const AdvancedModePanel: React.FC = () => {
               <div className="flex items-center gap-1.5">
                 <input
                   type="number"
+                  aria-label={`${activePart.name} diameter in millimetres`}
+                  min="0.1"
                   step="0.1"
                   value={paramDiameter}
-                  onChange={(e) => setParamDiameter(parseFloat(e.target.value) || 0)}
+                  onChange={(e) => setParamDiameter(Number(e.target.value))}
                   className="w-20 bg-slate-950 border border-slate-700 rounded px-2 py-0.5 text-right font-mono text-slate-100 focus:outline-none focus:border-teal-400"
                 />
                 <span className="text-slate-400 font-mono">mm</span>
@@ -115,21 +113,7 @@ export const AdvancedModePanel: React.FC = () => {
             </div>
 
             {/* Error correction warning if out of bounds */}
-            {isDiameterInvalid && (
-              <div className="p-2 rounded bg-rose-950/40 border border-rose-800 text-[11px] text-rose-300 space-y-1">
-                <div className="flex items-center gap-1 font-semibold">
-                  <XCircle className="h-3.5 w-3.5" />
-                  <span>Exceeds case dial seat boundary ({minValidDial}mm - {maxValidDial}mm)</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleSetNearestValid}
-                  className="px-2 py-0.5 rounded bg-rose-900 hover:bg-rose-800 text-white font-medium text-[10px]"
-                >
-                  Set to nearest valid value ({paramDiameter < minValidDial ? minValidDial : maxValidDial}mm)
-                </button>
-              </div>
-            )}
+            <p className="text-[10px] text-amber-200">Edits the physical component. Check Details for interface compatibility; no universal dial-size limit or automatic fit approval is assumed.</p>
           </div>
         </div>
       )}

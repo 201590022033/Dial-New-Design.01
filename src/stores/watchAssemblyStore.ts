@@ -23,6 +23,11 @@ import { applyArchetypeVisualProfile } from '@/domain/configurator/archetypeProf
 export interface WatchAssemblyStoreState {
   assembly: WatchAssembly;
   dirty: boolean;
+  historyPast: WatchAssembly[];
+  historyFuture: WatchAssembly[];
+  undoAssembly: () => void;
+  redoAssembly: () => void;
+  clearAssemblyHistory: () => void;
 
   // Authoritative 2.5D geometry resolution
   getResolvedGeometry: () => ResolvedAssemblyGeometry;
@@ -83,9 +88,33 @@ const resolvePartInstanceId = (
   return null;
 };
 
+let restoringAssemblyHistory = false;
+const cloneAssembly = (assembly: WatchAssembly): WatchAssembly => JSON.parse(JSON.stringify(assembly)) as WatchAssembly;
+
 export const useWatchAssemblyStore = create<WatchAssemblyStoreState>((set, get) => ({
   assembly: createDefaultWatchAssembly(),
   dirty: false,
+  historyPast: [],
+  historyFuture: [],
+  clearAssemblyHistory: () => set({ historyPast: [], historyFuture: [] }),
+  undoAssembly: () => {
+    const state = get();
+    const previous = state.historyPast.at(-1);
+    if (!previous) return;
+    restoringAssemblyHistory = true;
+    try { set({ assembly: cloneAssembly(previous), dirty: true,
+      historyPast: state.historyPast.slice(0, -1), historyFuture: [...state.historyFuture, cloneAssembly(state.assembly)] }); }
+    finally { restoringAssemblyHistory = false; }
+  },
+  redoAssembly: () => {
+    const state = get();
+    const next = state.historyFuture.at(-1);
+    if (!next) return;
+    restoringAssemblyHistory = true;
+    try { set({ assembly: cloneAssembly(next), dirty: true,
+      historyFuture: state.historyFuture.slice(0, -1), historyPast: [...state.historyPast, cloneAssembly(state.assembly)].slice(-50) }); }
+    finally { restoringAssemblyHistory = false; }
+  },
 
   getResolvedGeometry: () => resolveAssemblyGeometry(get().assembly),
 
@@ -570,3 +599,12 @@ export const useWatchAssemblyStore = create<WatchAssemblyStoreState>((set, get) 
     });
   }
 }));
+
+// Capture canonical edits from every authoring surface, including Style and CAD.
+useWatchAssemblyStore.subscribe((state, previous) => {
+  if (restoringAssemblyHistory || state.assembly === previous.assembly) return;
+  useWatchAssemblyStore.setState({
+    historyPast: [...state.historyPast, cloneAssembly(previous.assembly)].slice(-50),
+    historyFuture: []
+  });
+});

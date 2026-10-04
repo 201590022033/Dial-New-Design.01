@@ -41,7 +41,19 @@ export const createStarterBuild = (
     field: 'Matte utility dial, Arabic markers and subdued outdoor color palette.',
     chronograph: 'Two-tone timing dial, tachymeter reference and chronograph movement layout.'
   };
-  let base = applyArchetypeVisualProfile(sourceAssembly, archetypeIds[buildType]);
+  // A starter replaces its platform, rather than inheriting NH05/VK63 parts.
+  const fresh = createDefaultWatchAssembly();
+  fresh.metadata = { ...fresh.metadata, id: sourceAssembly.metadata.id, name: sourceAssembly.metadata.name,
+    designer: sourceAssembly.metadata.designer, revision: sourceAssembly.metadata.revision };
+  // Retain the authored 40/42 mm render frame for NH35 sources; do not carry
+  // the compact ladies frame into a larger starter.
+  if (sourceAssembly.metadata.movement.toLowerCase() === 'nh35') {
+    fresh.globalDimensions = { ...sourceAssembly.globalDimensions };
+  }
+  const reviewedSource = sourceAssembly.metadata.movement.toLowerCase() === 'nh35'
+    && sourceAssembly.designConfig?.visualReferenceId === 'reference-42-preview/v1'
+    && buildType !== 'ladies-dress';
+  let base = applyArchetypeVisualProfile(reviewedSource ? sourceAssembly : fresh, archetypeIds[buildType]);
   if (buildType === 'ladies-dress') {
     const variant = (id: string) => visualVariantCatalogueItems.find((item) => item.id === id)!;
     base = applyCatalogueVisualSelection(base, 'inst-midcase', variant('cat-case-nh05-ladies-dress-34'));
@@ -52,7 +64,12 @@ export const createStarterBuild = (
     if (midcase) parts['inst-midcase'] = { ...midcase, parametricGeometry: undefined, geometryProvenance: undefined };
     for (const id of ['inst-minute-hand', 'inst-central-seconds']) {
       const part = parts[id];
-      if (part) parts[id] = { ...part, dimensions: { ...part.dimensions, diameterMm: id === 'inst-minute-hand' ? 8.82 : 9.555 } };
+      if (part) parts[id] = {
+        ...part, catalogueItemId: 'cat-hands-nh05-dress-baton',
+        name: id === 'inst-minute-hand' ? 'NH05 Dress Minute Hand (supplier fitting unverified)' : 'NH05 Dress Seconds Hand (supplier fitting unverified)',
+        customProperties: { ...part.customProperties, engineeringSpecs: undefined },
+        dimensions: { ...part.dimensions, diameterMm: id === 'inst-minute-hand' ? 8.82 : 9.5 }
+      };
     }
     const strap = parts['inst-strap-integration'];
     if (strap) parts['inst-strap-integration'] = { ...strap, dimensions: { ...strap.dimensions, widthMm: 16 } };
@@ -239,7 +256,7 @@ export const createStarterBuild = (
     buildType,
     title: titles[buildType],
     description: descriptions[buildType],
-    status: buildType === 'chronograph' || buildType === 'ladies-dress' ? 'PRESENTATION_ONLY' : 'VERIFIED_SPEC',
+    status: 'PRESENTATION_ONLY',
     assembly: base,
     partExplanations: buildType === 'chronograph' ? chronographPartExplanations : buildType === 'ladies-dress' ? nh05PartExplanations : nh35PartExplanations
   };

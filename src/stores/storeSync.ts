@@ -7,6 +7,7 @@ import { assemblyToBands, assemblyToWatchComponentEntities } from '@/domain/asse
 import type { WatchAssembly } from '@/domain/assembly/assemblyTypes';
 import type { TemplateId } from '@/domain/generators/templateLibrary';
 import { useScaleStore } from './scaleStore';
+import { getMovementDesignRecommendations } from '@/services/movementRecommendationService';
 
 let isSyncing = false;
 
@@ -28,11 +29,11 @@ export const syncAssemblyDownstream = (assembly: WatchAssembly): void => {
   try {
     // 1. Sync globalSettingsStore (DERIVED / ADAPTER)
     useGlobalSettingsStore.setState({
+      ...(assembly.designConfig?.geometryParameters ?? {}),
       caseDiameterMm: assembly.globalDimensions.caseDiameterMm,
       bandGapMm: assembly.globalDimensions.bandGapMm,
       manufacturingToleranceMm: assembly.globalDimensions.manufacturingToleranceMm,
-      laserKerfMm: assembly.globalDimensions.laserKerfMm,
-      ...(assembly.designConfig?.geometryParameters ?? {})
+      laserKerfMm: assembly.globalDimensions.laserKerfMm
     });
 
     // 2. Sync bandsStore (DERIVED / ADAPTER)
@@ -61,6 +62,10 @@ export const syncAssemblyDownstream = (assembly: WatchAssembly): void => {
     }
 
     // 4. Sync designEngineStore (DERIVED / ADAPTER)
+    useDesignEngineStore.setState({
+      selectedMovementId: assembly.metadata.movement,
+      movementRecommendations: getMovementDesignRecommendations(assembly.metadata.movement)
+    });
     if (assembly.designConfig) {
       const { dialFaceConfig, markerConfig, typographyConfig, textureConfig } = assembly.designConfig;
       useDesignEngineStore.setState((prev) => ({

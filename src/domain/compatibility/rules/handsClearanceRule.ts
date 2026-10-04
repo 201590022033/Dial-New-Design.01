@@ -2,6 +2,7 @@ import type { CompatibilityCheckResult } from '../compatibilityTypes';
 import type { WatchAssembly } from '@/domain/assembly/assemblyTypes';
 import type { ResolvedAssemblyGeometry } from '@/domain/geometry/boundaryResolver';
 import type { ComponentCatalogueItem } from '@/domain/catalogue/types';
+import { nh05EngineeringReference } from '@/domain/movements/nh05EngineeringReference';
 
 /**
  * Checks physical clearances for Hands:
@@ -9,7 +10,7 @@ import type { ComponentCatalogueItem } from '@/domain/catalogue/types';
  * 2. Axial clearance: total hand stack height vs crystal underside clearance
  */
 export const checkHandsClearanceCompatibility = (
-  _assembly: WatchAssembly,
+  assembly: WatchAssembly,
   geometry: ResolvedAssemblyGeometry,
   candidateItem?: ComponentCatalogueItem
 ): CompatibilityCheckResult[] => {
@@ -30,8 +31,11 @@ export const checkHandsClearanceCompatibility = (
 
   // 1. Radial Check: Hand Length vs Dial Radius
   const candidateHandsSpec = candidateItem?.engineeringSpecs?.hands;
+  const centralHands = Object.values(assembly.parts).filter((part) => part.visible &&
+    ['inst-hour-hand', 'inst-minute-hand', 'inst-central-seconds'].includes(part.instanceId));
   const handCandidateLength = candidateHandsSpec?.lengthMm ??
-    (candidateItem?.category === 'hands' ? candidateItem.nominalDimensions.diameterMm : undefined);
+    (candidateItem?.category === 'hands' ? candidateItem.nominalDimensions.diameterMm :
+      centralHands.length ? Math.max(...centralHands.map((part) => part.dimensions.diameterMm)) : undefined);
 
   if (typeof handCandidateLength === 'number' && handCandidateLength > 0) {
     const radialDiff = handCandidateLength - usableDialRadiusMm;
@@ -77,7 +81,8 @@ export const checkHandsClearanceCompatibility = (
 
   const availableAxialClearanceMm = crystalBottomZ - dialTopZ;
   // Standard 3-hand stack nominal height (hour + minute + second + air gap)
-  const requiredHandStackHeightMm = candidateHandsSpec?.stackHeightMm ?? 1.25;
+  const requiredHandStackHeightMm = candidateHandsSpec?.stackHeightMm ?? (assembly.metadata.movement === 'nh05'
+    ? nh05EngineeringReference.hands.typeMStackFromDialMm.secondTop : 1.25);
 
   const axialMargin = availableAxialClearanceMm - requiredHandStackHeightMm;
 

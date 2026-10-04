@@ -288,12 +288,18 @@ export const useConfiguratorUIStore = create<ConfiguratorUIStoreState>((set, get
   setSearchAllComponents: (searchAllComponents) => set({ searchAllComponents }),
 
   setPreview: (assembly, partInstanceId, candidateItem) => {
+    const current = useWatchAssemblyStore.getState().assembly;
+    const evaluation = candidateItem.kind === 'style-finish' ? null : evaluateCandidate({
+      assembly: current, targetPartInstanceId: partInstanceId,
+      candidateCatalogueItemId: candidateItem.id, candidateItem
+    });
     set({
       previewAssembly: assembly,
       previewPartInstanceId: partInstanceId,
       previewCandidateItem: candidateItem,
       previewStatus: 'previewing',
-      previewError: null
+      previewError: get().lockedPartIds.has(partInstanceId) ? 'This component is physically locked. Unlock it before applying a change.'
+        : evaluation?.status === 'red' ? `Cannot apply an incompatible part. ${evaluation.summary}` : null
     });
   },
 
@@ -315,13 +321,25 @@ export const useConfiguratorUIStore = create<ConfiguratorUIStoreState>((set, get
     const watchAssemblyStore = useWatchAssemblyStore.getState();
     const currentAssembly = watchAssemblyStore.assembly;
     const currentSourcing = useSourcingStore.getState().sourcingPlan.selections;
-    const newEval = evaluateCandidate({
+    const isFinish = previewCandidateItem.kind === 'style-finish';
+    // A presentation-only finish must not bypass validation for a geometry swap.
+    if (isFinish) {
+      const normalized = JSON.parse(JSON.stringify(previewAssembly)) as WatchAssembly;
+      const originalPart = currentAssembly.parts[previewPartInstanceId];
+      if (!originalPart || !normalized.parts[previewPartInstanceId]) return false;
+      normalized.parts[previewPartInstanceId].texture = originalPart.texture;
+      if (JSON.stringify(normalized) !== JSON.stringify(currentAssembly)) {
+        set({ previewError: 'Finish previews may change only the selected component texture.' });
+        return false;
+      }
+    }
+    const newEval = isFinish ? evaluateAssembly(currentAssembly) : evaluateCandidate({
       assembly: currentAssembly,
       targetPartInstanceId: previewPartInstanceId,
       candidateCatalogueItemId: previewCandidateItem.id,
       candidateItem: previewCandidateItem
     });
-    if (newEval.status === 'red') {
+    if (!isFinish && newEval.status === 'red') {
       set({ previewError: `Cannot apply an incompatible part. ${newEval.summary}` });
       return false;
     }

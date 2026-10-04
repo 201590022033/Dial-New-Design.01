@@ -400,13 +400,13 @@ describe('Phase 5: Deterministic Physical Compatibility Engine', () => {
 
   // 11. Overall Assembly Evaluation
   describe('11. Whole Assembly Evaluation', () => {
-    it('evaluates the default assembly as GREEN across all verified interfaces', () => {
+    it('does not certify the default presentation assembly with an overlong hand and draft case', () => {
       const assembly = createDefaultWatchAssembly();
       const evaluation = evaluateAssembly(assembly);
 
-      expect(evaluation.status).toBe('green');
-      expect(evaluation.counts.red).toBe(0);
-      expect(evaluation.counts.unknown).toBe(0);
+      expect(evaluation.status).toBe('red');
+      expect(evaluation.checks.some((check) => check.code === 'HAND_LENGTH_EXCEEDS_DIAL_RADIUS')).toBe(true);
+      expect(evaluation.checks.some((check) => check.code === 'UNVERIFIED_CRITICAL_DIMENSION')).toBe(true);
       expect(evaluation.counts.green).toBeGreaterThan(5);
     });
   });

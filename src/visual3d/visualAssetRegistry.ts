@@ -61,6 +61,11 @@ const generatedCaseAssets: Record<string, VisualAssetDescriptor> = Object.fromEn
 }));
 
 export const visualAssetRegistry: Record<string, VisualAssetDescriptor> = {
+  'case-tandorio-nh05-research-34': { assetId: 'case-tandorio-nh05-research-34', category: 'case', assetType: 'glb', assetPath: `${variantRoot}/cases/case-tandorio-nh05-research-34.glb`, anchor: 'watch-axis', units: 'millimetres', upAxis: 'Y', referenceCaseDiameterMm: 34 },
+  'dial-nh05-white-matte-245': { assetId: 'dial-nh05-white-matte-245', category: 'dial', assetType: 'glb', assetPath: `${variantRoot}/dials/dial-nh05-white-matte-245.glb`, anchor: 'watch-axis', offset: [0, 0, 3.7], units: 'millimetres', upAxis: 'Y' },
+  'hands-nh05-luminous-588': { assetId: 'hands-nh05-luminous-588', category: 'hands', assetType: 'glb', assetPath: `${variantRoot}/hands/hands-nh05-luminous-588.glb`, handStyle: 'baton', anchor: 'watch-axis', offset: [0, 0, 4.35], units: 'millimetres', upAxis: 'Y' },
+  'bezel-diamond-rose-gold-34': { assetId: 'bezel-diamond-rose-gold-34', category: 'bezel', assetType: 'glb', assetPath: `${variantRoot}/bezels/bezel-diamond-rose-gold-34.glb`, anchor: 'watch-axis', offset: [0, 0, 5.65], units: 'millimetres', upAxis: 'Y', referenceCaseDiameterMm: 34, materialProfile: 'rose-gold' },
+  'bezel-diamond-rose-gold-42': { assetId: 'bezel-diamond-rose-gold-42', category: 'bezel', assetType: 'glb', assetPath: `${variantRoot}/bezels/bezel-diamond-rose-gold-42.glb`, anchor: 'watch-axis', offset: [0, 0, 5.65], units: 'millimetres', upAxis: 'Y', referenceCaseDiameterMm: 42, materialProfile: 'rose-gold' },
   ...generatedHandAssets,
   ...generatedBezelAssets,
   ...generatedDialAssets,

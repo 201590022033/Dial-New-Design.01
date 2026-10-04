@@ -178,13 +178,13 @@ export const RightInspector = () => {
             <div className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
               <p className="ds-label-inspector">Outer Diameter</p>
               <p className="mt-1 font-mono text-xs text-engineering-text">
-                {selectedBand ? selectedBand.outerDiameterMm.toFixed(2) : '--'} mm
+                {selectedBand ? (selectedBand.geometry.outerRadius * 2).toFixed(2) : '--'} mm
               </p>
             </div>
             <div className="rounded-md border border-engineering-border bg-engineering-bg/35 px-2 py-1.5">
               <p className="ds-label-inspector">Inner Diameter</p>
               <p className="mt-1 font-mono text-xs text-engineering-text">
-                {selectedBand ? selectedBand.innerDiameterMm.toFixed(2) : '--'} mm
+                {selectedBand ? (selectedBand.geometry.innerRadius * 2).toFixed(2) : '--'} mm
               </p>
             </div>
           </div>

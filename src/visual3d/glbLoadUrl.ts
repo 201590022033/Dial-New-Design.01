@@ -6,6 +6,7 @@ export const glbLoadUrl = (descriptor: VisualAssetDescriptor): string => {
     ['reference-42-case-preview', 'reference-42-strap-preview'].includes(descriptor.assetId);
   return descriptor.assetPath! + (descriptor.category === 'hands'
     ? '?v=main-hand-library-3'
+    : descriptor.assetPath?.includes('/variants/cases/') ? '?v=connected-lug-roots-2'
     : descriptor.scaleArtworkSurface ? '?v=pilot-scale-surfaces-1'
     : attachmentAsset ? '?v=attachment-seating-1' : '');
 };

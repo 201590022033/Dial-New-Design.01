@@ -43,7 +43,7 @@ export const ProjectWorkflowDialog = ({
       <div className="mx-auto max-w-5xl rounded-panel border border-engineering-border bg-engineering-panel/95 p-3 shadow-panel">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="ds-panel-title text-engineering-text">Project Workflow</h2>
-          <Button variant="icon" size="sm" onClick={onClose}>
+          <Button variant="icon" size="sm" aria-label="Close Project Workflow" onClick={onClose}>
             <X className="ds-icon-sm" />
           </Button>
         </div>
@@ -84,8 +84,9 @@ export const ProjectWorkflowDialog = ({
                   <input
                     className="ds-input mt-1"
                     value={info.movement}
-                    onChange={(event) => onUpdateInfo({ movement: event.target.value })}
+                    readOnly
                   />
+                  <span className="text-[10px] text-engineering-muted">Active assembly calibre. Change the baseline in Build.</span>
                 </label>
                 <label>
                   <span className="ds-label-inspector">Material</span>

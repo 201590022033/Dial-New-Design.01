@@ -74,7 +74,7 @@ describe('catalogue visual selections', () => {
       dials: visualVariantCatalogueItems.filter((item) => item.id.startsWith('cat-dial-') && item.id.endsWith('-285'))
     };
     expect(families.hands).toHaveLength(9);
-    expect(families.bezels).toHaveLength(8);
+    expect(families.bezels).toHaveLength(9);
     expect(families.dials).toHaveLength(9);
     expect(Object.values(families).flat().every((item) => item.visual?.representation === 'glb')).toBe(true);
   });

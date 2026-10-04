@@ -93,6 +93,7 @@ export const useScaleStore = create<ScaleState>((set, get) => ({
       pluginConfig: {
         ...defaults, ...selection.config,
         fontFamily: state.pluginConfig.fontFamily,
+        color: state.pluginConfig.color,
         scaleFontSizeMm: state.pluginConfig.scaleFontSizeMm ?? 0.8,
         scaleTickLengthFactor: state.pluginConfig.scaleTickLengthFactor ?? 1,
         placementTargetBandId: targetBand?.id ?? state.pluginConfig.placementTargetBandId,
@@ -132,7 +133,7 @@ export const useScaleStore = create<ScaleState>((set, get) => ({
 
     set({
       selectedScaleKind: kind,
-      pluginConfig: nextConfig
+      pluginConfig: { ...nextConfig, color: state.pluginConfig.color }
     });
 
     get().regeneratePreview();

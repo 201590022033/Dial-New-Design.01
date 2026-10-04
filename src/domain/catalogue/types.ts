@@ -53,6 +53,9 @@ export interface CatalogueVisualMetadata {
   handStyle?: 'baton' | 'mercedes' | 'needle' | 'sword' | 'dauphine' | 'syringe' | 'cathedral' | 'pencil' | 'broad-arrow' | 'skeleton';
   bezelProfile?: 'smooth' | 'coin-edge' | 'knurled' | 'scalloped';
   dialFinish?: TextureKind;
+  /** Presentation dimensions only; not supplier bore/clearance verification. */
+  handLengthsMm?: { hour: number; minute: number; second: number };
+  dialColor?: string;
   note?: string;
 }
 
@@ -120,6 +123,7 @@ export interface SupplierListing {
   sku?: string | null;
   productUrl?: string | null;
   unitPrice: number | null; // Nullable: never invent prices if unverified
+  purchaseUnit?: 'component' | 'central-hand-set';
   currency: string;
   shippingPrice?: number | null;
   shippingCurrency?: string | null;

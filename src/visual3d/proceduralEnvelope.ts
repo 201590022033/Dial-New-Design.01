@@ -7,11 +7,11 @@ import attachmentSpec from '../../tools/blender/attachment_preview.json';
 const positive = (n: unknown, fallback: number): number => typeof n === 'number' && Number.isFinite(n) && n > 0 ? n : fallback;
 
 /** Presentation envelope only; never writes dimensions or fit evidence back to the assembly. */
-export const resolveProceduralEnvelope = (diameter: number, height: number, parameters?: ParametricCaseV1, faceFrameHeight = height) => {
+export const resolveProceduralEnvelope = (diameter: number, height: number, parameters?: ParametricCaseV1, faceFrameHeight = height, lugGapMm?: number) => {
   const scale = diameter / caseFixture.caseDiameter;
   const zShift = faceFrameHeight / 2 - caseFixture.midcaseHeight / 2;
   const rootWidth = positive(parameters?.lugRootWidth, caseFixture.lugRootWidth * scale);
-  const gap = positive(parameters?.lugPairGap, caseFixture.lugPairGap * scale);
+  const gap = positive(parameters?.lugPairGap, positive(lugGapMm, caseFixture.lugPairGap * scale));
   const rootRadius = diameter / 2 - positive(parameters?.lugCaseOverlap, caseFixture.lugCaseOverlap * scale);
   const tipY = positive(parameters?.lugToLug, caseFixture.lugToLug * scale) / 2;
   const thickness = positive(parameters?.lugThickness, caseFixture.lugThickness * scale);
@@ -35,7 +35,7 @@ export const resolveProceduralEnvelope = (diameter: number, height: number, para
       gap, rootWidth,
       tipWidth: positive(parameters?.lugTipWidth, caseFixture.lugTipWidth * scale),
       thickness, drop,
-      rootY: Math.sqrt(Math.max(0, rootRadius ** 2 - (gap / 2 + rootWidth / 2) ** 2)),
+      rootY: Math.sqrt(Math.max(0, rootRadius ** 2 - (gap / 2 + rootWidth) ** 2)),
       tipY
     },
     dialZ: faceFixture.placement.dialCenterZMm + zShift,

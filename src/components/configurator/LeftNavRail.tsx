@@ -61,7 +61,7 @@ export const LeftNavRail: React.FC = () => {
       parts: partsStatus,
       style: 'green',
       research: 'grey',
-      bom: hasUnknown ? 'yellow' : 'green',
+      bom: partsStatus,
       manufacture: hasRed ? 'red' : 'green',
       advanced: hasRed ? 'red' : hasYellow ? 'yellow' : 'green',
       review: 'green'

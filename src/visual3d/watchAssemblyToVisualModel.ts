@@ -84,6 +84,10 @@ export type VisualWatchModel = {
     lumeColor?: string;
   };
   archetypeAppearance: {
+    caseColor?: string;
+    handsColor?: string;
+    markerColor?: string;
+    bezelMetalColor?: string;
     archetypeId?: string;
     dialColor: string;
     strapColor: string;
@@ -181,7 +185,12 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
     const referenceOnly = resolved.assetId.startsWith('reference-42-');
     const diameterMatches = resolved.referenceCaseDiameterMm === undefined ||
       (assembly.globalDimensions.caseDiameterMm === resolved.referenceCaseDiameterMm && (!referenceOnly || referenceIsCurrent));
-    assets[category] = diameterMatches ? resolved : visualAssetRegistry[fallbackId]!;
+    // Gem-set presentation bases may be resized radially; supplier cases must
+    // still match their recorded diameter. Never turn this into fit evidence.
+    const gemstoneScale = assembly.globalDimensions.caseDiameterMm / (resolved.referenceCaseDiameterMm ?? 42);
+    assets[category] = resolved.assetId.startsWith('bezel-diamond-rose-gold-')
+      ? { ...resolved, scale: [gemstoneScale, gemstoneScale, 1] }
+      : diameterMatches ? resolved : visualAssetRegistry[fallbackId]!;
     const strapFinish = visualReferences.strapStyleId === 'canvas' ? 'canvas' : visualReferences.strapStyleId === 'leather' || visualReferences.strapStyleId === 'racing' ? 'leather' : 'rubber';
     const fallbackFinish: FinishProfileId = category === 'dial' ? 'dial' : category === 'crystal' ? 'sapphire' : category === 'strap' ? strapFinish : category === 'chapter-ring' ? 'black-pvd' : category === 'bezel' ? 'polished-steel' : 'brushed-steel';
     finishes[category] = resolveFinishProfile(resolved.materialProfile ?? materialProfile(part, fallbackFinish), fallbackFinish);
@@ -189,7 +198,17 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
     visible[category] = part ? part.visible : category !== 'crown';
     transforms[category] = part?.visual?.transform;
   }
+  // These compact presentation GLBs are sterile substrates. A coloured marker
+  // request needs live indices, not a material change on nonexistent meshes.
+  if (visualReferences.markerColor && /^dial-nh05-(mother-of-pearl|champagne-sunburst|black-sunburst)-245$/.test(assets.dial.assetId)) {
+    assets.dial = visualAssetRegistry['visual-dial-default']!;
+  }
   const candidate = crownPart?.parametricGeometry;
+  if (visualReferences.caseFinish === 'rose-gold') {
+    for (const category of ['case', 'caseback', 'crown', 'pushers', 'bezel'] as const) finishes[category] = resolveFinishProfile('rose-gold', 'rose-gold');
+  }
+  if (visualReferences.handsFinish === 'rose-gold') finishes.hands = resolveFinishProfile('rose-gold', 'rose-gold');
+  if (visualReferences.bezelFinish) finishes.bezel = resolveFinishProfile(visualReferences.bezelFinish === 'rose-gold' ? 'rose-gold' : 'polished-steel', 'polished-steel');
   const crownParams = candidate?.schema === 'parametric-crown/v1' && validateParametricCrownV1(candidate).status !== 'invalid' ? candidate : undefined;
   const caseParams = casePart?.parametricGeometry?.schema === 'parametric-case/v1' ? casePart.parametricGeometry : undefined;
   const casePusherCount = caseParams?.pusherCount === undefined ? undefined : Math.max(0, Math.min(2, Math.round(Number(caseParams.pusherCount) || 0)));
@@ -229,6 +248,7 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
     return { kind: kind === 'day-window' ? 'day' as const : 'date' as const, angleDeg, widthMm: positive(part.dimensions.widthMm, 3.4), heightMm: positive(part.dimensions.thicknessMm, 1.2), cornerRadiusMm: 0.25 };
   });
   const dialDiameter = positive(dialPart?.dimensions.diameterMm, 32);
+  const publishedHandLengths = getCatalogueItem(handsPart?.catalogueItemId ?? '')?.visual?.handLengthsMm;
   const caseHeight = positive(caseParams?.midcaseHeight, positive(assembly.globalDimensions.totalThicknessMm, 12.5));
   // The authored 42 mm face components have fixed watch-axis coordinates. Keep
   // any missing component in that same frame, even without the opt-in fixture.
@@ -236,7 +256,7 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
   return {
     caseDiameterMm: positive(assembly.globalDimensions.caseDiameterMm, 40),
     caseThicknessMm: caseHeight,
-    previewEnvelope: resolveProceduralEnvelope(positive(assembly.globalDimensions.caseDiameterMm, 40), caseHeight, caseParams, hasFixedFaceFrame ? 10.2 : caseHeight),
+    previewEnvelope: resolveProceduralEnvelope(positive(assembly.globalDimensions.caseDiameterMm, 40), caseHeight, caseParams, hasFixedFaceFrame ? 10.2 : caseHeight, find('strap')?.dimensions.widthMm),
     caseMaterial: materialProfile(casePart, 'brushed-steel'),
     dialColor: effectiveDialColor,
     dial: {
@@ -297,9 +317,9 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
       // Procedural hands are sized to the visible dial, not the case. This is
       // especially important for NH05 watches, where a 24.5 mm dial sits in a
       // nominal 34 mm case and NH35-sized preview hands look oversized.
-      hourLengthMm: dialDiameter * 0.25,
-      minuteLengthMm: dialDiameter * 0.36,
-      secondLengthMm: dialDiameter * 0.39,
+      hourLengthMm: publishedHandLengths ? positive(assembly.parts['inst-hour-hand']?.dimensions.diameterMm, publishedHandLengths.hour) : dialDiameter * 0.25,
+      minuteLengthMm: publishedHandLengths ? positive(assembly.parts['inst-minute-hand']?.dimensions.diameterMm, publishedHandLengths.minute) : dialDiameter * 0.36,
+      secondLengthMm: publishedHandLengths ? positive(assembly.parts['inst-central-seconds']?.dimensions.diameterMm, publishedHandLengths.second) : dialDiameter * 0.39,
       hourWidthMm: movement?.id === 'nh05' ? 0.55 : effectiveHandStyle === 'mercedes' ? 1.1 : effectiveHandStyle === 'needle' ? 0.45 : 0.85,
       minuteWidthMm: movement?.id === 'nh05' ? 0.35 : effectiveHandStyle === 'needle' ? 0.28 : 0.58,
       secondWidthMm: movement?.id === 'nh05' ? 0.12 : 0.2
@@ -330,6 +350,10 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
       lumeColor: lumeReference?.visualColor
     },
     archetypeAppearance: {
+      caseColor: visualReferences.caseFinish === 'rose-gold' ? finishes.case.color : undefined,
+      handsColor: visualReferences.handsColor ?? (visualReferences.handsFinish === 'rose-gold' ? finishes.hands.color : undefined),
+      markerColor: visualReferences.markerColor,
+      bezelMetalColor: visualReferences.bezelFinish ? finishes.bezel.color : undefined,
       archetypeId: visualReferences.archetypeId,
       dialColor: effectiveDialColor,
       strapColor: archetypeProfile?.strapColor ?? '#080b10',
