@@ -1,6 +1,7 @@
 import type { ComponentCatalogueItem, CatalogueManufacturingMetadata, ManufacturingProcessProfile } from './types';
 import { visualVariantCatalogueItems } from './visualVariantCatalogue';
 import { nh05SupplierCandidateItems } from './nh05SupplierCandidates';
+import { supplierExpansionCandidateItems } from './supplierExpansionCandidates';
 
 const defaultManufacturing = (processProfile: ManufacturingProcessProfile): CatalogueManufacturingMetadata => ({
   processProfile,
@@ -840,6 +841,7 @@ export const catalogueItemById = new Map<string, ComponentCatalogueItem>([
   ...defaultCatalogueItems.map((item) => [item.id, item] as [string, ComponentCatalogueItem]),
   ...visualVariantCatalogueItems.map((item) => [item.id, item] as [string, ComponentCatalogueItem]),
   ...nh05SupplierCandidateItems.map((item) => [item.id, item] as [string, ComponentCatalogueItem]),
+  ...supplierExpansionCandidateItems.map((item) => [item.id, item] as [string, ComponentCatalogueItem]),
   ...compatibilityFixtureCatalogueItems.map((item) => [item.id, item] as [string, ComponentCatalogueItem])
 ]);
 

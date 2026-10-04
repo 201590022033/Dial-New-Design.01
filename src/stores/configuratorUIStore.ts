@@ -288,6 +288,10 @@ export const useConfiguratorUIStore = create<ConfiguratorUIStoreState>((set, get
   setSearchAllComponents: (searchAllComponents) => set({ searchAllComponents }),
 
   setPreview: (assembly, partInstanceId, candidateItem) => {
+    if (candidateItem.researchOnly) {
+      set({ previewAssembly: null, previewCandidateItem: null, previewPartInstanceId: null, previewStatus: 'none', previewError: 'Research-only listing: critical dimensions or movement-slot wiring are incomplete. Review supplier evidence before applying.' });
+      return;
+    }
     const current = useWatchAssemblyStore.getState().assembly;
     const evaluation = candidateItem.kind === 'style-finish' ? null : evaluateCandidate({
       assembly: current, targetPartInstanceId: partInstanceId,
@@ -315,6 +319,10 @@ export const useConfiguratorUIStore = create<ConfiguratorUIStoreState>((set, get
     // Check physical lock
     if (lockedPartIds.has(previewPartInstanceId)) {
       set({ previewError: 'This component is physically locked. Unlock it before applying a replacement.' });
+      return false;
+    }
+    if (previewCandidateItem.researchOnly) {
+      set({ previewError: 'Research-only listing cannot be applied to the assembly.' });
       return false;
     }
 

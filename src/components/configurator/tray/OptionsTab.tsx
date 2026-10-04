@@ -306,13 +306,15 @@ export const OptionsTab: React.FC = () => {
                           {item.displayName}
                         </h4>
                         <span className="text-[10px] text-slate-400 font-mono">
-                          {item.id} · {item.nominalDimensions.diameterMm}mm
+                          {item.id} · {item.nominalDimensions.diameterMm > 0 ? `${item.nominalDimensions.diameterMm}mm` : 'Diameter unknown'}
                         </span>
                       </div>
                       <div className="flex-shrink-0">
                         {renderStatusBadge(evaluation.status)}
                       </div>
                     </div>
+
+                    {item.researchOnly && <p className="mt-2 text-[10px] text-amber-200">Research only — supplier evidence available; preview and Apply blocked until critical dimensions or movement wiring are complete.</p>}
 
                     {/* Sourcing summary: Visually decoupled from engineering compatibility */}
                     <div className="flex items-center gap-2 mt-2 text-[10px] text-slate-400">

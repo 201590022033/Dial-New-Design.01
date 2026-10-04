@@ -1,5 +1,6 @@
 import type { SupplierListing } from './types';
 import { nh05SupplierCandidateListings } from './nh05SupplierCandidates';
+import { supplierExpansionCandidateListings } from './supplierExpansionCandidates';
 
 const RESEARCH_CAPTURED_AT = '2026-09-26T09:30:00+02:00';
 const LARGE_CASE_RESEARCH_AT = '2026-09-27T17:57:05+02:00';
@@ -57,6 +58,7 @@ const documentedCaseListing = (input: {
  */
 export const researchedSupplierListings: SupplierListing[] = [
   ...nh05SupplierCandidateListings,
+  ...supplierExpansionCandidateListings,
   documentedCaseListing({
     id: 'research-tandorio-pilot-case-40', catalogueItemId: 'cat-case-tandorio-pilot-40', supplierName: 'Tandorio Watches', sku: 'TANDORIO-PILOT-40',
     productUrl: 'https://tandoriowatch.com/products/40mm-pilot-watch-case-brushed-design-316l-stainless-steel', unitPrice: 44.58, currency: 'USD', stockStatus: 'in-stock',

@@ -65,6 +65,8 @@ export interface CatalogueVisualMetadata {
  * Exists independently of any one watch design or assembly project.
  */
 export interface ComponentCatalogueItem {
+  /** Discovery record with incomplete dimensions or no supported assembly slot. */
+  researchOnly?: boolean;
   id: string; // e.g. "cat-hour-hand"
   kind: string; // e.g. "hour-hand"
   displayName: string;

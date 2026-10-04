@@ -5,6 +5,7 @@ import {
   researchedSupplierListings,
   visualVariantCatalogueItems,
   nh05SupplierCandidateItems,
+  supplierExpansionCandidateItems,
   type ComponentCatalogueItem,
   type SupplierListing,
   type CatalogueItemCategory,
@@ -29,7 +30,7 @@ export interface CatalogueStoreState {
 }
 
 export const useCatalogueStore = create<CatalogueStoreState>((set, get) => ({
-  items: [...defaultCatalogueItems, ...visualVariantCatalogueItems, ...nh05SupplierCandidateItems],
+  items: [...defaultCatalogueItems, ...visualVariantCatalogueItems, ...nh05SupplierCandidateItems, ...supplierExpansionCandidateItems],
   supplierListings: [...defaultSupplierListings, ...researchedSupplierListings],
   categoryFilter: 'all',
   searchQuery: '',

@@ -8,6 +8,7 @@ export const applyCatalogueVisualSelection = (
   item: ComponentCatalogueItem
 ): WatchAssembly => {
   const provisional = JSON.parse(JSON.stringify(assembly)) as WatchAssembly;
+  if (item.researchOnly) return provisional;
   const part = provisional.parts[partInstanceId];
   if (!part) return provisional;
 
