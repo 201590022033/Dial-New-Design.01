@@ -42,6 +42,7 @@ const candidateListing = (id: string, catalogueItemId: string, path: string, sku
     id, catalogueItemId, supplierName: 'Tandorio Watches', sku, productUrl,
     unitPrice: price, currency: 'USD', shippingPrice: null, shippingCurrency: 'USD',
     ...(catalogueItemId === 'cat-research-tandorio-nh05-hands-588' ? { purchaseUnit: 'central-hand-set' as const } : {}),
+    ...(sku.startsWith('Black') ? { handsFinish: 'auto' as const, handsColor: '#171717' } : {}),
     shippingDestination: 'South Africa', stockStatus: 'unknown', status: 'active',
     verificationStatus: 'unverified', leadTimeDays: null, lastCheckedIso: NH05_SUPPLIER_CHECKED_AT,
     provenance: { dataSource: productUrl, sourceType: 'web-scrape', isDemonstrationFixture: false, retrievedAtIso: NH05_SUPPLIER_CHECKED_AT },
@@ -57,6 +58,12 @@ export const nh05SupplierCandidateListings: SupplierListing[] = [
     '24.5mm white matte dial, advertised NH05 fit and 3 o\'clock date. Stock labels conflict with purchase controls. Thickness, feet, centre opening, date aperture and marker height unknown.'),
   candidateListing('research-tandorio-nh05-hands-black-588', 'cat-research-tandorio-nh05-hands-588', 'nh05-hands-silver-blue-black-gold-rosegold-watch-hands-green-luminous?variant=50004173553949', 'Black / 50004173553949', 7.95,
     'One complete Black 5/8/8mm luminous NH05/NH06 hand set. Tip lengths fit within TMI maximum 9.5mm radius; bores, tube heights, thickness and complete clearances remain unverified. Do not charge this full-set price separately for each hand.'),
-  candidateListing('research-tandorio-nh05-hands-rosegold-588', 'cat-research-tandorio-nh05-hands-588', 'nh05-hands-silver-blue-black-gold-rosegold-watch-hands-green-luminous', 'RoseGold (advertised option; exact variant unchecked)', null,
-    'RoseGold finish advertised for the same 5/8/8mm hand set. Exact variant price and availability not checked; do not substitute Black price or the displayed range. Bores and tube heights remain unknown.')
+  {
+    ...candidateListing('research-tandorio-nh05-hands-rosegold-588', 'cat-research-tandorio-nh05-hands-588', 'nh05-hands-silver-blue-black-gold-rosegold-watch-hands-green-luminous?variant=50004173685021', 'RoseGold / 50004173685021', 9.08,
+      'Selected RoseGold 5/8/8mm complete three-hand set displayed USD9.08. Stock labels conflict with purchase controls. Bores, tube heights, thickness and South-African shipping remain unverified.'),
+    lastCheckedIso: '2026-10-05T10:09:16+02:00',
+    handsFinish: 'rose-gold',
+    handsColor: '#b76e79',
+    provenance: { dataSource: 'https://tandoriowatch.com/products/nh05-hands-silver-blue-black-gold-rosegold-watch-hands-green-luminous?variant=50004173685021', sourceType: 'web-scrape', isDemonstrationFixture: false, retrievedAtIso: '2026-10-05T10:09:16+02:00' }
+  }
 ];

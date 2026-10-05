@@ -15,14 +15,21 @@ const starter = () => createStarterBuild('ladies-dress', createDefaultWatchAssem
 const handId = 'cat-research-tandorio-nh05-hands-588';
 
 describe('NH05 researched GLB selection wiring', () => {
-  it('prices one complete hand set and does not replace an unknown rose-gold price with black', () => {
+  it('renders engineering hands with the same selected radial lengths as HD, not fixed legacy tips', () => {
+    const renderer = readFileSync(resolve('src/renderer/svgRenderer.ts'), 'utf8');
+    for (const role of ['hour', 'minute', 'second']) expect(renderer).toContain(`mmToPixels(visualHands.${role}LengthMm)`);
+    expect(renderer).not.toContain('mmToPixels(14.2)');
+  });
+  it('prices one complete hand set and uses the checked selected rose-gold price rather than black', () => {
     const assembly = applyCatalogueVisualSelection(starter(), 'inst-hour-hand', item(handId));
     const black = nh05SupplierCandidateListings.find(l => l.sku?.startsWith('Black'))!;
     const rose = nh05SupplierCandidateListings.find(l => l.sku?.startsWith('RoseGold'))!;
     const cost = calculateBomCost(assembly, nh05SupplierCandidateItems, [black, rose], {});
     expect(cost.partsTotal).toBe(listingPriceZar(black));
+    expect(cost.lineItems.filter(line => line.component.startsWith('Main hand set'))).toHaveLength(1);
+    expect(cost.lineItems.find(line => line.component.startsWith('Main hand set'))?.partInstanceIds).toHaveLength(3);
     expect(cost.shippingUnknownCount).toBe(1);
-    expect(calculateBomCost(assembly, nh05SupplierCandidateItems, [black, rose], { 'inst-minute-hand': rose.id }).partsTotal).toBe(0);
+    expect(calculateBomCost(assembly, nh05SupplierCandidateItems, [black, rose], { 'inst-minute-hand': rose.id }).partsTotal).toBe(listingPriceZar(rose));
   });
   it('updates all central engineering hands and the HD asset using published lengths', () => {
     const before = starter();

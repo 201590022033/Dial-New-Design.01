@@ -58,13 +58,36 @@ export interface SavedDesignVersion {
   readinessLabel: string;
 }
 
+export interface BomCostLine {
+  id: string;
+  partInstanceIds: string[];
+  name: string;
+  component: string;
+  priceZar: number | null;
+  shippingZar: number | null;
+  listingId?: string;
+  supplierName?: string;
+  supplierSku?: string | null;
+  productUrl?: string | null;
+  alternativePriceNote?: string;
+  lastCheckedIso?: string;
+  nativePrice?: number | null;
+  currency?: string;
+  status: 'selected' | 'estimate' | 'unpriced';
+  visible: boolean;
+  included?: boolean;
+  choiceGroup?: string;
+  fitWarning?: string;
+  catalogueItemId?: string;
+}
+
 export interface CostBreakdown {
+  lineItems: BomCostLine[];
   partsTotal: number;
   shippingEstimate: number;
   shippingUnknownCount: number;
   dutiesAndTaxesEstimate: number;
   customFabricationEstimate: number;
-  watchmakerLabourEstimate: number;
   grandTotal: number;
 }
 

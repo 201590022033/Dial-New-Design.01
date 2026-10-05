@@ -15,6 +15,16 @@ export interface SupplierProfile {
 /** A deliberately small directory: offers are captured on demand. */
 export const supplierDirectory: SupplierProfile[] = [
   {
+    id: 'supplier-sofly', name: 'Sofly', channel: 'specialist-direct', storefrontUrl: 'https://www.soflypart.com/',
+    coverage: ['movement', 'hands', 'strap'], pricePosition: 'mid-market', onboardingStatus: 'candidate', cataloguePolicy: 'capture-on-demand',
+    notes: 'NH05 Date 3 offer checked 5 October 2026. Candidate only; delivered revision, authenticity and South-African shipping still need verification.'
+  },
+  {
+    id: 'supplier-tandorio', name: 'Tandorio Watches', channel: 'specialist-direct', storefrontUrl: 'https://tandoriowatch.com/',
+    coverage: ['case', 'dial', 'hands', 'strap', 'movement'], pricePosition: 'budget', onboardingStatus: 'candidate', cataloguePolicy: 'capture-on-demand',
+    notes: 'Capture exact numbered variants. NH05 offers inspected; stock labels conflict with cart controls. No fit or plating approval; shipping must be checked.'
+  },
+  {
     id: 'supplier-aliexpress-marketplace', name: 'AliExpress marketplace', channel: 'marketplace',
     storefrontUrl: 'https://www.aliexpress.com/',
     coverage: ['case', 'dial', 'crystal', 'chapter-ring', 'bezel', 'hands', 'strap', 'movement'],

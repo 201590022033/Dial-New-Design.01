@@ -6,11 +6,16 @@ import { evaluateAssembly } from '@/domain/compatibility/compatibilityEngine';
 import type { WatchAssembly, WatchAssemblyPartInstance } from '@/domain/assembly/assemblyTypes';
 import type { BuildReadiness, CostBreakdown } from '@/domain/configurator/configuratorTypes';
 import type { AssemblyCompatibilityEvaluation } from '@/domain/compatibility/compatibilityTypes';
+import { BomCostLines } from './BomCostLines';
+import { formatBomZar } from '@/domain/catalogue/pricing';
+import { useCatalogueStore } from '@/stores/catalogueStore';
 
 /** Procurement must describe the active assembly, never a different kit. */
 export const ControlledBomPanel: React.FC = () => {
   const assembly = useWatchAssemblyStore((s) => s.assembly);
   const selections = useSourcingStore((s) => s.sourcingPlan.selections);
+  useCatalogueStore((s) => s.supplierListings);
+  useCatalogueStore((s) => s.items);
   const readiness = useConfiguratorUIStore.getState().getBuildReadiness();
   const cost = useConfiguratorUIStore.getState().getCommittedCost();
   const compatibility = evaluateAssembly(assembly);
@@ -31,10 +36,17 @@ export const ActiveBuildBomView: React.FC<{
       <p className="mt-1">Planning estimate: R{cost.grandTotal.toLocaleString('en-ZA', { maximumFractionDigits: 2 })}</p>
       <p className="mt-2 text-slate-400">Not an order approval. Verify supplier interfaces, price timestamps and shipping before buying. A controlled reference kit does not certify this assembly.</p>
     </section>
-    {parts.map((part) => <section key={part.instanceId} className="rounded border border-slate-800 bg-slate-900 p-2">
+    <BomCostLines cost={cost} interactive />
+    <section aria-label="Additional build costs" className="space-y-1 rounded border border-slate-800 p-2">
+      <p>Parts subtotal: {formatBomZar(cost.partsTotal)}</p>
+      <p>Known shipping: {formatBomZar(cost.shippingEstimate)} · {cost.shippingUnknownCount} unknown</p>
+      <p>Import VAT reserve (duty excluded): {formatBomZar(cost.dutiesAndTaxesEstimate)}</p>
+      {cost.customFabricationEstimate > 0 && <p>Custom fabrication: {formatBomZar(cost.customFabricationEstimate)}</p>}
+    </section>
+    <details><summary className="cursor-pointer text-slate-400">Engineering component details (not additional charges)</summary>{parts.map((part) => <section key={part.instanceId} className="rounded border border-slate-800 bg-slate-900 p-2">
       <h3 className="font-semibold">{part.name}</h3>
       <p className="font-mono text-[10px] text-slate-400">{part.catalogueItemId} · Ø{part.dimensions.diameterMm} mm · {part.dimensions.thicknessMm} mm thick</p>
       <p className="text-[10px]">{selections[part.instanceId] ? `Selected listing: ${selections[part.instanceId]} — verify price and fit` : 'No supplier selected'}</p>
-    </section>)}
+    </section>)}</details>
   </div>;
 };

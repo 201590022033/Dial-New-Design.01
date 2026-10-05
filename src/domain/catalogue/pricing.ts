@@ -1,5 +1,7 @@
 import type { SupplierListing } from './types';
 
+export const formatBomZar = (amount: number) => `R${amount.toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
 export const PRICING_SNAPSHOT = {
   capturedAtIso: '2026-09-27T17:57:05+02:00',
   usdZar: 16.3007,

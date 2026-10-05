@@ -128,6 +128,13 @@ export interface SupplierListing {
   sku?: string | null;
   productUrl?: string | null;
   unitPrice: number | null; // Nullable: never invent prices if unverified
+  caseFinish?: 'steel' | 'rose-gold' | 'black-pvd';
+  alternativePriceNote?: string; // Budget candidate, not an exact geometry/fit match.
+  movementCalibre?: string; // Prices the calibre-only BOM row when no physical movement part exists.
+  manualSelectionOnly?: boolean; // A different style/geometry must never silently price a preview.
+  replacementCatalogueItemId?: string; // Explicit physical alternative used only by BOM Apply.
+  handsFinish?: 'auto' | 'rose-gold';
+  handsColor?: string;
   purchaseUnit?: 'component' | 'central-hand-set';
   currency: string;
   shippingPrice?: number | null;

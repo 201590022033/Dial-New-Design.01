@@ -74,6 +74,8 @@ export interface WatchAssemblyGlobalDimensions {
  * - Ring/dial geometry parameters
  */
 export interface WatchAssemblyDesignConfig {
+  /** One purchased component per mutually exclusive procurement slot. */
+  bomPartSelections?: Record<string, string>;
   markerConfig?: MarkerEngineConfig;
   typographyConfig?: TypographyConfig;
   textureConfig?: TextureEngineConfig;

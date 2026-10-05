@@ -29,8 +29,9 @@ describe('dated NH05 supplier candidates', () => {
   });
   it('preserves source timestamps, unknown shipping/stock and partial evidence', () => {
     for (const listing of nh05SupplierCandidateListings) {
-      expect(listing.lastCheckedIso).toBe(NH05_SUPPLIER_CHECKED_AT);
-      expect(listing.provenance.retrievedAtIso).toBe(NH05_SUPPLIER_CHECKED_AT);
+      const checked = listing.sku?.startsWith('RoseGold') ? '2026-10-05T10:09:16+02:00' : NH05_SUPPLIER_CHECKED_AT;
+      expect(listing.lastCheckedIso).toBe(checked);
+      expect(listing.provenance.retrievedAtIso).toBe(checked);
       expect(listing.provenance.isDemonstrationFixture).toBe(false);
       expect(listing.shippingPrice).toBeNull();
       expect(listing.stockStatus).toBe('unknown');
@@ -43,7 +44,7 @@ describe('dated NH05 supplier candidates', () => {
     const black = nh05SupplierCandidateListings.find((listing) => listing.sku?.startsWith('Black'))!;
     const rose = nh05SupplierCandidateListings.find((listing) => listing.sku?.startsWith('RoseGold'))!;
     expect(black.unitPrice).toBe(7.95);
-    expect(rose.unitPrice).toBeNull();
+    expect(rose.unitPrice).toBe(9.08);
     expect(black.catalogueItemId).toBe(rose.catalogueItemId);
     expect(black.notes).toContain('One complete');
   });

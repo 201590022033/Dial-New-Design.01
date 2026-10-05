@@ -58,6 +58,34 @@ const documentedCaseListing = (input: {
  */
 export const researchedSupplierListings: SupplierListing[] = [
   ...nh05SupplierCandidateListings,
+  {
+    id: 'research-sofly-nh05-date3', catalogueItemId: 'movement-nh05', movementCalibre: 'nh05',
+    supplierName: 'Sofly', sku: 'SEIKO NH05 / Date 3 / quantity 1–2',
+    productUrl: 'https://www.soflypart.com/product/seiko-nh05-mechanical-movement/', unitPrice: 75, currency: 'USD',
+    shippingPrice: null, shippingCurrency: 'USD', shippingDestination: 'South Africa', stockStatus: 'unknown', status: 'active', verificationStatus: 'unverified',
+    lastCheckedIso: '2026-10-05T10:09:16+02:00',
+    provenance: { dataSource: 'https://www.soflypart.com/product/seiko-nh05-mechanical-movement/', sourceType: 'web-scrape', isDemonstrationFixture: false, retrievedAtIso: '2026-10-05T10:09:16+02:00' },
+    notes: 'Selected SEIKO / Date 3, single-unit tier USD75. Winding stem included according to seller. Authenticity, exact delivered revision, stock and South-African shipping unverified. Bulk discount not used.'
+  },
+  {
+    ...nh05SupplierCandidateListings.find(l => l.id === 'research-tandorio-nh05-dial-white-245')!,
+    id: 'budget-tandorio-nh05-dial-white-for-champagne', catalogueItemId: 'cat-dial-nh05-245-champagne-sunburst', manualSelectionOnly: true,
+    replacementCatalogueItemId: 'cat-research-tandorio-nh05-dial-white-245',
+    lastCheckedIso: '2026-10-05T10:09:16+02:00',
+    alternativePriceNote: 'White matte 24.5mm NO.1 dial alternative — NOT the champagne/sunburst or rose-coloured preview. Feet, thickness and fit unverified. Printing costs extra.',
+    provenance: { dataSource: 'https://tandoriowatch.com/products/24-5mm-watch-dial-nh05-white-matte-dial?variant=50672056467741', sourceType: 'web-scrape', isDemonstrationFixture: false, retrievedAtIso: '2026-10-05T10:09:16+02:00' }
+  },
+  {
+    ...nh05SupplierCandidateListings.find(l => l.id === 'research-tandorio-nh05-hands-black-588')!,
+    id: 'budget-tandorio-nh05-hands-rose-for-dress', catalogueItemId: 'cat-hands-nh05-dress-baton', manualSelectionOnly: true,
+    replacementCatalogueItemId: 'cat-research-tandorio-nh05-hands-588', handsFinish: 'rose-gold', handsColor: '#b76e79',
+    sku: 'RoseGold / 50004173685021', unitPrice: 9.08,
+    productUrl: 'https://tandoriowatch.com/products/nh05-hands-silver-blue-black-gold-rosegold-watch-hands-green-luminous?variant=50004173685021',
+    lastCheckedIso: '2026-10-05T10:09:16+02:00',
+    alternativePriceNote: 'RoseGold luminous three-hand set, 5/8/8mm. NOT the longer dress-baton preview hands. Bores, tube heights and fit unverified. One purchase supplies all three hands.',
+    notes: 'RoseGold selected option displayed USD9.08; conflicting stock labels. Complete 5/8/8mm set, not three purchases. Fit, stock and South-African shipping need confirmation.',
+    provenance: { dataSource: 'https://tandoriowatch.com/products/nh05-hands-silver-blue-black-gold-rosegold-watch-hands-green-luminous?variant=50004173685021', sourceType: 'web-scrape', isDemonstrationFixture: false, retrievedAtIso: '2026-10-05T10:09:16+02:00' }
+  },
   ...supplierExpansionCandidateListings,
   documentedCaseListing({
     id: 'research-tandorio-pilot-case-40', catalogueItemId: 'cat-case-tandorio-pilot-40', supplierName: 'Tandorio Watches', sku: 'TANDORIO-PILOT-40',
@@ -116,6 +144,18 @@ export const researchedSupplierListings: SupplierListing[] = [
       sourceType: 'web-scrape', isDemonstrationFixture: false, retrievedAtIso: '2026-09-27T10:34:27+02:00'
     },
     notes: 'Headline states 34 mm stainless case, sapphire and 24.5 mm dial support. Exact variant price and South-African shipping were not exposed; do not substitute a teaser price.'
+  },
+  {
+    id: 'research-tandorio-nh05-rose-case-16', catalogueItemId: 'cat-case-nh05-ladies-dress-34',
+    replacementCatalogueItemId: 'cat-research-tandorio-nh05-case-34',
+    supplierName: 'Tandorio Watches', sku: '16-case / 50684934586653',
+    productUrl: 'https://tandoriowatch.com/products/34mm-nh05-watch-case-bezel-insert-ring-sapphire-glass?variant=50684934586653',
+    caseFinish: 'rose-gold', unitPrice: 75.52, currency: 'USD', shippingPrice: null, shippingCurrency: 'USD',
+    shippingDestination: 'South Africa', stockStatus: 'unknown', status: 'active', verificationStatus: 'unverified',
+    lastCheckedIso: '2026-10-05T09:34:27+02:00',
+    provenance: { dataSource: 'https://tandoriowatch.com/products/34mm-nh05-watch-case-bezel-insert-ring-sapphire-glass?variant=50684934586653', sourceType: 'web-scrape', isDemonstrationFixture: false, retrievedAtIso: '2026-10-05T09:34:27+02:00' },
+    alternativePriceNote: 'Budget alternative only: 34mm / 12mm case, not a verified match to the 10.5mm dress-case preview. Rose colour inferred from option photo; plating and fit unverified.',
+    notes: 'Selected 16-case option displayed USD75.52 in South Africa / USD storefront. Case-only option, not the bracelet or gem-set option. Rose colour inferred from photo, not a supplier plating specification. Headline: 34mm OD, 12mm thickness, 24.2–25mm dial. Stock labels conflict with purchase controls; shipping and included crystal/caseback need confirmation.'
   },
   {
     id: 'research-aliexpress-nh05-dial-1005012168181106',

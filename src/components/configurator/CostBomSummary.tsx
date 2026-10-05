@@ -11,8 +11,17 @@ import {
 } from 'lucide-react';
 import { useConfiguratorUIStore } from '@/stores/configuratorUIStore';
 import { cn } from '@/utils/cn';
+import { BomCostLines } from './BomCostLines';
+import { formatBomZar } from '@/domain/catalogue/pricing';
+import { useWatchAssemblyStore } from '@/stores/watchAssemblyStore';
+import { useCatalogueStore } from '@/stores/catalogueStore';
+import { useSourcingStore } from '@/stores/sourcingStore';
 
 export const CostBomSummary: React.FC = () => {
+  useWatchAssemblyStore(s => s.assembly);
+  useCatalogueStore(s => s.supplierListings);
+  useCatalogueStore(s => s.items);
+  useSourcingStore(s => s.sourcingPlan.selections);
   const [isBreakdownOpen, setIsBreakdownOpen] = useState(false);
   const [isIssuesPanelOpen, setIsIssuesPanelOpen] = useState(false);
   const [activeSensitivityPopover, setActiveSensitivityPopover] = useState<string | null>(null);
@@ -167,7 +176,7 @@ export const CostBomSummary: React.FC = () => {
       {isBreakdownOpen && (
         <div
           data-testid="cost-breakdown-modal"
-          className="absolute left-4 bottom-12 w-80 p-3 rounded-lg bg-slate-950 border border-slate-800 shadow-2xl z-50 text-xs font-sans space-y-2"
+          className="absolute left-4 bottom-12 w-96 max-w-[calc(100vw-3rem)] max-h-[65vh] overflow-y-auto p-3 rounded-lg bg-slate-950 border border-slate-800 shadow-2xl z-50 text-xs font-sans space-y-2"
         >
           <div className="flex items-center justify-between border-b border-slate-800 pb-1.5">
             <h4 className="font-semibold text-slate-100 flex items-center gap-1.5">
@@ -177,20 +186,22 @@ export const CostBomSummary: React.FC = () => {
             <button
               type="button"
               onClick={() => setIsBreakdownOpen(false)}
+              aria-label="Close cost breakdown"
               className="text-slate-400 hover:text-white"
             >
               <X className="h-3.5 w-3.5" />
             </button>
           </div>
 
+          <BomCostLines cost={cost} interactive />
           <div className="space-y-1.5 font-mono text-[11px]">
             <div className="flex justify-between text-slate-300">
               <span>Selected components (estimates):</span>
-              <span>R{cost.partsTotal.toLocaleString()}</span>
+              <span>{formatBomZar(cost.partsTotal)}</span>
             </div>
             <div className="flex justify-between text-slate-400">
               <span>Known Shipping:</span>
-              <span>R{Math.round(cost.shippingEstimate).toLocaleString()}</span>
+              <span>{formatBomZar(cost.shippingEstimate)}</span>
             </div>
             {cost.shippingUnknownCount > 0 && <div className="flex justify-between gap-3 text-amber-300">
               <span>Shipping still to verify:</span>
@@ -198,23 +209,19 @@ export const CostBomSummary: React.FC = () => {
             </div>}
             <div className="flex justify-between text-slate-400">
               <span>Import VAT Reserve (duty excl.):</span>
-              <span>R{cost.dutiesAndTaxesEstimate.toLocaleString()}</span>
+              <span>{formatBomZar(cost.dutiesAndTaxesEstimate)}</span>
             </div>
             {cost.customFabricationEstimate > 0 && (
               <div className="flex justify-between text-amber-300">
                 <span>Custom Machining/Fabrication:</span>
-                <span>R{cost.customFabricationEstimate.toLocaleString()}</span>
+                <span>{formatBomZar(cost.customFabricationEstimate)}</span>
               </div>
             )}
-            <div className="flex justify-between text-slate-400">
-              <span>Watchmaker Assembly & Regulation:</span>
-              <span>R{cost.watchmakerLabourEstimate.toLocaleString()}</span>
-            </div>
           </div>
 
           <div className="border-t border-slate-800 pt-2 flex justify-between font-mono font-bold text-slate-100 text-xs">
             <span>Committed Total:</span>
-            <span className="text-teal-400">R{cost.grandTotal.toLocaleString()}</span>
+            <span className="text-teal-400">{formatBomZar(cost.grandTotal)}</span>
           </div>
         </div>
       )}

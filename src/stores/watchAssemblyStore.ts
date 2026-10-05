@@ -34,6 +34,7 @@ export interface WatchAssemblyStoreState {
 
   // Assembly-level authoritative actions
   setAssembly: (assembly: WatchAssembly) => void;
+  setBomPartSelection: (group: string, partId: string) => void;
   updateMetadata: (patch: Partial<WatchAssemblyMetadata>) => void;
   updateGlobalDimensions: (patch: Partial<WatchAssemblyGlobalDimensions>) => void;
   resetAssembly: () => void;
@@ -120,6 +121,11 @@ export const useWatchAssemblyStore = create<WatchAssemblyStoreState>((set, get) 
 
   setAssembly: (assembly) => {
     set({ assembly, dirty: false });
+  },
+  setBomPartSelection: (group, partId) => {
+    if (!get().assembly.parts[partId]) return;
+    set(state => ({ assembly: { ...state.assembly, designConfig: { ...state.assembly.designConfig,
+      bomPartSelections: { ...state.assembly.designConfig?.bomPartSelections, [group]: partId } } }, dirty: true }));
   },
 
   selectReference42Preview: () => set((state) => ({

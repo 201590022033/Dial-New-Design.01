@@ -530,7 +530,8 @@ export class SvgRenderer implements RendererAdapter {
       .attr('data-part-category', 'hands')
       .attr('data-interaction-role', 'physical-part')
       .attr('data-z-layer', '700');
-    const handStyle = watchAssemblyToVisualModel(assembly).hands.style;
+    const visualHands = watchAssemblyToVisualModel(assembly).hands;
+    const handStyle = visualHands.style;
     handsLayer.attr('data-hand-style', handStyle);
     const drawHand = (group: ReturnType<typeof handsLayer.group>, angleDeg: number, lengthPx: number, widthPx: number) => {
       const handMetalColor = assembly.designConfig?.visualReferenceConfig?.handsColor ?? (assembly.designConfig?.visualReferenceConfig?.handsFinish === 'rose-gold' ? '#c08a76' : '#E2E8F0');
@@ -568,7 +569,7 @@ export class SvgRenderer implements RendererAdapter {
 
     // Hour Hand: 10:10 presentation angle ~ 305° (10 o'clock)
     const hourAngleDeg = 305;
-    const hourHandLengthPx = mmToPixels(10.2);
+    const hourHandLengthPx = mmToPixels(visualHands.hourLengthMm);
     const hourGroup = handsLayer
       .group()
       .id('part-hour-hand')
@@ -586,7 +587,7 @@ export class SvgRenderer implements RendererAdapter {
 
     // Minute Hand: 10:10 presentation angle ~ 60° (2 o'clock)
     const minuteAngleDeg = 60;
-    const minuteHandLengthPx = mmToPixels(13.6);
+    const minuteHandLengthPx = mmToPixels(visualHands.minuteLengthMm);
     const minuteGroup = handsLayer
       .group()
       .id('part-minute-hand')
@@ -604,7 +605,7 @@ export class SvgRenderer implements RendererAdapter {
 
     // Central Seconds Hand: angle ~ 210°, needle tip with accent color and counterweight disc
     const secondAngleDeg = 210;
-    const secondHandLengthPx = mmToPixels(14.2);
+    const secondHandLengthPx = mmToPixels(visualHands.secondLengthMm);
     const secondHandTip = polarToCartesian(secondHandLengthPx, secondAngleDeg);
     const secondTailTip = polarToCartesian(mmToPixels(3.5), secondAngleDeg + 180);
 
