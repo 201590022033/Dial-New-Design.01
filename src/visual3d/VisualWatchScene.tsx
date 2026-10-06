@@ -206,8 +206,20 @@ const PreviewStrap = ({ model, sign }: { model: VisualWatchModel; sign: number }
   const a = model.previewEnvelope.attachment;
   const geometry = useMemo(() => createPreviewStrapGeometry(a, sign), [a, sign]);
   useEffect(() => () => geometry.dispose(), [geometry]);
+  const style = model.archetypeAppearance.strapStyleId;
+  const surfaceZ = a.barZ + a.strapThickness / 2 + .04;
   return <group>
     <mesh castShadow geometry={geometry}><meshPhysicalMaterial {...physicalFinish(model.finishes.strap)} /></mesh>
+    {/* Presentation relief follows the scaled attachment, never a fixed 42mm strap. */}
+    {style === 'rubber' && Array.from({ length: 8 }, (_, i) => <mesh key={i} position={[0, sign * (a.barY + 7 + i * 3), surfaceZ]}>
+      <boxGeometry args={[a.strapWidth * .82, .55, .18]} /><meshStandardMaterial {...finish(model.finishes.strap)} />
+    </mesh>)}
+    {style !== 'rubber' && [-1, 1].flatMap(side => Array.from({ length: 18 }, (_, i) => <mesh key={`${side}-${i}`} position={[side * a.strapWidth * (.43 - i * .0035), sign * (a.barY + 5 + i * a.strapLength / 22), surfaceZ]}>
+      <boxGeometry args={[.18, .75, .10]} /><meshStandardMaterial color={style === 'canvas' ? '#b0ab80' : '#b39472'} roughness={.9} />
+    </mesh>))}
+    {style === 'racing' && Array.from({ length: 5 }, (_, i) => <mesh key={`recess-${i}`} position={[0, sign * (a.barY + 9 + i * 6), surfaceZ + .02]}>
+      <circleGeometry args={[Math.min(1.6, a.strapWidth * .11), 32]} /><meshStandardMaterial color="#080706" roughness={1} />
+    </mesh>)}
     <Cylinder axis="X" radius={a.bodyRadius} depth={a.gap - .2} position={[0, sign * a.barY, a.barZ]} material={model.finishes.crown} />
     <Cylinder axis="X" radius={a.tipRadius} depth={a.gap + 2 * a.tipEngagement} position={[0, sign * a.barY, a.barZ]} material={model.finishes.crown} />
   </group>;

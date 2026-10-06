@@ -147,6 +147,10 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
   const movement = movementLibrary.find((item) => item.id === assembly.metadata.movement);
   const visualReferences = assembly.designConfig?.visualReferenceConfig ?? {};
   const archetypeProfile = getArchetypeVisualProfile(visualReferences.archetypeId);
+  const effectiveStrapStyle = visualReferences.strapStyleId ?? archetypeProfile?.strapStyleId ?? 'rubber';
+  const effectiveStrapColor = visualReferences.strapStyleId
+    ? { rubber: '#080b10', leather: '#704536', canvas: '#77764b', racing: '#39251e' }[effectiveStrapStyle]
+    : archetypeProfile?.strapColor ?? '#080b10';
   const archetypeAssets: Partial<Record<VisualCategory, string>> = archetypeProfile ? {
     dial: archetypeProfile.dialAssetId,
     bezel: archetypeProfile.bezelAssetId,
@@ -178,7 +182,7 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
   const referenceIsCurrent = assembly.globalDimensions.caseDiameterMm === 42 && matchesReference42Parameters(assembly);
   for (const category of visualCategories) {
     const part = find(category);
-    const explicitOverride = visualReferences.componentAssetOverrides?.[category];
+    const explicitOverride = category === 'strap' && visualReferences.strapStyleId ? undefined : visualReferences.componentAssetOverrides?.[category];
     const id = explicitOverride ?? archetypeAssets[category] ?? part?.visual?.assetId ?? part?.customProperties?.visualAssetId;
     const fallbackId = category === 'hands' ? `visual-hands-${style === 'mercedes' ? 'mercedes' : 'baton'}` : `visual-${category}-default`;
     const resolved = resolveVisualAssetByCategory(typeof id === 'string' ? id : undefined, category, visualAssetRegistry[fallbackId]!);
@@ -191,9 +195,11 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
     assets[category] = resolved.assetId.startsWith('bezel-diamond-rose-gold-')
       ? { ...resolved, scale: [gemstoneScale, gemstoneScale, 1] }
       : diameterMatches ? resolved : visualAssetRegistry[fallbackId]!;
-    const strapFinish = visualReferences.strapStyleId === 'canvas' ? 'canvas' : visualReferences.strapStyleId === 'leather' || visualReferences.strapStyleId === 'racing' ? 'leather' : 'rubber';
+    const strapFinish = effectiveStrapStyle === 'canvas' ? 'canvas' : effectiveStrapStyle === 'leather' || effectiveStrapStyle === 'racing' ? 'leather' : 'rubber';
     const fallbackFinish: FinishProfileId = category === 'dial' ? 'dial' : category === 'crystal' ? 'sapphire' : category === 'strap' ? strapFinish : category === 'chapter-ring' ? 'black-pvd' : category === 'bezel' ? 'polished-steel' : 'brushed-steel';
-    finishes[category] = resolveFinishProfile(resolved.materialProfile ?? materialProfile(part, fallbackFinish), fallbackFinish);
+    finishes[category] = category === 'strap'
+      ? { ...resolveFinishProfile(strapFinish, strapFinish), color: effectiveStrapColor }
+      : resolveFinishProfile(resolved.materialProfile ?? materialProfile(part, fallbackFinish), fallbackFinish);
     // Legacy documents retain the main schematic; crown requires an actual part.
     visible[category] = part ? part.visible : category !== 'crown';
     transforms[category] = part?.visual?.transform;
@@ -359,10 +365,10 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
       bezelMetalColor: visualReferences.bezelFinish ? finishes.bezel.color : undefined,
       archetypeId: visualReferences.archetypeId,
       dialColor: effectiveDialColor,
-      strapColor: archetypeProfile?.strapColor ?? '#080b10',
+      strapColor: effectiveStrapColor,
       bezelColor: visualReferences.bezelId === 'bezel-gmt-24-hour' ? '#173e77' : visualReferences.bezelId === 'bezel-tachymeter' ? '#16191d' : visualReferences.bezelId === 'bezel-smooth' ? '#7f8791' : '#05080d',
       accentColor: assembly.selectedColorPalette.accent,
-      strapStyleId: visualReferences.strapStyleId ?? archetypeProfile?.strapStyleId ?? 'rubber',
+      strapStyleId: effectiveStrapStyle,
       dialTextureKind: dialTexture.kind,
       dialTextureIntensity: dialTexture.intensity,
       lumeEnabled: markerConfig.style.lumed,

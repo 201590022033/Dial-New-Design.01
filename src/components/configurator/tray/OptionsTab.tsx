@@ -181,6 +181,14 @@ export const OptionsTab: React.FC = () => {
     setPreview(provisional, activePartInstanceId, item);
   };
 
+  const handleApplyCandidate = (item: ComponentCatalogueItem) => {
+    if (!activePartInstanceId) return;
+    // Rebuild this exact option; never commit whichever card was last hovered.
+    const current = useWatchAssemblyStore.getState().assembly;
+    setPreview(applyCatalogueVisualSelection(current, activePartInstanceId, item), activePartInstanceId, item);
+    if (applyPreview()) useConfiguratorUIStore.getState().setArchetypePreview(null);
+  };
+
   const renderStatusBadge = (status: CompatibilityStatus) => {
     switch (status) {
       case 'green':
@@ -224,6 +232,7 @@ export const OptionsTab: React.FC = () => {
   return (
     <div className="flex flex-col h-full overflow-hidden p-3 gap-3" data-testid="options-tab">
       <Nh05PartShortcuts />
+      <p className="text-[10px] text-slate-400">Click to preview · double-click or press Enter to Apply. Compatibility checks and locks still apply.</p>
       <DialIndexOptions />
       {/* Search Header */}
       <div className="flex flex-col gap-1.5">
@@ -286,6 +295,15 @@ export const OptionsTab: React.FC = () => {
                     key={item.id}
                     onMouseEnter={() => handlePreviewCandidate(item)}
                     onClick={() => handlePreviewCandidate(item)}
+                    onDoubleClick={(event) => { if ((event.target as HTMLElement).closest('button')) return; handleApplyCandidate(item); }}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Preview or apply ${item.displayName}`}
+                    onKeyDown={(event) => {
+                      if (event.target !== event.currentTarget) return;
+                      if (event.key === 'Enter') { event.preventDefault(); handleApplyCandidate(item); }
+                      if (event.key === ' ') { event.preventDefault(); handlePreviewCandidate(item); }
+                    }}
                     data-candidate-id={item.id}
                     data-status={evaluation.status}
                     className={cn(
