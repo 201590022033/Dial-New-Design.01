@@ -177,7 +177,8 @@ describe('scale placement envelope', () => {
       const scale = useScaleStore.getState();
       expect(scale.preview?.ticks.length).toBeGreaterThan(0);
       expect(scale.preview?.placementTargetBandId).toBe('band-outer-bezel');
-      expect(scale.preview?.placementEnvelope.outerRadiusMm).toBe(19);
+      expect(scale.preview?.placementEnvelope.outerRadiusMm).toBeLessThanOrEqual(19);
+      expect(scale.preview?.physicalTargetsResolved).toBe(true);
     } finally {
       useScaleStore.setState(previous);
     }

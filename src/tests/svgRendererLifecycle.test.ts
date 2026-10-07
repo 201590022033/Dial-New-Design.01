@@ -7,7 +7,7 @@ import { runScalePlugin } from '@/services/scaleEngineService';
 
 const svg = vi.hoisted(() => {
   const node: Record<string, unknown> = { node: { setAttribute: vi.fn() } };
-  for (const method of ['addTo', 'size', 'clear', 'remove', 'group', 'id', 'attr', 'css', 'line', 'stroke', 'circle', 'polygon', 'center', 'fill', 'path', 'front', 'clip', 'add', 'clipWith', 'text', 'font', 'rotate']) {
+  for (const method of ['addTo', 'size', 'clear', 'remove', 'group', 'id', 'attr', 'css', 'line', 'stroke', 'circle', 'polygon', 'center', 'fill', 'path', 'front', 'clip', 'add', 'clipWith', 'text', 'font', 'rotate', 'svg']) {
     node[method] = vi.fn(() => node);
   }
   node.findOne = vi.fn(() => null);
@@ -71,7 +71,7 @@ describe('engineering renderer lifecycle', () => {
     const scalePreview = runScalePlugin('circular', { ...getScalePlugin('circular')!.defaultConfig, color: '#a37db5' }, { startAngleDeg: 0, endAngleDeg: 360 });
     renderer.mount({} as HTMLElement);
     renderer.renderBands([], context, { ...options, scalePreview });
-    expect(svg.stroke).toHaveBeenCalledWith(expect.objectContaining({ color: '#a37db5' }));
-    expect(svg.fill).toHaveBeenCalledWith('#a37db5');
+    expect(svg.svg).toHaveBeenCalledWith(expect.stringContaining('stroke="#a37db5"'));
+    expect(svg.svg).toHaveBeenCalledWith(expect.stringContaining('fill="#a37db5"'));
   });
 });

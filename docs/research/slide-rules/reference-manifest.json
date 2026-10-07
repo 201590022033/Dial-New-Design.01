@@ -1,0 +1,233 @@
+{
+  "schemaVersion": 1,
+  "reviewedOn": "2026-10-07",
+  "status": "partial-reference-inventory",
+  "runtimeUse": "research-only; not imported by application",
+  "gatePassed": false,
+  "references": [
+    {
+      "id": "citizen-jy8078-01l-2026-10-07",
+      "preset": "Citizen Skyhawk",
+      "layout": "JY8078-01L; Canada official front image, corroborated by exact-model Citizen Spain front image",
+      "model": "JY8078-01L",
+      "sources": [
+        {
+          "id": "citizen-ca-front",
+          "url": "https://www.citizenwatch.com/ca/en/product/JY8078-01L.html",
+          "kind": "manufacturer-product-page",
+          "use": "primary visual and model identity",
+          "imageUrl": "https://citizenwatch.widen.net/content/9m8mgrwkqb/webp/Promaster+Skyhawk+A-T.webp?u=41zuoe&width=500&height=625&quality=80&crop=false&keep=c&color=F9F8F6",
+          "imagePixels": [
+            500,
+            625
+          ]
+        },
+        {
+          "id": "citizen-es-front",
+          "url": "https://citizen.es/colecciones/radiocontrol/jy8078-01l/jy8078-01l/",
+          "imageUrl": "https://citizen.es/wp-content/uploads/2022/07/JY8078-01L.jpg",
+          "imagePixels": [
+            900,
+            900
+          ],
+          "kind": "manufacturer-product-page",
+          "use": "same exact-model artwork corroboration; perspective photograph, not engineering drawing"
+        },
+        {
+          "id": "citizen-th-front",
+          "url": "https://www.citizen.co.th/html/en/products/promaster/sky/jy8078-01l.html",
+          "imageUrl": "https://www.citizen.co.th/filebase2/022/003/0-510735-01e51ccb054533b18c2957fec39f92ae.png?md5=d84918b4b08b5dd321f0d498fa71eba2",
+          "imagePixels": [856, 1284],
+          "kind": "manufacturer-product-page",
+          "use": "exact-model corroboration inspected at native browser zoom; no HH:MM row on pictured fixed calculator ring; top hollow KM pointer separate from red RX on white strip; perspective photo, not metrology"
+        },
+        {
+          "id": "citizen-u680-model2",
+          "url": "https://www.citizenwatch-global.com/support/pdf/u680/e.pdf",
+          "kind": "manufacturer-operation-manual",
+          "viewerPages": [
+            82,
+            92
+          ],
+          "printedPages": [
+            81,
+            91
+          ],
+          "zeroBasedIndices": [
+            81,
+            91
+          ],
+          "sha256": "F28A518CEC3FDA139FF4C713DD824EAC7C623AACE1618F494BEC3B24315A00C8",
+          "use": "operation only; generic Model 2 is NOT the chosen artwork"
+        }
+      ],
+      "dimensions": {
+        "caseDiameterMm": 45,
+        "source": "citizen-ca-front",
+        "printableRingOuterDiameterMm": null,
+        "printableRingInnerDiameterMm": null,
+        "tickLengthsMm": null,
+        "ringWidthsMm": null
+      },
+      "features": {
+        "timeRow": {
+          "status": "absent-on-selected-model-photograph",
+          "present": false,
+          "evidence": "Native-size exact-model Citizen Thailand image corroborates Canada/Spain: fixed calculator number row has no HH:MM row. Generic U680 Model 2 diagrams do; they are not exact-model artwork. Absence refers to pictured front layout, not every U680 watch."
+        },
+        "seconds36": {
+          "status": "not-verified",
+          "present": null
+        },
+        "hourRateIndex": {
+          "value": 60,
+          "status": "operation-confirmed; model-specific caption/pointer relationship needs separation from KM and RX"
+        },
+        "innerUnitIndex": {
+          "value": 10,
+          "observedColour": "yellow"
+        }
+      },
+      "rejectedVisualSources": [
+        {
+          "url": "https://www.citizenwatch-global.com/promaster/assets/img/page/sky/blue_angels_model/design-1.jpg",
+          "reason": "Bracelet variant photograph with dark fixed graduation substrate/yellow distance pointers. Do not merge these colours with selected 01L white strip/red pointers."
+        },
+        {
+          "url": "https://www.citizenwatch-global.com/promaster/assets/img/page/sky/blue_angels_model/products-kv.png",
+          "reason": "Bracelet variant, no authority for exact-model artwork."
+        }
+      ],
+      "gaps": [
+        "Full independently counted tick/subdivision inventory on BOTH rings, including every interval boundary",
+        "Exact tick length/width and text baseline/cap-height radial gaps",
+        "Separate hour-rate, KM and radio RX geometry at top; do not classify RX/NO as calculator captions",
+        "If HH:MM is requested, provide a separate disclosed enhanced layout; selected JY8078 photo has no such row",
+        "Source colour specifications/font files unavailable; no exact hex or font claim",
+        "Physical printable annulus dimensions not supplied by case diameter"
+      ]
+    },
+    {
+      "id": "navitimer-booklet-training-disc-2026-10-07",
+      "preset": "Classic Navitimer",
+      "layout": "Coloured circular training-disc illustration on viewer page 2 of the exact user-selected booklet; NOT a named watch model",
+      "model": null,
+      "sources": [
+        {
+          "id": "nav-training-disc",
+          "url": "https://www.breitlingsource.com/images/manuals/slide-rule.pdf",
+          "kind": "scan-of-manufacturer-booklet-mirrored",
+          "viewerPage": 2,
+          "printedPage": null,
+          "pageSizePoints": [
+            600,
+            525
+          ],
+          "embeddedImagePixels": [
+            600,
+            525
+          ],
+          "sha256": "3DCF8EFF7382092F4A2883B9844D73EA70B89C27949A2C6F0FDF584063A014B0",
+          "use": "sole selected artwork; enlargement cannot recover missing pixels"
+        },
+        {
+          "id": "nav-booklet-operation",
+          "url": "https://www.breitlingsource.com/images/manuals/slide-rule.pdf",
+          "kind": "same-booklet-operational-text",
+          "viewerPages": [
+            7,
+            17
+          ],
+          "printedPageConvention": "even printed pages 6 to 26; each scan is one booklet page",
+          "use": "unit/hour indices, seconds reference and distance conversion"
+        },
+        {
+          "id": "nav-alternate-booklet",
+          "url": "https://manuals.plus/m/b6d5d1d60ac6235a1e6800bfdb207105500ca0e512cbff28d725cda7e780c948",
+          "pdfUrl": "https://manuals.plus/m/b6d5d1d60ac6235a1e6800bfdb207105500ca0e512cbff28d725cda7e780c948_optim.pdf",
+          "kind": "manufacturer-booklet-third-party-copy",
+          "sha256": "E02B5A14D1144B464ACB7BA927F00172A48115E86818B8C99DA1DE98B80D1D7F",
+          "bytes": 11955597,
+          "pageCount": 92,
+          "use": "manufacturer English operational text, viewer 10 / printed 16-17 confirms red KM pointer just right of MPH; 84x84 ring diagrams cannot resolve ticks; unrelated and duplicated material not used"
+        },
+        {
+          "id": "nav-aopa-1967",
+          "url": "https://www.breitlingsource.com/images/manuals/navitimer-aopa-1967-sliderule.pdf",
+          "kind": "manufacturer-booklet-collector-hosted-scan",
+          "sha256": "49296915CB7F4A2AA87812D9EB984223ACE9F657E0A787840A5F0F83417F3DA7",
+          "bytes": 1812422,
+          "pageCount": 10,
+          "use": "distinct classic watch layout, not selected training-disc artwork: cover and viewer 3-4 / printed 6-9 confirm additional HH:MM row; cannot import its rows/palette into selected disc"
+        },
+        {
+          "id": "nav-official-operation-index",
+          "url": "https://www.breitling.com/media/document/2/archive-archive-archive-archive-archive-archive-archive-archive-archive-archive-archive-archive-archive-navitimer_slide_rule.pdf",
+          "kind": "manufacturer-indexed-manual",
+          "use": "indexed operation corroboration only; direct PDF retrieval failed during review"
+        }
+      ],
+      "dimensions": {
+        "caseDiameterMm": null,
+        "discDiameterMm": null,
+        "printableRingOuterDiameterMm": null,
+        "printableRingInnerDiameterMm": null,
+        "tickLengthsMm": null
+      },
+      "features": {
+        "timeRow": {
+          "present": false,
+          "status": "not present on selected training-disc illustration; do not borrow a row from watch diagrams"
+        },
+        "seconds36": {
+          "present": true,
+          "status": "booklet viewer 12 / printed 16 explicitly defines fixed seconds index 36; selected disc shows red pointer with black 36"
+        },
+        "hourRateIndex": {
+          "value": 60,
+          "text": "MPH",
+          "status": "operation-confirmed; diagram physical angle not 12 o'clock in skewed photograph"
+        },
+        "innerUnitIndex": {
+          "value": 10,
+          "observedColour": "red"
+        },
+        "kilometrePointer": {
+          "colour": "red",
+          "relativePosition": "just right of MPH on fixed scale",
+          "status": "manufacturer-operation-confirmed; shape, physical anchor and exact ink remain unmeasured",
+          "sourceId": "nav-alternate-booklet"
+        }
+      },
+      "rejectedVisualSources": [
+        {
+          "viewerPages": [
+            3,
+            4
+          ],
+          "reason": "Black-and-white operational ring diagrams: not colour evidence for selected training-disc artwork; do not copy their different rows."
+        },
+        {
+          "reason": "Modern B01/Automatic 36/38/Navitimer World artwork not selected; not used to fill vintage gaps."
+        }
+      ],
+      "gaps": [
+        "600x525 source scan too small/skewed to prove EVERY tick count, width and anchor",
+        "Exact fixed conversion-group numerical anchor unresolved; relative ratios can be defined without guessing absolute placement",
+        "KM pointer red and just right of MPH confirmed; independent MPH pointer shape/colour and both measured anchors still need review",
+        "No original physical dimensions, ink hex specifications or font files",
+        "This is a clearly identified booklet illustration, not proof of a particular production watch model"
+      ]
+    }
+  ],
+  "rules": {
+    "sourceCoordinates": "Normalized [x,y,width,height] relative to complete source image unless page stated; broad region locators are not measured mark anchors.",
+    "confidence": "observed = visual transcription; operation-confirmed = manual; unverified = do not render as faithful.",
+    "angle": "degreeOffsetFromUnit = 360*log10(value/10), clockwise mathematically; reference origin remains separately verified; never use photographic angle to calibrate.",
+    "unknown": "null means unverified, not zero or absent",
+    "fontPolicy": "No exact font recovered. Measure actual substitute glyph bounds later; original artwork fidelity must disclose substitution.",
+    "exclusionPolicy": "Remove dedicated semantic weight/volume/fuel-oil annotations and pointers, retain coincident ordinary values and gaps.",
+    "colourPolicy": "Qualitative source observations only. No sampled hex is promoted to original ink specification.",
+    "acceptance": "Do not load this partial inventory into an Original/Faithful runtime preset."
+  }
+}

@@ -7,6 +7,7 @@ import { useScaleStore } from '@/stores/scaleStore';
 import { useSelectionStore } from '@/stores/selectionStore';
 import { useViewportStore } from '@/stores/viewportStore';
 import { useSourcingStore } from '@/stores/sourcingStore';
+import { scaleSnapshotFromAssembly, withScaleSnapshot } from '@/domain/scales/scaleDocumentAdapter';
 
 /**
  * Hydrates a runtime project into the canonical WatchAssembly store.
@@ -15,9 +16,10 @@ import { useSourcingStore } from '@/stores/sourcingStore';
  */
 export const hydrateRuntimeProject = (project: DialProjectFile): void => {
   // 1. Authoritative migration to WatchAssembly
-  const assembly = project.assembly
+  let assembly = project.assembly
     ? deserializeWatchAssembly(JSON.stringify(project.assembly))
     : migrateLegacyProjectToAssembly(project);
+  if (!scaleSnapshotFromAssembly(assembly) && project.scale.selectedScaleKind === 'slide-rule') assembly = withScaleSnapshot(assembly, project.scale);
   useWatchAssemblyStore.getState().setAssembly(assembly);
 
   // 2. If the persisted legacy project contains custom physical bands, preserve them in bandsStore
@@ -36,7 +38,7 @@ export const hydrateRuntimeProject = (project: DialProjectFile): void => {
   useSourcingStore.getState().resetSourcingPlan(assembly.metadata.id);
 
   // 4. Hydrate transient and specialized subsystems
-  useScaleStore.getState().hydrateScaleState(project.scale);
+  useScaleStore.getState().hydrateScaleState(scaleSnapshotFromAssembly(assembly) ?? project.scale);
   useViewportStore.setState({
     zoom: project.viewport.zoom,
     panX: project.viewport.panX,

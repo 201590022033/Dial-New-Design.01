@@ -74,6 +74,8 @@ export interface WatchAssemblyGlobalDimensions {
  * - Ring/dial geometry parameters
  */
 export interface WatchAssemblyDesignConfig {
+  /** M2 versioned per-target configuration; legacy rendering remains until shared artwork integration. */
+  slideRuleLayers?: import('@/domain/scales/slideRuleLayers').SlideRuleLayersDocument;
   /** One purchased component per mutually exclusive procurement slot. */
   bomPartSelections?: Record<string, string>;
   markerConfig?: MarkerEngineConfig;
@@ -140,6 +142,10 @@ export interface WatchAssembly {
   };
   templateId?: string;
   scaleBinding?: {
+    context?: import('@/domain/scales/types').ScaleMathContext;
+    previewEnabled?: boolean;
+    crossArchetypeUnlocked?: boolean;
+    archetypeId?: string;
     scaleKind: string;
     assignedPartId?: string;
     config: Record<string, unknown>;

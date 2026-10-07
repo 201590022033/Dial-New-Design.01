@@ -10,6 +10,7 @@ import type { TemplateId } from '@/domain/generators/templateLibrary';
 import { createDefaultWatchAssembly, WATCH_ASSEMBLY_VERSION } from './assemblyFactory';
 import { assemblyToBands } from './assemblyAdapters';
 import type { WatchAssembly } from './assemblyTypes';
+import { assertSlideRuleLayers, migrateSimplifiedLayer } from '@/domain/scales/slideRuleLayers';
 
 const BANNED_TRANSIENT_KEYS = [
   'zoom',
@@ -60,6 +61,7 @@ export const assertNoTransientState = (data: unknown): void => {
  */
 export const serializeWatchAssembly = (assembly: WatchAssembly): string => {
   assertNoTransientState(assembly);
+  if (assembly.designConfig?.slideRuleLayers) assertSlideRuleLayers(assembly.designConfig.slideRuleLayers);
 
   const cleanDocument: WatchAssembly = {
     version: assembly.version || WATCH_ASSEMBLY_VERSION,
@@ -118,6 +120,7 @@ export const deserializeWatchAssembly = (jsonString: string): WatchAssembly => {
 
   // Ensure no transient state was injected
   assertNoTransientState(raw);
+  if (raw.designConfig?.slideRuleLayers) assertSlideRuleLayers(raw.designConfig.slideRuleLayers);
 
   return raw as WatchAssembly;
 };
@@ -166,6 +169,9 @@ export const migrateLegacyProjectToAssembly = (legacy: DialProjectFile): WatchAs
       config: legacy.scale.pluginConfig as unknown as Record<string, unknown>
     },
     designConfig: {
+      ...(legacy.scale.selectedScaleKind === 'slide-rule' ? {
+        slideRuleLayers: migrateSimplifiedLayer(legacy.scale, legacy.bands.find((band) => band.kind === 'chapter-ring')?.id ?? null)
+      } : {}),
       markerConfig: legacy.design.markerConfig,
       typographyConfig: legacy.design.typographyConfig,
       textureConfig: legacy.design.textureConfig,

@@ -8,6 +8,7 @@ import type { WatchAssembly } from '@/domain/assembly/assemblyTypes';
 import type { TemplateId } from '@/domain/generators/templateLibrary';
 import { useScaleStore } from './scaleStore';
 import { getMovementDesignRecommendations } from '@/services/movementRecommendationService';
+import { scaleSnapshotFromAssembly } from '@/domain/scales/scaleDocumentAdapter';
 
 let isSyncing = false;
 
@@ -40,14 +41,16 @@ export const syncAssemblyDownstream = (assembly: WatchAssembly): void => {
     const bands = assemblyToBands(assembly);
     useBandsStore.setState({ bands });
     useScaleStore.getState().syncArchetypeScale(assembly.designConfig?.visualReferenceConfig?.archetypeId, bands);
+    const savedScale = scaleSnapshotFromAssembly(assembly);
+    if (savedScale) useScaleStore.getState().hydrateScaleState(savedScale);
     const scale = useScaleStore.getState();
     const targetBand = bands.find((band) => band.id === scale.pluginConfig.placementTargetBandId);
-    if (targetBand && (
+    if (!savedScale && targetBand && (
       scale.pluginConfig.bandInnerRadiusMm !== targetBand.geometry.innerRadius ||
       scale.pluginConfig.bandOuterRadiusMm !== targetBand.geometry.outerRadius
     )) {
       scale.syncFromBand(targetBand, useGlobalSettingsStore.getState().minimumLineWidthMm);
-    } else if (!scale.preview && scale.previewEnabled && !scale.activeArchetypeId && scale.selectedScaleKind === 'circular') {
+    } else if ((!scale.preview || !targetBand) && scale.previewEnabled && !scale.activeArchetypeId && scale.selectedScaleKind === 'circular') {
       // The initial UI advertises the diver program before a user selects an
       // archetype. Build its preview against the current bezel on first load.
       scale.applyScaleProgram('diver', bands);
@@ -98,9 +101,18 @@ export const syncAssemblyDownstream = (assembly: WatchAssembly): void => {
 };
 
 // Wire the listener immediately to watchAssemblyStore mutations
-useWatchAssemblyStore.subscribe((state) => {
-  syncAssemblyDownstream(state.assembly);
+useWatchAssemblyStore.subscribe((state, previous) => {
+  if (state.assembly !== previous.assembly) syncAssemblyDownstream(state.assembly);
 });
 
 // Run initial sync on load
 syncAssemblyDownstream(useWatchAssemblyStore.getState().assembly);
+
+useScaleStore.subscribe((state, previous) => {
+  if (isSyncing || (state.pluginConfig === previous.pluginConfig && state.context === previous.context &&
+    state.selectedScaleKind === previous.selectedScaleKind && state.previewEnabled === previous.previewEnabled && state.crossArchetypeUnlocked === previous.crossArchetypeUnlocked)) return;
+  useWatchAssemblyStore.getState().setScaleSnapshot({ selectedScaleKind: state.selectedScaleKind,
+    pluginConfig: state.pluginConfig, context: state.context, previewEnabled: state.previewEnabled, crossArchetypeUnlocked: state.crossArchetypeUnlocked },
+    { selectedScaleKind: previous.selectedScaleKind, pluginConfig: previous.pluginConfig, context: previous.context,
+      previewEnabled: previous.previewEnabled, crossArchetypeUnlocked: previous.crossArchetypeUnlocked });
+});

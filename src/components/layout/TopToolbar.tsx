@@ -165,8 +165,9 @@ export const TopToolbar = () => {
         accept=".dial,application/json"
         className="hidden"
         onChange={(event) => {
+          const input = event.currentTarget;
           void (async () => {
-            const file = event.target.files?.[0];
+            const file = input.files?.[0];
             if (!file) {
               return;
             }
@@ -174,7 +175,7 @@ export const TopToolbar = () => {
             const text = await file.text();
             await openProjectFile(file);
             applyProjectPayload(text);
-            event.currentTarget.value = '';
+            input.value = '';
           })();
         }}
       />
@@ -185,15 +186,16 @@ export const TopToolbar = () => {
         accept=".dial,application/json"
         className="hidden"
         onChange={(event) => {
+          const input = event.currentTarget;
           void (async () => {
-            const file = event.target.files?.[0];
+            const file = input.files?.[0];
             if (!file) {
               return;
             }
             const text = await file.text();
             historyPush(exportProjectJson());
             applyProjectPayload(text);
-            event.currentTarget.value = '';
+            input.value = '';
           })();
         }}
       />

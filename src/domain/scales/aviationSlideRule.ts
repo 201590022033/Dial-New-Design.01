@@ -1,5 +1,7 @@
 import type { ScaleLabel, ScalePluginConfig, ScaleTick } from '@/domain/scales/types';
-import { styleScaleTicks } from './markingStyle';
+import { resolvedScaleSvg } from './resolvedScaleArtwork';
+import { runScalePlugin } from '@/services/scaleEngineService';
+import { logDecadeAngle } from './calibratedSlideRule';
 
 export type AviationCalculation = 'time' | 'distance' | 'groundspeed' | 'fuel-used' | 'endurance';
 
@@ -25,9 +27,7 @@ export const calculateAviation = (mode: AviationCalculation, first: number, seco
 // One decade is repeated around the watch. Pilots supply the order of magnitude,
 // just as on a conventional E6B circular calculator.
 export const aviationAngle = (value: number): number => {
-  if (!Number.isFinite(value) || value <= 0) return Number.NaN;
-  const decade = ((Math.log10(value / 10) % 1) + 1) % 1;
-  return 360 * decade;
+  return logDecadeAngle(value);
 };
 
 export const aviationBezelAlignment = (mode: AviationCalculation, first: number, second: number): number => {
@@ -90,27 +90,9 @@ export const generateAviationRings = (config: ScalePluginConfig): { ticks: Scale
   return { ticks, labels: ['outer', 'inner'].flatMap((ringId) => separatedLabels(labels.filter((label) => label.ringId === ringId), scaleFontSizeMm(config))) };
 };
 
-const escapeXml = (value: string): string => value.replace(/[<>&"']/g, (character) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&apos;' })[character] ?? character);
-
-// Marking artwork only; no case, dial, gasket, or cutting paths are implied.
+// Compatibility helper explicitly requests home alignment; the live panel
+// exports its current resolved preview instead. Both use the same resolver.
 export const createAviationRingSvg = (config: ScalePluginConfig, ringId: 'outer' | 'inner', caseDiameterMm: number): string => {
-  const homeConfig = { ...config, outerRotationOffsetDeg: 0, innerRotationOffsetDeg: 0 };
-  const generated = generateAviationRings(homeConfig);
-  const ticks = styleScaleTicks(generated.ticks, homeConfig);
-  const labels = generated.labels;
-  const polar = (radius: number, angle: number) => {
-    const radians = (angle - 90) * Math.PI / 180;
-    return `${(radius * Math.cos(radians)).toFixed(4)},${(radius * Math.sin(radians)).toFixed(4)}`;
-  };
-  const lines = ticks.filter((tick) => tick.ringId === ringId).map((tick) => {
-    const [x1, y1] = polar(tick.radiusMm, tick.angleDeg).split(',');
-    const [x2, y2] = polar(tick.radiusMm - tick.lengthMm, tick.angleDeg).split(',');
-    return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#000" stroke-width="${tick.widthMm}"/>`;
-  }).join('');
-  const text = labels.filter((label) => label.ringId === ringId).map((label) => {
-    const [x, y] = polar(label.radiusMm, label.angleDeg).split(',');
-    return `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" font-family="${escapeXml(config.fontFamily)}" font-size="${scaleFontSizeMm(config)}" fill="#000">${escapeXml(label.text)}</text>`;
-  }).join('');
-  const half = caseDiameterMm / 2;
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${caseDiameterMm}mm" height="${caseDiameterMm}mm" viewBox="${-half} ${-half} ${caseDiameterMm} ${caseDiameterMm}" data-ring="${ringId}" data-units="mm"><title>Aviation slide rule ${ringId === 'outer' ? 'rotating bezel' : 'fixed chapter ring'} marking artwork</title><desc>Scale markings only. Preview geometry; verify material, font outlines, radial fit and engraving process before manufacture.</desc><g id="${ringId}-markings">${lines}${text}</g></svg>`;
+  const preview = runScalePlugin('slide-rule', { ...config, outerRotationOffsetDeg: 0, innerRotationOffsetDeg: 0 }, { startAngleDeg: 0, endAngleDeg: 360 });
+  return preview ? resolvedScaleSvg(preview, caseDiameterMm, ringId).replace('<title>', `<g id="${ringId}-markings"></g><title>`) : '';
 };

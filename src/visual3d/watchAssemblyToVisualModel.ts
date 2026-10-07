@@ -148,9 +148,12 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
   const visualReferences = assembly.designConfig?.visualReferenceConfig ?? {};
   const archetypeProfile = getArchetypeVisualProfile(visualReferences.archetypeId);
   const effectiveStrapStyle = visualReferences.strapStyleId ?? archetypeProfile?.strapStyleId ?? 'rubber';
-  const effectiveStrapColor = visualReferences.strapStyleId
-    ? { rubber: '#080b10', leather: '#704536', canvas: '#77764b', racing: '#39251e' }[effectiveStrapStyle]
-    : archetypeProfile?.strapColor ?? '#080b10';
+  // Archetype selection also writes strapStyleId, so its presence alone does
+  // not mean the user picked a different strap. Keep the archetype palette
+  // for its default style, including when switching back after an override.
+  const effectiveStrapColor = archetypeProfile?.strapStyleId === effectiveStrapStyle
+    ? archetypeProfile.strapColor
+    : { rubber: '#080b10', leather: '#704536', canvas: '#77764b', racing: '#39251e' }[effectiveStrapStyle];
   const archetypeAssets: Partial<Record<VisualCategory, string>> = archetypeProfile ? {
     dial: archetypeProfile.dialAssetId,
     bezel: archetypeProfile.bezelAssetId,

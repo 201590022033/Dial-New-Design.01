@@ -11,6 +11,7 @@ import { CentreCanvas } from '@/components/layout/CentreCanvas';
 import { evaluateCollisions } from '@/domain/geometry/collisionEngine';
 import { materialById } from '@/domain/materials/materialLibrary';
 import { hydrateRuntimeProject } from '@/services/runtimeProjectHydrationService';
+import { clearScaleEngineCache } from '@/services/scaleEngineService';
 import { useWatchAssemblyStore } from '@/stores/watchAssemblyStore';
 import {
   useBandsStore,
@@ -169,6 +170,11 @@ export const App = () => {
 
   useEffect(() => {
     regenerateScalePreview();
+    let active = true;
+    void document.fonts.ready.then(() => {
+      if (active) { clearScaleEngineCache(); regenerateScalePreview(); }
+    });
+    return () => { active = false; };
   }, [regenerateScalePreview]);
 
   useEffect(() => {

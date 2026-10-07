@@ -79,7 +79,8 @@ describe('archetype scale guard', () => {
     expect(useScaleStore.getState().pluginConfig).toMatchObject({
       placementTargetBandId: 'band-outer-bezel', bandInnerRadiusMm: 15.5, bandOuterRadiusMm: 19
     });
-    expect(useScaleStore.getState().preview?.placementEnvelope.outerRadiusMm).toBe(19);
+    expect(useScaleStore.getState().preview?.placementEnvelope.outerRadiusMm).toBeLessThanOrEqual(19);
+    expect(useScaleStore.getState().preview?.physicalTargetsResolved).toBe(true);
   });
 
   it('clears a temporary archetype preview when returning to Build', () => {

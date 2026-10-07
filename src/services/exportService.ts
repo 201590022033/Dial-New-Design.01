@@ -4,7 +4,6 @@ import {
   estimateOutputSize,
   generateEngineeringSvg,
   generatePseudoDxf,
-  generatePseudoPdf,
   type EngineeringExportInput,
   type EngineeringExportTarget,
   type ExportMetadata
@@ -101,14 +100,16 @@ const rasterizeSvgToPngBlob = async (svgMarkup: string): Promise<Blob> => {
     });
 
     const canvas = document.createElement('canvas');
-    canvas.width = Math.max(1, image.width || 1200);
-    canvas.height = Math.max(1, image.height || 1200);
+    const svg = new DOMParser().parseFromString(svgMarkup, 'image/svg+xml').documentElement;
+    const viewBox = (svg.getAttribute('viewBox') ?? '').split(/\s+/).map(Number);
+    canvas.width = Math.max(1, viewBox[2] || image.width || 1200);
+    canvas.height = Math.max(1, viewBox[3] || image.height || 1200);
     const context = canvas.getContext('2d');
     if (!context) {
       throw new Error('Canvas context unavailable for PNG export.');
     }
 
-    context.drawImage(image, 0, 0);
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
 
     const pngBlob = await new Promise<Blob>((resolve, reject) => {
       canvas.toBlob((blob) => {
@@ -127,13 +128,18 @@ const rasterizeSvgToPngBlob = async (svgMarkup: string): Promise<Blob> => {
 };
 
 export const exportByFormat = async (request: ExtendedExportRequest): Promise<void> => {
-  const payload = request.metadata
+  const payload = request.metadata && request.format === 'svg'
     ? `${request.content}\n<!-- metadata: ${JSON.stringify(request.metadata)} -->`
     : request.content;
 
   if (request.format === 'png') {
     const pngBlob = await rasterizeSvgToPngBlob(request.content);
     exportBlob(pngBlob, request.filename);
+    return;
+  }
+  if (request.format === 'pdf') {
+    const { engineeringSvgToPdfBlob } = await import('./vectorPdfService');
+    exportBlob(await engineeringSvgToPdfBlob(request.content), request.filename);
     return;
   }
 
@@ -193,9 +199,7 @@ export const buildEngineeringExport = (request: EngineeringExportRequest): {
       ? svg
       : request.format === 'dxf'
         ? generatePseudoDxf(baseInput)
-        : request.format === 'pdf'
-          ? generatePseudoPdf(svg)
-          : svg;
+        : svg;
 
   const preview = buildExportPreviewSummary({
     target: request.target,

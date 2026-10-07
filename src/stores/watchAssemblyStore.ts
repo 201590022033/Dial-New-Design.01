@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { withScaleSnapshot } from '@/domain/scales/scaleDocumentAdapter';
 import {
   createDefaultWatchAssembly,
   type WatchAssembly,
@@ -62,6 +63,7 @@ export interface WatchAssemblyStoreState {
   updateDialFaceConfig: (patch: Partial<DialFaceConfig>) => void;
   updateVisualReferenceConfig: (patch: NonNullable<WatchAssembly['designConfig']>['visualReferenceConfig']) => void;
   updateTextureConfig: (patch: Partial<TextureEngineConfig>) => void;
+  setScaleSnapshot: (snapshot: import('@/domain/scales/scaleDocumentAdapter').ScaleSnapshot, previous?: import('@/domain/scales/scaleDocumentAdapter').ScaleSnapshot) => void;
   applyTemplate: (templateId: TemplateId, colors?: { primary: string; secondary: string; accent: string }) => void;
 
   // Band authoritative write paths
@@ -121,6 +123,18 @@ export const useWatchAssemblyStore = create<WatchAssemblyStoreState>((set, get) 
 
   setAssembly: (assembly) => {
     set({ assembly, dirty: false });
+  },
+  setScaleSnapshot: (snapshot, previous) => {
+    // A legacy assembly has no scale binding yet. Its first edit must still
+    // have an undoable baseline, not restore an assembly with no scale state.
+    restoringAssemblyHistory = true;
+    try {
+      set((state) => {
+        const baseline = previous ? withScaleSnapshot(state.assembly, previous) : state.assembly;
+        return { assembly: withScaleSnapshot(baseline, snapshot), dirty: true,
+          historyPast: [...state.historyPast, cloneAssembly(baseline)].slice(-50), historyFuture: [] };
+      });
+    } finally { restoringAssemblyHistory = false; }
   },
   setBomPartSelection: (group, partId) => {
     if (!get().assembly.parts[partId]) return;

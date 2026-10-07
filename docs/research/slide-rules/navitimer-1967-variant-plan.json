@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "referenceId": "navitimer-aopa-1967-cover-layout",
+  "status": "separate-layout-planned-not-runtime-enabled",
+  "selectedTrainingDiscReplaced": false,
+  "sourceUrl": "https://www.breitlingsource.com/images/manuals/navitimer-aopa-1967-sliderule.pdf",
+  "sha256": "49296915CB7F4A2AA87812D9EB984223ACE9F657E0A787840A5F0F83417F3DA7",
+  "identity": "Manufacturer AOPA booklet dated 1967 by archive identity; use its cover illustration as one distinct layout, not proof of a named production reference number",
+  "timeRow": {
+    "present": true,
+    "evidence": "Cover and viewer 3-4 / printed 6-9",
+    "confirmedSampleLabels": ["1:10", "1:20", "1:30", "2:30", "3:00"],
+    "actualMinutes": [70, 80, 90, 150, 180],
+    "completeGraduationInventory": false
+  },
+  "graduationReview": [
+    {
+      "row": "outer",
+      "fromValue": 12,
+      "toValue": 13,
+      "sourceViewerPage": 1,
+      "sourceRegion": [0.46, 0.02, 0.11, 0.27],
+      "observedIntervalCount": 5,
+      "status": "provisional-manual-visual-count-not-accepted-graduation-table",
+      "observation": "Four intermediate strokes appear between labelled endpoint strokes in rendered cover detail; do not infer all other sectors from this one",
+      "underlyingIntermediateValues": null,
+      "measuredWidthsAndLengths": null,
+      "needsIndependentCorroboration": true
+    }
+  ],
+  "colourObservations": {
+    "outerSubstrate": "light",
+    "outerNumbers": "dark",
+    "innerSubstrate": "dark",
+    "innerNumbersAndTimeText": "light",
+    "inkHex": null
+  },
+  "gatePassed": false,
+  "implementationSteps": [
+    "Independently transcribe full outer, fixed and HH:MM rows from this cover; obtain clearer original before claiming tick widths, lengths or complete counts",
+    "Verify rate/KM/NAUT/STAT/seconds identities and source-specific pointer/text colours; never borrow red training-disc roles",
+    "Bind a distinct reference ID under Navitimer with its own immutable defaults; changing reference is explicit, not migration",
+    "Use M2 fixed time group, actual minute values, per-mark palette and per-target annulus checks",
+    "Keep all dedicated weight/volume/fuel-oil conversion annotations excluded; retain ordinary coincident values",
+    "Acceptance in Engineering, HD and vector export before enabling faithful preset"
+  ],
+  "glbRequirement": "No new GLB per scale layout; existing physical print surfaces consume shared live artwork after M2 integration"
+}

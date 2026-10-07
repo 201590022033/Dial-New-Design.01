@@ -10,7 +10,9 @@ export const scaleArtworkClipEnvelope = (
   ring: ScaleArtworkRing
 ) => {
   const target = preview.placementEnvelope;
+  if (preview.physicalTargetsResolved) return ring === 'inner' ? preview.fixedPlacementEnvelope ?? target : target;
   if (ring === 'inner' && preview.kind === 'slide-rule') {
+    if (preview.fixedPlacementEnvelope) return preview.fixedPlacementEnvelope;
     return {
       innerRadiusMm: Math.max(model.chapterRingEnvelope.innerRadiusMm, model.assets['chapter-ring'].scaleArtworkInnerRadiusMm ?? 0),
       outerRadiusMm: Math.min(model.chapterRingEnvelope.outerRadiusMm, model.assets['chapter-ring'].scaleArtworkOuterRadiusMm ?? Number.POSITIVE_INFINITY)
@@ -32,6 +34,7 @@ export const scaleArtworkRadialShiftMm = (
   model: VisualWatchModel,
   ring: ScaleArtworkRing
 ): number => {
+  if (preview.physicalTargetsResolved || preview.fixedPlacementEnvelope) return 0;
   if (preview.kind === 'slide-rule') {
     const ticks = preview.ticks.filter((tick) => tick.ringId === ring);
     const clip = scaleArtworkClipEnvelope(preview, model, ring);
@@ -50,9 +53,12 @@ export const scaleArtworkRadialShiftMm = (
     : 0;
 };
 
-export const scaleArtworkSurfaceZ = (model: VisualWatchModel, ring: ScaleArtworkRing): number => {
+export const scaleArtworkSurfaceZ = (model: VisualWatchModel, ring: ScaleArtworkRing, preview?: ScaleRunResult): number => {
   const envelope = model.previewEnvelope;
-  if (ring === 'inner') return envelope.chapterZ + 0.7 + 0.008;
+  const target = ring === 'inner' ? preview?.fixedPlacementTargetBandId : preview?.placementTargetBandId;
+  if (target === 'band-dial-face') return envelope.dialZ + model.dial.thicknessMm / 2 + 0.008;
+  if (target === 'band-chapter-ring') return envelope.chapterZ + 0.708;
+  if (ring === 'inner' && !target) return envelope.chapterZ + 0.7 + 0.008;
   // Authored inserts and raised pip/scale details extend above the carrier.
   // The procedural insert also sits 0.08 mm above its carrier top.
   const faceOffset = model.assets.bezel.scaleArtworkFaceOffsetMm ?? envelope.bezelHeight / 2 + 0.08;

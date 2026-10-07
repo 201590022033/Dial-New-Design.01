@@ -72,6 +72,21 @@ describe('design engines', () => {
     expect(result[0]?.fontFamily.length).toBeGreaterThan(0);
   });
 
+  it.each(['straight', 'horizontal'] as const)('keeps %s captions in a single text run instead of stacking glyphs', (layout) => {
+    const result = generateTypographyLayout({
+      ...defaultTypographyConfig,
+      content: 'FLIEGER',
+      layout,
+      radiusMm: 7.2,
+      angleStartDeg: -38
+    });
+
+    expect(result).toHaveLength(1);
+    expect(result[0]).toMatchObject({
+      text: 'FLIEGER', orientation: 'horizontal', radiusMm: 7.2, angleDeg: -38
+    });
+  });
+
   it('resolves implemented texture plugin', () => {
     const plugin = resolveTexturePlugin('matte');
     expect(plugin).not.toBeNull();

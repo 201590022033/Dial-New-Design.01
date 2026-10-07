@@ -2,6 +2,8 @@ import type { BandEntity } from '@/domain/bands/types';
 import type { RenderContext } from '@/renderer/types';
 import type { ScaleRunResult } from '@/services/scaleEngineService';
 import type { DesignOverlay } from '@/renderer/types';
+import { scaleArtworkLayers, scaleArtworkSvgContent, scaleLabelRotation, scaleTickRadii } from '@/domain/scales/resolvedScaleArtwork';
+import { scalePointerRotation, scalePointerVertices } from '@/domain/scales/pointerGeometry';
 
 export interface ExportMetadata {
   projectName?: string;
@@ -53,6 +55,7 @@ const buildCacheKey = (input: EngineeringExportInput): string => {
     scale: input.scalePreview
       ? {
           kind: input.scalePreview.kind,
+          artwork: input.scalePreview.svg,
           ticks: input.scalePreview.ticks,
           labels: input.scalePreview.labels
         }
@@ -121,7 +124,8 @@ const renderOverlaySvg = (
   scalePreview: ScaleRunResult | null,
   centerX: number,
   centerY: number,
-  target: EngineeringExportTarget
+  target: EngineeringExportTarget,
+  selectedBandId: string | null
 ): string => {
   const markerLines = (overlay?.markers ?? [])
     .map((entry) => {
@@ -145,41 +149,9 @@ const renderOverlaySvg = (
     })
     .join('');
 
-  const includeMark = (ringId?: 'outer' | 'inner') => {
-    if (scalePreview?.kind !== 'slide-rule') return true;
-    if (target === 'outer-bezel') return ringId === 'outer';
-    if (target === 'chapter-ring' || target === 'inner-bezel') return ringId === 'inner';
-    return true;
-  };
-  const ticks = scalePreview
-    ? scalePreview.ticks.filter((tick) => includeMark(tick.ringId))
-        .map((tick) => {
-          const start = polarToCartesianPx(tick.radiusMm, tick.angleDeg);
-          const end = polarToCartesianPx(
-            tick.direction === 'inside' ? tick.radiusMm - tick.lengthMm : tick.radiusMm + tick.lengthMm,
-            tick.angleDeg
-          );
-          return svgLine(
-            centerX + start.x,
-            centerY + start.y,
-            centerX + end.x,
-            centerY + end.y,
-            '#F59E0B',
-            Math.max(1, tick.widthMm * 10)
-          );
-        })
-        .join('')
-    : '';
-
-  const scaleLabels = scalePreview
-    ? scalePreview.labels.filter((label) => includeMark(label.ringId)).map((label) => {
-      const point = polarToCartesianPx(label.radiusMm, label.angleDeg);
-      const safeText = label.text.replace(/[<>&"']/g, (character) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&apos;' })[character] ?? character);
-      const safeFamily = scalePreview.fontFamily.replace(/[<>&"']/g, (character) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&apos;' })[character] ?? character);
-      return `<text x="${centerX + point.x}" y="${centerY + point.y}" fill="#E2E8F0" font-size="${scalePreview.fontSizeMm * 10}" text-anchor="middle" dominant-baseline="central" font-family="${safeFamily}">${safeText}</text>`;
-    }).join('') : '';
-
-  return `<g id="engineering-overlay">${markerLines}${text}${ticks}${scaleLabels}</g>`;
+  const targetBand = target === 'selected-band' ? selectedBandId : { 'dial-face': 'band-dial-face', 'chapter-ring': 'band-chapter-ring', 'inner-bezel': 'band-inner-bezel', 'outer-bezel': 'band-outer-bezel' }[target as string];
+  const artwork = scalePreview ? scaleArtworkSvgContent(scalePreview, 10, centerX, centerY, undefined, targetBand ?? undefined, false) : '';
+  return `<g id="engineering-overlay">${markerLines}${text}${artwork}</g>`;
 };
 
 const renderMetadataComment = (metadata?: ExportMetadata): string => {
@@ -191,6 +163,7 @@ const renderMetadataComment = (metadata?: ExportMetadata): string => {
 };
 
 export const generateEngineeringSvg = (input: EngineeringExportInput): string => {
+  if (input.scalePreview && !input.scalePreview.validation.valid) throw new Error('Scale artwork cannot fit its physical targets. Correct the scale-envelope errors before exporting.');
   const cacheKey = buildCacheKey(input);
   const cached = exportSvgCache.get(cacheKey);
   if (cached) {
@@ -204,9 +177,9 @@ export const generateEngineeringSvg = (input: EngineeringExportInput): string =>
   const centerY = height / 2;
 
   const content = renderBandGeometrySvg(scoped, centerX, centerY);
-  const overlays = renderOverlaySvg(input.designOverlay, input.scalePreview, centerX, centerY, input.target);
+  const overlays = renderOverlaySvg(input.designOverlay, input.scalePreview, centerX, centerY, input.target, input.selectedBandId);
 
-  const result = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">${renderMetadataComment(input.metadata)}${content}${overlays}</svg>`;
+  const result = `<svg xmlns="http://www.w3.org/2000/svg" width="${width / 10}mm" height="${height / 10}mm" viewBox="0 0 ${width} ${height}">${renderMetadataComment(input.metadata)}${content}${overlays}</svg>`;
   exportSvgCache.set(cacheKey, result);
   if (exportSvgCache.size > 30) {
     const firstKey = exportSvgCache.keys().next().value;
@@ -219,7 +192,36 @@ export const generateEngineeringSvg = (input: EngineeringExportInput): string =>
 };
 
 export const generatePseudoDxf = (input: EngineeringExportInput): string => {
+  if (input.scalePreview && !input.scalePreview.validation.valid) throw new Error('Scale artwork cannot fit its physical targets. Correct the scale-envelope errors before exporting.');
   const scoped = scopeBands(input);
+  const preview = input.scalePreview;
+  const targetBand = input.target === 'selected-band' ? input.selectedBandId : { 'dial-face': 'band-dial-face', 'chapter-ring': 'band-chapter-ring', 'inner-bezel': 'band-inner-bezel', 'outer-bezel': 'band-outer-bezel' }[input.target as string];
+  const point = (radius: number, angle: number) => [radius * Math.sin(angle * Math.PI / 180), radius * Math.cos(angle * Math.PI / 180)];
+  const colour = (hex: string) => String(/^#[0-9a-f]{6}$/i.test(hex) ? parseInt(hex.slice(1), 16) : 0xffffff);
+  const marks = preview ? scaleArtworkLayers(preview).flatMap((layer) => {
+    const include = (ring?: 'outer' | 'inner') => !targetBand || targetBand === (ring === 'inner' ? layer.fixedPlacementTargetBandId ?? 'band-chapter-ring' : layer.placementTargetBandId ?? 'band-outer-bezel');
+    return [
+    ...layer.ticks.filter((tick) => include(tick.ringId)).flatMap((tick) => {
+      const [start, end] = scaleTickRadii(tick), [x1, y1] = point(start, tick.angleDeg), [x2, y2] = point(end, tick.angleDeg);
+      return ['0', 'LWPOLYLINE', '8', `scale-${tick.ringId ?? 'outer'}`, '420', colour(tick.color ?? preview.color), '90', '2', '70', '0', '43', String(tick.widthMm), '10', String(x1), '20', String(y1), '10', String(x2), '20', String(y2)];
+    }),
+    ...layer.labels.filter((label) => include(label.ringId)).flatMap((label) => {
+      const [x, y] = point(label.radiusMm, label.angleDeg);
+      return ['0', 'TEXT', '8', `scale-${label.ringId ?? 'outer'}`, '420', colour(label.color ?? layer.color), '10', String(x), '20', String(y), '11', String(x), '21', String(y), '40', String(layer.fontSizeMm), '50', String(-scaleLabelRotation(label)), '72', '1', '73', '2', '1', label.text.replace(/[\r\n]/g, ' ')];
+    }),
+    ...(layer.pointers ?? []).filter((pointer) => include(pointer.ringId)).flatMap((pointer) => {
+      const [x,y] = point(pointer.radiusMm, pointer.angleDeg), angle = scalePointerRotation(pointer) * Math.PI / 180;
+      const points = scalePointerVertices(pointer).map(([px,py]) => [x! + px*Math.cos(angle)-py*Math.sin(angle), y! - px*Math.sin(angle)-py*Math.cos(angle)] as const);
+      const vertices = points.flatMap(([px,py]) => ['10', String(px), '20', String(py)]);
+      const fills = points.slice(1,-1).flatMap((p,index) => {
+        const triangle = [points[0]!, p, points[index+2]!, points[index+2]!];
+        return ['0', 'SOLID', '8', `scale-${pointer.ringId}-pointer`, '420', colour(pointer.color),
+          ...triangle.flatMap(([px,py], vertex) => [String(10+vertex), String(px), String(20+vertex), String(py)])];
+      });
+      return [...fills, '0', 'LWPOLYLINE', '8', `scale-${pointer.ringId}-pointer`, '420', colour(pointer.strokeColor ?? pointer.color), '90', String(points.length), '70', '1', '43', String(pointer.strokeWidthMm), ...vertices];
+    })
+  ]; }) : [];
+
   const lines = scoped.flatMap((band) => {
     return [
       `0`,
@@ -254,6 +256,7 @@ export const generatePseudoDxf = (input: EngineeringExportInput): string => {
     `$ACADVER`,
     `1`,
     `AC1021`,
+    '9', '$INSUNITS', '70', '4',
     `0`,
     `ENDSEC`,
     `0`,
@@ -261,6 +264,9 @@ export const generatePseudoDxf = (input: EngineeringExportInput): string => {
     `2`,
     `ENTITIES`,
     ...lines,
+    '999', 'Scale text uses the DXF viewer font; use SVG with outlined text for font-exact manufacture.',
+    ...(preview && !preview.validation.valid ? ['999', 'WARNING: printable annulus fit is invalid; do not manufacture this drawing.'] : []),
+    ...marks,
     `0`,
     `ENDSEC`,
     `0`,
@@ -268,27 +274,6 @@ export const generatePseudoDxf = (input: EngineeringExportInput): string => {
   ].join('\n');
 };
 
-export const generatePseudoPdf = (svgMarkup: string): string => {
-  const byteLength = new Blob([svgMarkup]).size;
-  return [
-    `%PDF-1.4`,
-    `% Dial Designer Technical Drawing`,
-    `1 0 obj`,
-    `<< /Type /Catalog /Pages 2 0 R >>`,
-    `endobj`,
-    `2 0 obj`,
-    `<< /Type /Pages /Count 1 /Kids [3 0 R] >>`,
-    `endobj`,
-    `3 0 obj`,
-    `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 841.89 595.28] >>`,
-    `endobj`,
-    `% Embedded SVG bytes: ${byteLength}`,
-    `% ${svgMarkup.replace(/\n/g, ' ')}`,
-    `trailer`,
-    `<< /Root 1 0 R >>`,
-    `%%EOF`
-  ].join('\n');
-};
 
 export const estimateOutputSize = (payload: string): number => {
   return new Blob([payload]).size;

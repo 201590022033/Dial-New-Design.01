@@ -387,9 +387,13 @@ export const LeftBandsPanel = () => {
       }
     };
 
-    const preview = buildEngineeringExport({ ...request, format: 'svg' }).preview;
-    setPreviewWarnings(preview.warnings.map((warning) => warning.message));
-    void exportEngineeringByFormat(request);
+    try {
+      const preview = buildEngineeringExport({ ...request, format: 'svg' }).preview;
+      setPreviewWarnings(preview.warnings.map((warning) => warning.message));
+      void exportEngineeringByFormat(request).catch((error: unknown) => setPreviewWarnings([error instanceof Error ? error.message : 'Export failed.']));
+    } catch (error) {
+      setPreviewWarnings([error instanceof Error ? error.message : 'Export failed.']);
+    }
   };
 
   return (

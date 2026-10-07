@@ -4,6 +4,8 @@ import type { ScaleRunResult } from '@/services/scaleEngineService';
 import type { ScaleTick, ScaleLabel } from '@/domain/scales/types';
 import type { VisualWatchModel } from './watchAssemblyToVisualModel';
 import { scaleArtworkClipEnvelope, scaleArtworkRadialShiftMm, type ScaleArtworkRing } from './scaleArtworkEnvelope';
+import { scaleLabelRotation } from '@/domain/scales/resolvedScaleArtwork';
+import { scalePointerRotation, scalePointerVertices } from '@/domain/scales/pointerGeometry';
 
 type Ring = ScaleArtworkRing;
 
@@ -21,7 +23,8 @@ export const useScaleArtworkTexture = (preview: ScaleRunResult | null, model: Vi
   const texture = useMemo(() => {
     if (!preview || typeof document === 'undefined') return null;
     const marks = artworkForRing(preview, ring);
-    if (!marks.ticks.length && !marks.labels.length) return null;
+    const pointers = (preview.pointers ?? []).filter((pointer) => pointer.ringId === ring);
+    if (!marks.ticks.length && !marks.labels.length && !pointers.length) return null;
     const canvas = document.createElement('canvas');
     canvas.width = canvas.height = 2048;
     const context = canvas.getContext('2d');
@@ -45,12 +48,13 @@ export const useScaleArtworkTexture = (preview: ScaleRunResult | null, model: Vi
     context.fillStyle = color;
     context.lineCap = 'round';
     for (const tick of marks.ticks) {
+      context.strokeStyle = tick.color ?? color;
       const length = tick.direction === 'bidirectional' ? tick.lengthMm / 2 : tick.lengthMm;
       const startRadius = tick.radiusMm - inwardShiftMm - (tick.direction === 'bidirectional' ? length : 0);
       const endRadius = tick.radiusMm - inwardShiftMm + (tick.direction === 'inside' ? -length : length);
       const start = polar(startRadius, tick.angleDeg, pxPerMm, centre);
       const end = polar(endRadius, tick.angleDeg, pxPerMm, centre);
-      context.lineWidth = Math.max(1.4, tick.widthMm * pxPerMm);
+      context.lineWidth = tick.widthMm * pxPerMm;
       context.beginPath();
       context.moveTo(...start);
       context.lineTo(...end);
@@ -60,11 +64,28 @@ export const useScaleArtworkTexture = (preview: ScaleRunResult | null, model: Vi
     context.textBaseline = 'middle';
     context.font = `600 ${preview.fontSizeMm * pxPerMm}px ${preview.fontFamily}`;
     for (const label of marks.labels) {
+      context.fillStyle = label.color ?? color;
       const [x, y] = polar(label.radiusMm - inwardShiftMm, label.angleDeg, pxPerMm, centre);
       context.save();
       context.translate(x, y);
-      if (label.orientation !== 'horizontal') context.rotate((label.angleDeg + label.rotationDeg) * Math.PI / 180);
+      context.rotate(scaleLabelRotation(label) * Math.PI / 180);
       context.fillText(label.text, 0, 0);
+      context.restore();
+    }
+    for (const pointer of pointers) {
+      const [x,y] = polar(pointer.radiusMm, pointer.angleDeg, pxPerMm, centre);
+      context.save();
+      context.translate(x,y);
+      context.rotate(scalePointerRotation(pointer) * Math.PI / 180);
+      context.fillStyle = pointer.color;
+      context.strokeStyle = pointer.strokeColor ?? pointer.color;
+      context.lineWidth = pointer.strokeWidthMm * pxPerMm;
+      context.lineJoin = 'round';
+      context.beginPath();
+      scalePointerVertices(pointer).forEach(([px,py], index) => index ? context.lineTo(px*pxPerMm, py*pxPerMm) : context.moveTo(px*pxPerMm, py*pxPerMm));
+      context.closePath();
+      context.fill();
+      if (pointer.strokeWidthMm > 0) context.stroke();
       context.restore();
     }
     const result = new CanvasTexture(canvas);

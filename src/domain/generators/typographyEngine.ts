@@ -76,7 +76,11 @@ export const generateTypographyLayout = (config: TypographyConfig): PolarText[] 
     return [];
   }
 
-  const chars = [...text];
+  // A straight caption is one shaped text run. Emitting each character at
+  // the same polar anchor stacks all glyphs in Engineering and SVG exports.
+  const chars = config.layout === 'straight' || config.layout === 'horizontal'
+    ? [text]
+    : [...text];
   const span = config.layout === 'straight' || config.layout === 'horizontal' || config.layout === 'vertical'
     ? 0
     : config.angleSpanDeg * clampCurvature(config.curvature || 1);

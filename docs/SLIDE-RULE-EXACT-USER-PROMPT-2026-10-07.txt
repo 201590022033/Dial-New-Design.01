@@ -1,0 +1,381 @@
+Update my existing GitHub dial-design dashboard to add two accurate, functional slide-rule marking systems: “Citizen Skyhawk” and “Classic Navitimer”.
+
+Inspect the repository first. Follow its existing components, design language, rendering system, physical units, state management and export architecture. Implement the changes fully and verify the resulting interface and scale geometry.
+
+The goal is to reproduce each selected original marking system exactly, including original colours, numerical labels, subdivision counts, tick lengths, pointer shapes, typography and positioning, with only the explicitly excluded weight and volume conversion markings removed.
+
+1. ADVANCED TAB AND LEFT SIDEBAR
+
+Place both marking systems under the Advanced tab on the LEFT sidebar.
+
+When Advanced is clicked:
+• Show two labelled tick boxes: “Citizen Skyhawk” and “Classic Navitimer”.
+• Open the corresponding Advanced configuration panel on the RIGHT sidebar.
+• Make the selected system’s configurations available as selectable options in that right panel.
+
+Use tick boxes visually, but make the two systems mutually exclusive for the same slide-rule band:
+• Ticking Citizen Skyhawk unticks Classic Navitimer.
+• Ticking Classic Navitimer unticks Citizen Skyhawk.
+• Unticking the active system disables its markings for that band.
+• Never overlay both systems on the same band.
+
+If the dashboard supports multiple independently configured bands, store the selection per band.
+
+Selecting a tick box must immediately update the dial preview and right configuration panel. Clicking Advanced again must restore the current selection and configuration rather than reset them.
+
+Use the existing dashboard styling for the tick boxes and panels.
+
+2. RIGHT SIDEBAR CONFIGURATION
+
+When Advanced is selected on the left, show the following configuration options on the right for the active marking system:
+
+• Selected marking system.
+• Original reference model/layout.
+• Original Colours, enabled by default.
+• Custom Colours, available as an explicit alternative.
+• Outer rotating scale visibility.
+• Inner fixed scale visibility.
+• Time-conversion row visibility, where present in the selected original.
+• Distance-conversion references visibility.
+• Ring dimensions and radial positions.
+• Numerical label size.
+• Tick and line scaling.
+• Outer-scale rotation angle.
+• Reset to Original.
+
+Group these controls clearly using the existing interface conventions.
+
+The default configuration must reproduce the selected reference faithfully, apart from the requested exclusions.
+
+Dimension and styling overrides must preserve mathematical positions. Do not change subdivision values, conversion ratios or angular geometry when the user changes ring size, text size or line thickness.
+
+If a supporting row is absent from the selected original, do not offer to display it as though it were an original feature.
+
+Reset to Original must restore original colours, retained labels, tick proportions, ring proportions and reference alignment. It must continue to exclude the weight and volume markings listed below.
+
+3. REFERENCE REQUIREMENTS
+
+Use one clearly identified original reference for each system. Do not combine artwork from different models or generations.
+
+CITIZEN SKYHAWK
+
+Use the Citizen Blue Angels Skyhawk JY8078-01L as the default visual reference:
+https://www.citizenwatch.com/ca/en/product/JY8078-01L.html
+
+Use Citizen’s U680 instructions to verify calculator operation:
+https://www.citizenwatch-global.com/support/pdf/u680/e.pdf
+Printed pages 81–91.
+
+The U680 manual contains generic illustrations. Use the selected model’s actual artwork to establish exact colours, typography, tick patterns and visual positioning.
+
+CLASSIC NAVITIMER
+
+Use the classic Breitling slide-rule instruction booklet to verify operation and identify the classic layout:
+https://www.breitlingsource.com/images/manuals/slide-rule.pdf
+
+Choose a specific classic Navitimer model or original illustrated layout and record that choice. Use a clear original diagram or official, straight-on model image to establish the retained artwork.
+
+Do not combine an older Navitimer scale with modern Navitimer styling.
+
+For both systems:
+• Record the source, model/layout and reference image used.
+• Prefer official vector artwork where available.
+• Otherwise use sufficiently detailed, straight-on reference images.
+• Do not derive colours from reflections, shadows, compression artefacts or tinted screenshots.
+• Use official colour specifications if available.
+• If only photographic evidence exists, document the sampled colour values and identify them as reference-derived approximations.
+• Do not describe unverified colours, fonts or subdivisions as exact.
+• Continue implementing verified elements and identify any missing reference detail explicitly.
+
+My existing mock-up is a dashboard layout reference only. Its numerical scales, labels and tick placement are not authoritative.
+
+4. SHARED MATHEMATICAL REQUIREMENTS
+
+Both systems must use two concentric main calculation scales:
+• An outer rotating scale.
+• An inner fixed scale.
+
+Both main scales cover one logarithmic decade, from 10 through values below 100, returning to the shared 100/10 position.
+
+Calculate every numerical graduation using:
+
+angle(value) = origin + direction × 360 × log10(value / 10)
+
+Use identical logarithmic angular geometry and increasing direction for both scales.
+
+Their radii can differ. Their mathematical angular spacing cannot differ.
+
+Determine the fixed scale origin and direction from the selected original reference. Apply bezel rotation only to the rotating group.
+
+Do not:
+• Space numerical labels uniformly around the circle.
+• Space subdivisions uniformly between endpoints.
+• Treat the main slide rule as a conventional 60-minute bezel.
+• Add a duplicate physical tick at the shared 100/10 position.
+• Copy malformed numbers or geometry from my mock-up.
+
+Equal numerical ratios must produce equal angular differences. For example:
+• 20 to 40 has the same angular separation as 30 to 60.
+• 30 to 60 spans approximately 108.371°, not 180°.
+
+Match the original printed labels. If the original abbreviates a value, such as printing 7 to represent 70, retain the correct underlying mathematical value.
+
+5. EXACT SUBDIVISIONS AND TICK LENGTHS
+
+Reproduce the actual subdivision pattern of each selected original independently.
+
+Inspect the entire circumference and create a complete graduation inventory specifying:
+• Underlying numerical value.
+• Scale or row.
+• Whether a label is printed.
+• Exact printed label.
+• Major, intermediate or minor tick class.
+• Tick length.
+• Tick width.
+• Colour.
+• Radial position.
+• Source evidence.
+
+Identify every point where the subdivision interval changes. Do not assume both brands use identical subdivision schedules.
+
+Do not use a generic subdivision table from memory. Verify the number of intervals between successive labelled values against the original.
+
+Reproduce:
+• Long major graduations.
+• Medium intermediate graduations.
+• Short minor graduations.
+• Special reference ticks.
+• Triangular pointers or arrows.
+• Any differences in tick width.
+• Original inward-facing or outward-facing tick direction.
+
+Every subdivision must be placed at its true logarithmic value.
+
+Changing the dashboard’s size or export resolution must scale the artwork consistently without changing the underlying subdivision pattern.
+
+6. EXACT ORIGINAL COLOURS
+
+Original Colours must preserve the colour of each individual retained marking.
+
+This includes every original red, white, blue, yellow, black or other colour used for:
+• Numerical labels.
+• Major ticks.
+• Intermediate ticks.
+• Minor ticks.
+• Reference arrows.
+• Conversion pointers.
+• Reference text.
+• Ring outlines.
+• Scale backgrounds.
+
+Do not apply a single accent colour to all special markings.
+
+A pointer and its accompanying text may have different colours. Preserve them separately.
+
+Do not assume:
+• Every Breitling reference is red.
+• Every Blue Angels reference is yellow.
+• All numerals share one colour.
+• All ticks share one colour.
+• A coloured number requires its corresponding tick to have the same colour.
+
+Store the verified colours as separate marking roles or individual overrides where necessary.
+
+Custom Colours may override these roles only after the user explicitly selects that mode. Preserve the original palette so it can be restored exactly.
+
+7. CITIZEN SKYHAWK MARKINGS TO RETAIN
+
+Retain all verified original numerical labels and graduations.
+
+Retain:
+• Fixed inner 10 unit reference.
+• Fixed SPEED INDEX at numerical 60.
+• NAUT distance-conversion reference.
+• STAT distance-conversion reference.
+• KM distance-conversion reference.
+• The separate hours-and-minutes conversion row present in the selected reference.
+• Other verified numerical reference markings unrelated to the exclusions.
+
+Match the Blue Angels Skyhawk reference’s exact retained colours, label orientation, typography, pointer shapes and ring proportions.
+
+Do not add Citizen logos, Blue Angels insignia, watch subdials, digital displays or unrelated dial graphics. This feature concerns the slide-rule marking system.
+
+8. CLASSIC NAVITIMER MARKINGS TO RETAIN
+
+Retain all verified original numerical labels and graduations.
+
+Retain:
+• Fixed inner 10 multiplication/division reference.
+• MPH/hour-index pointer at fixed numerical 60.
+• NAUT distance-conversion reference.
+• STAT distance-conversion reference.
+• KM distance-conversion reference.
+• Fixed 36 seconds reference if present in the selected original.
+• The separate time-conversion row if present in the selected original.
+• Other verified reference markings unrelated to the exclusions.
+
+Individually verify the original colours of:
+• Inner 10.
+• Outer 10.
+• Outer 60.
+• MPH pointer.
+• MPH text.
+• KM pointer.
+• KM text.
+• STAT pointer and text.
+• NAUT pointer and text.
+• Seconds reference, where present.
+
+Preserve colour differences between pointers, labels and adjacent ticks.
+
+If the selected original places MPH at 12 o’clock, set the fixed scale origin so numerical 60 falls precisely there.
+
+Do not add Breitling logos, wings, watch subdials or unrelated dial graphics.
+
+9. EXCLUDED MARKINGS — BOTH SYSTEMS
+
+Remove the following completely from both presets:
+
+WEIGHT CONVERSIONS
+• LBS.
+• LB.
+• KG.
+• Related weight-conversion variants.
+
+VOLUME CONVERSIONS
+• U.S. GAL.
+• US GAL.
+• IMP. GAL.
+• LITER.
+• LITERS.
+• LITRE.
+• LITRES.
+• Equivalent spelling or punctuation variants.
+
+FUEL/OIL WEIGHT CONVERSIONS
+• FUEL LBS.
+• OIL LBS.
+• Equivalent variants.
+
+Remove their:
+• Dedicated labels.
+• Dedicated arrows or pointers.
+• Dedicated conversion annotations.
+• Dedicated supporting rows, where applicable.
+
+Keep ordinary numerical graduations that happen to coincide with an excluded conversion reference.
+
+For example, if an excluded “35 LBS” reference sits beside numerical 35, remove the LBS annotation and its dedicated pointer while preserving the ordinary 35 label and graduation.
+
+Do not reposition, stretch, compress or redistribute the remaining artwork to fill the spaces left by exclusions.
+
+Do not reintroduce the excluded markings through optional controls or exports.
+
+Retain the ordinary numerical scales, which can still support rate calculations even without dedicated fuel or volume conversion labels.
+
+10. DISTANCE-CONVERSION GEOMETRY
+
+Retain correct distance-conversion relationships:
+
+1 statute mile = 1.609344 kilometres.
+1 nautical mile = 1.852 kilometres.
+
+Preserve the selected reference’s placement of its conversion group. Check the relative logarithmic positions mathematically.
+
+Do not place NAUT, STAT or KM at approximate clock positions merely to resemble the reference.
+
+Verify:
+• 30 statute miles = approximately 26.069 nautical miles.
+• 30 statute miles = 48.28032 kilometres.
+• 60 statute miles = approximately 52.139 nautical miles.
+• 60 statute miles = 96.56064 kilometres.
+
+The printed watch scale may only support an approximate visual reading, but the underlying geometry must use accurate ratios.
+
+11. TIME-CONVERSION ROW
+
+Where present in the selected original, keep the time row separate from the main fixed calculation scale.
+
+Place time labels using actual duration in minutes:
+• 1:10 = 70 minutes.
+• 1:20 = 80 minutes.
+• 1:30 = 90 minutes.
+• 2:30 = 150 minutes.
+• 3:00 = 180 minutes.
+
+Normalize across decades for circular positioning.
+
+Do not position “1:20” using decimal 1.20 or “2:30” using decimal 2.30.
+
+Match the original time-row labels, subdivision pattern, colours and orientation. Do not invent additional durations to fill gaps.
+
+12. RENDERING, SAVING AND EXPORTS
+
+Use the existing vector rendering architecture wherever possible.
+
+Maintain separate groups for:
+• Outer rotating scale.
+• Inner fixed scale.
+• Optional time-conversion row.
+• Fixed conversion references.
+• Rotating reference markings where present.
+
+All outer elements must rotate together. Fixed elements must remain stationary.
+
+Persist:
+• Active preset.
+• Selected reference.
+• Visibility options.
+• Original/custom colour mode.
+• Colour overrides.
+• Dimensions.
+• Bezel rotation.
+
+Use the same authoritative geometry for the live preview and every existing export format.
+
+Preserve colours, tick lengths, line widths and label positions in exported output. Avoid rasterising the markings when the export format supports vectors.
+
+13. VERIFICATION
+
+Verify both systems mathematically and visually.
+
+CALCULATION CHECKS
+• Align outer 20 with inner 10. Outer 60 must appear opposite inner 30, representing 2 × 3 = 6.
+• Align outer 20 with inner 10. Outer 30 must appear opposite inner 15, representing 20 × 15 = 300.
+• Align outer 80 with inner 20. Outer 40 must appear opposite inner 10, representing 80 ÷ 20 = 4.
+• Align outer 25 with inner 20. Outer 12.5 must appear opposite inner 10.
+• Align outer 12 with fixed 60. Outer 60 must appear opposite inner 30, representing 60 kilometres travelled in 30 minutes at 120 km/h.
+• Align outer 18 with fixed 60. Outer 45 must correspond to 150 minutes / 2:30, representing 450 nautical miles at 180 knots.
+• Verify the distance conversions above.
+
+INTERFACE CHECKS
+• Advanced on the left opens the configuration options on the right.
+• Both tick boxes appear in Advanced.
+• Selecting one system deselects the other for the same band.
+• Switching presets updates the preview and controls.
+• Closing and reopening Advanced preserves state.
+• Saving and loading preserves configuration.
+• Reset to Original restores the verified reference configuration.
+• Excluded conversions remain absent in all states and exports.
+
+VISUAL CHECKS
+• Compare each finished preset side by side with its selected original.
+• Check every numerical label and subdivision around the entire circumference.
+• Check all tick lengths, widths and colours.
+• Check all retained pointer positions, shapes and colours.
+• Check typography and orientation.
+• Check label collisions and clipping at intended physical dial sizes.
+• Check export consistency.
+• Confirm that removing excluded references has not altered the remaining artwork.
+
+DELIVERY
+
+Complete the implementation in the repository and provide:
+• A concise summary of the changes.
+• The exact reference chosen for each preset.
+• Screenshots showing the Advanced tick boxes on the left and configuration panel on the right.
+• A comparison of each rendered marking system with its original.
+• Verification results.
+• Any unresolved reference limitations.
+
+Treat an exact copy of the retained marking artwork as the target. Do not claim exact fidelity for colours, fonts, subdivisions or positions unless the selected source and comparison support that claim.

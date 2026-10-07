@@ -2,9 +2,26 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { createDefaultWatchAssembly } from '@/domain/assembly/assemblyFactory';
 import { createStarterBuild } from '@/domain/configurator/defaultBuilds';
+import { getArchetypeVisualProfile, RENDER_GALLERY_ARCHETYPES } from '@/domain/configurator/archetypeProfiles';
+import { deserializeWatchAssembly, serializeWatchAssembly } from '@/domain/assembly/assemblySerialization';
 import { watchAssemblyToVisualModel } from '@/visual3d/watchAssemblyToVisualModel';
 
 describe('strap styles and direct option Apply', () => {
+  it.each(RENDER_GALLERY_ARCHETYPES)('preserves $label default strap colours after switching away, back and reloading', ({ id }) => {
+    const profile = getArchetypeVisualProfile(id)!;
+    const assembly = createDefaultWatchAssembly();
+    assembly.designConfig!.visualReferenceConfig = { archetypeId: id, strapStyleId: profile.strapStyleId };
+    const before = watchAssemblyToVisualModel(assembly);
+    expect(before.archetypeAppearance.strapColor).toBe(profile.strapColor);
+    expect(before.finishes.strap.color).toBe(profile.strapColor);
+    assembly.designConfig!.visualReferenceConfig.strapStyleId = profile.strapStyleId === 'rubber' ? 'leather' : 'rubber';
+    expect(watchAssemblyToVisualModel(assembly).finishes.strap.color).not.toBe(profile.strapColor);
+    assembly.designConfig!.visualReferenceConfig.strapStyleId = profile.strapStyleId;
+    const restored = watchAssemblyToVisualModel(deserializeWatchAssembly(serializeWatchAssembly(assembly)));
+    expect(restored.archetypeAppearance.strapColor).toBe(profile.strapColor);
+    expect(restored.finishes.strap.color).toBe(profile.strapColor);
+    expect(restored.assets.strap.assetId).toBe(before.assets.strap.assetId);
+  });
   it('updates small-case fallback materials, colors and style in both directions', () => {
     const assembly = createStarterBuild('ladies-dress', createDefaultWatchAssembly()).assembly;
     const colors = new Set<string>();

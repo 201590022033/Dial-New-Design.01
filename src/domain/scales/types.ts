@@ -114,6 +114,11 @@ export type TickStyle = 'line' | 'block' | 'decorative';
 export type LabelPlacement = 'inside' | 'outside';
 
 export interface ScaleTick {
+  hoverPaddingMm?: number;
+  id?: string;
+  color?: string;
+  semanticRole?: string;
+  dedicatedConversion?: import('./calibratedSlideRule').ConversionClass;
   angleDeg: number;
   radiusMm: number;
   lengthMm: number;
@@ -128,6 +133,14 @@ export interface ScaleTick {
 }
 
 export interface ScaleLabel {
+  hoverPaddingMm?: number;
+  id?: string;
+  color?: string;
+  semanticRole?: string;
+  dedicatedConversion?: import('./calibratedSlideRule').ConversionClass;
+  /** Resolved glyph bounds in mm; absent values use disclosed conservative estimates. */
+  boundsMm?: { width: number; height: number };
+  boundsEvidence?: 'browser-measured' | 'estimated';
   text: string;
   angleDeg: number;
   radiusMm: number;
@@ -136,6 +149,24 @@ export interface ScaleLabel {
   placement: LabelPlacement;
   value?: number;
   ringId?: 'outer' | 'inner';
+}
+
+/** Source-neutral pointer geometry. No manufacturer positions are guessed. */
+export interface ScalePointer {
+  id: string;
+  value: number;
+  ringId: 'outer' | 'inner';
+  radiusMm: number;
+  angleDeg: number;
+  shape: 'triangle' | 'diamond' | 'rectangle';
+  widthMm: number;
+  heightMm: number;
+  strokeWidthMm: number;
+  color: string;
+  strokeColor?: string;
+  rotationDeg?: number;
+  hoverPaddingMm?: number;
+  dedicatedConversion?: import('./calibratedSlideRule').ConversionClass;
 }
 
 export interface ScaleValidationResult {
@@ -185,6 +216,18 @@ export interface ScalePluginConfig {
   bandOuterRadiusMm: number;
   minimumLineWidthMm: number;
   placementTargetBandId?: string;
+  fixedPlacementTargetBandId?: string;
+  physicalTargetsResolved?: boolean;
+  fixedBandInnerRadiusMm?: number;
+  fixedBandOuterRadiusMm?: number;
+  outerNumeralsVisible?: boolean;
+  innerNumeralsVisible?: boolean;
+  outerScaleVisible?: boolean;
+  innerScaleVisible?: boolean;
+  markColorOverrides?: Record<string, string>;
+  /** Additional verified/user-authored pointers; calibration is resolved, not supplied as pixels. */
+  pointers?: ScalePointer[];
+  hoverPaddingMm?: number;
   logarithmicBase?: number;
   tickDensityProfile?: 'ultra-dense' | 'dense' | 'balanced' | 'sparse' | 'engineering';
   includeMinorLabels?: boolean;

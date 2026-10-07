@@ -13,6 +13,10 @@ import { fullMinuteRingContext } from '@/domain/scales/minuteRingContext';
 import { getScaleProgram, type ScaleProgram } from '@/domain/scales/scalePrograms';
 import { scalePolicyForArchetype } from '@/domain/scales/archetypeScalePolicy';
 import { useBandsStore } from './bandsStore';
+import { useWatchAssemblyStore } from './watchAssemblyStore';
+import { resolveScaleLayers } from '@/services/scaleLayerArtworkService';
+import { getCatalogueItem } from '@/domain/catalogue/catalogueRegistry';
+import { assemblyToBands } from '@/domain/assembly/assemblyAdapters';
 
 interface ScaleState {
   selectedScaleKind: ScaleKind;
@@ -33,13 +37,16 @@ interface ScaleState {
   setContext: (context: Partial<ScaleMathContext>) => void;
   setEngineeringReadout: (readout: ScaleEngineeringReadout | null) => void;
   syncFromBand: (band: BandEntity | null, minimumLineWidthMm: number) => void;
-  regeneratePreview: () => void;
+  regeneratePreview: (bands?: BandEntity[]) => void;
   hydrateScaleState: (snapshot: {
     selectedScaleKind: ScaleKind;
     pluginConfig: ScalePluginConfig;
     context: ScaleMathContext;
+    previewEnabled?: boolean;
+    crossArchetypeUnlocked?: boolean;
   }) => void;
   resetScaleState: () => void;
+  resetSimplifiedBaseline: () => void;
 }
 
 const fallbackPlugin = getScalePlugin('circular');
@@ -71,6 +78,17 @@ const fallbackConfig: ScalePluginConfig = fallbackPlugin?.defaultConfig ?? {
 };
 
 const defaultContext: ScaleMathContext = fullMinuteRingContext;
+const scaleTargetLocked = (config: ScalePluginConfig): boolean => {
+  const assembly = useWatchAssemblyStore.getState().assembly;
+  const bands = [...assemblyToBands(assembly), ...useBandsStore.getState().bands];
+  const targets = [config.placementTargetBandId,
+    ...(config.engineeringPreset === 'aviation-slide-rule' ? [config.fixedPlacementTargetBandId ?? 'band-chapter-ring'] : [])];
+  return targets.some((target) => {
+    const kind = bands.find((band) => band.id === target)?.kind;
+    return bands.some((band) => band.id === target && band.locked) ||
+      Boolean(kind && Object.values(assembly.parts).some((part) => part.locked && getCatalogueItem(part.catalogueItemId)?.linkedBandKind === kind));
+  });
+};
 
 export const useScaleStore = create<ScaleState>((set, get) => ({
   selectedScaleKind: 'circular',
@@ -88,6 +106,7 @@ export const useScaleStore = create<ScaleState>((set, get) => ({
     const selection = getScaleProgram(program, bands);
     const defaults = getScalePlugin(selection.kind)?.defaultConfig ?? state.pluginConfig;
     const targetBand = bands.find((band) => band.kind === 'outer-bezel');
+    if (scaleTargetLocked({ ...state.pluginConfig, placementTargetBandId: targetBand?.id ?? state.pluginConfig.placementTargetBandId })) return false;
     set({
       selectedScaleKind: selection.kind,
       pluginConfig: {
@@ -124,6 +143,7 @@ export const useScaleStore = create<ScaleState>((set, get) => ({
   },
   setSelectedScaleKind: (kind) => {
     const state = get();
+    if (scaleTargetLocked(state.pluginConfig)) return;
     if (!state.crossArchetypeUnlocked && state.activeArchetypeId) {
       const allowedKinds = scalePolicyForArchetype(state.activeArchetypeId).allowed.map((program) => getScaleProgram(program, []).kind);
       if (!allowedKinds.includes(kind)) return;
@@ -139,6 +159,7 @@ export const useScaleStore = create<ScaleState>((set, get) => ({
     get().regeneratePreview();
   },
   updatePluginConfig: (params) => {
+    if (scaleTargetLocked(get().pluginConfig)) return;
     set((state) => ({
       pluginConfig: {
         ...state.pluginConfig,
@@ -149,10 +170,12 @@ export const useScaleStore = create<ScaleState>((set, get) => ({
     get().regeneratePreview();
   },
   setPreviewEnabled: (enabled) => {
+    if (scaleTargetLocked(get().pluginConfig)) return;
     set({ previewEnabled: enabled });
     get().regeneratePreview();
   },
   setContext: (contextPatch) => {
+    if (scaleTargetLocked(get().pluginConfig)) return;
     set((state) => ({
       context: {
         ...state.context,
@@ -165,13 +188,25 @@ export const useScaleStore = create<ScaleState>((set, get) => ({
   setEngineeringReadout: (readout) => {
     set({ engineeringReadout: readout });
   },
-  syncFromBand: (band, minimumLineWidthMm) => {
+  syncFromBand: (inputBand, minimumLineWidthMm) => {
+    const band = inputBand ? assemblyToBands(useWatchAssemblyStore.getState().assembly).find((entry) => entry.id === inputBand.id) ?? inputBand : null;
     if (!band) {
       return;
+    }
+    if (band.id !== get().pluginConfig.placementTargetBandId) {
+      const layer = useWatchAssemblyStore.getState().assembly.designConfig?.slideRuleLayers?.layers.find((entry) => entry.targetBandId === band.id);
+      const settings = layer?.settings.simplified;
+      if (settings) {
+        get().hydrateScaleState({ ...structuredClone(settings.legacy), previewEnabled: layer?.activeDesign === 'simplified', crossArchetypeUnlocked: get().crossArchetypeUnlocked });
+        return;
+      }
     }
 
     const innerRadius = band.geometry.innerRadius;
     const outerRadius = band.geometry.outerRadius;
+    const current = get().pluginConfig;
+    if (current.placementTargetBandId === band.id && current.bandInnerRadiusMm === innerRadius &&
+      current.bandOuterRadiusMm === outerRadius && current.minimumLineWidthMm === minimumLineWidthMm) return;
 
     set((state) => ({
       pluginConfig: {
@@ -192,15 +227,17 @@ export const useScaleStore = create<ScaleState>((set, get) => ({
 
     get().regeneratePreview();
   },
-  regeneratePreview: () => {
+  regeneratePreview: (sourceBands) => {
     const state = get();
     const permitted = state.crossArchetypeUnlocked || !state.activeArchetypeId || scalePolicyForArchetype(state.activeArchetypeId).allowed.some((program) => getScaleProgram(program, []).kind === state.selectedScaleKind);
-    if (!state.previewEnabled || !permitted) {
+    if (!permitted) {
       set({ preview: null, validation: null, engineeringReadout: null });
       return;
     }
 
-    const result = runScalePlugin(state.selectedScaleKind, state.pluginConfig, state.context);
+    const physicalBands = assemblyToBands(useWatchAssemblyStore.getState().assembly);
+    const bands = sourceBands ?? [...physicalBands, ...useBandsStore.getState().bands.filter((band) => !physicalBands.some((entry) => entry.id === band.id))];
+    const result = resolveScaleLayers(useWatchAssemblyStore.getState().assembly, bands, state.selectedScaleKind, { ...state.pluginConfig, previewEnabled: state.previewEnabled }, state.context);
     set({
       preview: result,
       validation: result?.validation ?? null
@@ -210,9 +247,18 @@ export const useScaleStore = create<ScaleState>((set, get) => ({
     set({
       selectedScaleKind: snapshot.selectedScaleKind,
       pluginConfig: snapshot.pluginConfig,
-      context: snapshot.context
+      context: snapshot.context,
+      previewEnabled: snapshot.previewEnabled ?? snapshot.pluginConfig.previewEnabled,
+      crossArchetypeUnlocked: snapshot.crossArchetypeUnlocked ?? get().crossArchetypeUnlocked
     });
     get().regeneratePreview();
+  },
+  resetSimplifiedBaseline: () => {
+    if (scaleTargetLocked(get().pluginConfig)) return;
+    const target = get().pluginConfig.placementTargetBandId ?? 'band-outer-bezel';
+    const baseline = useWatchAssemblyStore.getState().assembly.designConfig?.slideRuleLayers?.layers
+      .find((layer) => layer.targetBandId === target)?.settings.simplified?.baseline;
+    if (baseline) get().hydrateScaleState(structuredClone(baseline));
   },
   resetScaleState: () => {
     set({

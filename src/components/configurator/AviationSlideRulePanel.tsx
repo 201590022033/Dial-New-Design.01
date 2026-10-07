@@ -2,11 +2,12 @@ import { useState } from 'react';
 import { Lock, LockOpen } from 'lucide-react';
 import {
   aviationBezelAlignment, aviationCalculations, calculateAviation,
-  createAviationRingSvg, type AviationCalculation
+  type AviationCalculation
 } from '@/domain/scales/aviationSlideRule';
 import { getScaleProgram, type ScaleProgram } from '@/domain/scales/scalePrograms';
 import { scaleFontFamilies, scaleTickLengthFactor } from '@/domain/scales/markingStyle';
 import { scalePolicyForArchetype } from '@/domain/scales/archetypeScalePolicy';
+import { resolvedScaleSvg } from '@/domain/scales/resolvedScaleArtwork';
 import { useBandsStore, useDesignEngineStore, useGlobalSettingsStore, useScaleStore } from '@/stores';
 
 const modes: AviationCalculation[] = ['time', 'distance', 'groundspeed', 'fuel-used', 'endurance'];
@@ -23,6 +24,7 @@ const saveSvg = (markup: string, name: string) => {
 };
 
 export const AviationSlideRulePanel = () => {
+  const [exportError, setExportError] = useState('');
   const [mode, setMode] = useState<AviationCalculation>('time');
   const [first, setFirst] = useState(80);
   const [second, setSecond] = useState(120);
@@ -33,6 +35,8 @@ export const AviationSlideRulePanel = () => {
   const unlocked = useScaleStore((state) => state.crossArchetypeUnlocked);
   const setUnlocked = useScaleStore((state) => state.setCrossArchetypeUnlocked);
   const previewEnabled = useScaleStore((state) => state.previewEnabled);
+  const preview = useScaleStore((state) => state.preview);
+  const resetBaseline = useScaleStore((state) => state.resetSimplifiedBaseline);
   const updateConfig = useScaleStore((state) => state.updatePluginConfig);
   const updateBezel = useDesignEngineStore((state) => state.updateBezelConfig);
   const caseDiameterMm = useGlobalSettingsStore((state) => state.caseDiameterMm);
@@ -42,21 +46,26 @@ export const AviationSlideRulePanel = () => {
   const policy = scalePolicyForArchetype(activeArchetypeId);
   const calculation = aviationCalculations[mode];
   const answer = calculateAviation(mode, first, second);
-  const outerBand = bands.find((band) => band.kind === 'outer-bezel');
-  const chapterBand = bands.find((band) => band.kind === 'chapter-ring');
   const outerRadius = config.outerRadiusMm ?? 18.7;
   const innerRadius = config.innerRadiusMm ?? 16.3;
-  const physicalWarning = active && (
-    !outerBand || !chapterBand ||
-    outerRadius - 0.45 * scaleTickLengthFactor(config) < outerBand.geometry.innerRadius || outerRadius + 0.95 > outerBand.geometry.outerRadius ||
-    innerRadius - 1.15 < chapterBand.geometry.innerRadius || innerRadius > chapterBand.geometry.outerRadius
-  );
+  const physicalWarning = active && preview?.validation.structuredWarnings.some((warning) => warning.affectedObject === 'scale-envelope');
 
   const selectProgram = (program: ScaleProgram) => {
     if (applyScaleProgram(program, bands)) updateBezel(getScaleProgram(program, bands).bezel);
   };
   const programClass = (program: ScaleProgram) => `rounded border px-1 py-1.5 text-[10px] font-semibold ${activeProgram === program ? 'border-teal-400 bg-teal-500/20 text-teal-200' : 'border-slate-700 bg-slate-900 text-slate-300 hover:border-teal-600'}`;
   const actionClass = 'rounded border border-teal-600 bg-teal-500/15 px-2 py-1.5 font-semibold text-teal-200 hover:bg-teal-500/25 disabled:cursor-not-allowed disabled:opacity-40';
+  const savePdf = async (ring: 'outer' | 'inner') => {
+    if (!preview?.validation.valid) return;
+    try {
+      const { engineeringSvgToPdfBlob } = await import('@/services/vectorPdfService');
+      const blob = await engineeringSvgToPdfBlob(resolvedScaleSvg(preview, caseDiameterMm, ring), 1, '#0b1224');
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a'); link.href = url; link.download = `aviation-${ring}-markings.pdf`; link.click();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      setExportError('');
+    } catch (error) { setExportError(error instanceof Error ? error.message : 'PDF export failed.'); }
+  };
 
   return (
     <div className="space-y-2 text-xs text-engineering-text" data-testid="aviation-slide-rule-panel">
@@ -91,6 +100,17 @@ export const AviationSlideRulePanel = () => {
       </label>}
       {active ? (
         <>
+          <fieldset className="space-y-1 rounded border border-slate-700 p-2">
+            <legend>Simplified marking visibility</legend>
+            {([
+              ['outerScaleVisible', 'Outer rotating scale'], ['innerScaleVisible', 'Inner fixed scale'],
+              ['outerNumeralsVisible', 'Outer numerals'], ['innerNumeralsVisible', 'Inner numerals']
+            ] as const).map(([key, title]) => <label key={key} className="flex items-center gap-2">
+              <input type="checkbox" checked={config[key] !== false} onChange={(event) => updateConfig({ [key]: event.target.checked })}/>{title}
+            </label>)}
+            <button type="button" className={actionClass} onClick={resetBaseline}>Reset Simplified baseline</button>
+            <p className="text-[10px] text-engineering-muted">Citizen Skyhawk and Classic Navitimer remain unavailable until their complete original graduations are verified. This is the existing Simplified design, not original branded artwork.</p>
+          </fieldset>
           <label className="block">Calculation
             <select className="ds-input mt-1" value={mode} onChange={(event) => {
               const next = event.target.value as AviationCalculation;
@@ -123,10 +143,15 @@ export const AviationSlideRulePanel = () => {
           <p>Outer bezel: {outerRadius.toFixed(2)} mm radius · Fixed chapter: {innerRadius.toFixed(2)} mm radius</p>
           {physicalWarning ? <p className="text-amber-300">Artwork may fall outside the current bezel/chapter bands. Check radii before marking.</p> : null}
           <div className="grid grid-cols-2 gap-2">
-            <button type="button" className={actionClass} onClick={() => saveSvg(createAviationRingSvg(config, 'outer', caseDiameterMm), 'aviation-rotating-bezel.svg')}>Bezel SVG</button>
-            <button type="button" className={actionClass} onClick={() => saveSvg(createAviationRingSvg(config, 'inner', caseDiameterMm), 'aviation-fixed-chapter-ring.svg')}>Chapter SVG</button>
+            <button type="button" className={actionClass} disabled={!preview?.validation.valid} onClick={() => preview && saveSvg(resolvedScaleSvg(preview, caseDiameterMm, 'outer'), 'aviation-rotating-bezel.svg')}>Bezel SVG</button>
+            <button type="button" className={actionClass} disabled={!preview?.validation.valid} onClick={() => preview && saveSvg(resolvedScaleSvg(preview, caseDiameterMm, 'inner'), 'aviation-fixed-chapter-ring.svg')}>Chapter SVG</button>
+            <button type="button" className={actionClass} disabled={!preview?.validation.valid} onClick={() => { void savePdf('outer'); }}>Bezel PDF</button>
+            <button type="button" className={actionClass} disabled={!preview?.validation.valid} onClick={() => { void savePdf('inner'); }}>Chapter PDF</button>
           </div>
-          <p className="text-engineering-muted">SVGs are 1:1 mm marking artwork at the home alignment. Fonts remain text; convert to paths and verify size, fit, kerf, and readability before laser marking. Planning aid only; confirm with aircraft POH, fuel reserve requirements, and approved navigation sources.</p>
+          {!!preview?.validation.warnings.length && <p role="alert" className="text-amber-300">{preview.validation.warnings.slice(0, 4).join(' ')}{preview.validation.warnings.length > 4 ? ` (${preview.validation.warnings.length - 4} further fit/detail warnings.)` : ''}{!preview.validation.valid ? ' Marking export is blocked until the physical fit is valid.' : ''}</p>}
+          <p className="text-engineering-muted">SVGs use the current resolved artwork, colours, visibility and bezel alignment at 1:1 mm. Fonts remain text; convert to paths and verify size, fit, kerf, and readability before laser marking. Planning aid only; confirm with aircraft POH, fuel reserve requirements, and approved navigation sources.</p>
+          <p className="text-[10px] text-engineering-muted">PDF is a 1:1 mm vector preview on a dark viewing substrate, preserving ink colours but substituting standard PDF fonts. The background is not a part finish. For manufacture, outline the chosen fonts in the SVG and verify fit.</p>
+          {exportError && <p role="alert" className="text-red-300">{exportError}</p>}
         </>
       ) : null}
     </div>

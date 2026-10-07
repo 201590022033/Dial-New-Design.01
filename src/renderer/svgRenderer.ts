@@ -1,4 +1,5 @@
 import { SVG, type Svg } from '@svgdotjs/svg.js';
+import { scaleArtworkSvgContent } from '@/domain/scales/resolvedScaleArtwork';
 import { resolvePhysicalAssembly } from '@/domain/assembly/physicalAssembly';
 import type { BandEntity } from '@/domain/bands/types';
 import type {
@@ -66,6 +67,8 @@ export class SvgRenderer implements RendererAdapter {
         scaleLabels: options.scalePreview?.labels.map((label) => [label.angleDeg, label.radiusMm, label.text, label.ringId]),
         scaleFontSizeMm: options.scalePreview?.fontSizeMm,
         scaleFontFamily: options.scalePreview?.fontFamily,
+        scaleArtwork: options.scalePreview?.svg,
+        scaleHover: options.scalePreview?.layers?.map((layer) => [layer.ticks.map((tick) => tick.hoverPaddingMm), layer.labels.map((label) => label.hoverPaddingMm), layer.pointers]),
         designOverlay: options.designOverlay,
         selectedHitId: options.selectedHit?.partInstanceId ?? null,
         hoveredHitId: options.hoveredHit?.partInstanceId ?? null,
@@ -454,73 +457,7 @@ export class SvgRenderer implements RendererAdapter {
         .attr('data-band-id', placementTargetBandId)
         .attr('data-label', placementTargetMetadata[2]);
 
-      // The selected component's physical OD is a hard artwork envelope. This
-      // clip is a final renderer safeguard in addition to the geometry clamp.
-      const envelopeRadiusPx = mmToPixels(options.scalePreview.placementEnvelope.outerRadiusMm);
-      const envelopeClip = layer.clip().add(
-        layer.circle(envelopeRadiusPx * 2).center(context.centerX, context.centerY)
-      );
-      scaleGroup.clipWith(envelopeClip);
-
-      const { ticks, labels } = options.scalePreview;
-      const outerScaleGroup = options.scalePreview.kind === 'slide-rule'
-        ? scaleGroup.group().id('scale-outer-ring').attr('data-band-id', placementTargetBandId).attr('data-ring-id', 'outer')
-        : scaleGroup;
-      const innerScaleGroup = options.scalePreview.kind === 'slide-rule'
-        ? scaleGroup.group().id('scale-inner-ring').attr('data-band-id', 'band-chapter-ring').attr('data-ring-id', 'inner')
-        : scaleGroup;
-
-      ticks.forEach((tick, index) => {
-        const tickLength = mmToPixels(tick.lengthMm);
-        const baseRadius = mmToPixels(tick.radiusMm);
-
-        const directionMultiplier =
-          tick.direction === 'inside' ? -1 : tick.direction === 'outside' ? 1 : 0;
-
-        const startRadius =
-          tick.direction === 'bidirectional'
-            ? baseRadius - tickLength / 2
-            : baseRadius;
-        const endRadius =
-          tick.direction === 'bidirectional'
-            ? baseRadius + tickLength / 2
-            : baseRadius + tickLength * directionMultiplier;
-
-        const start = polarToCartesian(startRadius, tick.angleDeg);
-        const end = polarToCartesian(endRadius, tick.angleDeg);
-
-        (tick.ringId === 'outer' ? outerScaleGroup : innerScaleGroup)
-          .line(
-            context.centerX + start.x,
-            context.centerY + start.y,
-            context.centerX + end.x,
-            context.centerY + end.y
-          )
-          .stroke({
-            color: options.scalePreview?.color ?? (options.scalePreview?.kind === 'circular' && typeof tick.value === 'number' && tick.value <= 20
-              ? '#F59E0B'
-              : tick.weight === 'major' ? '#F8FAFC' : '#94A3B8'),
-            width: Math.max(1, mmToPixels(tick.widthMm))
-          })
-          .attr('data-scale-tick-index', String(index))
-          .attr('data-interaction-role', 'rendering-primitive');
-      });
-
-      labels.forEach((label, index) => {
-        const point = polarToCartesian(mmToPixels(label.radiusMm), label.angleDeg);
-        (label.ringId === 'outer' ? outerScaleGroup : innerScaleGroup)
-          .text(label.text)
-          .font({ size: mmToPixels(options.scalePreview?.fontSizeMm ?? 0.8), family: options.scalePreview?.fontFamily ?? 'sans-serif', anchor: 'middle' })
-          .fill(options.scalePreview?.color ?? '#E2E8F0')
-          .center(context.centerX + point.x, context.centerY + point.y)
-          .rotate(
-            label.orientation === 'horizontal' ? label.rotationDeg : label.angleDeg + label.rotationDeg,
-            context.centerX + point.x,
-            context.centerY + point.y
-          )
-          .attr('data-scale-label-index', String(index))
-          .attr('data-interaction-role', 'rendering-primitive');
-      });
+      scaleGroup.svg(scaleArtworkSvgContent(options.scalePreview, mmToPixels(1), context.centerX, context.centerY));
     }
 
     // 4. Render Physical Hands Stack (Hour, Minute, Seconds) at canonical 10:10 presentation time
