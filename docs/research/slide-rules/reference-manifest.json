@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
   "reviewedOn": "2026-10-07",
-  "status": "partial-reference-inventory",
+  "status": "Citizen photographic reference accepted for M3A; Navitimer inventory incomplete",
   "runtimeUse": "research-only; not imported by application",
   "gatePassed": false,
   "references": [
     {
       "id": "citizen-jy8078-01l-2026-10-07",
       "preset": "Citizen Skyhawk",
-      "layout": "JY8078-01L; Canada official front image, corroborated by exact-model Citizen Spain front image",
+      "layout": "JY8078-01L; published Canada1600x2000 zoom, corroborated by official Europe2000x2000 front (same base-photo transforms)",
       "model": "JY8078-01L",
       "sources": [
         {
@@ -37,9 +37,12 @@
           "id": "citizen-th-front",
           "url": "https://www.citizen.co.th/html/en/products/promaster/sky/jy8078-01l.html",
           "imageUrl": "https://www.citizen.co.th/filebase2/022/003/0-510735-01e51ccb054533b18c2957fec39f92ae.png?md5=d84918b4b08b5dd321f0d498fa71eba2",
-          "imagePixels": [856, 1284],
+          "imagePixels": [
+            856,
+            1284
+          ],
           "kind": "manufacturer-product-page",
-          "use": "exact-model corroboration inspected at native browser zoom; no HH:MM row on pictured fixed calculator ring; top hollow KM pointer separate from red RX on white strip; perspective photo, not metrology"
+          "use": "exact-model corroboration; no HH:MM row. Earlier low-resolution top-pointer identity is superseded by native Canada/Europe verification: hollow hour-rate60, separate tiny yellow KM, separate red RX. Perspective photo, not metrology."
         },
         {
           "id": "citizen-u680-model2",
@@ -59,6 +62,34 @@
           ],
           "sha256": "F28A518CEC3FDA139FF4C713DD824EAC7C623AACE1618F494BEC3B24315A00C8",
           "use": "operation only; generic Model 2 is NOT the chosen artwork"
+        },
+        {
+          "id": "citizen-ca-zoom",
+          "url": "https://www.citizenwatch.com/ca/en/product/JY8078-01L.html",
+          "imageUrl": "https://citizenwatch.widen.net/content/9m8mgrwkqb/webp/Promaster+Skyhawk+A-T.webp?u=41zuoe&width=1600&height=2000&quality=80&crop=false&keep=c&color=FFFFFF00",
+          "discovery": "Published data-zoom-image/data-extra-large-screen-image in exact-model product gallery",
+          "imagePixels": [
+            1600,
+            2000
+          ],
+          "localFile": "evidence/citizen-ca-1600.webp",
+          "sha256": "43A24B38F34BDA5F99F8A74C680260A2BEE217677BFDF4876342CF4A18A2CBF1",
+          "kind": "manufacturer-exact-model-image",
+          "use": "Native photographic reconstruction evidence; not engineering/factory artwork"
+        },
+        {
+          "id": "citizen-de-front",
+          "url": "https://de.citizenwatch.eu/de/p/jy8078-01l/",
+          "imageUrl": "https://de.citizenwatch.eu/media/thumbs/66/29/a2ef575d063e189177daf711ae91179bbe8a/2000x_crop=center;format=webp/managed/c0/e5/c0e592ce81748df3b251f460a2b3f3d5/JY8078-01L.png.thumb.webp",
+          "discovery": "Observed published 2000w responsive srcset; natural dimensions checked",
+          "imagePixels": [
+            2000,
+            2000
+          ],
+          "localFile": "evidence/citizen-de-2000.webp",
+          "sha256": "1B1D2A2555C1718DFF435719370FAAE51E09637CD5A450B5250BDD5A929AE30E",
+          "kind": "manufacturer-exact-model-image",
+          "use": "Native photographic reconstruction evidence; not engineering/factory artwork"
         }
       ],
       "dimensions": {
@@ -73,19 +104,25 @@
         "timeRow": {
           "status": "absent-on-selected-model-photograph",
           "present": false,
-          "evidence": "Native-size exact-model Citizen Thailand image corroborates Canada/Spain: fixed calculator number row has no HH:MM row. Generic U680 Model 2 diagrams do; they are not exact-model artwork. Absence refers to pictured front layout, not every U680 watch."
+          "evidence": "Native Canada1600/Europe2000 corroborate Spain/Thailand: no HH:MM row on selected01L. Generic U680Model2 is operational evidence, not selected artwork."
         },
         "seconds36": {
-          "status": "not-verified",
-          "present": null
+          "status": "dedicated index absent on selected photograph; ordinary36 retained",
+          "present": false
         },
         "hourRateIndex": {
           "value": 60,
-          "status": "operation-confirmed; model-specific caption/pointer relationship needs separation from KM and RX"
+          "status": "exact-model hollow white inward triangle verified; U680 operation-confirmed; no literal SPEED INDEX caption on selected photo"
         },
         "innerUnitIndex": {
           "value": 10,
-          "observedColour": "yellow"
+          "observedColour": "dark digits in yellow rectangle",
+          "pointerOrTickColour": "black, separate from digit box"
+        },
+        "kilometrePointer": {
+          "value": 61.05560505168395,
+          "observedColour": "filled yellow outward triangle; light KM caption",
+          "status": "source-fitted with exact ratios; not manufacturer-specified absolute anchor"
         }
       },
       "rejectedVisualSources": [
@@ -99,13 +136,15 @@
         }
       ],
       "gaps": [
-        "Full independently counted tick/subdivision inventory on BOTH rings, including every interval boundary",
-        "Exact tick length/width and text baseline/cap-height radial gaps",
-        "Separate hour-rate, KM and radio RX geometry at top; do not classify RX/NO as calculator captions",
-        "If HH:MM is requested, provide a separate disclosed enhanced layout; selected JY8078 photo has no such row",
-        "Source colour specifications/font files unavailable; no exact hex or font claim",
-        "Physical printable annulus dimensions not supplied by case diameter"
-      ]
+        "Unavailable exact font/ink specifications; disclosed photographic palette and glyph profiles are reconstruction targets, not factory certification.",
+        "Printable physical annulus/tick dimensions absent; case diameter does not supply them.",
+        "Inner10 stroke joins perimeter; visible photographic component is a lower bound, recorded with uncertainty instead of an exact endpoint.",
+        "M3A must implement the inventory, measure substitute glyphs and compare live/exported artwork before enabling runtime preset."
+      ],
+      "verificationFile": "citizen-jy8078-verification.json",
+      "photographicInventoryAccepted": true,
+      "runtimeImplemented": false,
+      "factoryExactReproductionCertified": false
     },
     {
       "id": "navitimer-booklet-training-disc-2026-10-07",

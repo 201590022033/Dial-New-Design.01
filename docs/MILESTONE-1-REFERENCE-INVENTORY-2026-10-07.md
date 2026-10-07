@@ -1,14 +1,15 @@
 # Milestone 1: original-reference research checkpoint
 
-7 October 2026. **Partial; full graduation/typography gate NOT passed.** Research and documentation only. No application rendering, supplier catalogue, GLB or runtime state changes were made in this milestone. Preserve Milestone 0's five uncommitted source/test edits.
+7 October 2026. **Updated: Citizen's photographic reference is verified for M3A implementation; Navitimer remains partial, so the combined original-fidelity gate is NOT passed.** See [Citizen verification](CITIZEN-VERIFICATION-2026-10-07.md) and its 450-position packet for the authoritative later review. Earlier research checkpoints below are retained as history and are superseded where they call Citizen ticks, top pointers or colours unresolved. Research only; no application renderer, supplier catalogue, GLB or runtime preset changes.
 
 ## Durable deliverables
 
 - [Reference manifest](research/slide-rules/reference-manifest.json): selected identities, URLs, PDF fingerprints, page numbering, confirmed facts and unresolved details.
 - [Machine-readable research inventory](research/slide-rules/graduation-inventory.json): 122 records (106 numerical labels, 9 reference identities, 7 excluded annotation identities), plus 108 consecutive interval-review sectors covering all four main rings from 10 to the single 100/10 seam.
-- [Research validator](research/slide-rules/validate-inventory.mjs): unique identities, valid sources, decade/seam handling, full sector-review coverage, abbreviated labels, exclusion flags and mathematical consistency. This does NOT validate every pictured tick.
+- [Citizen photographic verification packet](research/slide-rules/citizen-jy8078-verification.json): all 52 Citizen sectors counted, 450 graduation identities, value-specific photographic profiles, separate pointer/ink/box roles, glyph samples and reproducible ellipse/palette measurements.
+- [Research validator](research/slide-rules/validate-inventory.mjs): identities, sources, sector coverage, counts, seams, exclusions and mathematical consistency. Passing it is not runtime photographic-fidelity certification.
 
-This is not a complete graduation inventory: minor/intermediate ticks, independent interval counts and physical typography metrics remain unverified. Unknowns are deliberately `null`; none may silently become generic subdivisions, zero dimensions or runtime defaults. The application does not import these files.
+Citizen's source subdivision/layout gap is closed with disclosed photographic metric/font/colour approximations. The 56 Navitimer sectors and factory physical typography specifications remain unresolved. Unknowns stay `null`; none may silently become generic subdivisions, zero dimensions or runtime defaults. The application does not import these files.
 
 ## Selected originals and differences
 
@@ -17,15 +18,15 @@ This is not a complete graduation inventory: minor/intermediate ticks, independe
 | Single chosen identity | JY8078-01L, Canada official front artwork; exact same model's official Spain image corroborates legibility | Coloured training-disc illustration, viewer page 2 of the exact user-selected booklet. This is an identified illustrated layout, NOT a verified named production watch |
 | Main outer printed numbers | 10-25 by ones; 30,35,40,45,50,55,60,70,80,90 | 10-25 by ones; 30,35,40,45,50,55,60,65,70,75,80,85,90,95 |
 | Main inner printed numbers | 10-25 by ones; 30,35,40,45,50,55,70,80,90; rate reference replaces an ordinary printed 60 | 10-25 by ones; 30,35,40,45,50,55; 7,8,9 represent 70,80,90; MPH at underlying 60. NO printed inner 65 |
-| Unit/reference colour observations | Inner 10 yellow; outer 10 dark text in a light box; most ordinary numbers light on dark substrate | Inner 10, outer 10 and outer 60 red; ordinary numbers/ticks black on light substrate |
-| Distance writing versus pointer | NAUT./STAT. light lettering with red pointers in selected 01L front image; KM. light lettering beside a light outlined top pointer | Black distance lettering. Manufacturer text confirms red KM pointer just right of MPH; MPH shape/colour still needs independent review. Do not colour all reference pointers red |
+| Unit/reference colour observations | Inner 10 dark digits in yellow box; outer 10 dark digits in light box; most ordinary numbers light on dark substrate | Inner 10, outer 10 and outer 60 red; ordinary numbers/ticks black on light substrate |
+| Distance writing versus pointer | NAUT./STAT. light lettering with red outward pointers; KM. light lettering beside separate tiny yellow outward pointer. Hollow light inward pointer at60 is hour-rate, not KM | Black distance lettering. Manufacturer text confirms red KM pointer just right of MPH; MPH shape/colour still needs independent review. Do not colour all reference pointers red |
 | Typography | Curved tangent-following rows; bottom labels follow the ring rather than being automatically flipped upright | Same broad tangent-following principle, independently transcribed numbers and abbreviations; no font identity proven |
 | Time conversion row | Absent from selected JY8078 front layout, corroborated by clearer official Thailand photograph. Generic U680 Model 2 has it; do not borrow it | No HH:MM row on selected training disc. Newly recovered 1967 AOPA watch layout DOES have it; keep layouts separate |
-| 36-seconds reference | Not verified on selected artwork | Confirmed by booklet viewer 12 / printed 16; separate fixed reference, not an elapsed 36-second chronograph graduation |
+| 36-seconds reference | Dedicated index absent on selected artwork; ordinary36 retained | Confirmed by booklet viewer 12 / printed 16; separate fixed reference, not an elapsed 36-second chronograph graduation |
 | Original dimensions | Official case 45mm, lug width 22mm; neither gives printable annulus sizes | No original physical disc/print dimensions recovered |
 | Exact fonts/hex | Not specified by retrieved source; not claimed | Not specified by scan; not claimed |
 
-Printed numeral schedules are NOT tick subdivision schedules. A labelled 50-to-55 sector does not prove five intervals. All 108 sector counts remain pending independent source review. The original long/medium/short tick widths and lengths cannot be recovered exactly from a resized screenshot.
+Printed numeral schedules are NOT tick subdivision schedules. Citizen's native zoom source now verifies 225 positions per ring, changes in increment at15/30/60 and a separate outer length hierarchy change at25. All56 Navitimer sector counts remain pending. Neither source supplies factory-exact tick millimetres; the Citizen packet records photographic ranges instead.
 
 ### Avoiding a concrete model-mixing error
 
@@ -64,6 +65,8 @@ Citizen's manual verifies time/distance/speed, fuel rate/quantity/endurance, dis
 Milestone 2 may later implement the verified shared mathematical/state foundation without pretending these incomplete original inventories are accepted. Branded artwork must remain gated until the critical inventory gaps are closed. Simplified stays separate and unchanged.
 
 ## Verification and restart checkpoint
+
+Historical checks below precede the native-zoom Citizen recovery. Use the separate Citizen checkpoint for the current accepted counts, pointer identities, measured profiles and final verification results.
 
 Actual checks: `node docs/research/slide-rules/validate-inventory.mjs` passed (122 records, 106 numerical labels, 108 uncounted review sectors; equal-ratio angle 108.370798439 degrees). Distance results were 26.069287257 NM / 48.28032km for 30 statute miles and 52.138574514 NM / 96.56064km for 60. `git diff --check` passed with only existing LF-to-CRLF notices. New research documents were also checked independently because ordinary Git diff does not cover untracked files. These are documentation/research checks only; this turn does not re-run or supersede Milestone 0's 445-test/typecheck/lint/build baseline.
 
