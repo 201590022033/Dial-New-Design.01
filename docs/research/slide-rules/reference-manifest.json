@@ -1,9 +1,10 @@
 {
   "schemaVersion": 1,
-  "reviewedOn": "2026-10-07",
-  "status": "Citizen photographic reference accepted for M3A; Navitimer inventory incomplete",
+  "reviewedOn": "2026-10-08",
+  "status": "Citizen and selected Navitimer inventories ready for disclosed reconstruction; factory and runtime acceptance remain gated",
   "runtimeUse": "research-only; not imported by application",
   "gatePassed": false,
+  "referenceInventoryReady": true,
   "references": [
     {
       "id": "citizen-jy8078-01l-2026-10-07",
@@ -204,6 +205,23 @@
           "url": "https://www.breitling.com/media/document/2/archive-archive-archive-archive-archive-archive-archive-archive-archive-archive-archive-archive-archive-navitimer_slide_rule.pdf",
           "kind": "manufacturer-indexed-manual",
           "use": "indexed operation corroboration only; direct PDF retrieval failed during review"
+        },
+        {
+          "id": "nav-training-native",
+          "url": "https://www.breitlingsource.com/images/manuals/slide-rule.pdf",
+          "viewerPage": 2,
+          "parentPdfSha256": "3DCF8EFF7382092F4A2883B9844D73EA70B89C27949A2C6F0FDF584063A014B0",
+          "localFile": "evidence/navitimer-training-disc-native.jpg",
+          "sha256": "46A429FC5F62BC2F69BB101FC55F4D8F524938E9D5BAFB3F80751AEF9B951E4F",
+          "bytes": 53146,
+          "imagePixels": [
+            600,
+            525
+          ],
+          "discovery": "Original page2 xref4 DCTDecode stream; unmodified bytes, not a high-resolution render or screenshot.",
+          "freshDownloadClaim": false,
+          "kind": "original-pdf-embedded-jpeg-stream",
+          "use": "Native visual inventory, sampled pixels and source-fit sensitivity; not engineering artwork"
         }
       ],
       "dimensions": {
@@ -220,22 +238,38 @@
         },
         "seconds36": {
           "present": true,
-          "status": "booklet viewer 12 / printed 16 explicitly defines fixed seconds index 36; selected disc shows red pointer with black 36"
+          "caption": null,
+          "status": "Selected disc shows an unlabelled red outward fixed triangle at36; viewer12/printed16 defines seconds index36. Adjacent black35 is an ordinary numeral, not a36 caption."
         },
         "hourRateIndex": {
           "value": 60,
           "text": "MPH",
-          "status": "operation-confirmed; diagram physical angle not 12 o'clock in skewed photograph"
+          "pointerColour": "black",
+          "textColour": "black",
+          "pointerShape": "solid-outward-triangle",
+          "status": "Selected native disc visually verified; unit origin derived logarithmically, not from photograph angle."
         },
         "innerUnitIndex": {
           "value": 10,
-          "observedColour": "red"
+          "observedColour": "red",
+          "pointerShape": "solid-outward-triangle",
+          "boxColour": null
         },
         "kilometrePointer": {
           "colour": "red",
+          "textColour": "black",
           "relativePosition": "just right of MPH on fixed scale",
-          "status": "manufacturer-operation-confirmed; shape, physical anchor and exact ink remain unmeasured",
-          "sourceId": "nav-alternate-booklet"
+          "shape": "solid-outward-triangle",
+          "value": 61.205358305169234,
+          "manufacturerSpecified": false,
+          "sourceId": "nav-training-native",
+          "supportingSourceId": "nav-booklet-operation",
+          "status": "Visual identity verified; same selected booklet viewer16-17 confirms operation. Absolute anchor is a disclosed source fit with +/-1 conservative value uncertainty."
+        },
+        "outerUnlabelledReference36": {
+          "present": true,
+          "operationConfirmed": false,
+          "evidence": "Native red inward triangle beside ordinary outer35; source model values35.980 and36.38 are compatible with36; retain reference without an invented caption."
         }
       },
       "rejectedVisualSources": [
@@ -251,12 +285,20 @@
         }
       ],
       "gaps": [
-        "600x525 source scan too small/skewed to prove EVERY tick count, width and anchor",
-        "Exact fixed conversion-group numerical anchor unresolved; relative ratios can be defined without guessing absolute placement",
-        "KM pointer red and just right of MPH confirmed; independent MPH pointer shape/colour and both measured anchors still need review",
-        "No original physical dimensions, ink hex specifications or font files",
-        "This is a clearly identified booklet illustration, not proof of a particular production watch model"
-      ]
+        "Source is a low-resolution skewed training-disc scan, not engineering artwork or a particular watch model.",
+        "Concentric-circle projective fitting is a disclosed model assumption, not an independently calibrated factory plane.",
+        "Pixel apices have +/-2px uncertainty; absolute conversion anchor is a reconstruction estimate, not a manufacturer value.",
+        "RGB/hex are scan approximations only, not original ink specifications.",
+        "Individual widths at 1-2px are undersampled; retain ranges rather than claim exact widths.",
+        "Higher-resolution identical source not recovered. Browser PDF opened blank; previously saved booklet fingerprint verified. Archive mirrors/modern diagrams do not fill missing native detail.",
+        "Exact tick underlay at outer10/60 and isolated blue-divider ink remain unverified; footprint/pointer/value identities retained without false precision.",
+        "1967 AOPA variant remains separate and unverified; no new HH:MM row is borrowed.",
+        "Reconstruction readiness is not runtime or original-fidelity acceptance; neither branded runtime gate is enabled by this packet."
+      ],
+      "verificationFile": "navitimer-training-disc-verification.json",
+      "photographicInventoryAccepted": true,
+      "runtimeImplemented": false,
+      "factoryExactReproductionCertified": false
     }
   ],
   "rules": {
@@ -267,6 +309,6 @@
     "fontPolicy": "No exact font recovered. Measure actual substitute glyph bounds later; original artwork fidelity must disclose substitution.",
     "exclusionPolicy": "Remove dedicated semantic weight/volume/fuel-oil annotations and pointers, retain coincident ordinary values and gaps.",
     "colourPolicy": "Qualitative source observations only. No sampled hex is promoted to original ink specification.",
-    "acceptance": "Do not load this partial inventory into an Original/Faithful runtime preset."
+    "acceptance": "Reference-inventory readiness is not runtime or factory-fidelity acceptance. Implement and visually compare artwork in M3A/3B before enabling either reference preset; disclose scan/font/ink/mm approximations."
   }
 }

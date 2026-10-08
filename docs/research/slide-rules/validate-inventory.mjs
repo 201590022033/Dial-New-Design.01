@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { validateCitizenReference } from './validate-citizen-reference.mjs';
+import { validateNavitimerReference } from './validate-navitimer-reference.mjs';
 
 // Research consistency only. This does not certify a photographic transcription.
 const read = (name) => JSON.parse(readFileSync(new URL(name, import.meta.url), 'utf8'));
@@ -8,6 +9,8 @@ const manifest = read('reference-manifest.json');
 const inventory = read('graduation-inventory.json');
 const citizenPacket = read('citizen-jy8078-verification.json');
 validateCitizenReference(citizenPacket);
+const navitimerPacket = read('navitimer-training-disc-verification.json');
+validateNavitimerReference(navitimerPacket);
 const variant = read('navitimer-1967-variant-plan.json');
 assert.equal(variant.selectedTrainingDiscReplaced, false);
 assert.equal(variant.gatePassed, false);
@@ -27,7 +30,8 @@ const sources = new Set(manifest.references.flatMap((r) => r.sources.map((s) => 
 const ids = inventory.marks.map((m) => m.id);
 assert.equal(new Set(ids).size, ids.length, 'Duplicate mark identity');
 assert.equal(inventory.runtimeUse, false, 'Partial inventory must stay out of runtime');
-assert.equal(manifest.gatePassed, false, 'Unresolved tick inventory must not pass fidelity gate');
+assert.equal(manifest.gatePassed, false, 'Research acceptance must not pass runtime/factory fidelity gate');
+assert.equal(manifest.referenceInventoryReady, true);
 for (const m of inventory.marks) {
   assert(refs.has(m.referenceId), `Unknown reference: ${m.id}`);
   assert(sources.has(m.evidence.sourceId), `Unknown source: ${m.id}`);
@@ -51,14 +55,11 @@ for (const ref of refs) {
       assert(sources.has(s.sourceId));
       assert(s.toValue > s.fromValue);
       if (i) assert.equal(sectors[i - 1].toValue, s.fromValue, 'Gap/overlap in sector review coverage');
-      if (ref === citizenPacket.referenceId) {
-        const accepted = citizenPacket.sectors.find((sector) => sector.id === s.id);
-        assert(accepted, 'Citizen sector must have a reviewed photographic record');
-        assert.equal(s.intervalCount, accepted.intervalCount);
-        assert.equal(s.increment, accepted.increment);
-      } else {
-        assert.equal(s.intervalCount, null, 'Do not promote uncounted Navitimer sectors');
-      }
+      const packet = ref === citizenPacket.referenceId ? citizenPacket : navitimerPacket;
+      const accepted = packet.sectors.find((sector) => sector.id === s.id);
+      assert(accepted, 'Every sector must have a reviewed photographic record');
+      assert.equal(s.intervalCount, accepted.intervalCount);
+      assert.equal(s.increment, accepted.increment);
     });
   }
 }
@@ -73,11 +74,18 @@ assert.equal(nav.features.seconds36.present, true);
 assert.equal(manifest.references.find((r) => r.model === 'JY8078-01L').features.timeRow.present, false);
 const km = inventory.marks.find((m) => m.referenceId === nav.id && m.semanticRole === 'distance-km');
 assert.equal(km.style.pointerColour, 'red');
-assert.equal(km.style.pointerGeometry, null, 'Operational evidence does not prove exact shape');
-assert.equal(km.degreeOffsetFromUnit, null, 'Relative pointer location is not an absolute anchor');
+assert.equal(km.style.pointerGeometry, 'solid-triangle');
+assert.equal(km.style.pointerDirection, 'outward');
+assert.equal(km.value, navitimerPacket.distanceAnchorFit.fittedKmValue);
+assert.equal(navitimerPacket.distanceAnchorFit.manufacturerSpecified, false);
+const seconds = inventory.marks.find((m) => m.referenceId === nav.id && m.semanticRole === 'seconds');
+assert.equal(seconds.printedText, null, 'Ordinary black35 is not a seconds36 caption');
+const extraOuterReference = inventory.marks.find((m) => m.referenceId === nav.id && m.semanticRole === 'outer-unlabelled-reference');
+assert.equal(extraOuterReference.printedText, null);
+assert.equal(nav.features.outerUnlabelledReference36.operationConfirmed, false);
 const angle = (v) => 360 * Math.log10(v / 10);
 assert(Math.abs((angle(40) - angle(20)) - (angle(60) - angle(30))) < 1e-10);
 const distances = { statute30ToNm: 30 * 1.609344 / 1.852, statute30ToKm: 30 * 1.609344, statute60ToNm: 60 * 1.609344 / 1.852, statute60ToKm: 60 * 1.609344 };
 assert(Math.abs(distances.statute30ToKm - 48.28032) < 1e-10);
 assert(Math.abs(distances.statute60ToKm - 96.56064) < 1e-10);
-console.log(JSON.stringify({ result: 'research consistency PASS; Citizen reference ready for M3A; combined/runtime fidelity NOT accepted', markRecords: inventory.marks.length, numericalLabels: inventory.marks.filter((m) => m.kind === 'numerical-label').length, citizenGraduationPositions: citizenPacket.graduations.length, countedCitizenSectors: inventory.intervals.filter((s) => s.referenceId === citizenPacket.referenceId && s.intervalCount !== null).length, uncountedIntervalSectors: inventory.intervals.filter((s) => s.intervalCount === null).length, equalRatioDegrees: angle(60) - angle(30), distances }, null, 2));
+console.log(JSON.stringify({ result: 'research consistency PASS; Citizen/Navitimer ready for disclosed reconstruction; runtime/factory fidelity NOT accepted', markRecords: inventory.marks.length, numericalLabels: inventory.marks.filter((m) => m.kind === 'numerical-label').length, citizenGraduationPositions: citizenPacket.graduations.length, navitimerGraduationPositions: navitimerPacket.graduations.length, countedCitizenSectors: inventory.intervals.filter((s) => s.referenceId === citizenPacket.referenceId && s.intervalCount !== null).length, countedNavitimerSectors: inventory.intervals.filter((s) => s.referenceId === navitimerPacket.referenceId && s.intervalCount !== null).length, uncountedIntervalSectors: inventory.intervals.filter((s) => s.intervalCount === null).length, equalRatioDegrees: angle(60) - angle(30), distances }, null, 2));

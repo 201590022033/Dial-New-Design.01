@@ -88,11 +88,15 @@ describe('verified Citizen JY8078-01L research inventory', () => {
     expect(packet.graduations.every((g) => g.retained)).toBe(true);
     expect(packet.pointers.some((p) => /RX|NO|LBS|GAL|LITER|KG/.test(p.caption))).toBe(false);
   });
-  it('does not promote the still-unverified Navitimer sectors', () => {
+  it('keeps newly verified Navitimer research separate from runtime acceptance', () => {
     expect(inventory.intervals.filter((s) => s.referenceId.startsWith('citizen')).every((s) => s.intervalCount !== null)).toBe(true);
     const nav = inventory.intervals.filter((s) => s.referenceId.startsWith('navitimer'));
     expect(nav).toHaveLength(56);
-    expect(nav.every((s) => s.intervalCount === null)).toBe(true);
+    expect(nav.every((s) => s.intervalCount !== null)).toBe(true);
+    for (const row of ['outer', 'inner']) {
+      expect(nav.filter((s) => s.row === row).reduce((sum, s) => sum + (s.intervalCount ?? 0), 0)).toBe(210);
+    }
+    expect(slideRuleReferenceGate).toEqual({ citizen: false, navitimer: false });
   });
   it('preserves the native evidence bytes and labels sampled colours as approximations', () => {
     for (const source of packet.sources.filter((s) => s.localFile)) {
