@@ -31,6 +31,8 @@ export interface SlideRuleLayer {
   targetBandId: string;
   fixedTargetBandId: string | null;
   activeDesign: SlideRuleDesign | null;
+  /** Reopening a disabled band restores its last inspector, without enabling its print. */
+  lastSelectedDesign?: SlideRuleDesign;
   settings: Partial<Record<SlideRuleDesign, SlideRuleDesignSettings>>;
 }
 
@@ -41,7 +43,7 @@ export interface SlideRuleLayersDocument {
 
 /** Software acceptance for disclosed reconstruction; never a factory-exact fidelity gate. */
 export const slideRuleReferenceGate: Readonly<Record<Exclude<SlideRuleDesign, 'simplified'>, boolean>> =
-  Object.freeze({ citizen: true, navitimer: false });
+  Object.freeze({ citizen: true, navitimer: true });
 
 const clone = <T,>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
 
@@ -55,9 +57,17 @@ export const assertSlideRuleLayers = (document: SlideRuleLayersDocument): void =
     ids.add(layer.id);
     targets.add(layer.targetBandId);
     if (layer.activeDesign !== null && !['simplified', 'citizen', 'navitimer'].includes(layer.activeDesign)) throw new Error('Invalid scale design');
+    if (layer.lastSelectedDesign !== undefined && !['simplified', 'citizen', 'navitimer'].includes(layer.lastSelectedDesign)) throw new Error('Invalid last selected scale design');
     if (!layer.settings || (layer.activeDesign && !layer.settings[layer.activeDesign])) throw new Error('Missing scale design settings');
     if (layer.activeDesign && layer.activeDesign !== 'simplified' && !slideRuleReferenceGate[layer.activeDesign]) {
       throw new Error('Unaccepted faithful reference in scale-layer document');
+    }
+    if (layer.activeDesign && layer.activeDesign !== 'simplified') {
+      const settings = layer.settings[layer.activeDesign]!;
+      const identity = layer.activeDesign === 'citizen' ? 'citizen-jy8078-01l-2026-10-07' : 'navitimer-booklet-training-disc-2026-10-07';
+      if (settings.referenceId !== identity || settings.legacy?.pluginConfig?.referenceDesign !== layer.activeDesign || settings.legacy.selectedScaleKind !== 'slide-rule') {
+        throw new Error('Mismatched reference identity in scale-layer document');
+      }
     }
     for (const settings of Object.values(layer.settings)) {
       if (!settings || !Number.isFinite(settings.outerRotationDeg) || !settings.legacy?.pluginConfig || !settings.legacy.context ||
@@ -75,6 +85,7 @@ export const migrateSimplifiedLayer = (
   return { version: 1, layers: [{
     id: `slide-rule:${targetBandId}`, targetBandId, fixedTargetBandId,
     activeDesign: legacy.pluginConfig.previewEnabled === false ? null : 'simplified',
+    lastSelectedDesign: 'simplified',
     settings: { simplified: {
       referenceId: null, colourMode: 'custom', colourOverrides: {},
       visibility: { outer: true, inner: true, time: false, distance: false },
@@ -97,6 +108,7 @@ export const selectSlideRuleDesign = (
   if (!layer) throw new Error(`Unknown scale layer: ${layerId}`);
   if (design && !layer.settings[design]) throw new Error(`Missing ${design} settings`);
   layer.activeDesign = design;
+  if (design) layer.lastSelectedDesign = design;
   return next;
 };
 

@@ -199,7 +199,8 @@ export const useScaleStore = create<ScaleState>((set, get) => ({
     }
     if (band.id !== get().pluginConfig.placementTargetBandId) {
       const layer = useWatchAssemblyStore.getState().assembly.designConfig?.slideRuleLayers?.layers.find((entry) => entry.targetBandId === band.id);
-      const selected = layer?.activeDesign ?? (get().pluginConfig.referenceDesign ?? 'simplified');
+      const selected = layer?.activeDesign ?? layer?.lastSelectedDesign ??
+        (layer?.settings.simplified ? 'simplified' : Object.keys(layer?.settings ?? {})[0] as SlideRuleDesign | undefined) ?? 'simplified';
       const settings = layer?.settings[selected];
       if (settings) {
         get().hydrateScaleState({ ...structuredClone(settings.legacy), previewEnabled: layer?.activeDesign !== null, crossArchetypeUnlocked: get().crossArchetypeUnlocked });

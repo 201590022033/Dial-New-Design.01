@@ -110,7 +110,7 @@ describe('M2 persisted per-band foundation (not yet the editing adapter)', () =>
     expect(deserializeWatchAssembly(serializeWatchAssembly(migrated)).designConfig?.slideRuleLayers)
       .toEqual(migrated.designConfig?.slideRuleLayers);
   });
-  it('rejects duplicate target layers and injected unaccepted active references on load', () => {
+  it('rejects duplicate target layers and falsely labelled generic reference payloads on load', () => {
     const document = migrateSimplifiedLayer(legacy());
     document.layers.push({ ...document.layers[0]!, id: 'duplicate-target' });
     expect(() => assertSlideRuleLayers(document)).toThrow('Duplicate');
@@ -119,7 +119,7 @@ describe('M2 persisted per-band foundation (not yet the editing adapter)', () =>
     injected.layers[0]!.settings.navitimer = injected.layers[0]!.settings.simplified;
     injected.layers[0]!.activeDesign = 'navitimer';
     assembly.designConfig = { ...assembly.designConfig, slideRuleLayers: injected };
-    expect(() => deserializeWatchAssembly(JSON.stringify(assembly))).toThrow('Unaccepted');
+    expect(() => deserializeWatchAssembly(JSON.stringify(assembly))).toThrow('Mismatched reference identity');
   });
   it('keeps disabled settings and per-target edits isolated', () => {
     const document = migrateSimplifiedLayer(legacy());
@@ -132,10 +132,10 @@ describe('M2 persisted per-band foundation (not yet the editing adapter)', () =>
     const enabled = selectSlideRuleDesign(edited, edited.layers[0]!.id, 'simplified');
     expect(enabled.layers[0]!.settings.simplified?.outerRotationDeg).toBe(80);
   });
-  it('refuses incomplete brand presets rather than silently rendering generic artwork', () => {
+  it('refuses missing brand settings rather than silently rendering generic artwork', () => {
     const document = migrateSimplifiedLayer(legacy());
-    for (const design of ['navitimer'] as const) {
-      expect(() => selectSlideRuleDesign(document, document.layers[0]!.id, design)).toThrow('not accepted');
+    for (const design of ['citizen', 'navitimer'] as const) {
+      expect(() => selectSlideRuleDesign(document, document.layers[0]!.id, design)).toThrow('Missing');
     }
     expect(() => selectSlideRuleDesign(document, 'missing', null)).toThrow('Unknown');
   });

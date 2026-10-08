@@ -28,7 +28,7 @@ describe('verified selected Navitimer training-disc research inventory', () => {
     expect(packet.runtimeUse).toBe(false);
     expect(manifest.referenceInventoryReady).toBe(true);
     expect(manifest.gatePassed).toBe(false);
-    expect(slideRuleReferenceGate).toEqual({ citizen: true, navitimer: false });
+    expect(slideRuleReferenceGate).toEqual({ citizen: true, navitimer: true });
   });
   it.each(['outer', 'inner'])('records exactly 210 %s positions, not the Citizen schedule', (row) => {
     const ticks = packet.graduations.filter((g) => g.row === row);

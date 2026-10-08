@@ -34,11 +34,12 @@ export const withScaleSnapshot = (assembly: WatchAssembly, snapshot: ScaleSnapsh
     if (layer) {
       layer.fixedTargetBandId = migrated.fixedTargetBandId;
       layer.activeDesign = copy.previewEnabled ? design : null;
+      layer.lastSelectedDesign = design;
       layer.settings[design] = {
         ...settings,
         baseline: layer.settings[design]?.baseline ?? layer.settings[design]?.legacy ?? migrated.settings.simplified!.baseline
       };
-    } else layers.layers.push({ ...migrated, activeDesign: copy.previewEnabled ? design : null, settings: { [design]: settings } });
+    } else layers.layers.push({ ...migrated, activeDesign: copy.previewEnabled ? design : null, lastSelectedDesign: design, settings: { [design]: settings } });
   } else if (layer) layer.activeDesign = null;
   const savedSettings = layers.layers.find((entry) => entry.targetBandId === target)?.settings[copy.pluginConfig.referenceDesign ?? 'simplified'];
   if (copy.selectedScaleKind === 'slide-rule' && savedSettings) {

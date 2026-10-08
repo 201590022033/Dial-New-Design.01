@@ -16,6 +16,12 @@ Citizen verification follow-up: the published native Canada1600/Europe2000 image
 
 ## Typography and simplified-design addendum
 
+### Accepted practical-design standard — 8 October 2026
+
+The user accepts substitute fonts and an independent, reference-inspired design; factory-exact reproduction is not a completion requirement. This supersedes earlier exact-font/fidelity gates throughout this plan. Milestone3B is complete under this standard. Record source approximations as provenance, not recurring blockers. Do not claim factory identity or legal clearance.
+
+Keep functional/manufacturing checks: calibrated logarithmic positions and distance ratios, correct printed values, millimetre export dimensions, actual glyph fit, no collisions/overflow, independent saved state and consistent rendering/export. For laser preparation, convert the selected font's SVG text to outlines in the manufacturing application, verify the resulting dimensions and legibility at1:1, assign engraving versus cutting operations explicitly, and make a material/kerf test. These are production preparation steps, not reasons to reopen3B over unavailable original font files. Automatic text outlining is not currently implemented.
+
 Preserve **Simplified** as a third, explicitly non-original design, alongside Citizen Skyhawk and Classic Navitimer. The three designs are mutually exclusive on the same band; disabled is a separate state. Migrate existing generic aviation projects into Simplified without silently replacing their geometry, font, density or appearance. Preserve independently edited settings when switching designs.
 
 The initial PDF review found tangent-following number rows, several graduation-length levels, abbreviated printed values, and separate time/reference rows. Citizen U680 printed pages 81-91 correspond to zero-based PDF indices 81-91 (viewer pages 82-92). Its generic diagrams verify operation, not JY8078-01L artwork. The classic Breitling booklet is a 17-page image scan; its training-disc illustration and operational examples are evidence, but not proof of a specific watch model, exact ink hex values, or original font files. A complete per-mark inventory is still required in Milestone 1.
@@ -66,7 +72,7 @@ The exact user's prompt is a requirements document for future milestones. Its in
 | 1 | Reference selection and full graduation/typography inventories | Both selected inventories accepted for disclosed reconstruction: Citizen52 sectors/450 positions; Navitimer56 sectors/420 positions. Factory font/ink/mm and exact source geometry remain qualified; runtime/factory gate false. See [Citizen checkpoint](CITIZEN-VERIFICATION-2026-10-07.md) and [Navitimer checkpoint](NAVITIMER-VERIFICATION-2026-10-08.md) |
 | 2 | Per-band state, Simplified migration, mathematics, typography and shared artwork | Source-independent software foundation complete and committed as adf2fb3;508-test baseline. See [checkpoint](MILESTONE-2-FOUNDATION-CHECKPOINT-2026-10-07.md). Reference research does not enable branded runtime presets |
 | 3A | Citizen Skyhawk preset and Advanced controls | Runtime/state/shared-export wiring complete;568 tests and browser40/42mm checks. Disclosed font/ink/radial/readability limits remain, not factory certification. See [checkpoint](M3A-CITIZEN-IMPLEMENTATION-2026-10-08.md) |
-| 3B | Classic Navitimer preset and comparison | Training-disc reference ready with scan limitations; implementation waits for shared Citizen workflow in3A. Separate1967AOPA variant is not verified/replaced |
+| 3B | Classic Navitimer preset and comparison | Functional runtime/state/shared-export wiring complete with independent420-position training-disc inventory and Engineering/HD checks. Disclosed font/ink/anchor/readability limits remain; separate1967AOPA variant is not verified/replaced. See [checkpoint](M3B-NAVITIMER-IMPLEMENTATION-2026-10-08.md) |
 | 4 | Hybrid shell, contextual inspector and fully wired writing/detail controls | Not started |
 | 5 | Custom decimal-hour / knots-MPH and rate calculators | Not started |
 | 6 | Lume modes, hand tips and targeted GLB work | Not started |

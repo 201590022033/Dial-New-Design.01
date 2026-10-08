@@ -1,4 +1,5 @@
 import { generateCitizenReferenceArtwork, CITIZEN_REFERENCE_ID, type CitizenArtworkOptions } from '@/domain/scales/citizenReferenceArtwork';
+import { generateNavitimerReferenceArtwork, NAVITIMER_REFERENCE_ID } from '@/domain/scales/navitimerReferenceArtwork';
 import type { ScalePluginConfig, ScaleMathContext } from '@/domain/scales/types';
 import { resolvedScaleSvg } from '@/domain/scales/resolvedScaleArtwork';
 import type { ScaleRunResult } from './scaleEngineService';
@@ -7,18 +8,19 @@ import type { ScaleRunResult } from './scaleEngineService';
 export const referenceScaleDefaults = (design: 'citizen' | 'navitimer', config: ScalePluginConfig): Partial<ScalePluginConfig> => {
   const oi = config.bandInnerRadiusMm, oo = config.bandOuterRadiusMm;
   const ii = config.fixedBandInnerRadiusMm ?? oi, io = config.fixedBandOuterRadiusMm ?? oo;
-  const unit = Math.max(0.0001, Math.min(oo - oi - 0.2, io - ii - 0.2) / 115);
+  const navitimer = design === 'navitimer';
+  const unit = Math.max(0.0001, Math.min(oo - oi - 0.2, io - ii - 0.2) / (navitimer ? 60 : 115));
   // Arial cap height is about 0.73em; the packet measures ink caps, not em size.
   // Browser glyph bounds below are authoritative; this is a disclosed fallback.
-  const font = unit * 28 / 0.73;
+  const font = unit * (navitimer ? 14 : 28) / 0.73;
   return {
     referenceDesign: design, referenceColourMode: 'original', referenceColourOverrides: {},
     referenceDistanceVisible: true, referenceLineFactor: 1, referenceTickFactor: 1,
     referencePixelMm: unit, scaleFontSizeMm: font, fontFamily: 'Arial, sans-serif',
     referenceOuterTickRadiusMm: oi + 0.1 + unit * 4,
-    referenceOuterNumeralRadiusMm: oi + 0.1 + unit * 4 + unit * 53,
+    referenceOuterNumeralRadiusMm: oi + 0.1 + unit * (navitimer ? 34 : 57),
     referenceInnerTickRadiusMm: io - 0.1 - unit * 4,
-    referenceInnerNumeralRadiusMm: io - 0.1 - unit * 4 - unit * 55.75,
+    referenceInnerNumeralRadiusMm: io - 0.1 - unit * (navitimer ? 38 : 59.75),
     outerRotationOffsetDeg: 0, outerScaleVisible: true, innerScaleVisible: true,
     outerNumeralsVisible: true, innerNumeralsVisible: true, hoverPaddingMm: 0
   };
@@ -38,8 +40,10 @@ const fontMeasurer = (fontFamily: string) => {
 
 export const runReferenceScale = (config: ScalePluginConfig, _context: ScaleMathContext): ScaleRunResult | null => {
   void _context;
-  if (config.referenceDesign !== 'citizen') return null;
-  const defaults = referenceScaleDefaults('citizen', config);
+  if (config.referenceDesign !== 'citizen' && config.referenceDesign !== 'navitimer') return null;
+  const navitimer = config.referenceDesign === 'navitimer';
+  const designName = navitimer ? 'Classic Navitimer training disc' : 'Citizen Skyhawk JY8078-01L';
+  const defaults = referenceScaleDefaults(config.referenceDesign, config);
   const value = (key: keyof ScalePluginConfig) => (config[key] ?? defaults[key]) as number;
   const font = value('scaleFontSizeMm'), unit = value('referencePixelMm');
   const fixedInner = config.fixedBandInnerRadiusMm ?? config.bandInnerRadiusMm;
@@ -49,7 +53,7 @@ export const runReferenceScale = (config: ScalePluginConfig, _context: ScaleMath
     outer: { innerRadiusMm: config.bandInnerRadiusMm, outerRadiusMm: config.bandOuterRadiusMm,
       tickRadiusMm: value('referenceOuterTickRadiusMm'), numeralRadiusMm: value('referenceOuterNumeralRadiusMm'), sourcePixelMm: unit, fontSizeMm: font },
     inner: { innerRadiusMm: fixedInner, outerRadiusMm: fixedOuter,
-      tickRadiusMm: value('referenceInnerTickRadiusMm'), numeralRadiusMm: value('referenceInnerNumeralRadiusMm'), sourcePixelMm: unit, fontSizeMm: font * (18.5 / 28) },
+      tickRadiusMm: value('referenceInnerTickRadiusMm'), numeralRadiusMm: value('referenceInnerNumeralRadiusMm'), sourcePixelMm: unit, fontSizeMm: font * (navitimer ? 0.85 : 18.5 / 28) },
     outerRotationDeg: config.outerRotationOffsetDeg ?? 0,
     colourMode: config.referenceColourMode ?? 'original', colourOverrides: config.referenceColourOverrides,
     outerVisible: config.outerScaleVisible, innerVisible: config.innerScaleVisible,
@@ -57,12 +61,18 @@ export const runReferenceScale = (config: ScalePluginConfig, _context: ScaleMath
     lineFactor: config.referenceLineFactor, hoverPaddingMm: config.hoverPaddingMm,
     measureText: fontMeasurer(fontFamily)
   };
-  const artwork = generateCitizenReferenceArtwork(options);
+  const artwork = navitimer ? generateNavitimerReferenceArtwork(options) : generateCitizenReferenceArtwork(options);
+  const palette: Readonly<Record<string, string>> = artwork.palette;
+  const ink = (role: string): string => {
+    const colour = palette[role];
+    if (!colour) throw new Error(`Missing ${designName} colour role: ${role}`);
+    return colour;
+  };
   const envelope = (innerRadiusMm: number, outerRadiusMm: number) => ({ innerRadiusMm, outerRadiusMm, contentOuterRadiusMm: outerRadiusMm - 0.08, safetyMarginMm: 0.08 });
   const issues = [...artwork.validation.issues];
   // Both physical targets are required; fallback envelopes are preview-only, never export approval.
   if (!config.fixedPlacementTargetBandId || config.fixedBandOuterRadiusMm === undefined)
-    issues.push('Citizen requires an independently bound fixed calculation ring.');
+    issues.push(`${designName} requires an independently bound fixed calculation ring.`);
   const labels = artwork.labels.filter((label) => !label.id.includes('.number.') ||
     (label.ringId === 'inner' ? config.innerNumeralsVisible !== false : config.outerNumeralsVisible !== false));
   // Do not auto-omit crowded writing. Diagnose it while preserving the calibrated inventory.
@@ -80,14 +90,17 @@ export const runReferenceScale = (config: ScalePluginConfig, _context: ScaleMath
   const structuredWarnings = issues.map((description) => ({ severity: 'error' as const, description, affectedObject: 'reference-scale', suggestedFix: 'Adjust artwork dimensions within the physical target; mathematical positions are fixed.' }));
   const stripInner = Math.max(fixedInner, options.inner.tickRadiusMm - 30 * unit * (config.referenceTickFactor ?? 1) - unit * 2);
   const result: ScaleRunResult = {
-    kind: 'slide-rule', pluginName: `Citizen Skyhawk JY8078-01L (${CITIZEN_REFERENCE_ID}; photographic reconstruction)`,
-    fontSizeMm: font, fontFamily, color: artwork.palette['outer-light-ink'],
+    kind: 'slide-rule', pluginName: `${designName} (${navitimer ? NAVITIMER_REFERENCE_ID : CITIZEN_REFERENCE_ID}; photographic reconstruction)`,
+    fontSizeMm: font, fontFamily, color: ink(navitimer ? 'black-ink' : 'outer-light-ink'),
     ticks: artwork.ticks, labels, pointers: artwork.pointers,
-    substrates: [
-      ...(config.outerScaleVisible !== false ? [{ ringId: 'outer' as const, innerRadiusMm: config.bandInnerRadiusMm, outerRadiusMm: config.bandOuterRadiusMm, color: artwork.palette['outer-navy-substrate'] }] : []),
+    substrates: navitimer ? [
+      ...(config.outerScaleVisible !== false ? [{ ringId: 'outer' as const, innerRadiusMm: config.bandInnerRadiusMm, outerRadiusMm: config.bandOuterRadiusMm, color: ink('outer-light-substrate') }] : []),
+      ...(config.innerScaleVisible !== false ? [{ ringId: 'inner' as const, innerRadiusMm: fixedInner, outerRadiusMm: fixedOuter, color: ink('fixed-light-substrate') }] : [])
+    ] : [
+      ...(config.outerScaleVisible !== false ? [{ ringId: 'outer' as const, innerRadiusMm: config.bandInnerRadiusMm, outerRadiusMm: config.bandOuterRadiusMm, color: ink('outer-navy-substrate') }] : []),
       ...(config.innerScaleVisible !== false ? [
-        { ringId: 'inner' as const, innerRadiusMm: fixedInner, outerRadiusMm: stripInner, color: artwork.palette['fixed-blue-numeral-substrate'] },
-        { ringId: 'inner' as const, innerRadiusMm: stripInner, outerRadiusMm: fixedOuter, color: artwork.palette['fixed-light-substrate'] }
+        { ringId: 'inner' as const, innerRadiusMm: fixedInner, outerRadiusMm: stripInner, color: ink('fixed-blue-numeral-substrate') },
+        { ringId: 'inner' as const, innerRadiusMm: stripInner, outerRadiusMm: fixedOuter, color: ink('fixed-light-substrate') }
       ] : [])
     ],
     geometry: { ticks: artwork.ticks, labels },

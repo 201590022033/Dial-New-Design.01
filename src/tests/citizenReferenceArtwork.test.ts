@@ -106,8 +106,8 @@ describe('Citizen reference artwork generator, pre-runtime acceptance', () => {
     expect(() => generateCitizenReferenceArtwork({ ...options(), colourMode: 'custom', colourOverrides: { 'outer-light-ink': 'red' } })).toThrow();
     expect(() => generateCitizenReferenceArtwork({ ...options(), measureText: () => ({ width: NaN, height: 1 }) })).toThrow();
   });
-  it('separates accepted Citizen reconstruction from pending Navitimer and factory fidelity', () => {
-    expect(slideRuleReferenceGate).toEqual({ citizen: true, navitimer: false });
+  it('separates accepted software reconstruction from factory fidelity', () => {
+    expect(slideRuleReferenceGate).toEqual({ citizen: true, navitimer: true });
     expect(generateCitizenReferenceArtwork(options()).evidence).toBe('photographic-reconstruction-not-factory-exact');
   });
 });

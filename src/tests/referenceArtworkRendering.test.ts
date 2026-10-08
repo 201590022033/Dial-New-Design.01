@@ -5,6 +5,7 @@ import { resolvedScaleSvg } from '@/domain/scales/resolvedScaleArtwork';
 import { generatePseudoDxf } from '@/services/exportGeometryService';
 import { useScaleArtworkTexture } from '@/visual3d/useScaleArtworkTexture';
 import type { VisualWatchModel } from '@/visual3d/watchAssemblyToVisualModel';
+import { generateNavitimerReferenceArtwork, NAVITIMER_PALETTE } from '@/domain/scales/navitimerReferenceArtwork';
 
 const artwork = (): ScaleRunResult => ({
   kind: 'slide-rule', pluginName: 'reference test', fontSizeMm: 0.8, fontFamily: 'Arial', color: '#FFFFFF',
@@ -92,5 +93,33 @@ describe('shared reference artwork primitives', () => {
     const glbTexture = useScaleArtworkTexture(artwork(), { caseDiameterMm: 42 } as VisualWatchModel, 'inner', undefined, false);
     expect(glbTexture!.flipY).toBe(false);
     glbTexture?.dispose();
+  });
+  it.each(['outer', 'inner'] as const)('paints the complete Navitimer %s inventory on its light, not Citizen navy, substrate', (ring) => {
+    const generated = generateNavitimerReferenceArtwork({
+      outer: { innerRadiusMm: 17, outerRadiusMm: 20, tickRadiusMm: 17.2, numeralRadiusMm: 18.7, sourcePixelMm: 0.02, fontSizeMm: 0.4 },
+      inner: { innerRadiusMm: 13, outerRadiusMm: 16, tickRadiusMm: 15.8, numeralRadiusMm: 14.5, sourcePixelMm: 0.02, fontSizeMm: 0.34 }
+    });
+    const preview = { ...artwork(), ticks: generated.ticks, labels: generated.labels, pointers: generated.pointers,
+      color: NAVITIMER_PALETTE['black-ink'], substrates: [
+        { ringId: 'outer' as const, innerRadiusMm: 17, outerRadiusMm: 20, color: NAVITIMER_PALETTE['outer-light-substrate'] },
+        { ringId: 'inner' as const, innerRadiusMm: 13, outerRadiusMm: 16, color: NAVITIMER_PALETTE['fixed-light-substrate'] }
+      ] };
+    const fills: string[] = [], textColours: string[] = [];
+    const context = { fillStyle: '', strokeStyle: '', font: '', lineWidth: 0, lineCap: '', lineJoin: '', textAlign: '', textBaseline: '',
+      beginPath: vi.fn(), arc: vi.fn(), clip: vi.fn(), fillRect: vi.fn(), moveTo: vi.fn(), lineTo: vi.fn(), stroke: vi.fn(),
+      save: vi.fn(), restore: vi.fn(), translate: vi.fn(), rotate: vi.fn(), closePath: vi.fn(),
+      fill: vi.fn(() => { fills.push(context.fillStyle); }), fillText: vi.fn(() => { textColours.push(context.fillStyle); }) };
+    vi.stubGlobal('document', { createElement: () => ({ width: 0, height: 0, getContext: () => context }) });
+    const texture = useScaleArtworkTexture(preview, { caseDiameterMm: 42 } as VisualWatchModel, ring, '#080d14', false);
+    expect(texture).not.toBeNull();
+    expect(texture!.flipY).toBe(false);
+    expect(fills[0]).toBe(NAVITIMER_PALETTE[ring === 'outer' ? 'outer-light-substrate' : 'fixed-light-substrate']);
+    expect(context.stroke).toHaveBeenCalledTimes(208);
+    expect(context.fillText).toHaveBeenCalledTimes(ring === 'outer' ? 30 : 29);
+    expect(textColours).toContain(NAVITIMER_PALETTE['black-ink']);
+    expect(textColours).toContain(NAVITIMER_PALETTE[ring === 'outer' ? 'outer-unit-red' : 'inner-unit-red']);
+    expect(fills).not.toContain('#111C2D');
+    expect(fills.length).toBe(ring === 'outer' ? 4 : 7);
+    texture?.dispose();
   });
 });

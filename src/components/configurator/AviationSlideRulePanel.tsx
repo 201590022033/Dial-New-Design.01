@@ -110,7 +110,7 @@ export const AviationSlideRulePanel = () => {
               <input type="checkbox" checked={config[key] !== false} onChange={(event) => updateConfig({ [key]: event.target.checked })}/>{title}
             </label>)}
             <button type="button" className={actionClass} onClick={resetBaseline}>Reset Simplified baseline</button>
-            <p className="text-[10px] text-engineering-muted">This is the independently saved Simplified design, not original branded artwork. Select Citizen Skyhawk in Advanced on the left for the reference-derived reconstruction. Classic Navitimer is the next implementation milestone.</p>
+            <p className="text-[10px] text-engineering-muted">This is the independently saved Simplified design, not original branded artwork. Select Citizen Skyhawk or Classic Navitimer in Advanced on the left for their distinct reference-derived reconstructions.</p>
           </fieldset>
           <label className="block">Calculation
             <select className="ds-input mt-1" value={mode} onChange={(event) => {

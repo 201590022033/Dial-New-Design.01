@@ -62,3 +62,39 @@ describe('Citizen shared runtime and export adapter', () => {
     expect(styled.ticks.filter((t) => t.ringId === 'inner').map((t) => t.angleDeg)).toEqual(baseline.ticks.filter((t) => t.ringId === 'inner').map((t) => t.angleDeg));
   });
 });
+
+describe('Navitimer shared runtime and export adapter', () => {
+  const nav = () => { const config = fixture(); return { ...config, ...referenceScaleDefaults('navitimer', config) }; };
+  it('uses its independent schedule, light surfaces and black MPH without Citizen boxes', () => {
+    const result = run(nav());
+    expect(result.validation.warnings).toEqual([]);
+    expect(result.ticks).toHaveLength(416);
+    expect(result.labels).toHaveLength(59);
+    expect(result.pointers).toHaveLength(9);
+    expect(result.substrates).toHaveLength(2);
+    expect(result.labels.find((label) => label.text === 'MPH')?.color).toBe('#3C2623');
+    expect(result.labels.filter((label) => label.id?.includes('.inner.number.')).map((label) => label.text)).toContain('7');
+    expect(result.svg).not.toContain('#DEBE34');
+    expect(dxf(nav()).match(/\nHATCH\n/g)).toHaveLength(2);
+    expect(dxf(nav())).not.toMatch(/LBS|GALLON|LITER|HH:MM/);
+  });
+  it('rotates only the outer row and keeps the seconds and distance calibration fixed', () => {
+    const baseline = run(nav()), rotated = run({ ...nav(), outerRotationOffsetDeg: 35 });
+    expect(rotated.pointers?.filter((p) => p.ringId === 'inner')).toEqual(baseline.pointers?.filter((p) => p.ringId === 'inner'));
+    expect(rotated.pointers?.find((p) => p.id.endsWith('.seconds'))?.value).toBe(36);
+    expect(rotated.pointers?.find((p) => p.id.endsWith('.distance-km'))?.value).toBe(61);
+    expect(rotated.ticks.filter((t) => t.ringId === 'outer')[0]!.angleDeg).toBeCloseTo((baseline.ticks[0]!.angleDeg + 35) % 360);
+    expect(run({ ...nav(), referenceDistanceVisible: false }).pointers).toHaveLength(6);
+  });
+  it('isolates custom ink and refuses overflow without dropping source graduations', () => {
+    const config = nav();
+    const custom = run({ ...config, referenceColourMode: 'custom', referenceColourOverrides: { 'mph-black-caption': '#123456' } });
+    expect(custom.labels.find((label) => label.text === 'MPH')?.color).toBe('#123456');
+    expect(custom.pointers?.find((p) => p.id.endsWith('.hour-rate'))?.color).toBe('#2E1A1A');
+    const invalid = run({ ...config, scaleFontSizeMm: 5 });
+    expect(invalid.validation.valid).toBe(false);
+    expect(invalid.ticks).toHaveLength(416);
+    expect(invalid.labels).toHaveLength(59);
+    expect(() => dxf({ ...config, scaleFontSizeMm: 5 })).toThrow();
+  });
+});
