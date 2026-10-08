@@ -1,0 +1,4 @@
+# Preserve generated vector artifacts byte-for-byte. PDF xref padding and
+# DXF TEXT entities containing a space are intentional format content.
+output/pdf/*.pdf binary
+output/pdf/*.dxf -text whitespace=-blank-at-eol

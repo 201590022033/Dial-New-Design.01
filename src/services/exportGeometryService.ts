@@ -4,6 +4,7 @@ import type { ScaleRunResult } from '@/services/scaleEngineService';
 import type { DesignOverlay } from '@/renderer/types';
 import { escapeScaleXml, scaleArtworkLayers, scaleArtworkSvgContent, scaleLabelRotation, scaleLabelBoxSize, scaleTickRadii } from '@/domain/scales/resolvedScaleArtwork';
 import { scalePointerRotation, scalePointerVertices } from '@/domain/scales/pointerGeometry';
+import { resolveMarkerColour, markerNumeralLayout } from '@/domain/generators/markerAppearance';
 
 export interface ExportMetadata {
   projectName?: string;
@@ -102,19 +103,26 @@ const scopeBands = (input: EngineeringExportInput): BandEntity[] => {
   }
 };
 
-const renderBandGeometrySvg = (bands: BandEntity[], centerX: number, centerY: number): string => {
+const renderBandGeometrySvg = (bands: BandEntity[], centerX: number, centerY: number, overlay: DesignOverlay | null): string => {
   return [...bands]
     .sort((a, b) => a.zIndex - b.zIndex)
     .map((band) => {
       const outerR = band.geometry.outerRadius * 10;
       const innerR = band.geometry.innerRadius * 10;
-      const outer = svgCircle(centerX, centerY, outerR, band.style.fill, band.style.stroke, Math.max(1, band.style.strokeWidth), band.style.opacity);
+      const face = band.kind === 'dial-face' ? overlay?.dialFace : undefined;
+      const fill = face?.fill ?? band.style.fill;
+      const stroke = face?.stroke ?? band.style.stroke;
+      const strokeWidth = face ? face.borderWidthMm * 10 : Math.max(1, band.style.strokeWidth);
+      const opacity = face?.opacity ?? band.style.opacity;
+      const outer = svgCircle(centerX, centerY, outerR, fill, stroke, strokeWidth, opacity);
       if (innerR <= 0) {
         return `<g id="${escapeScaleXml(band.svgGroupId)}" data-band-id="${escapeScaleXml(band.id)}">${outer}</g>`;
       }
 
-      const inner = svgCircle(centerX, centerY, innerR, '#0B1224', '#0B1224', 1, 1);
-      return `<g id="${escapeScaleXml(band.svgGroupId)}" data-band-id="${escapeScaleXml(band.id)}">${outer}${inner}</g>`;
+      // A ring has a transparent hole, not a dark disc painted over the dial.
+      const loop = (r: number) => `M ${centerX + r} ${centerY} A ${r} ${r} 0 1 0 ${centerX - r} ${centerY} A ${r} ${r} 0 1 0 ${centerX + r} ${centerY} Z`;
+      const annulus = `<path d="${loop(outerR)} ${loop(innerR)}" fill="${escapeScaleXml(fill)}" fill-rule="evenodd" stroke="${escapeScaleXml(stroke)}" stroke-width="${strokeWidth}" opacity="${opacity}" />`;
+      return `<g id="${escapeScaleXml(band.svgGroupId)}" data-band-id="${escapeScaleXml(band.id)}">${annulus}</g>`;
     })
     .join('');
 };
@@ -125,10 +133,17 @@ const renderOverlaySvg = (
   centerX: number,
   centerY: number,
   target: EngineeringExportTarget,
-  selectedBandId: string | null
+  selectedBandId: string | null,
+  dialRadiusMm: number
 ): string => {
   const markerLines = (overlay?.markers ?? [])
     .map((entry) => {
+      const colour = resolveMarkerColour(overlay?.dialFace.fill ?? '#18202b', overlay?.markerColour, entry.lumed);
+      if (entry.marker.text && (entry.kind === 'arabic-numeral' || entry.kind === 'roman-numeral')) {
+        const glyph = markerNumeralLayout(entry.marker, dialRadiusMm);
+        const font = entry.kind === 'roman-numeral' ? 'Georgia, serif' : 'Arial, sans-serif';
+        return `<text data-hour-marker="${escapeScaleXml(entry.marker.id)}" x="${centerX + glyph.xMm * 10}" y="${centerY + glyph.yMm * 10}" fill="${escapeScaleXml(colour)}" font-size="${glyph.fontSizeMm * 10}" text-anchor="middle" dominant-baseline="central" font-family="${font}">${escapeScaleXml(entry.marker.text)}</text>`;
+      }
       const start = polarToCartesianPx(entry.marker.innerRadiusMm, entry.marker.angleDeg);
       const end = polarToCartesianPx(entry.marker.outerRadiusMm, entry.marker.angleDeg);
       return svgLine(
@@ -136,7 +151,7 @@ const renderOverlaySvg = (
         centerY + start.y,
         centerX + end.x,
         centerY + end.y,
-        entry.lumed ? '#C7F9CC' : '#E2E8F0',
+        colour,
         Math.max(1, entry.marker.widthMm * 10)
       );
     })
@@ -178,8 +193,9 @@ export const generateEngineeringSvg = (input: EngineeringExportInput): string =>
   const centerX = width / 2;
   const centerY = height / 2;
 
-  const content = renderBandGeometrySvg(scoped, centerX, centerY);
-  const overlays = renderOverlaySvg(input.designOverlay, input.scalePreview, centerX, centerY, input.target, input.selectedBandId);
+  const content = renderBandGeometrySvg(scoped, centerX, centerY, input.designOverlay);
+  const overlays = renderOverlaySvg(input.designOverlay, input.scalePreview, centerX, centerY, input.target, input.selectedBandId,
+    input.bands.find(band => band.kind === 'dial-face')?.geometry.outerRadius ?? 14.25);
 
   const result = `<svg xmlns="http://www.w3.org/2000/svg" width="${width / 10}mm" height="${height / 10}mm" viewBox="0 0 ${width} ${height}">${renderMetadataComment(input.metadata)}${content}${overlays}</svg>`;
   exportSvgCache.set(cacheKey, result);
@@ -269,6 +285,27 @@ export const generatePseudoDxf = (input: EngineeringExportInput): string => {
     ];
   });
 
+  const overlay = input.designOverlay;
+  const includeDialArtwork = scoped.some(band => band.kind === 'dial-face');
+  const textEntity = (layer: string, text: string, x: number, y: number, size: number, hex: string) =>
+    ['0', 'TEXT', '8', layer, '420', colour(hex), '10', String(x), '20', String(y), '11', String(x), '21', String(y), '40', String(size), '72', '1', '73', '2', '1', text.replace(/[\r\n]/g, ' ')];
+  const dialRadius = input.bands.find(band => band.kind === 'dial-face')?.geometry.outerRadius ?? 14.25;
+  const dialArtwork = !includeDialArtwork || !overlay ? [] : [
+    ...overlay.markers.flatMap(entry => {
+      const hex = resolveMarkerColour(overlay.dialFace.fill, overlay.markerColour, entry.lumed);
+      if (entry.marker.text && (entry.kind === 'roman-numeral' || entry.kind === 'arabic-numeral')) {
+        const glyph = markerNumeralLayout(entry.marker, dialRadius);
+        return textEntity('dial-hour-markers', entry.marker.text, glyph.xMm, -glyph.yMm, glyph.fontSizeMm, hex);
+      }
+      const [x1, y1] = point(entry.marker.innerRadiusMm, entry.marker.angleDeg), [x2, y2] = point(entry.marker.outerRadiusMm, entry.marker.angleDeg);
+      return ['0', 'LWPOLYLINE', '8', 'dial-hour-markers', '420', colour(hex), '90', '2', '70', '0', '43', String(entry.marker.widthMm), '10', String(x1), '20', String(y1), '10', String(x2), '20', String(y2)];
+    }),
+    ...overlay.typography.flatMap(entry => {
+      const [x, y] = point(entry.radiusMm, entry.angleDeg);
+      return textEntity('dial-typography', entry.text, x!, y!, Math.max(.8, entry.fontSizeMm), entry.color);
+    })
+  ];
+
   return [
     `0`,
     `SECTION`,
@@ -289,6 +326,7 @@ export const generatePseudoDxf = (input: EngineeringExportInput): string => {
     '999', 'Scale text uses the DXF viewer font; use SVG with outlined text for font-exact manufacture.',
     ...(preview && !preview.validation.valid ? ['999', 'WARNING: printable annulus fit is invalid; do not manufacture this drawing.'] : []),
     ...marks,
+    ...dialArtwork,
     `0`,
     `ENDSEC`,
     `0`,

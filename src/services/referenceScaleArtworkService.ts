@@ -1,7 +1,7 @@
 import { generateCitizenReferenceArtwork, CITIZEN_REFERENCE_ID, type CitizenArtworkOptions } from '@/domain/scales/citizenReferenceArtwork';
 import { generateNavitimerReferenceArtwork, NAVITIMER_REFERENCE_ID } from '@/domain/scales/navitimerReferenceArtwork';
-import type { ScalePluginConfig, ScaleMathContext } from '@/domain/scales/types';
-import { resolvedScaleSvg } from '@/domain/scales/resolvedScaleArtwork';
+import type { ScalePluginConfig, ScaleMathContext, ScaleLabel } from '@/domain/scales/types';
+import { resolvedScaleSvg, scaleLabelBoxSize, scaleLabelRotation } from '@/domain/scales/resolvedScaleArtwork';
 import type { ScaleRunResult } from './scaleEngineService';
 
 /** Reference proportions adapted to the selected printable annuli, never supplier factory mm. */
@@ -36,6 +36,34 @@ const fontMeasurer = (fontFamily: string) => {
     return { width: Math.max(m.width, m.actualBoundingBoxLeft + m.actualBoundingBoxRight) / 100,
       height: ((m.actualBoundingBoxAscent ?? 0) + (m.actualBoundingBoxDescent ?? 0) || size * 100) / 100 };
   };
+};
+
+/** Conservative rotated ink-box check; warnings do not alter calibrated positions. */
+export const referenceCaptionCollisionWarnings = (labels: ScaleLabel[], fontSizeMm: number): string[] => {
+  const box = (label: ScaleLabel) => {
+    const size = scaleLabelBoxSize(label, fontSizeMm);
+    const angle = label.angleDeg * Math.PI / 180;
+    const rotation = scaleLabelRotation(label) * Math.PI / 180;
+    const cx = label.radiusMm * Math.sin(angle), cy = -label.radiusMm * Math.cos(angle);
+    return ([[-1, -1], [1, -1], [1, 1], [-1, 1]] as const).map(([x, y]) => {
+      const px = x * size.width / 2, py = y * size.height / 2;
+      return [cx + px * Math.cos(rotation) - py * Math.sin(rotation), cy + px * Math.sin(rotation) + py * Math.cos(rotation)] as const;
+    });
+  };
+  const overlap = (a: ScaleLabel, b: ScaleLabel) => {
+    const ap = box(a), bp = box(b);
+    for (const polygon of [ap, bp]) for (let i = 0; i < 2; i++) {
+      const p = polygon[i]!, q = polygon[i + 1]!;
+      const axis = [q[1] - p[1], p[0] - q[0]];
+      const av = ap.map(v => v[0] * axis[0]! + v[1] * axis[1]!);
+      const bv = bp.map(v => v[0] * axis[0]! + v[1] * axis[1]!);
+      if (Math.max(...av) <= Math.min(...bv) || Math.max(...bv) <= Math.min(...av)) return false;
+    }
+    return true;
+  };
+  return labels.filter(label => !label.id?.includes('.number.')).flatMap(caption =>
+    labels.filter(label => label.id?.includes('.number.') && label.ringId === caption.ringId && overlap(caption, label))
+      .map(number => `${caption.ringId} caption ${caption.text} may overlap numeral ${number.text}; inspect 1:1 and adjust the printable ring or caption layout before manufacture.`));
 };
 
 export const runReferenceScale = (config: ScalePluginConfig, _context: ScaleMathContext): ScaleRunResult | null => {
@@ -75,6 +103,46 @@ export const runReferenceScale = (config: ScalePluginConfig, _context: ScaleMath
     issues.push(`${designName} requires an independently bound fixed calculation ring.`);
   const labels = artwork.labels.filter((label) => !label.id.includes('.number.') ||
     (label.ringId === 'inner' ? config.innerNumeralsVisible !== false : config.outerNumeralsVisible !== false));
+  const readabilityWarnings: string[] = [];
+  // Adapt caption radius only when real glyph boxes collide. Logarithmic angular
+  // anchors, calibrated values, numerals and graduations remain untouched.
+  for (let index = 0; index < labels.length; index++) {
+    const caption = labels[index]!;
+    if (caption.id?.includes('.number.') || !referenceCaptionCollisionWarnings([caption, ...labels.filter(label => label.id?.includes('.number.'))], font).length) continue;
+    const inner = caption.ringId === 'inner' ? fixedInner : config.bandInnerRadiusMm;
+    const outer = caption.ringId === 'inner' ? fixedOuter : config.bandOuterRadiusMm;
+    const fits = (candidate: ScaleLabel) => {
+      const size = scaleLabelBoxSize(candidate, font), angle = candidate.angleDeg * Math.PI / 180;
+      const rotation = scaleLabelRotation(candidate) * Math.PI / 180;
+      const cx = candidate.radiusMm * Math.sin(angle), cy = -candidate.radiusMm * Math.cos(angle);
+      const localX = cx * Math.cos(rotation) + cy * Math.sin(rotation);
+      const localY = -cx * Math.sin(rotation) + cy * Math.cos(rotation);
+      const nearestRadius = Math.hypot(Math.max(0, Math.abs(localX) - size.width / 2), Math.max(0, Math.abs(localY) - size.height / 2));
+      return nearestRadius >= inner + .08 && ([-1, 1] as const).every(sx => ([-1, 1] as const).every(sy => {
+        const x = sx * size.width / 2, y = sy * size.height / 2;
+        const r = Math.hypot(cx + x * Math.cos(rotation) - y * Math.sin(rotation), cy + x * Math.sin(rotation) + y * Math.cos(rotation));
+        return r >= inner + .08 && r <= outer - .08;
+      })) && !referenceCaptionCollisionWarnings([candidate, ...labels.filter(label => label.id?.includes('.number.'))], font).length;
+    };
+    let adapted: typeof caption | undefined;
+    for (let step = 1; step <= Math.ceil((outer - inner) / .05) && !adapted; step++)
+      for (const direction of [-1, 1]) {
+        const candidate = { ...caption, radiusMm: caption.radiusMm + direction * step * .05 };
+        if (fits(candidate)) { adapted = candidate; break; }
+      }
+    if (adapted) {
+      labels[index] = adapted;
+      readabilityWarnings.push(`${caption.text} caption moved radially ${(adapted.radiusMm - caption.radiusMm).toFixed(2)} mm to avoid ink collision; its calibrated angular anchor is unchanged.`);
+    } else issues.push(`${caption.text} caption cannot avoid numeral collision within its physical annulus; choose wider hardware or a simpler design before exporting.`);
+  }
+  const minimumFont = labels.length ? Math.min(...labels.map((label) => label.fontSizeMm)) : Infinity;
+  // A fit-only adaptation can shrink all artwork into an invisible surface.
+  // This is a practical production safeguard, not an original-font fidelity gate.
+  if (minimumFont < .1) issues.push(`Scale text is microscopic (${minimumFont.toFixed(3)} mm font size, below the 0.10 mm safety floor). Use a wider printable ring or a simpler design; export is refused.`);
+  const profileTextSize = Math.max(.1, (config.minimumLineWidthMm ?? .1) * 3);
+  if (minimumFont >= .1 && minimumFont < profileTextSize)
+    readabilityWarnings.push(`Scale text is ${minimumFont.toFixed(3)} mm; the selected minimum-line profile suggests at least ${profileTextSize.toFixed(2)} mm font size (three times its line feature). Verify readability and material/laser tests at 1:1.`);
+  readabilityWarnings.push(...referenceCaptionCollisionWarnings(labels, font));
   // Do not auto-omit crowded writing. Diagnose it while preserving the calibrated inventory.
   const numbered = labels.filter((label) => label.id.includes('.number.'));
   for (const row of ['outer', 'inner'] as const) {
@@ -88,6 +156,7 @@ export const runReferenceScale = (config: ScalePluginConfig, _context: ScaleMath
     }
   }
   const structuredWarnings = issues.map((description) => ({ severity: 'error' as const, description, affectedObject: 'reference-scale', suggestedFix: 'Adjust artwork dimensions within the physical target; mathematical positions are fixed.' }));
+  const allWarnings = [...structuredWarnings, ...readabilityWarnings.map((description) => ({ severity: 'warning' as const, description, affectedObject: 'reference-scale', suggestedFix: 'Check 1:1 readability and make a material/laser test, or choose a wider physical ring.' }))];
   const stripInner = Math.max(fixedInner, options.inner.tickRadiusMm - 30 * unit * (config.referenceTickFactor ?? 1) - unit * 2);
   const result: ScaleRunResult = {
     kind: 'slide-rule', pluginName: `${designName} (${navitimer ? NAVITIMER_REFERENCE_ID : CITIZEN_REFERENCE_ID}; photographic reconstruction)`,
@@ -104,7 +173,7 @@ export const runReferenceScale = (config: ScalePluginConfig, _context: ScaleMath
       ] : [])
     ],
     geometry: { ticks: artwork.ticks, labels },
-    validation: { valid: !issues.length, warnings: issues, structuredWarnings }, svg: '', preview: '',
+    validation: { valid: !issues.length, warnings: [...issues, ...readabilityWarnings], structuredWarnings: allWarnings }, svg: '', preview: '',
     placementTargetBandId: config.placementTargetBandId, fixedPlacementTargetBandId: config.fixedPlacementTargetBandId,
     physicalTargetsResolved: config.physicalTargetsResolved,
     placementEnvelope: envelope(config.bandInnerRadiusMm, config.bandOuterRadiusMm),

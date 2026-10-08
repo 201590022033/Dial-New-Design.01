@@ -18,6 +18,7 @@ export const DesignVersionsFilmstrip: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
 
   const savedVersions = useConfiguratorUIStore((s) => s.savedVersions);
+  const versionStorageWarning = useConfiguratorUIStore((s) => s.versionStorageWarning);
   const previewingVersionId = useConfiguratorUIStore((s) => s.previewingVersionId);
   const saveVersion = useConfiguratorUIStore((s) => s.saveVersion);
   const restoreVersion = useConfiguratorUIStore((s) => s.restoreVersion);
@@ -39,6 +40,7 @@ export const DesignVersionsFilmstrip: React.FC = () => {
       className="bg-slate-950 border-t border-slate-800 text-slate-200 select-none transition-all duration-200"
     >
       {/* Filmstrip Header / Toggle bar */}
+      {versionStorageWarning && <p role="status" className="px-3 py-1 text-[10px] text-amber-300">{versionStorageWarning} Export your project to keep a durable backup.</p>}
       <div className="flex items-center justify-between px-3 py-1.5 bg-slate-900/80 border-b border-slate-800/60 text-xs">
         <div className="flex items-center gap-2">
           <History className="h-3.5 w-3.5 text-teal-400" />

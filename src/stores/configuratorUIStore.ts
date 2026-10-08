@@ -18,7 +18,9 @@ import {
 } from '@/domain/configurator/bomCostCalculator';
 import {
   createVersionRecord,
-  pruneAutomaticCheckpoints
+  pruneAutomaticCheckpoints,
+  loadSavedVersions,
+  persistSavedVersions
 } from '@/domain/configurator/versionManager';
 import type {
   BuildReadiness,
@@ -75,6 +77,7 @@ export interface ConfiguratorUIStoreState {
 
   // Versioning & Checkpoints
   savedVersions: SavedDesignVersion[];
+  versionStorageWarning: string | null;
   previewingVersionId: string | null;
 
   // Guided Fix flow
@@ -137,6 +140,8 @@ export interface ConfiguratorUIStoreState {
   undoLastChange: () => boolean;
 }
 
+const durableVersions = loadSavedVersions();
+
 export const useConfiguratorUIStore = create<ConfiguratorUIStoreState>((set, get) => ({
   workMode: 'parts',
   activePartInstanceId: 'inst-dial',
@@ -163,7 +168,8 @@ export const useConfiguratorUIStore = create<ConfiguratorUIStoreState>((set, get
   committedDecisionsHistory: [],
   suppressedSensitivities: new Set<PracticalSensitivityKind>(),
 
-  savedVersions: [],
+  savedVersions: durableVersions.versions,
+  versionStorageWarning: durableVersions.warning,
   previewingVersionId: null,
 
   isGuidedFixActive: false,
@@ -611,3 +617,9 @@ export const useConfiguratorUIStore = create<ConfiguratorUIStoreState>((set, get
     return true;
   }
 }));
+
+useConfiguratorUIStore.subscribe((state, previous) => {
+  if (state.savedVersions === previous.savedVersions) return;
+  const warning = persistSavedVersions(state.savedVersions);
+  if (state.versionStorageWarning !== warning) useConfiguratorUIStore.setState({ versionStorageWarning: warning });
+});

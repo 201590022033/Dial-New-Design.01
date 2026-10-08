@@ -1,10 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { runScalePlugin } from '@/services/scaleEngineService';
-import { referenceScaleDefaults } from '@/services/referenceScaleArtworkService';
+import { referenceScaleDefaults, referenceCaptionCollisionWarnings } from '@/services/referenceScaleArtworkService';
 import { getScalePlugin } from '@/domain/scales/scaleRegistry';
 import { fullMinuteRingContext } from '@/domain/scales/minuteRingContext';
 import { generatePseudoDxf } from '@/services/exportGeometryService';
 import type { ScalePluginConfig } from '@/domain/scales/types';
+import { createStarterBuild } from '@/domain/configurator/defaultBuilds';
+import { assemblyToBands } from '@/domain/assembly/assemblyAdapters';
+import { resolvePhysicalScaleConfig } from '@/services/scaleLayerArtworkService';
 
 const fixture = (): ScalePluginConfig => {
   const config = { ...getScalePlugin('slide-rule')!.defaultConfig,
@@ -17,6 +20,37 @@ const dxf = (config: ScalePluginConfig) => generatePseudoDxf({ target: 'entire-p
   context: { width: 600, height: 600, centerX: 300, centerY: 300, zoom: 1, panX: 0, panY: 0 }, scalePreview: run(config), designOverlay: null });
 
 describe('Citizen shared runtime and export adapter', () => {
+  it('warns about unit-caption ink collision without changing scale anchors', () => {
+    const common = { radiusMm: 15, angleDeg: 0, rotationDeg: 0, orientation: 'horizontal' as const, placement: 'inside' as const, ringId: 'inner' as const, fontSizeMm: 1, boundsMm: { width: 2, height: 1 } };
+    const number = { ...common, id: 'citizen.inner.number.10', text: '10' };
+    const caption = { ...common, id: 'citizen.inner.distance-naut', text: 'NAUT.' };
+    expect(referenceCaptionCollisionWarnings([number, caption], 1)[0]).toContain('caption NAUT. may overlap numeral 10');
+    expect(referenceCaptionCollisionWarnings([number, { ...caption, angleDeg: 90 }], 1)).toEqual([]);
+  });
+  it('adapts crowded pilot captions radially or refuses the physical fit without shifting graduations', () => {
+    const assembly = createStarterBuild('pilot').assembly;
+    const physical = resolvePhysicalScaleConfig(assembly, assemblyToBands(assembly), { ...getScalePlugin('slide-rule')!.defaultConfig, placementTargetBandId: 'band-outer-bezel', fixedPlacementTargetBandId: 'band-chapter-ring' }, 'slide-rule');
+    const config = { ...physical, ...referenceScaleDefaults('citizen', physical) };
+    const result = run(config);
+    expect(referenceCaptionCollisionWarnings(result.labels, result.fontSizeMm)).toEqual([]);
+    expect(result.validation.valid).toBe(true);
+    const rotated = run({ ...config, outerRotationOffsetDeg: 30 });
+    expect(rotated.ticks.filter(tick => tick.ringId === 'inner').map(tick => tick.angleDeg)).toEqual(result.ticks.filter(tick => tick.ringId === 'inner').map(tick => tick.angleDeg));
+    const crowded = run({ ...config, scaleFontSizeMm: 2 });
+    expect(crowded.validation.valid).toBe(false);
+    expect(crowded.ticks).toHaveLength(result.ticks.length);
+  });
+  it('refuses microscopic text but preserves substitute-font/profile-warning adaptations', () => {
+    const config = fixture();
+    const microscopic = run({ ...config, scaleFontSizeMm: .06 });
+    expect(microscopic.validation.valid).toBe(false);
+    expect(microscopic.validation.warnings.join(' ')).toContain('0.10 mm safety floor');
+    expect(() => dxf({ ...config, scaleFontSizeMm: .06 })).toThrow();
+    const adapted = run({ ...config, scaleFontSizeMm: .3, fontFamily: 'Arial, sans-serif' });
+    expect(adapted.validation.valid).toBe(true);
+    expect(adapted.validation.structuredWarnings.some(warning => warning.severity === 'warning' && warning.description.includes('selected minimum-line profile'))).toBe(true);
+    expect(adapted.ticks.map(tick => tick.angleDeg)).toEqual(run(config).ticks.map(tick => tick.angleDeg));
+  });
   it('uses verified retained geometry and distinct annular surfaces in the canonical engine', () => {
     const result = run();
     expect(result.validation.warnings).toEqual([]);

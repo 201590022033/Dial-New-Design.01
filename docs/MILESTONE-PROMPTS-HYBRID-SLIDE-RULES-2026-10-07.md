@@ -73,7 +73,7 @@ The exact user's prompt is a requirements document for future milestones. Its in
 | 2 | Per-band state, Simplified migration, mathematics, typography and shared artwork | Source-independent software foundation complete and committed as adf2fb3;508-test baseline. See [checkpoint](MILESTONE-2-FOUNDATION-CHECKPOINT-2026-10-07.md). Reference research does not enable branded runtime presets |
 | 3A | Citizen Skyhawk preset and Advanced controls | Runtime/state/shared-export wiring complete;568 tests and browser40/42mm checks. Disclosed font/ink/radial/readability limits remain, not factory certification. See [checkpoint](M3A-CITIZEN-IMPLEMENTATION-2026-10-08.md) |
 | 3B | Classic Navitimer preset and comparison | Functional runtime/state/shared-export wiring complete with independent420-position training-disc inventory and Engineering/HD checks. Disclosed font/ink/anchor/readability limits remain; separate1967AOPA variant is not verified/replaced. See [checkpoint](M3B-NAVITIMER-IMPLEMENTATION-2026-10-08.md) |
-| 4 | Hybrid shell, contextual inspector and fully wired writing/detail controls | Not started |
+| 4 | Hybrid shell, contextual inspector and fully wired writing/detail controls | Implemented and published as 531bf2f; visual exception repairs verified in the follow-up checkpoint. See [repair checkpoint](M4-VISUAL-REPAIRS-2026-10-08.md) |
 | 5 | Custom decimal-hour / knots-MPH and rate calculators | Not started |
 | 6 | Lume modes, hand tips and targeted GLB work | Not started |
 | 7 | Full browser, export and cross-archetype acceptance | Not started |
@@ -124,7 +124,7 @@ Gate: Navitimer calculation/visual/state requirements pass without regressing Ci
 
 ### Milestone 4 prompt — build the hybrid dashboard and inspector
 
-8 October completion: [Milestone 4 checkpoint](M4-HYBRID-DASHBOARD-2026-10-08.md) records the local hybrid dashboard implementation, 652 passing tests, browser/export acceptance and remaining visual/manufacturing limitations. Changes are uncommitted; M5 has not started.
+8 October completion: [Milestone 4 checkpoint](M4-HYBRID-DASHBOARD-2026-10-08.md) records the original hybrid dashboard implementation, published as `531bf2f`. The [visual repair follow-up](M4-VISUAL-REPAIRS-2026-10-08.md) records subsequent verification and remaining physical manufacturing checks. M5 has not started.
 
 > Apply the shared master prompt and complete Milestone 4 only. Implement the audit's top diameter slider + typed mm field, compact thumbnail component navigator, selected-ring highlight, contextual right-hand inspector, texture thumbnails/direction where applicable, editable/copyable validated hex fields and finish close-up. Keep the established workflow rail and procurement/design checks. Respect ladies and larger cases instead of hard-limiting everything to the mock-up's 38–44mm range. Clearly distinguish resizing a custom preview from buying a physically different supplier case.
 >

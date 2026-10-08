@@ -1,5 +1,7 @@
 # Milestone 4 — hybrid dashboard checkpoint
 
+Publication/reconciliation follow-up: this checkpoint was committed and pushed as `531bf2f`. The user subsequently requested repair of its recorded visual exceptions; see [reconciliation](M4-VISUAL-REPAIRS-2026-10-08.md). The original observations below are historical, not claims that those defects must remain.
+
 Completed 8 October 2026. Implementation is local and uncommitted; baseline remains published `3b60e98`. No Milestone 5/6 work, supplier contacts, purchases or new GLBs were undertaken.
 
 ## Implemented

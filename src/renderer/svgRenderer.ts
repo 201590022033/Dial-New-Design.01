@@ -1,5 +1,6 @@
 import { SVG, type Svg } from '@svgdotjs/svg.js';
 import { generateTextureGrain } from '@/domain/generators/textureEngine';
+import { markerGlyphOverlapsCutout, markerNumeralLayout, resolveMarkerColour } from '@/domain/generators/markerAppearance';
 import { fitWatchScale } from '@/renderer/services/zoomService';
 import { scaleArtworkSvgContent } from '@/domain/scales/resolvedScaleArtwork';
 import { resolvePhysicalAssembly } from '@/domain/assembly/physicalAssembly';
@@ -323,12 +324,14 @@ export class SvgRenderer implements RendererAdapter {
         const innerRadiusMm = Math.max(0, outerRadiusMm - markerLengthMm);
         const inner = polarToCartesian(mmToPixels(innerRadiusMm), marker.angleDeg);
         const outer = polarToCartesian(mmToPixels(outerRadiusMm), marker.angleDeg);
-        const color = assembly.designConfig?.visualReferenceConfig?.markerColor ?? (entry.lumed ? '#C7F9CC' : '#E2E8F0');
+        const color = resolveMarkerColour(overlay.dialFace.fill, assembly.designConfig?.visualReferenceConfig?.markerColor, entry.lumed);
 
         if (marker.text) {
-          const midpoint = polarToCartesian(mmToPixels((innerRadiusMm + outerRadiusMm) / 2), marker.angleDeg);
+          const glyph = markerNumeralLayout({ ...marker, innerRadiusMm, outerRadiusMm }, dialRadiusMm);
+          if (markerGlyphOverlapsCutout(glyph, [{ xMm: 10.5, yMm: 0, widthMm: 3.2, heightMm: 2.6 }])) return;
+          const midpoint = polarToCartesian(mmToPixels(glyph.radiusMm), marker.angleDeg);
           markersGroup.text(marker.text)
-            .font({ size: mmToPixels(Math.min(1.55, Math.max(0.9, markerLengthMm * 0.65))), family: entry.kind === 'roman-numeral' ? 'Georgia, serif' : 'Arial, sans-serif', anchor: 'middle', weight: 'bold' })
+            .font({ size: mmToPixels(glyph.fontSizeMm), family: entry.kind === 'roman-numeral' ? 'Georgia, serif' : 'Arial, sans-serif', anchor: 'middle', weight: 'bold' })
             .fill(color)
             .center(context.centerX + midpoint.x, context.centerY + midpoint.y)
             .attr('data-marker-index', String(index))

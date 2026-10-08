@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { BandEntity } from '@/domain/bands/types';
-import { fitSpanToRegion, resolvePhysicalAssembly } from '@/domain/assembly/physicalAssembly';
+import { resolvePhysicalAssembly } from '@/domain/assembly/physicalAssembly';
 import {
   defaultDialFaceConfig,
   generateDialFace,
@@ -103,7 +103,8 @@ const createOverlay = (
   chapterRingResult: ChapterRingResult,
   lumeResult: LumeResult,
   chapterRingVisible = true,
-  texture = defaultDialFaceConfig.texture
+  texture = defaultDialFaceConfig.texture,
+  markerColour?: string
 ): DesignOverlay => {
   const markers = generateMarkers(markerConfig).map((marker) => ({
     marker,
@@ -112,6 +113,7 @@ const createOverlay = (
   }));
 
   return {
+    markerColour,
     dialFace: {
       fill: dialFaceResult.background.style.fill,
       stroke: dialFaceResult.background.style.stroke,
@@ -269,7 +271,14 @@ export const useDesignEngineStore = create<DesignEngineState>((set, get) => ({
     const chapterRegion = assembly.regions['chapter-ring'];
     const chapterRingVisible = Boolean(chapterRegion);
     const markerLengthMm = state.markerConfig.radiusOuterMm - state.markerConfig.radiusInnerMm;
-    const markerSpan = dialRegion ? fitSpanToRegion(dialRegion, markerLengthMm) : null;
+    // Preserve the authored inward clearance. Synchronisation clamps overflow,
+    // rather than sliding every marker to the dial edge and obscuring its track.
+    const markerSpan = dialRegion ? (() => {
+      const length = Math.max(0, Math.min(markerLengthMm, dialRegion.outerRadiusMm - dialRegion.innerRadiusMm));
+      const outerRadiusMm = Math.max(dialRegion.innerRadiusMm + length,
+        Math.min(state.markerConfig.radiusOuterMm, dialRegion.outerRadiusMm));
+      return { innerRadiusMm: outerRadiusMm - length, outerRadiusMm };
+    })() : null;
 
     const geometryChanged = Boolean(
       (chapterRegion &&
@@ -360,7 +369,8 @@ export const useDesignEngineStore = create<DesignEngineState>((set, get) => ({
         chapterRingResult,
         lumeResult,
         state.chapterRingVisible,
-        state.dialFaceConfig.texture
+        state.dialFaceConfig.texture,
+        state.visualReferenceConfig?.markerColor
       ),
       warnings: collectWarnings(dialFaceResult, chapterRingResult, bezelResult)
     });

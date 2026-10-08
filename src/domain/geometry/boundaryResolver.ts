@@ -437,7 +437,9 @@ export const resolveAssemblyGeometry = (
   }
 
   // 10. Compute Authoritative Content Slots
-  const dialApertureRadius = chapterExtent ? chapterExtent.innerRadiusMm : dialOuterRadius;
+  // A larger chapter opening cannot create printable dial beyond the physical
+  // blank. A smaller one legitimately covers its rim; keep both constraints.
+  const dialApertureRadius = chapterExtent ? Math.min(chapterExtent.innerRadiusMm, dialOuterRadius) : dialOuterRadius;
 
   const dialSlot: ContentSlotRegion = {
     slotId: 'slot-dial-face',
@@ -523,7 +525,7 @@ export const resolveAssemblyGeometry = (
 
   const projected2DBands: Record<string, DonutGeometry> = {
     'dial-face': { innerRadius: r0, outerRadius: r1 },
-    'chapter-ring': { innerRadius: r1, outerRadius: r2 },
+    'chapter-ring': { innerRadius: chapterSlot?.innerRadiusMm ?? r1, outerRadius: r2 },
     'inner-bezel': { innerRadius: r2, outerRadius: r3 },
     'outer-bezel': { innerRadius: r3, outerRadius: r4 }
   };

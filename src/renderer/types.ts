@@ -43,6 +43,8 @@ export interface MarkerOverlay {
 }
 
 export interface DesignOverlay {
+  /** Explicit user choice only; absence enables presentation contrast against the dial. */
+  markerColour?: string;
   dialFace: DialFaceOverlay;
   markers: MarkerOverlay[];
   typography: PolarText[];

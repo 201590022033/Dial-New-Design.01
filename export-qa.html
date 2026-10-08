@@ -1,0 +1,7 @@
+<!doctype html>
+<html lang="en"><head><meta charset="UTF-8"><title>Dial Designer local vector export QA</title></head>
+<body style="font:16px system-ui;background:#18202b;color:#eee;padding:24px">
+<h1>Local vector export QA</h1><p>Developer-only deterministic fixtures. These use the production SVG, DXF and vector PDF functions, without changing your active project.</p>
+<p>Start <code>node scripts/export-qa-collector.mjs</code> first. Files are written to <code>output/pdf/</code>. Verify fonts, dimensions and readability before manufacturing; no fit certification.</p>
+<button id="generate" type="button">Generate actual SVG, DXF and PDF QA files</button><pre id="status" role="status"></pre>
+<script type="module" src="/src/qa/exportQa.ts"></script></body></html>

@@ -25,12 +25,23 @@ export const assemblyToBands = (assembly: WatchAssembly): BandEntity[] => {
   const innerBezelGeom = pb['inner-bezel'] ?? { innerRadius: chapterGeom.outerRadius, outerRadius: Math.max(chapterGeom.outerRadius + 0.5, caseRadius - 1.5) };
   const outerBezelGeom = pb['outer-bezel'] ?? { innerRadius: innerBezelGeom.outerRadius, outerRadius: caseRadius };
 
-  return [
+  const bands = [
     createBand('band-dial-face', 'dial-face', dialGeom),
     createBand('band-chapter-ring', 'chapter-ring', chapterGeom),
     createBand('band-inner-bezel', 'inner-bezel', innerBezelGeom),
     createBand('band-outer-bezel', 'outer-bezel', outerBezelGeom)
   ];
+  const owners: Record<string, string> = {
+    'band-dial-face': 'inst-dial-blank', 'band-chapter-ring': 'inst-chapter-ring',
+    'band-inner-bezel': 'inst-inner-bezel', 'band-outer-bezel': 'inst-rotating-bezel'
+  };
+  return bands.map(band => {
+    const part = assembly.parts[owners[band.id] ?? ''];
+    if (!part) return band;
+    return { ...band, visible: part.visible, locked: part.locked, color: part.color,
+      material: part.material, thicknessMm: part.dimensions.thicknessMm,
+      style: { ...band.style, fill: part.color } };
+  });
 };
 
 /**

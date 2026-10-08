@@ -13,7 +13,8 @@ import type { ScaleRunResult } from '@/services/scaleEngineService';
 import { ScaleArtwork3D } from './ScaleArtwork3D';
 import { scaleArtworkLayers } from '@/domain/scales/resolvedScaleArtwork';
 import { useScaleArtworkTexture } from './useScaleArtworkTexture';
-import { createDialFinishTexture } from './dialFinishTexture';
+import { createDialFinishTexture, dialFinishBumpScale } from './dialFinishTexture';
+import { markerNumeralLayout } from '@/domain/generators/markerAppearance';
 
 const finish = (profile: FinishProfile, color?: string) => ({ color: color ?? profile.color, metalness: profile.metalness, roughness: profile.roughness });
 const physicalFinish = (profile: FinishProfile, color?: string) => ({
@@ -70,23 +71,7 @@ export const DialArtwork = ({ model }: { model: VisualWatchModel }) => {
     context.lineWidth = Math.max(2, pixelsPerMm * 0.08);
     context.textAlign = 'center';
     context.textBaseline = 'middle';
-    if (!usesArchetypeDial && !model.dial.customMarkerOverride && (archetype === 'archetype-field' || archetype === 'archetype-pilot')) {
-      const labels = archetype === 'archetype-pilot' ? [12, 3, 6, 9] : Array.from({ length: 12 }, (_, index) => index + 1);
-      context.font = `700 ${(archetype === 'archetype-pilot' ? 1.7 : 1.05) * pixelsPerMm}px "Arial Narrow", Arial, sans-serif`;
-      labels.forEach((label, index) => {
-        const hour = archetype === 'archetype-pilot' ? index * 3 : index + 1;
-        const angle = hour * Math.PI / 6;
-        const radius = centre * (archetype === 'archetype-pilot' ? 0.68 : 0.72);
-        context.fillText(String(label), centre + Math.sin(angle) * radius, centre - Math.cos(angle) * radius);
-      });
-    } else if (!usesArchetypeDial && !model.dial.customMarkerOverride && archetype === 'archetype-gmt-travel') {
-      context.font = `700 ${0.9 * pixelsPerMm}px Arial, sans-serif`;
-      [24, 6, 12, 18].forEach((label, index) => {
-        const angle = index * Math.PI / 2;
-        const radius = centre * 0.7;
-        context.fillText(String(label), centre + Math.sin(angle) * radius, centre - Math.cos(angle) * radius);
-      });
-    } else if (!usesArchetypeDial && !model.dial.customMarkerOverride && archetype === 'archetype-chronograph') {
+    if (!usesArchetypeDial && !model.dial.customMarkerOverride && archetype === 'archetype-chronograph') {
       ([[-0.22, 0], [0.22, 0], [0, 0.24]] as Array<[number, number]>).forEach(([x, y]) => {
         context.beginPath();
         context.arc(centre + centre * x, centre + centre * y, centre * 0.16, 0, Math.PI * 2);
@@ -109,15 +94,30 @@ export const DialArtwork = ({ model }: { model: VisualWatchModel }) => {
     context.fillStyle = artwork.color;
     context.textAlign = 'center';
     context.textBaseline = 'middle';
-    if (model.assets.dial.assetType === 'procedural') {
+    {
       context.fillStyle = model.archetypeAppearance.markerColor ?? model.archetypeAppearance.accentColor;
-      context.font = `700 ${Math.max(22, 1.25 * pixelsPerMm)}px ${model.dial.markerKind === 'roman-numeral' ? 'Georgia, serif' : artwork.fontFamily}`;
       for (const marker of model.dial.markers) {
         if (!marker.text) continue;
+        const glyph = markerNumeralLayout(marker, model.dial.outerDiameterMm / 2);
+        context.font = `700 ${glyph.fontSizeMm * pixelsPerMm}px ${model.dial.markerKind === 'roman-numeral' ? 'Georgia, serif' : artwork.fontFamily}`;
         const theta = marker.angleDeg * Math.PI / 180;
-        const r = (marker.innerRadiusMm + marker.outerRadiusMm) / 2 * pixelsPerMm;
+        const r = glyph.radiusMm * pixelsPerMm;
         context.fillText(marker.text, centre + Math.sin(theta) * r, centre - Math.cos(theta) * r);
       }
+    }
+    // Source GLBs have presentation-only apertures, or none. The current assembly
+    // owns the date display; this print is anchored to the dial below the crystal.
+    if (model.assets.dial.assetType === 'glb') for (const window of [...model.dial.windows].sort((a, b) => a.kind === 'day' ? -1 : b.kind === 'day' ? 1 : 0)) {
+      const angle = window.angleDeg * Math.PI / 180, radius = model.dial.outerDiameterMm / 2 * .74;
+      const x = centre + Math.sin(angle) * radius * pixelsPerMm, y = centre - Math.cos(angle) * radius * pixelsPerMm;
+      context.fillStyle = '#f8fafc';
+      context.fillRect(x - window.widthMm * pixelsPerMm / 2, y - window.heightMm * pixelsPerMm / 2, window.widthMm * pixelsPerMm, window.heightMm * pixelsPerMm);
+      context.strokeStyle = '#26313d';
+      context.lineWidth = .08 * pixelsPerMm;
+      context.strokeRect(x - window.widthMm * pixelsPerMm / 2, y - window.heightMm * pixelsPerMm / 2, window.widthMm * pixelsPerMm, window.heightMm * pixelsPerMm);
+      context.fillStyle = '#26313d';
+      context.font = `600 ${Math.min(1, window.heightMm * .7) * pixelsPerMm}px Arial, sans-serif`;
+      context.fillText(window.kind === 'day' ? 'MON' : '18', x, y);
     }
     context.fillStyle = artwork.color;
     context.font = `600 ${Math.max(18, artwork.fontSizeMm * pixelsPerMm)}px ${artwork.fontFamily}`;
@@ -155,6 +155,19 @@ export const DialArtwork = ({ model }: { model: VisualWatchModel }) => {
   </mesh>;
 };
 
+export const LiveHourMarkers = ({ model }: { model: VisualWatchModel }) => <group name="canonical-hour-markers">
+  {model.dial.markers.map((marker, index) => {
+    if (marker.text) return null;
+    const theta = marker.angleDeg * Math.PI / 180, radius = (marker.innerRadiusMm + marker.outerRadiusMm) / 2;
+    const color = model.archetypeAppearance.markerColor ?? '#e5e7eb';
+    return <mesh key={index} position={[radius * Math.sin(theta), radius * Math.cos(theta), model.dial.thicknessMm / 2 + .28]} rotation={[0, 0, -theta]}>
+      {model.dial.markerKind === 'round' ? <sphereGeometry args={[Math.max(.36, marker.widthMm), 18, 12]} />
+        : <boxGeometry args={[marker.widthMm, Math.max(.35, marker.outerRadiusMm - marker.innerRadiusMm), .14]} />}
+      <meshPhysicalMaterial color={color} metalness={model.archetypeAppearance.markerColorExplicit ? .35 : 0} roughness={.6} />
+    </mesh>;
+  })}
+</group>;
+
 const DialSurfaceMaterial = ({ model }: { model: VisualWatchModel }) => {
   const sunburstMap = useMemo(() => createDialFinishTexture({ kind: model.dial.textureKind as 'sunburst', intensity: model.dial.textureIntensity, contrast: model.dial.textureContrast, directionDeg: model.dial.textureDirectionDeg }, model.dial.outerDiameterMm), [model.dial.textureKind, model.dial.textureIntensity, model.dial.textureContrast, model.dial.textureDirectionDeg, model.dial.outerDiameterMm]);
   useEffect(() => () => sunburstMap?.dispose(), [sunburstMap]);
@@ -163,6 +176,8 @@ const DialSurfaceMaterial = ({ model }: { model: VisualWatchModel }) => {
     metalness={model.dial.textureKind === 'sunburst' ? 0.38 : model.finishes.dial.metalness}
     roughness={model.dial.textureKind === 'matte' ? 0.58 : Math.max(0.2, 0.45 - model.dial.textureIntensity * 0.2)}
     roughnessMap={sunburstMap ?? undefined}
+    bumpMap={sunburstMap ?? undefined}
+    bumpScale={dialFinishBumpScale({ kind: model.dial.textureKind as 'sunburst', intensity: model.dial.textureIntensity, contrast: model.dial.textureContrast })}
     envMapIntensity={model.dial.textureKind === 'sunburst' ? 1.7 : 1.1}
   />;
 };
@@ -275,7 +290,7 @@ export const ProceduralComponent = ({ category, model }: { category: VisualCateg
           <sphereGeometry args={[Math.max(0.36, marker.widthMm), 18, 12]} /><meshPhysicalMaterial {...physicalFinish(model.finishes.hands, model.archetypeAppearance.markerColor ?? model.referenceProfiles.lumeColor ?? '#e5e7eb')} />
         </mesh>;
         return <mesh key={index} position={[markerRadius * Math.sin(theta), markerRadius * Math.cos(theta), 0.28]} rotation={[0, 0, -theta]}>
-          <boxGeometry args={[marker.widthMm, Math.max(0.35, marker.outerRadiusMm - marker.innerRadiusMm), 0.14]} /><meshPhysicalMaterial {...physicalFinish(marker.lumed && !model.archetypeAppearance.markerColor ? { ...finishProfiles.lume, color: model.referenceProfiles.lumeColor ?? finishProfiles.lume.color } : model.finishes.hands, model.archetypeAppearance.markerColor ?? (marker.lumed ? model.referenceProfiles.lumeColor ?? finishProfiles.lume.color : '#e5e7eb'))} />
+          <boxGeometry args={[marker.widthMm, Math.max(0.35, marker.outerRadiusMm - marker.innerRadiusMm), 0.14]} /><meshPhysicalMaterial {...physicalFinish(marker.lumed && !model.archetypeAppearance.markerColorExplicit ? { ...finishProfiles.lume, color: model.referenceProfiles.lumeColor ?? finishProfiles.lume.color } : model.finishes.hands, model.archetypeAppearance.markerColor ?? (marker.lumed ? model.referenceProfiles.lumeColor ?? finishProfiles.lume.color : '#e5e7eb'))} />
         </mesh>;
       })}
       {model.dial.subdials.map((subdial, index) => {
@@ -295,7 +310,7 @@ export const ProceduralComponent = ({ category, model }: { category: VisualCateg
       {model.dial.windows.map((window, index) => {
         const theta = (window.angleDeg * Math.PI) / 180;
         const windowRadius = radius * 0.74;
-        return <mesh key={`window-${index}`} position={[windowRadius * Math.sin(theta), windowRadius * Math.cos(theta), 0.36]} rotation={[0, 0, -theta]}>
+        return <mesh key={`window-${index}`} position={[windowRadius * Math.sin(theta), windowRadius * Math.cos(theta), 0.36]}>
           <boxGeometry args={[window.widthMm, window.heightMm, 0.16]} /><meshStandardMaterial color="#e5e7eb" metalness={0.1} roughness={0.28} />
         </mesh>;
       })}
@@ -355,7 +370,10 @@ export const VisualComponent = ({ category, model }: { category: VisualCategory;
   return <group name={category} position={placement.anchor.positionMm} rotation={placement.anchor.rotationRad}>
     <group position={placement.offset} rotation={placement.rotation}>
       {placement.glb ? <GlbAsset key={descriptor.assetId + ':' + descriptor.assetPath} descriptor={descriptor} fallback={fallback} appearance={model.archetypeAppearance} dialFinishConfig={category === 'dial' ? { kind: model.dial.textureKind as 'sunburst', intensity: model.dial.textureIntensity, contrast: model.dial.textureContrast, directionDeg: model.dial.textureDirectionDeg } : undefined} dialDiameterMm={model.dial.outerDiameterMm} /> : fallback}
-      {category === 'dial' && <group position={placement.glb ? placement.descriptorOffset : [0, 0, model.previewEnvelope.dialZ - placement.anchor.positionMm[2]]}><DialArtwork model={model} /></group>}
+      {category === 'dial' && <group position={placement.glb ? placement.descriptorOffset : [0, 0, model.previewEnvelope.dialZ - placement.anchor.positionMm[2]]}>
+        {placement.glb && <LiveHourMarkers model={model} />}
+        <DialArtwork model={model} />
+      </group>}
     </group>
   </group>;
 };

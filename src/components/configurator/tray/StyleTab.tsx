@@ -9,6 +9,7 @@ import { HexColourField } from './HexColourField';
 import { FinishSample } from './FinishSample';
 import type { TextureKind } from '@/domain/generators/textureEngine';
 import { getCatalogueItem } from '@/domain/catalogue/catalogueRegistry';
+import { resolveMarkerColour } from '@/domain/generators/markerAppearance';
 import { useSelectionStore } from '@/stores/selectionStore';
 import { buildComponentNavigatorItems, resolveNavigatorSelection } from '@/domain/configurator/componentNavigator';
 
@@ -70,6 +71,7 @@ export const StyleTab: React.FC = () => {
   const updateScale = useScaleStore((s) => s.updatePluginConfig);
   const dialColor = useDesignEngineStore((s) => s.dialFaceConfig.color);
   const dialTexture = useDesignEngineStore((s) => s.dialFaceConfig.texture);
+  const markerLume = useDesignEngineStore((s) => s.markerConfig.style.lumed);
   const referenceDesign = useScaleStore((s) => s.pluginConfig.referenceDesign);
   const selectMainHands = (style: typeof MAIN_HAND_STYLES[number] | 'archetype') => {
     const overrides = { ...visualReferenceConfig?.componentAssetOverrides };
@@ -190,12 +192,13 @@ export const StyleTab: React.FC = () => {
         {([
           { label: 'Dial surface', value: dialColor, apply: (color: string) => updateDialFaceConfig({ color, secondaryColor: color }) },
           { label: 'Main hand colour', value: visualReferenceConfig?.handsColor ?? (visualReferenceConfig?.handsFinish === 'rose-gold' ? '#c08a76' : '#e2e8f0'), apply: (color: string) => updateVisualReferenceConfig({ handsColor: color }) },
-          { label: 'Hour markers / numerals', value: visualReferenceConfig?.markerColor ?? '#e2e8f0', apply: (color: string) => updateVisualReferenceConfig({ markerColor: color }) },
+          { label: 'Hour markers / numerals', value: resolveMarkerColour(dialColor, visualReferenceConfig?.markerColor, markerLume), apply: (color: string) => updateVisualReferenceConfig({ markerColor: color }) },
           { label: 'Scale ticks / numerals', value: scaleColor, apply: (color: string) => updateScale({ color }) }
         ]).filter(control => control.label === 'Dial surface' || control.label === 'Hour markers / numerals' ? dialContext : control.label === 'Main hand colour' ? handsContext : (!activePart || bezelContext || activeKind === 'chapter-ring') && referenceDesign !== 'citizen' && referenceDesign !== 'navitimer').map((control) => <div key={control.label} className="flex flex-wrap items-center gap-1 text-xs text-slate-300">
           <HexColourField label={control.label} value={control.value} onChange={control.apply} />
           {['#e2e8f0', '#c08a76', '#d4af37', '#111827'].map((color) => <button key={color} type="button" aria-label={`${control.label}: ${color === '#c08a76' ? 'rose gold' : color === '#e2e8f0' ? 'silver' : color === '#d4af37' ? 'gold' : 'black'}`} onClick={() => control.apply(color)} className="h-5 w-5 rounded border border-slate-600" style={{ backgroundColor: color }} />)}
         </div>)}
+        {dialContext && !visualReferenceConfig?.markerColor && <p className="text-[10px] text-slate-400">Hour marker colour is automatic contrast; the hex field shows its current resolved colour. Editing it creates a custom colour.</p>}
         {(referenceDesign === 'citizen' || referenceDesign === 'navitimer') && <p className="text-[10px] text-teal-300">Reference scale inks are independent. Use Advanced → Custom Colours; this panel never overwrites Original Colours.</p>}
         {(dialContext || handsContext) && <button type="button" className="text-xs text-slate-400" onClick={() => updateVisualReferenceConfig(dialContext && activePart ? { markerColor: undefined } : handsContext && activePart ? { handsColor: undefined, handsFinish: 'auto' } : { markerColor: undefined, handsColor: undefined, handsFinish: 'auto' })}>Restore automatic {activePart ? dialContext ? 'marker lume' : 'hands' : 'hands & marker lume'}</button>}
         {bezelContext && <><button type="button" className="rounded border border-slate-700 p-2 text-xs"

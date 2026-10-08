@@ -5,12 +5,14 @@ import { Color, Material, Mesh, MeshPhysicalMaterial, MeshStandardMaterial, type
 import type { VisualAssetDescriptor } from './visualAssetRegistry';
 import { glbLoadUrl } from './glbLoadUrl';
 import type { TextureEngineConfig } from '@/domain/generators/textureEngine';
-import { createDialFinishTexture } from './dialFinishTexture';
+import { createDialFinishTexture, dialFinishBumpScale } from './dialFinishTexture';
+import { isAuthoredHourMarker } from '@/domain/generators/markerAppearance';
 
 type AssetAppearance = {
   caseColor?: string;
   handsColor?: string;
   markerColor?: string;
+  markerColorExplicit?: boolean;
   bezelMetalColor?: string;
   archetypeId?: string;
   dialColor: string;
@@ -29,6 +31,7 @@ export const LoadedGlbAsset = ({ descriptor, appearance, scaleTexture, dialFinis
   const finishIntensity = dialFinishConfig?.intensity ?? 0;
   const finishContrast = dialFinishConfig?.contrast ?? 0;
   const finishDirection = dialFinishConfig?.directionDeg ?? 0;
+  const finishBumpScale = dialFinishConfig ? dialFinishBumpScale(dialFinishConfig) : 0;
   const dialFinishTexture = useMemo(() => {
     if (!finishKind) return undefined;
     const texture = createDialFinishTexture({ kind: finishKind, intensity: finishIntensity, contrast: finishContrast, directionDeg: finishDirection }, dialDiameterMm);
@@ -54,6 +57,7 @@ export const LoadedGlbAsset = ({ descriptor, appearance, scaleTexture, dialFinis
       if (!(object instanceof Mesh)) return;
       hasMesh = true;
       const objectName = object.name.toUpperCase();
+      if (descriptor.category === 'dial' && isAuthoredHourMarker(objectName)) object.visible = false;
       // GLBs include authored default relief for standalone Blender review.
       // The live surface print replaces it so edits do not double the artwork.
       if (descriptor.scaleArtworkSurface && objectName.startsWith('DD_PILOT_SCALE_')) object.visible = false;
@@ -137,7 +141,11 @@ export const LoadedGlbAsset = ({ descriptor, appearance, scaleTexture, dialFinis
             ? 0.56
             : Math.max(0.2, 0.42 - (appearance?.dialTextureIntensity ?? 0.5) * 0.18);
           material.envMapIntensity = appearance?.dialTextureKind === 'sunburst' ? 1.65 : 1.05;
-          if (dialFinishTexture !== undefined) material.roughnessMap = dialFinishTexture;
+          if (dialFinishTexture !== undefined) {
+            material.roughnessMap = dialFinishTexture;
+            material.bumpMap = dialFinishTexture;
+            material.bumpScale = finishBumpScale;
+          }
         } else if (objectName.includes('DATE_CARD')) {
           material.color = new Color('#e7e1d2');
           material.metalness = 0;
@@ -146,12 +154,16 @@ export const LoadedGlbAsset = ({ descriptor, appearance, scaleTexture, dialFinis
           material.color = new Color('#05070a');
           material.metalness = 0;
           material.roughness = 0.48;
-        } else if (appearance?.markerColor && (objectName.includes('DIAL_MARKER') || objectName.includes('_INDEX_') || objectName.includes('HOUR_MARKERS') || objectName.includes('DIAL_MINUTE') || objectName.includes('ARCH_MINUTE') || objectName.includes('NUMERAL'))) {
+        } else if (appearance?.markerColor && (objectName.includes('DIAL_MARKER') || objectName.includes('_INDEX_') || objectName.includes('HOUR_MARKERS') || objectName.includes('DIAL_MINUTE') || objectName.includes('ARCH_MINUTE') || objectName.includes('NUMERAL') || objectName.includes('ARCH_ORIENTATION'))) {
           material.color = new Color(appearance.markerColor);
-          material.emissive = new Color('#000000');
-          material.emissiveIntensity = 0;
-          material.metalness = 0.8;
-          material.roughness = 0.24;
+          const automaticLume = !appearance.markerColorExplicit && appearance.lumeEnabled;
+          material.emissive = new Color(automaticLume ? appearance.lumeColor : '#000000');
+          material.emissiveIntensity = automaticLume && appearance.markerColor !== '#26313D' ? 0.12 : 0;
+          // Printed scales/numerals are ink, not highly reflective metal. Dark ink
+          // must not turn silver simply because the studio environment is bright.
+          material.metalness = 0;
+          material.roughness = 0.65;
+          material.envMapIntensity = .3;
         } else if (descriptor.assetId === 'dial-namoki-108-silver-285' && (objectName.includes('_INDEX_') || objectName.includes('NUMERAL') || objectName.includes('DIAL_TEXT'))) {
           material.color = new Color('#171b20');
           material.emissive = new Color('#000000');
@@ -207,7 +219,7 @@ export const LoadedGlbAsset = ({ descriptor, appearance, scaleTexture, dialFinis
     });
     if (!hasMesh) throw new Error('GLB has no mesh');
     return clone;
-  }, [appearance?.caseColor, appearance?.handsColor, appearance?.markerColor, appearance?.bezelMetalColor, appearance?.dialTextureIntensity, appearance?.dialTextureKind, appearance?.lumeColor, appearance?.lumeEnabled, appearance?.strapStyleId, bezelColor, descriptor.assetId, descriptor.category, descriptor.scaleArtworkSurface, dialColor, gltf, scaleTexture, dialFinishTexture, strapColor]);
+  }, [appearance?.caseColor, appearance?.handsColor, appearance?.markerColor, appearance?.markerColorExplicit, appearance?.bezelMetalColor, appearance?.dialTextureIntensity, appearance?.dialTextureKind, appearance?.lumeColor, appearance?.lumeEnabled, appearance?.strapStyleId, bezelColor, descriptor.assetId, descriptor.category, descriptor.scaleArtworkSurface, dialColor, gltf, scaleTexture, dialFinishTexture, finishBumpScale, strapColor]);
   // Loading can complete after the frame triggered by a Style click. Demand
   // rendering must capture the new mesh (including sapphire transmission).
   useEffect(() => {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { generateEngineeringSvg } from '@/services/exportGeometryService';
+import { generateEngineeringSvg, generatePseudoDxf } from '@/services/exportGeometryService';
 import { createBand } from '@/domain/bands/bandRegistry';
 import { defaultTypographyConfig, generateTypographyLayout } from '@/domain/generators/typographyEngine';
 import type { DesignOverlay } from '@/renderer/types';
@@ -44,5 +44,40 @@ describe('engineering SVG XML escaping for browser/vector PDF parsing', () => {
     expect(svg).toContain('-- keep --&gt; &lt;script/&gt;');
     expect(svg).not.toContain('<!-- metadata:');
     expect(svg).not.toContain('<script/>');
+  });
+  it('uses shared automatic marker contrast and preserves explicit colour in actual SVG/PDF artwork', () => {
+    const marker = { id: 'hour3', angleDeg: 90, innerRadiusMm: 12, outerRadiusMm: 14, widthMm: .4, text: 'III' };
+    const pale: DesignOverlay = { ...overlay, dialFace: { ...overlay.dialFace, fill: '#e2e8f0' }, typography: [], markers: [{ marker, kind: 'roman-numeral', lumed: false }] };
+    const automatic = generateEngineeringSvg(request(pale));
+    expect(automatic).toContain('data-hour-marker="hour3"');
+    expect(automatic).toContain('fill="#26313D"');
+    expect(automatic).toContain('>III</text>');
+    const explicit = generateEngineeringSvg(request({ ...pale, markerColour: '#c08a76' }));
+    expect(explicit).toContain('fill="#c08a76"');
+    expect(explicit).not.toContain('fill="#26313D"');
+  });
+  it('exports real transparent annuli without erasing the configured dial surface', () => {
+    const input = request({ ...overlay, dialFace: { ...overlay.dialFace, fill: '#e2e8f0' } });
+    const ring = createBand('chapter', 'chapter-ring', { innerRadius: 12, outerRadius: 14 });
+    ring.style.fill = '#222222';
+    input.bands.push(ring);
+    const svg = generateEngineeringSvg(input);
+    expect(svg).toContain('fill="#e2e8f0"');
+    expect(svg).toContain('fill-rule="evenodd"');
+    expect(svg).not.toContain('fill="#0B1224"');
+    expect(svg).toMatch(/data-band-id="chapter"><path/);
+  });
+  it('exports dial numerals and lettering into DXF in physical mm and honours part scope', () => {
+    const marker = { id: 'hour3', angleDeg: 90, innerRadiusMm: 9, outerRadiusMm: 11, widthMm: .3, text: 'III' };
+    const design = { ...overlay, markers: [{ marker, kind: 'roman-numeral' as const, lumed: false }] };
+    const input = request(design);
+    const dxf = generatePseudoDxf(input);
+    expect(dxf).toContain('\ndial-hour-markers\n');
+    expect(dxf).toContain('\nIII\n');
+    expect(dxf).toContain('\ndial-typography\n');
+    expect(dxf.match(/\ndial-typography\n/g)).toHaveLength(overlay.typography.length);
+    expect(dxf).toContain('\nD\n');
+    expect(dxf).toContain('\n$INSUNITS\n70\n4\n');
+    expect(generatePseudoDxf({ ...input, target: 'outer-bezel' })).not.toContain('dial-hour-markers');
   });
 });

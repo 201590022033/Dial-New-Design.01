@@ -10,6 +10,7 @@ import { useWatchAssemblyStore } from '@/stores/watchAssemblyStore';
 import { useConfiguratorUIStore } from '@/stores/configuratorUIStore';
 import { useScaleStore } from '@/stores/scaleStore';
 import { useSelectionStore } from '@/stores/selectionStore';
+import { useDesignEngineStore } from '@/stores/designEngineStore';
 import '@/stores/storeSync';
 
 // SSR reads Zustand's closed-over initial API snapshot. Use live selector
@@ -59,6 +60,14 @@ describe('hybrid Style inspector uses real authoritative catalogue contexts', ()
     expect(html).not.toContain('aria-label="Main hand metal colour"');
     expect(html).not.toContain('Case Lug Geometry');
     expect(html).not.toContain('Strap Style');
+  });
+  it('shows the resolved automatic marker hex on a pale dial without creating an explicit override', () => {
+    useDesignEngineStore.getState().updateDialFaceConfig({ color: '#e2e8f0' });
+    useDesignEngineStore.getState().updateVisualReferenceConfig({ markerColor: undefined });
+    const html = renderPart('inst-dial-blank');
+    expect(html).toContain('Hour marker colour is automatic contrast');
+    expect(html).toMatch(/aria-label="Hour markers \/ numerals hex"[^>]*value="#26313D"/);
+    expect(useDesignEngineStore.getState().visualReferenceConfig?.markerColor).toBeUndefined();
   });
   it('resolves a stale legacy inst-dial ID through the selected physical band, matching the contextual header', () => {
     useSelectionStore.getState().selectBand('band-dial-face');

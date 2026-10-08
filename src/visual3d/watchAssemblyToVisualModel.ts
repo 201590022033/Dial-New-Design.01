@@ -13,6 +13,7 @@ import { defaultTypographyConfig, fontFamilyForCategory } from '@/domain/generat
 import { getArchetypeReferenceById, getBezelReferenceById, getComplicationReferenceById, getLumeReferenceById } from '@/domain/asset-library';
 import { getArchetypeVisualProfile } from '@/domain/configurator/archetypeProfiles';
 import { resolveProceduralEnvelope } from './proceduralEnvelope';
+import { markerGlyphOverlapsCutout, markerNumeralLayout, resolveMarkerColour } from '@/domain/generators/markerAppearance';
 
 export type PusherVisualDescriptor = {
   count: number;
@@ -88,6 +89,7 @@ export type VisualWatchModel = {
     caseColor?: string;
     handsColor?: string;
     markerColor?: string;
+    markerColorExplicit?: boolean;
     bezelMetalColor?: string;
     archetypeId?: string;
     dialColor: string;
@@ -251,14 +253,21 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
   const lumeReference = getLumeReferenceById(visualReferences.lumeId ?? '');
   const dateWindowParts = parts.filter((part) => {
     const kind = getCatalogueItem(part.catalogueItemId)?.kind;
-    return part.visible && (kind === 'date-window' || kind === 'day-window');
+    // The default assembly contains complication placeholders, not proof that
+    // the selected calibre has both discs. Only render supported visible apertures.
+    if (!part.visible || !movement?.dateWindowSupported) return false;
+    return kind === 'date-window' || (kind === 'day-window' && /day/i.test(movement.datePosition ?? ''));
   });
   const windows = dateWindowParts.map((part) => {
     const kind = getCatalogueItem(part.catalogueItemId)?.kind;
     const configured = typeof part.customProperties?.position === 'string' ? part.customProperties.position : undefined;
     const position = configured ?? (kind === 'day-window' ? movement?.datePosition ?? '12:00' : movement?.datePosition ?? '3:00');
-    const angleDeg = position.includes('4') ? 45 : position.includes('6') ? 0 : position.includes('9') ? 90 : position.includes('12') ? 180 : 90;
-    return { kind: kind === 'day-window' ? 'day' as const : 'date' as const, angleDeg, widthMm: positive(part.dimensions.widthMm, 3.4), heightMm: positive(part.dimensions.thicknessMm, 1.2), cornerRadiusMm: 0.25 };
+    const clock = /^(\d{1,2})(?::(\d{2}))?/.exec(position);
+    const hour = Number(clock?.[1]), minute = Number(clock?.[2] ?? 0);
+    const angleDeg = clock && hour >= 1 && hour <= 12 && minute < 60 ? ((hour % 12) + minute / 60) * 30 : 90;
+    // Rectangular catalogue apertures use diameter/width for their two in-plane
+    // dimensions. Thickness is axial bevel depth, not the printed opening height.
+    return { kind: kind === 'day-window' ? 'day' as const : 'date' as const, angleDeg, widthMm: positive(part.dimensions.diameterMm, kind === 'day-window' ? 6 : 3.5), heightMm: positive(part.dimensions.widthMm, kind === 'day-window' ? 3 : 2.8), cornerRadiusMm: 0.25 };
   });
   const dialDiameter = positive(dialPart?.dimensions.diameterMm, 32);
   const publishedHandLengths = getCatalogueItem(handsPart?.catalogueItemId ?? '')?.visual?.handLengthsMm;
@@ -276,7 +285,15 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
       outerDiameterMm: dialDiameter,
       thicknessMm: positive(dialPart?.dimensions.thicknessMm, 0.4),
       centreHoleDiameterMm: positive(dialConfig?.centreHole?.diameterMm, 1.5),
-      markers: generateMarkers(markerConfig).map((marker) => ({ ...marker, lumed: markerConfig.style.lumed })),
+      markers: generateMarkers(markerConfig).filter((marker) => {
+        if (!marker.text) return true;
+        const glyph = markerNumeralLayout(marker, dialDiameter / 2);
+        return !markerGlyphOverlapsCutout(glyph, windows.map((window) => {
+          const angle = window.angleDeg * Math.PI / 180, radius = dialDiameter / 2 * .74;
+          return { xMm: Math.sin(angle) * radius, yMm: -Math.cos(angle) * radius,
+            widthMm: window.widthMm, heightMm: window.heightMm };
+        }));
+      }).map((marker) => ({ ...marker, lumed: markerConfig.style.lumed })),
       markerKind: markerConfig.kind,
       customMarkerOverride: Boolean(visualReferences.dialMarkerMode && visualReferences.dialMarkerMode !== 'auto'),
       subdials: (movement?.subdials ?? []).map((subdial) => ({
@@ -366,7 +383,8 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
     archetypeAppearance: {
       caseColor: visualReferences.caseFinish === 'rose-gold' || visualReferences.caseFinish === 'black-pvd' ? finishes.case.color : undefined,
       handsColor: visualReferences.handsColor ?? (visualReferences.handsFinish === 'rose-gold' ? finishes.hands.color : undefined),
-      markerColor: visualReferences.markerColor,
+      markerColor: resolveMarkerColour(effectiveDialColor, visualReferences.markerColor, markerConfig.style.lumed),
+      markerColorExplicit: Boolean(visualReferences.markerColor),
       bezelMetalColor: visualReferences.bezelFinish ? finishes.bezel.color : undefined,
       archetypeId: visualReferences.archetypeId,
       dialColor: effectiveDialColor,

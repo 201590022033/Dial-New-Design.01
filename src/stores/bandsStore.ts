@@ -1,7 +1,11 @@
 import { create } from 'zustand';
 import { createBand } from '@/domain/bands/bandRegistry';
 import type { BandEntity, BandId, BandKind } from '@/domain/bands/types';
-import { runGeometryEngine } from '@/domain/geometry/geometryEngine';
+import { deriveGeometryContext, validateGeometryParameters } from '@/domain/geometry/geometryEngine';
+import { evaluateGeometryConstraints } from '@/domain/geometry/constraints';
+import { validateAllCategories } from '@/domain/geometry/validationEngine';
+import { assemblyToBands } from '@/domain/assembly/assemblyAdapters';
+import { resolveAssemblyGeometry } from '@/domain/geometry/boundaryResolver';
 import type { CollisionWarning } from '@/domain/geometry/collisionEngine';
 import type { GlobalGeometryParameters, StructuredValidationResult } from '@/domain/geometry/types';
 import type { ManufacturingWarning } from '@/domain/manufacturing/validationEngine';
@@ -62,21 +66,35 @@ export const useBandsStore = create<BandsState>((set) => ({
   },
   syncWithGeometryEngine: (params, options) =>
     set((state) => {
-      const engine = runGeometryEngine(state.bands, params);
-      const manufacturing = validateManufacturing(engine.bands, params, {
+      const assembly = useWatchAssemblyStore.getState().assembly;
+      // Validate the authoritative physical projection. The legacy geometry
+      // engine chains widths from case-level defaults and must never resize
+      // real dial/chapter/bezel parts merely as a side effect of validation.
+      const canonicalBands = assemblyToBands(assembly);
+      const bands = [...canonicalBands, ...state.bands.filter(band => !canonicalBands.some(canonical => canonical.id === band.id))];
+      const physicalParams = { ...params,
+        dialDiameterMm: assembly.parts['inst-dial-blank']?.dimensions.diameterMm ?? params.dialDiameterMm,
+        chapterRingWidthMm: canonicalBands.find(band => band.kind === 'chapter-ring')?.calculatedWidthMm ?? params.chapterRingWidthMm,
+        innerBezelWidthMm: canonicalBands.find(band => band.kind === 'inner-bezel')?.calculatedWidthMm ?? params.innerBezelWidthMm,
+        outerBezelWidthMm: canonicalBands.find(band => band.kind === 'outer-bezel')?.calculatedWidthMm ?? params.outerBezelWidthMm
+      };
+      const constraints = evaluateGeometryConstraints(bands, physicalParams, deriveGeometryContext(physicalParams));
+      const validationResults = validateAllCategories(bands, physicalParams, constraints);
+      const manufacturing = validateManufacturing(bands, physicalParams, {
         selectedMaterial: options?.selectedMaterial ?? null,
         collisions: options?.collisions ?? [],
-        printableAreaDiameterMm: params.dialDiameterMm,
+        printableAreaDiameterMm: physicalParams.dialDiameterMm,
         minimumTextHeightMm: params.minimumTextHeightMm
       });
       const warnings = [
-        ...engine.warnings.map((warning) => warning.message),
-        ...engine.constraintViolations.map((violation) => violation.description),
+        ...validateGeometryParameters(physicalParams).map((warning) => warning.message),
+        ...constraints.map((violation) => violation.description),
+        ...resolveAssemblyGeometry(assembly).diagnostics.map(diagnostic => diagnostic.message),
         ...manufacturing.warnings.map((warning) => warning.message)
       ];
 
       const warningsByBand = new Map<string, string[]>();
-      engine.validationResults.forEach((result) => {
+      validationResults.forEach((result) => {
         if (!result.affectedObject || !result.affectedObject.startsWith('band-')) {
           return;
         }
@@ -86,7 +104,7 @@ export const useBandsStore = create<BandsState>((set) => ({
       });
 
       return {
-        bands: engine.bands.map((band) => {
+        bands: bands.map((band) => {
           const bandWarnings = warningsByBand.get(band.id) ?? [];
           return {
             ...band,
@@ -99,7 +117,7 @@ export const useBandsStore = create<BandsState>((set) => ({
         }),
         warnings,
         manufacturingWarnings: manufacturing.warnings,
-        validationResults: engine.validationResults
+        validationResults
       };
     })
 }));
