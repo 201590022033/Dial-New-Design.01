@@ -147,7 +147,7 @@ export const runScalePlugin = (
   // Independent concentric rows share angles intentionally. The old generic
   // validator incorrectly treated these as colliding ticks on one circle.
   const validation = kind === 'slide-rule' && config.engineeringPreset === 'aviation-slide-rule'
-    ? validateResolvedAviation(constrained.ticks, constrained.labels)
+    ? validateResolvedAviation(constrained.ticks, labels)
     : plugin.validate(config, constrained.ticks, constrained.labels);
   if (constrained.issues.length) {
     validation.valid = false;

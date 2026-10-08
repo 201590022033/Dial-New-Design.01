@@ -13,6 +13,7 @@ import type { ScaleRunResult } from '@/services/scaleEngineService';
 import { ScaleArtwork3D } from './ScaleArtwork3D';
 import { scaleArtworkLayers } from '@/domain/scales/resolvedScaleArtwork';
 import { useScaleArtworkTexture } from './useScaleArtworkTexture';
+import { createDialFinishTexture } from './dialFinishTexture';
 
 const finish = (profile: FinishProfile, color?: string) => ({ color: color ?? profile.color, metalness: profile.metalness, roughness: profile.roughness });
 const physicalFinish = (profile: FinishProfile, color?: string) => ({
@@ -155,31 +156,7 @@ export const DialArtwork = ({ model }: { model: VisualWatchModel }) => {
 };
 
 const DialSurfaceMaterial = ({ model }: { model: VisualWatchModel }) => {
-  const sunburstMap = useMemo(() => {
-    if (model.dial.textureKind !== 'sunburst' || typeof document === 'undefined') return null;
-    const canvas = document.createElement('canvas');
-    canvas.width = canvas.height = 512;
-    const context = canvas.getContext('2d');
-    if (!context) return null;
-    context.fillStyle = '#777';
-    context.fillRect(0, 0, 512, 512);
-    for (let index = 0; index < 360; index++) {
-      const start = (index * Math.PI) / 180;
-      const end = ((index + 1.2) * Math.PI) / 180;
-      context.beginPath();
-      context.moveTo(256, 256);
-      context.arc(256, 256, 362, start, end);
-      context.closePath();
-      const lightness = 82 + Math.sin(index * 0.47) * 36;
-      context.fillStyle = `rgb(${lightness}, ${lightness}, ${lightness})`;
-      context.fill();
-    }
-    const texture = new CanvasTexture(canvas);
-    texture.minFilter = LinearFilter;
-    texture.magFilter = LinearFilter;
-    texture.needsUpdate = true;
-    return texture;
-  }, [model.dial.textureKind]);
+  const sunburstMap = useMemo(() => createDialFinishTexture({ kind: model.dial.textureKind as 'sunburst', intensity: model.dial.textureIntensity, contrast: model.dial.textureContrast, directionDeg: model.dial.textureDirectionDeg }, model.dial.outerDiameterMm), [model.dial.textureKind, model.dial.textureIntensity, model.dial.textureContrast, model.dial.textureDirectionDeg, model.dial.outerDiameterMm]);
   useEffect(() => () => sunburstMap?.dispose(), [sunburstMap]);
   return <meshPhysicalMaterial
     {...physicalFinish(model.finishes.dial, model.dialColor)}
@@ -377,7 +354,7 @@ export const VisualComponent = ({ category, model }: { category: VisualCategory;
   // The fallback is outside descriptor corrections; those belong to the authored GLB.
   return <group name={category} position={placement.anchor.positionMm} rotation={placement.anchor.rotationRad}>
     <group position={placement.offset} rotation={placement.rotation}>
-      {placement.glb ? <GlbAsset key={descriptor.assetId + ':' + descriptor.assetPath} descriptor={descriptor} fallback={fallback} appearance={model.archetypeAppearance} /> : fallback}
+      {placement.glb ? <GlbAsset key={descriptor.assetId + ':' + descriptor.assetPath} descriptor={descriptor} fallback={fallback} appearance={model.archetypeAppearance} dialFinishConfig={category === 'dial' ? { kind: model.dial.textureKind as 'sunburst', intensity: model.dial.textureIntensity, contrast: model.dial.textureContrast, directionDeg: model.dial.textureDirectionDeg } : undefined} dialDiameterMm={model.dial.outerDiameterMm} /> : fallback}
       {category === 'dial' && <group position={placement.glb ? placement.descriptorOffset : [0, 0, model.previewEnvelope.dialZ - placement.anchor.positionMm[2]]}><DialArtwork model={model} /></group>}
     </group>
   </group>;

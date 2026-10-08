@@ -26,7 +26,33 @@ export interface TextureEngineConfig {
   kind: TextureKind;
   intensity: number;
   contrast: number;
+  /** Brushed grain direction in the dial plane; radial and matte finishes are symmetric. */
+  directionDeg?: number;
 }
+
+export interface TextureGrainLine { x1: number; y1: number; x2: number; y2: number; opacity: number; widthMm: number }
+
+/** Presentation grain in physical mm, never a supplier machining/roughness specification. */
+export const generateTextureGrain = (config: TextureEngineConfig, radiusMm: number): TextureGrainLine[] => {
+  if (!Number.isFinite(radiusMm) || radiusMm <= 0 || !['sunburst', 'brushed-metal'].includes(config.kind)) return [];
+  const intensity = Number.isFinite(config.intensity) ? Math.max(0, Math.min(1, config.intensity)) : 0;
+  const contrast = Number.isFinite(config.contrast) ? Math.max(0, Math.min(1, config.contrast)) : 0;
+  if (!intensity || !contrast) return [];
+  const count = config.kind === 'sunburst' ? 360 : 180;
+  const angle = (Number.isFinite(config.directionDeg) ? config.directionDeg! : 0) * Math.PI / 180;
+  const rotate = (x: number, y: number) => ({ x: x * Math.cos(angle) - y * Math.sin(angle), y: x * Math.sin(angle) + y * Math.cos(angle) });
+  return Array.from({ length: count }, (_, index) => {
+    const opacity = intensity * contrast * (0.12 + (Math.sin(index * 2.3999632297) + 1) * 0.1);
+    if (config.kind === 'sunburst') {
+      const theta = index * Math.PI * 2 / count;
+      return { x1: 0, y1: 0, x2: Math.cos(theta) * radiusMm, y2: Math.sin(theta) * radiusMm, opacity, widthMm: .015 };
+    }
+    const y = radiusMm * ((index + .5) * 2 / count - 1);
+    const x = Math.sqrt(radiusMm * radiusMm - y * y);
+    const start = rotate(-x, y); const end = rotate(x, y);
+    return { x1: start.x, y1: start.y, x2: end.x, y2: end.y, opacity, widthMm: .018 };
+  });
+};
 
 const clamp01 = (value: number): number => Math.max(0, Math.min(1, value));
 

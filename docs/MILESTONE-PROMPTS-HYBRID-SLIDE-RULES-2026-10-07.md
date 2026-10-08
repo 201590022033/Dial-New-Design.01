@@ -124,6 +124,8 @@ Gate: Navitimer calculation/visual/state requirements pass without regressing Ci
 
 ### Milestone 4 prompt — build the hybrid dashboard and inspector
 
+8 October completion: [Milestone 4 checkpoint](M4-HYBRID-DASHBOARD-2026-10-08.md) records the local hybrid dashboard implementation, 652 passing tests, browser/export acceptance and remaining visual/manufacturing limitations. Changes are uncommitted; M5 has not started.
+
 > Apply the shared master prompt and complete Milestone 4 only. Implement the audit's top diameter slider + typed mm field, compact thumbnail component navigator, selected-ring highlight, contextual right-hand inspector, texture thumbnails/direction where applicable, editable/copyable validated hex fields and finish close-up. Keep the established workflow rail and procurement/design checks. Respect ladies and larger cases instead of hard-limiting everything to the mock-up's 38–44mm range. Clearly distinguish resizing a custom preview from buying a physically different supplier case.
 >
 > Use the mock-up's `#1A1D24`, `#F0F0F0`, `#E63946` as UI/custom-theme references, never to overwrite Original Colours on either brand preset. All component thumbnails, selection contexts and physical measurements derive from the authoritative assembly. Keep the Advanced checkbox/config workflow visible and functional; do not create a competing legacy sidebar. Reuse existing export services for toolbar shortcuts and preserve guarded preview, double-click Apply, keyboard access, BOM and Undo. Test responsive laptop and narrow layouts.

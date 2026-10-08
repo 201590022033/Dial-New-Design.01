@@ -7,6 +7,7 @@ import { DesignVersionsFilmstrip } from '@/components/configurator/DesignVersion
 import { GuidedFixOverlay } from '@/components/configurator/GuidedFixOverlay';
 import { FinalReviewModal } from '@/components/configurator/FinalReviewModal';
 import { TopToolbar } from '@/components/layout/TopToolbar';
+import { ComponentNavigator } from '@/components/configurator/ComponentNavigator';
 import { CentreCanvas } from '@/components/layout/CentreCanvas';
 import { evaluateCollisions } from '@/domain/geometry/collisionEngine';
 import { materialById } from '@/domain/materials/materialLibrary';
@@ -164,9 +165,11 @@ export const App = () => {
   ]);
 
   useEffect(() => {
-    const selectedBand = bands.find((band) => band.id === selectedBandId) ?? null;
-    syncScaleFromBand(selectedBand, minimumLineWidthMm);
-  }, [bands, minimumLineWidthMm, selectedBandId, syncScaleFromBand]);
+    // Inspector selection is not a placement command. Keep existing artwork on
+    // its explicit physical target while synchronising that target's dimensions.
+    const targetBand = bands.find((band) => band.id === scalePluginConfig.placementTargetBandId) ?? null;
+    syncScaleFromBand(targetBand, minimumLineWidthMm);
+  }, [bands, minimumLineWidthMm, scalePluginConfig.placementTargetBandId, syncScaleFromBand]);
 
   useEffect(() => {
     regenerateScalePreview();
@@ -263,7 +266,7 @@ export const App = () => {
         const centreRect = centre.getBoundingClientRect();
         const rightRect = right.getBoundingClientRect();
 
-        if (topRect.height < 56 || topRect.height > 96) {
+        if (topRect.height < 56 || topRect.height > 220) {
           issues.push(`TopToolbar height out of compact range: ${topRect.height.toFixed(1)}px`);
         }
 
@@ -277,11 +280,11 @@ export const App = () => {
           issues.push(`Workspace column contract broken: expected 3, got ${columnCount}`);
         }
 
-        if (!(leftRect.left < centreRect.left && centreRect.left < rightRect.left)) {
+        if (window.innerWidth >= 768 && !(leftRect.left < centreRect.left && centreRect.left < rightRect.left)) {
           issues.push('Columns are not simultaneously arranged left-to-right');
         }
 
-        if (centre.clientHeight < 240) {
+        if (centre.clientHeight < (window.innerWidth < 768 ? 160 : 240)) {
           issues.push(`Centre canvas region too short: ${centre.clientHeight}px`);
         }
 
@@ -339,7 +342,7 @@ export const App = () => {
         ============================================================
         ARCHITECTURAL RULE
 
-        TopToolbar = Navigation only.
+        TopToolbar = Project navigation, case preview dimensions and export shortcuts.
 
         Left Panel = Guided Engineering Workflow.
 
@@ -357,14 +360,14 @@ export const App = () => {
             'grid min-h-0 h-full flex-1 gap-3 overflow-hidden',
             presentationMode
               ? 'min-w-0 grid-cols-[minmax(0,1fr)]'
-              : 'min-w-0 grid-cols-[72px_minmax(0,1fr)_minmax(300px,340px)] lg:grid-cols-[84px_minmax(0,1fr)_380px] xl:grid-cols-[84px_minmax(0,1fr)_400px]'
+              : 'min-w-0 grid-cols-[56px_minmax(0,1fr)] grid-rows-[minmax(160px,1fr)_minmax(180px,.7fr)] md:grid-rows-1 md:grid-cols-[72px_minmax(0,1fr)_minmax(300px,340px)] lg:grid-cols-[84px_minmax(0,1fr)_380px] xl:grid-cols-[84px_minmax(0,1fr)_400px]'
           ].join(' ')}
           data-layout-columns="3"
         >
           <aside
             ref={leftPanelRef}
             data-layout-column="left-workflow"
-            className={presentationMode ? 'hidden' : 'min-h-0 overflow-hidden flex flex-col'}
+            className={presentationMode ? 'hidden' : 'row-span-2 md:row-span-1 min-h-0 overflow-hidden flex flex-col'}
           >
             <LeftNavRail />
           </aside>
@@ -374,13 +377,16 @@ export const App = () => {
             data-layout-column="centre-canvas"
             className="flex min-h-0 min-w-0 flex-col overflow-hidden rounded-xl border border-engineering-border bg-engineering-panel/50"
           >
-            <div className="flex-1 min-h-0 relative flex items-center justify-center overflow-hidden">
+            <div className="flex-1 min-h-0 relative flex overflow-hidden">
+              {presentationMode ? null : <ComponentNavigator />}
+              <div className="min-w-0 min-h-0 flex-1 relative flex items-center justify-center overflow-hidden">
               <CentreCanvas
                 presentationMode={presentationMode}
                 onTogglePresentationMode={() => setPresentationMode((value) => !value)}
                 visualMode={visualMode}
                 onToggleVisualMode={() => setVisualMode((value) => value === 'engineering' ? 'visual' : 'engineering')}
               />
+              </div>
             </div>
             {presentationMode ? null : <CostBomSummary />}
             {presentationMode ? null : <DesignVersionsFilmstrip />}
@@ -389,7 +395,7 @@ export const App = () => {
           <aside
             ref={rightPanelRef}
             data-layout-column="right-inspector"
-            className={presentationMode ? 'hidden' : 'min-h-0 overflow-hidden flex flex-col'}
+            className={presentationMode ? 'hidden' : 'col-start-2 md:col-start-3 min-h-0 overflow-hidden flex flex-col'}
           >
             <RightTraySwitch />
           </aside>

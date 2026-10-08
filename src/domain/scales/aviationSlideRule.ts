@@ -77,7 +77,7 @@ export const generateAviationRings = (config: ScalePluginConfig): { ticks: Scale
         widthMm: major ? 0.15 : 0.1, weight: major ? 'major' : 'minor',
         direction: 'inside', style: 'line', value, ringId
       });
-      if (major) {
+      if (major || (config.aviationNumeralDetail === 'whole-units' && Number.isInteger(value))) {
         labels.push({
           text: String(value), angleDeg,
           radiusMm: ringId === 'outer' ? radiusMm + 0.55 : radiusMm - 0.75,
@@ -87,7 +87,8 @@ export const generateAviationRings = (config: ScalePluginConfig): { ticks: Scale
       }
     }
   }
-  return { ticks, labels: ['outer', 'inner'].flatMap((ringId) => separatedLabels(labels.filter((label) => label.ringId === ringId), scaleFontSizeMm(config))) };
+  return { ticks, labels: config.allowAdaptiveLabelOmission === false ? labels
+    : ['outer', 'inner'].flatMap((ringId) => separatedLabels(labels.filter((label) => label.ringId === ringId), scaleFontSizeMm(config))) };
 };
 
 // Compatibility helper explicitly requests home alignment; the live panel

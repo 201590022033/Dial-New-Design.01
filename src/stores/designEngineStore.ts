@@ -102,7 +102,8 @@ const createOverlay = (
   typographyConfig: TypographyConfig,
   chapterRingResult: ChapterRingResult,
   lumeResult: LumeResult,
-  chapterRingVisible = true
+  chapterRingVisible = true,
+  texture = defaultDialFaceConfig.texture
 ): DesignOverlay => {
   const markers = generateMarkers(markerConfig).map((marker) => ({
     marker,
@@ -116,7 +117,8 @@ const createOverlay = (
       stroke: dialFaceResult.background.style.stroke,
       opacity: dialFaceResult.background.style.opacity,
       borderWidthMm: dialFaceResult.background.style.strokeWidthMm,
-      centreHoleMm: dialFaceResult.centreHole.diameterMm
+      centreHoleMm: dialFaceResult.centreHole.diameterMm,
+      texture
     },
     markers,
     typography: generateTypographyLayout(typographyConfig),
@@ -357,7 +359,8 @@ export const useDesignEngineStore = create<DesignEngineState>((set, get) => ({
         state.typographyConfig,
         chapterRingResult,
         lumeResult,
-        state.chapterRingVisible
+        state.chapterRingVisible,
+        state.dialFaceConfig.texture
       ),
       warnings: collectWarnings(dialFaceResult, chapterRingResult, bezelResult)
     });

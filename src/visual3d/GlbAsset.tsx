@@ -4,6 +4,8 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { Color, Material, Mesh, MeshPhysicalMaterial, MeshStandardMaterial, type Texture } from 'three';
 import type { VisualAssetDescriptor } from './visualAssetRegistry';
 import { glbLoadUrl } from './glbLoadUrl';
+import type { TextureEngineConfig } from '@/domain/generators/textureEngine';
+import { createDialFinishTexture } from './dialFinishTexture';
 
 type AssetAppearance = {
   caseColor?: string;
@@ -22,7 +24,18 @@ type AssetAppearance = {
   lumeColor: string;
 };
 
-export const LoadedGlbAsset = ({ descriptor, appearance, scaleTexture }: { descriptor: VisualAssetDescriptor; appearance?: AssetAppearance; scaleTexture?: Texture | null }) => {
+export const LoadedGlbAsset = ({ descriptor, appearance, scaleTexture, dialFinishConfig, dialDiameterMm = 28.5 }: { descriptor: VisualAssetDescriptor; appearance?: AssetAppearance; scaleTexture?: Texture | null; dialFinishConfig?: TextureEngineConfig; dialDiameterMm?: number }) => {
+  const finishKind = dialFinishConfig?.kind;
+  const finishIntensity = dialFinishConfig?.intensity ?? 0;
+  const finishContrast = dialFinishConfig?.contrast ?? 0;
+  const finishDirection = dialFinishConfig?.directionDeg ?? 0;
+  const dialFinishTexture = useMemo(() => {
+    if (!finishKind) return undefined;
+    const texture = createDialFinishTexture({ kind: finishKind, intensity: finishIntensity, contrast: finishContrast, directionDeg: finishDirection }, dialDiameterMm);
+    if (texture) texture.flipY = false;
+    return texture;
+  }, [finishKind, finishIntensity, finishContrast, finishDirection, dialDiameterMm]);
+  useEffect(() => () => dialFinishTexture?.dispose(), [dialFinishTexture]);
   // Suspense discards initial useMemo state when a load suspends. A per-mount
   // URL therefore restarts the request on every retry and never reveals the GLB.
   // Stable URLs + isolated clones (dispose=null below) support repeated swaps.
@@ -124,6 +137,7 @@ export const LoadedGlbAsset = ({ descriptor, appearance, scaleTexture }: { descr
             ? 0.56
             : Math.max(0.2, 0.42 - (appearance?.dialTextureIntensity ?? 0.5) * 0.18);
           material.envMapIntensity = appearance?.dialTextureKind === 'sunburst' ? 1.65 : 1.05;
+          if (dialFinishTexture !== undefined) material.roughnessMap = dialFinishTexture;
         } else if (objectName.includes('DATE_CARD')) {
           material.color = new Color('#e7e1d2');
           material.metalness = 0;
@@ -193,7 +207,7 @@ export const LoadedGlbAsset = ({ descriptor, appearance, scaleTexture }: { descr
     });
     if (!hasMesh) throw new Error('GLB has no mesh');
     return clone;
-  }, [appearance?.caseColor, appearance?.handsColor, appearance?.markerColor, appearance?.bezelMetalColor, appearance?.dialTextureIntensity, appearance?.dialTextureKind, appearance?.lumeColor, appearance?.lumeEnabled, appearance?.strapStyleId, bezelColor, descriptor.assetId, descriptor.category, descriptor.scaleArtworkSurface, dialColor, gltf, scaleTexture, strapColor]);
+  }, [appearance?.caseColor, appearance?.handsColor, appearance?.markerColor, appearance?.bezelMetalColor, appearance?.dialTextureIntensity, appearance?.dialTextureKind, appearance?.lumeColor, appearance?.lumeEnabled, appearance?.strapStyleId, bezelColor, descriptor.assetId, descriptor.category, descriptor.scaleArtworkSurface, dialColor, gltf, scaleTexture, dialFinishTexture, strapColor]);
   // Loading can complete after the frame triggered by a Style click. Demand
   // rendering must capture the new mesh (including sapphire transmission).
   useEffect(() => {
@@ -206,11 +220,11 @@ export const LoadedGlbAsset = ({ descriptor, appearance, scaleTexture }: { descr
   </group>;
 };
 
-export class GlbAsset extends React.Component<{ descriptor: VisualAssetDescriptor; fallback: React.ReactNode; appearance?: AssetAppearance; scaleTexture?: Texture | null }, { failed: boolean }> {
+export class GlbAsset extends React.Component<{ descriptor: VisualAssetDescriptor; fallback: React.ReactNode; appearance?: AssetAppearance; scaleTexture?: Texture | null; dialFinishConfig?: TextureEngineConfig; dialDiameterMm?: number }, { failed: boolean }> {
   state = { failed: false };
   static getDerivedStateFromError() { return { failed: true }; }
   componentDidCatch(error: unknown) { console.warn('[visual3d] GLB unavailable; using procedural fallback.', error); }
   render() {
-    return this.state.failed ? this.props.fallback : <Suspense fallback={this.props.fallback}><LoadedGlbAsset descriptor={this.props.descriptor} appearance={this.props.appearance} scaleTexture={this.props.scaleTexture} /></Suspense>;
+    return this.state.failed ? this.props.fallback : <Suspense fallback={this.props.fallback}><LoadedGlbAsset descriptor={this.props.descriptor} appearance={this.props.appearance} scaleTexture={this.props.scaleTexture} dialFinishConfig={this.props.dialFinishConfig} dialDiameterMm={this.props.dialDiameterMm} /></Suspense>;
   }
 }

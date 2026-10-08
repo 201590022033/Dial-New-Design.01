@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Lock, LockOpen } from 'lucide-react';
 import {
   aviationBezelAlignment, aviationCalculations, calculateAviation,
@@ -8,7 +8,10 @@ import { getScaleProgram, type ScaleProgram } from '@/domain/scales/scaleProgram
 import { scaleFontFamilies, scaleTickLengthFactor } from '@/domain/scales/markingStyle';
 import { scalePolicyForArchetype } from '@/domain/scales/archetypeScalePolicy';
 import { resolvedScaleSvg } from '@/domain/scales/resolvedScaleArtwork';
-import { useBandsStore, useDesignEngineStore, useGlobalSettingsStore, useScaleStore } from '@/stores';
+import { useDesignEngineStore } from '@/stores/designEngineStore';
+import { useScaleStore } from '@/stores/scaleStore';
+import { useWatchAssemblyStore } from '@/stores/watchAssemblyStore';
+import { assemblyToBands } from '@/domain/assembly/assemblyAdapters';
 
 const modes: AviationCalculation[] = ['time', 'distance', 'groundspeed', 'fuel-used', 'endurance'];
 
@@ -39,8 +42,9 @@ export const AviationSlideRulePanel = () => {
   const resetBaseline = useScaleStore((state) => state.resetSimplifiedBaseline);
   const updateConfig = useScaleStore((state) => state.updatePluginConfig);
   const updateBezel = useDesignEngineStore((state) => state.updateBezelConfig);
-  const caseDiameterMm = useGlobalSettingsStore((state) => state.caseDiameterMm);
-  const bands = useBandsStore((state) => state.bands);
+  const assembly = useWatchAssemblyStore((state) => state.assembly);
+  const bands = useMemo(() => assemblyToBands(assembly), [assembly]);
+  const caseDiameterMm = assembly.globalDimensions.caseDiameterMm;
   const reference = config.referenceDesign === 'citizen' || config.referenceDesign === 'navitimer';
   const active = !reference && previewEnabled && kind === 'slide-rule' && config.engineeringPreset === 'aviation-slide-rule';
   const activeProgram = !previewEnabled ? 'other' : active ? 'aviation' : kind === 'tachymeter' ? 'chrono' : kind === 'circular' ? 'diver' : kind === 'compass' ? 'compass' : 'other';
@@ -49,6 +53,8 @@ export const AviationSlideRulePanel = () => {
   const answer = calculateAviation(mode, first, second);
   const outerRadius = config.outerRadiusMm ?? 18.7;
   const innerRadius = config.innerRadiusMm ?? 16.3;
+  const outerTarget = bands.find((band) => band.id === (config.placementTargetBandId ?? 'band-outer-bezel'));
+  const innerTarget = bands.find((band) => band.id === (config.fixedPlacementTargetBandId ?? 'band-chapter-ring'));
   const physicalWarning = active && preview?.validation.structuredWarnings.some((warning) => warning.affectedObject === 'scale-envelope');
 
   const selectProgram = (program: ScaleProgram) => {
@@ -89,7 +95,7 @@ export const AviationSlideRulePanel = () => {
       {activeProgram === 'other' && !reference ? <p>Select a program to generate its markings.</p> : null}
       {activeProgram !== 'other' && <label className="block">Scale numeral size · {(config.scaleFontSizeMm ?? 0.8).toFixed(2)} mm
         <input className="mt-1 w-full" aria-label="Scale numeral size" type="range" min="0.45" max="1.4" step="0.05" value={config.scaleFontSizeMm ?? 0.8} onChange={(event) => updateConfig({ scaleFontSizeMm: Number(event.target.value) })}/>
-        <span className="block text-[10px] text-engineering-muted">{active ? 'Crowded aviation numerals are omitted automatically; tick marks stay in place. ' : ''}Check the artwork at 1:1 before marking.</span>
+        <span className="block text-[10px] text-engineering-muted">{active && config.allowAdaptiveLabelOmission !== false ? 'Auto-fit omits crowded Simplified numerals; tick marks stay in place. ' : ''}Check the artwork at 1:1 before marking.</span>
       </label>}
       {activeProgram !== 'other' && <label className="block">Tick length · {Math.round(scaleTickLengthFactor(config) * 100)}%
         <input className="mt-1 w-full" aria-label="Scale tick length" type="range" min="0.5" max="1.6" step="0.05" value={scaleTickLengthFactor(config)} onChange={(event) => updateConfig({ scaleTickLengthFactor: Number(event.target.value) })}/>
@@ -101,14 +107,27 @@ export const AviationSlideRulePanel = () => {
       </label>}
       {active ? (
         <>
-          <fieldset className="space-y-1 rounded border border-slate-700 p-2">
-            <legend>Simplified marking visibility</legend>
+          <fieldset className="space-y-2 rounded border border-slate-700 p-2" data-testid="simplified-writing-controls">
+            <legend>Simplified rows &amp; writing</legend>
             {([
               ['outerScaleVisible', 'Outer rotating scale'], ['innerScaleVisible', 'Inner fixed scale'],
-              ['outerNumeralsVisible', 'Outer numerals'], ['innerNumeralsVisible', 'Inner numerals']
+              ['outerNumeralsVisible', 'Outer numeral writing'], ['innerNumeralsVisible', 'Inner numeral writing']
             ] as const).map(([key, title]) => <label key={key} className="flex items-center gap-2">
-              <input type="checkbox" checked={config[key] !== false} onChange={(event) => updateConfig({ [key]: event.target.checked })}/>{title}
+              <input type="checkbox" aria-label={title} checked={config[key] !== false} onChange={(event) => updateConfig({ [key]: event.target.checked })}/>{title}
             </label>)}
+            <p className="text-[10px] text-engineering-muted">Hide writing without removing its graduations. Hiding a whole scale also hides its ticks. Without the 10 unit or 60 hour-rate numeral, calculations become harder to read.</p>
+            <label className="block">Numeral detail
+              <select className="ds-input mt-1" aria-label="Simplified numeral detail" value={config.aviationNumeralDetail ?? 'key'} onChange={(event) => updateConfig({ aviationNumeralDetail: event.target.value as 'key' | 'whole-units' })}>
+                <option value="key">Key calculation numerals</option>
+                <option value="whole-units">Additional whole-unit numerals</option>
+              </select>
+            </label>
+            <label className="flex items-center gap-2"><input type="checkbox" aria-label="Auto-fit Simplified writing" checked={config.allowAdaptiveLabelOmission !== false} onChange={(event) => updateConfig({ allowAdaptiveLabelOmission: event.target.checked })}/>Auto-fit crowded writing</label>
+            <p className="text-[10px] text-engineering-muted">Turn off auto-fit to keep every selected numeral and inspect overlap warnings. Additional writing labels existing graduations only; subdivision detail is controlled separately below.</p>
+            <div className="space-y-1 border-t border-slate-700 pt-2" aria-label="Unavailable Simplified writing groups">
+              {['Time-conversion row writing', 'Distance-reference writing', 'Reference captions'].map((title) => <label key={title} className="flex items-center gap-2 text-engineering-muted"><input type="checkbox" checked={false} disabled aria-label={title}/>{title} · not present</label>)}
+              <p className="text-[10px] text-engineering-muted">This Simplified design has two numerical rows, not a time row or named conversion references. Those controls are unavailable rather than decorative placeholders; brand reference writing remains separate.</p>
+            </div>
             <button type="button" className={actionClass} onClick={resetBaseline}>Reset Simplified baseline</button>
             <p className="text-[10px] text-engineering-muted">This is the independently saved Simplified design, not original branded artwork. Select Citizen Skyhawk or Classic Navitimer in Advanced on the left for their distinct reference-derived reconstructions.</p>
           </fieldset>
@@ -141,7 +160,8 @@ export const AviationSlideRulePanel = () => {
           <label className="block">Bezel rotation: {Math.round(config.outerRotationOffsetDeg ?? 0)}°
             <input className="w-full" type="range" min="0" max="359" step="1" value={((config.outerRotationOffsetDeg ?? 0) % 360 + 360) % 360} onChange={(event) => updateConfig({ outerRotationOffsetDeg: Number(event.target.value) })}/>
           </label>
-          <p>Outer bezel: {outerRadius.toFixed(2)} mm radius · Fixed chapter: {innerRadius.toFixed(2)} mm radius</p>
+          <p>Outer print radius: {outerRadius.toFixed(2)} mm · Fixed print radius: {innerRadius.toFixed(2)} mm</p>
+          <p className="text-[10px] text-engineering-muted">Physical rotating target: {outerTarget ? `Ø${(outerTarget.geometry.outerRadius * 2).toFixed(2)} mm` : 'unavailable'} · Fixed target: {innerTarget ? `Ø${(innerTarget.geometry.outerRadius * 2).toFixed(2)} mm` : 'unavailable'}. Part dimensions come from the current assembly, not print positions.</p>
           {physicalWarning ? <p className="text-amber-300">Artwork may fall outside the current bezel/chapter bands. Check radii before marking.</p> : null}
           <div className="grid grid-cols-2 gap-2">
             <button type="button" className={actionClass} disabled={!preview?.validation.valid} onClick={() => preview && saveSvg(resolvedScaleSvg(preview, caseDiameterMm, 'outer'), 'aviation-rotating-bezel.svg')}>Bezel SVG</button>

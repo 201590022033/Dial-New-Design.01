@@ -5,6 +5,12 @@ import { useDesignEngineStore } from '@/stores/designEngineStore';
 import type { WatchAssembly } from '@/domain/assembly/assemblyTypes';
 import { cn } from '@/utils/cn';
 import { useScaleStore } from '@/stores/scaleStore';
+import { HexColourField } from './HexColourField';
+import { FinishSample } from './FinishSample';
+import type { TextureKind } from '@/domain/generators/textureEngine';
+import { getCatalogueItem } from '@/domain/catalogue/catalogueRegistry';
+import { useSelectionStore } from '@/stores/selectionStore';
+import { buildComponentNavigatorItems, resolveNavigatorSelection } from '@/domain/configurator/componentNavigator';
 
 const FINISH_PRESETS = [
   { id: 'matte', name: 'Matte Finish', texture: 'matte', description: 'Non-reflective micro-bead blasted surface' },
@@ -44,9 +50,18 @@ const LUG_STYLES = [
 ] as const;
 
 export const StyleTab: React.FC = () => {
-  const activePartInstanceId = useConfiguratorUIStore((s) => s.activePartInstanceId);
+  const requestedPartInstanceId = useConfiguratorUIStore((s) => s.activePartInstanceId);
+  const lockedPartIds = useConfiguratorUIStore((s) => s.lockedPartIds);
   const setPreview = useConfiguratorUIStore((s) => s.setPreview);
   const assembly = useWatchAssemblyStore((s) => s.assembly);
+  const selectedComponentId = useSelectionStore((s) => s.selectedComponentId);
+  const selectedBandId = useSelectionStore((s) => s.selectedBandId);
+  const navigatorItems = React.useMemo(() => buildComponentNavigatorItems(assembly), [assembly]);
+  // Saved/legacy tray IDs can outlive their parts. Match the contextual header
+  // and navigator fallback so controls and edits target the same real instance.
+  const selectedItem = resolveNavigatorSelection(navigatorItems, { componentId: requestedPartInstanceId ?? selectedComponentId, bandId: selectedBandId });
+  const activePartInstanceId = requestedPartInstanceId && assembly.parts[requestedPartInstanceId]
+    ? requestedPartInstanceId : selectedItem?.id ?? null;
   const updateDialFaceConfig = useDesignEngineStore((s) => s.updateDialFaceConfig);
   const visualReferenceConfig = useDesignEngineStore((s) => s.visualReferenceConfig);
   const updateVisualReferenceConfig = useDesignEngineStore((s) => s.updateVisualReferenceConfig);
@@ -54,6 +69,8 @@ export const StyleTab: React.FC = () => {
   const scaleColor = useScaleStore((s) => s.pluginConfig.color);
   const updateScale = useScaleStore((s) => s.updatePluginConfig);
   const dialColor = useDesignEngineStore((s) => s.dialFaceConfig.color);
+  const dialTexture = useDesignEngineStore((s) => s.dialFaceConfig.texture);
+  const referenceDesign = useScaleStore((s) => s.pluginConfig.referenceDesign);
   const selectMainHands = (style: typeof MAIN_HAND_STYLES[number] | 'archetype') => {
     const overrides = { ...visualReferenceConfig?.componentAssetOverrides };
     if (style === 'archetype') delete overrides.hands;
@@ -62,9 +79,23 @@ export const StyleTab: React.FC = () => {
   };
 
   const activePart = activePartInstanceId ? assembly.parts[activePartInstanceId] : null;
+  const activeDefinition = activePart ? getCatalogueItem(activePart.catalogueItemId) : undefined;
+  const activeKind = activeDefinition?.kind ?? '';
+  const visualCategory = activePart?.visual?.category ?? activeDefinition?.visual?.category;
+  const dialContext = !activePart || activePart.category === 'dial';
+  const bezelContext = !activePart || visualCategory === 'bezel' || activeKind.includes('bezel');
+  const caseContext = !activePart || visualCategory === 'case' || visualCategory === 'crown' || ['midcase', 'lugs', 'caseback', 'crown'].includes(activeKind);
+  const handsContext = !activePart || activePart.category.includes('hand');
+  const strapContext = !activePart || visualCategory === 'strap' || activeKind.includes('strap') || activeKind.includes('bracelet');
+  const editingLocked = activePart?.locked || (activePartInstanceId ? lockedPartIds.has(activePartInstanceId) : false);
 
   const handleApplyFinish = (finishTexture: string) => {
     if (!activePartInstanceId) return;
+    if (dialContext) {
+      const kind = finishTexture === 'brushed' ? 'brushed-metal' : finishTexture;
+      if (kind === 'matte' || kind === 'sunburst' || kind === 'brushed-metal') updateDialFaceConfig({ texture: { ...dialTexture, kind } });
+      return;
+    }
 
     // Create preview assembly
     const preview: WatchAssembly = JSON.parse(JSON.stringify(assembly)) as WatchAssembly;
@@ -123,40 +154,51 @@ export const StyleTab: React.FC = () => {
         </p>
       </div>
 
+      {editingLocked && <p role="status" className="text-xs text-amber-200">This component is locked. Unlock it before changing its style.</p>}
+      <fieldset disabled={editingLocked} className="contents">
+      {dialContext && <section aria-label="Dial background and finish" className="space-y-2">
+        <h4 className="text-xs text-teal-300">Background · Dial finish</h4>
+        <div className="grid grid-cols-2 gap-2">{([['matte', 'Matte'], ['sunburst', 'Satin sunburst'], ['brushed-metal', 'Directional brushed']] as [TextureKind, string][]).map(([kind, title]) => <button key={kind} type="button" aria-pressed={dialTexture.kind === kind} onClick={() => updateDialFaceConfig({ texture: { ...dialTexture, kind } })} className={cn('flex items-center gap-2 rounded border p-2 text-left text-xs', dialTexture.kind === kind ? 'border-teal-400' : 'border-slate-700')}><FinishSample kind={kind} colour={dialColor} direction={dialTexture.directionDeg ?? 0} />{title}</button>)}</div>
+        <label className="block text-xs">Texture direction (degrees)<input aria-label="Dial texture direction" type="number" min="0" max="359" disabled={dialTexture.kind !== 'brushed-metal'} value={dialTexture.directionDeg ?? 0} className="ds-input ml-2 w-20" onChange={e => { const n = Number(e.target.value); if (e.target.value.trim() && Number.isFinite(n)) updateDialFaceConfig({ texture: { ...dialTexture, directionDeg: ((n % 360) + 360) % 360 } }); }} /></label>
+        {dialTexture.kind !== 'brushed-metal' && <p className="text-[10px] text-slate-400">Direction applies to directional brushing; matte and radial sunburst have no meaningful grain axis.</p>}
+        <div aria-label="Selected dial finish close-up"><FinishSample kind={dialTexture.kind} colour={dialColor} direction={dialTexture.directionDeg ?? 0} large /></div>
+        <p className="text-[10px] text-slate-400">Illustrative finish sample, not a photograph or manufacturing texture. Guilloché generation is not implemented.</p>
+      </section>}
       {/* Surface Textures */}
       <div className="space-y-2">
         <h4 className="text-[11px] font-mono text-slate-400 uppercase">Independent Colours &amp; Bezel</h4>
         <p className="text-[10px] text-slate-400">Presentation only; no plating, gemstone or supplier-fit claim.</p>
         <p className="text-[10px] text-slate-400">Mix a silver dial with a rose-gold case. Plain or diamond-set bezels can have either metal colour. Custom marker colour replaces the marker lume appearance, not hand lume.</p>
-        <label className="block text-xs text-slate-300">Case &amp; crown
+        {caseContext && <label className="block text-xs text-slate-300">Case &amp; crown
           <select aria-label="Case metal colour" className="ml-2 bg-slate-900" value={visualReferenceConfig?.caseFinish ?? 'steel'}
             onChange={(event) => updateVisualReferenceConfig({ caseFinish: event.target.value as 'steel' | 'rose-gold' | 'black-pvd' })}>
             <option value="steel">Steel / original</option><option value="rose-gold">Rose gold</option><option value="black-pvd">Matte black PVD</option>
           </select>
-        </label>
-        <label className="block text-xs text-slate-300">Main hands
+        </label>}
+        {handsContext && <label className="block text-xs text-slate-300">Main hands
           <select aria-label="Main hand metal colour" className="ml-2 bg-slate-900" value={visualReferenceConfig?.handsFinish ?? 'auto'}
             onChange={(event) => updateVisualReferenceConfig({ handsFinish: event.target.value as 'auto' | 'rose-gold', handsColor: undefined })}>
             <option value="auto">Automatic contrast</option><option value="rose-gold">Rose gold</option>
           </select>
-        </label>
-        <label className="block text-xs text-slate-300">Bezel metal
+        </label>}
+        {bezelContext && <label className="block text-xs text-slate-300">Bezel metal
           <select aria-label="Bezel metal colour" className="ml-2 bg-slate-900" value={visualReferenceConfig?.bezelFinish ?? 'case'}
             onChange={(event) => updateVisualReferenceConfig({ bezelFinish: event.target.value === 'case' ? undefined : event.target.value as 'steel' | 'rose-gold' })}>
             <option value="case">Follow case / original asset</option><option value="steel">Silver steel</option><option value="rose-gold">Rose gold</option>
           </select>
-        </label>
+        </label>}
         {([
           { label: 'Dial surface', value: dialColor, apply: (color: string) => updateDialFaceConfig({ color, secondaryColor: color }) },
           { label: 'Main hand colour', value: visualReferenceConfig?.handsColor ?? (visualReferenceConfig?.handsFinish === 'rose-gold' ? '#c08a76' : '#e2e8f0'), apply: (color: string) => updateVisualReferenceConfig({ handsColor: color }) },
           { label: 'Hour markers / numerals', value: visualReferenceConfig?.markerColor ?? '#e2e8f0', apply: (color: string) => updateVisualReferenceConfig({ markerColor: color }) },
           { label: 'Scale ticks / numerals', value: scaleColor, apply: (color: string) => updateScale({ color }) }
-        ]).map((control) => <div key={control.label} className="flex flex-wrap items-center gap-1 text-xs text-slate-300">
-          <label className="mr-auto">{control.label}<input type="color" aria-label={control.label} value={control.value} onChange={(event) => control.apply(event.target.value)} className="ml-2 h-6 w-8 bg-transparent align-middle" /></label>
+        ]).filter(control => control.label === 'Dial surface' || control.label === 'Hour markers / numerals' ? dialContext : control.label === 'Main hand colour' ? handsContext : (!activePart || bezelContext || activeKind === 'chapter-ring') && referenceDesign !== 'citizen' && referenceDesign !== 'navitimer').map((control) => <div key={control.label} className="flex flex-wrap items-center gap-1 text-xs text-slate-300">
+          <HexColourField label={control.label} value={control.value} onChange={control.apply} />
           {['#e2e8f0', '#c08a76', '#d4af37', '#111827'].map((color) => <button key={color} type="button" aria-label={`${control.label}: ${color === '#c08a76' ? 'rose gold' : color === '#e2e8f0' ? 'silver' : color === '#d4af37' ? 'gold' : 'black'}`} onClick={() => control.apply(color)} className="h-5 w-5 rounded border border-slate-600" style={{ backgroundColor: color }} />)}
         </div>)}
-        <button type="button" className="text-xs text-slate-400" onClick={() => updateVisualReferenceConfig({ markerColor: undefined, handsColor: undefined, handsFinish: 'auto' })}>Restore automatic hands &amp; marker lume</button>
-        <button type="button" className="rounded border border-slate-700 p-2 text-xs"
+        {(referenceDesign === 'citizen' || referenceDesign === 'navitimer') && <p className="text-[10px] text-teal-300">Reference scale inks are independent. Use Advanced → Custom Colours; this panel never overwrites Original Colours.</p>}
+        {(dialContext || handsContext) && <button type="button" className="text-xs text-slate-400" onClick={() => updateVisualReferenceConfig(dialContext && activePart ? { markerColor: undefined } : handsContext && activePart ? { handsColor: undefined, handsFinish: 'auto' } : { markerColor: undefined, handsColor: undefined, handsFinish: 'auto' })}>Restore automatic {activePart ? dialContext ? 'marker lume' : 'hands' : 'hands & marker lume'}</button>}
+        {bezelContext && <><button type="button" className="rounded border border-slate-700 p-2 text-xs"
           onClick={() => updateVisualReferenceConfig({ componentAssetOverrides: { ...visualReferenceConfig?.componentAssetOverrides,
             bezel: `bezel-diamond-rose-gold-${assembly.globalDimensions.caseDiameterMm <= 36 ? 34 : 42}` } })}>
           Diamond-set bezel (choose metal above)
@@ -164,7 +206,7 @@ export const StyleTab: React.FC = () => {
         <button type="button" className="ml-2 text-xs text-slate-400" onClick={() => {
           const overrides = { ...visualReferenceConfig?.componentAssetOverrides }; delete overrides.bezel;
           updateVisualReferenceConfig({ componentAssetOverrides: overrides });
-        }}>Restore archetype bezel</button>
+        }}>Restore archetype bezel</button></>}
       </div>
       <div className="space-y-2">
         <h4 className="text-[11px] font-mono text-slate-400 uppercase tracking-wider">
@@ -172,13 +214,15 @@ export const StyleTab: React.FC = () => {
         </h4>
         <div className="grid grid-cols-1 gap-2">
           {FINISH_PRESETS.map((preset) => {
-            const isCurrent = activePart?.texture === preset.texture;
+            const isCurrent = dialContext ? dialTexture.kind === (preset.texture === 'brushed' ? 'brushed-metal' : preset.texture) : activePart?.texture === preset.texture;
 
             return (
               <button
                 key={preset.id}
                 type="button"
                 onClick={() => handleApplyFinish(preset.texture)}
+                disabled={!activePart || preset.id === 'guilloche' || (dialContext && preset.id === 'polished')}
+                title={preset.id === 'guilloche' ? 'Guilloché generation is not implemented.' : dialContext && preset.id === 'polished' ? 'Mirror-polished dial preview is not implemented.' : !activePart ? 'Select a component first.' : preset.description}
                 className={cn(
                   'flex flex-col text-left p-2.5 rounded-lg border transition-all duration-150',
                   isCurrent
@@ -200,7 +244,7 @@ export const StyleTab: React.FC = () => {
       </div>
 
       {/* Color Palettes for Dial Face */}
-      <div className="space-y-2 pt-2 border-t border-slate-800">
+      {dialContext && <div className="space-y-2 pt-2 border-t border-slate-800">
         <h4 className="text-[11px] font-mono text-slate-400 uppercase tracking-wider">
           Dial Color Schemes
         </h4>
@@ -226,9 +270,9 @@ export const StyleTab: React.FC = () => {
             </button>
           ))}
         </div>
-      </div>
+      </div>}
 
-      <div className="space-y-2 pt-2 border-t border-slate-800">
+      {strapContext && <div className="space-y-2 pt-2 border-t border-slate-800">
         <h4 className="text-[11px] font-mono text-slate-400 uppercase tracking-wider">Strap Style</h4>
         <div className="grid grid-cols-2 gap-2">
           {STRAP_STYLES.map((style) => <button key={style.id} type="button"
@@ -238,9 +282,9 @@ export const StyleTab: React.FC = () => {
             <span className="block text-[10px] text-slate-400">{style.note}</span>
           </button>)}
         </div>
-      </div>
+      </div>}
 
-      <div className="space-y-2 pt-2 border-t border-slate-800">
+      {caseContext && <div className="space-y-2 pt-2 border-t border-slate-800">
         <h4 className="text-[11px] font-mono text-slate-400 uppercase tracking-wider">Case Lug Geometry</h4>
         <p className="text-[10px] text-slate-400">{assembly.globalDimensions.caseDiameterMm === 42
           ? '42 mm presentation variants. Each shape needs separate physical validation before ordering.'
@@ -253,9 +297,9 @@ export const StyleTab: React.FC = () => {
             <span className="text-xs text-slate-200">{style}</span>
           </button>)}
         </div>
-      </div>
+      </div>}
 
-      <div className="space-y-2 pt-2 border-t border-slate-800">
+      {handsContext && <div className="space-y-2 pt-2 border-t border-slate-800">
         <h4 className="text-[11px] font-mono text-slate-400 uppercase tracking-wider">Main Hour &amp; Minute Hands</h4>
         <p className="text-[10px] text-slate-400">Changes both Engineering and HD Visual. The GLBs are presentation shapes; confirm supplier bores and lengths.</p>
         <div className="grid grid-cols-3 gap-2">
@@ -265,9 +309,9 @@ export const StyleTab: React.FC = () => {
             onClick={() => selectMainHands(style)}
             className={cn('rounded-lg border p-2 text-left text-xs capitalize', selectedMainHandAsset === `hands-${style}-42` ? 'border-teal-400 bg-slate-800' : 'border-slate-800 bg-slate-900')}>{style.replace('-', ' ')}</button>)}
         </div>
-      </div>
+      </div>}
 
-      {visualReferenceConfig?.archetypeId === 'archetype-chronograph' && <div className="space-y-2 pt-2 border-t border-slate-800">
+      {handsContext && visualReferenceConfig?.archetypeId === 'archetype-chronograph' && <div className="space-y-2 pt-2 border-t border-slate-800">
         <h4 className="text-[11px] font-mono text-slate-400 uppercase tracking-wider">Chronograph Subdial Hands</h4>
         <p className="text-[10px] text-slate-400">Controls only chronograph registers, not the main hour/minute hand set. Supplier bore verification is still required.</p>
         <div className="grid grid-cols-3 gap-2">
@@ -279,7 +323,7 @@ export const StyleTab: React.FC = () => {
         </div>
       </div>}
 
-      <div className="space-y-2 pt-2 border-t border-slate-800">
+      {dialContext && <div className="space-y-2 pt-2 border-t border-slate-800">
         <h4 className="text-[11px] font-mono text-slate-400 uppercase tracking-wider">Custom Dial Artwork</h4>
         <p className="text-[10px] text-slate-400">PNG, JPEG or WebP up to 2 MB. Preview-only; no manufacturing claim.</p>
         <label className="block cursor-pointer rounded-lg border border-slate-700 bg-slate-900 p-2 text-center text-xs text-slate-200 hover:bg-slate-800">
@@ -288,7 +332,8 @@ export const StyleTab: React.FC = () => {
         </label>
         {visualReferenceConfig?.artworkDataUrl && <button type="button" className="text-[10px] text-rose-300"
           onClick={() => updateVisualReferenceConfig({ artworkDataUrl: undefined, artworkName: undefined })}>Remove artwork</button>}
-      </div>
+      </div>}
+      </fieldset>
     </div>
   );
 };

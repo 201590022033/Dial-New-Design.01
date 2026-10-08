@@ -245,6 +245,8 @@ export interface ScalePluginConfig {
   fixedBandOuterRadiusMm?: number;
   outerNumeralsVisible?: boolean;
   innerNumeralsVisible?: boolean;
+  /** Simplified aviation writing only; extra labels never create or reposition graduations. */
+  aviationNumeralDetail?: 'key' | 'whole-units';
   outerScaleVisible?: boolean;
   innerScaleVisible?: boolean;
   markColorOverrides?: Record<string, string>;

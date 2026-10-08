@@ -1,4 +1,6 @@
 import { SVG, type Svg } from '@svgdotjs/svg.js';
+import { generateTextureGrain } from '@/domain/generators/textureEngine';
+import { fitWatchScale } from '@/renderer/services/zoomService';
 import { scaleArtworkSvgContent } from '@/domain/scales/resolvedScaleArtwork';
 import { resolvePhysicalAssembly } from '@/domain/assembly/physicalAssembly';
 import type { BandEntity } from '@/domain/bands/types';
@@ -92,8 +94,7 @@ export class SvgRenderer implements RendererAdapter {
       return Math.max(current, band.geometry.outerRadius);
     }, 20);
     const nominalDiameterPx = Math.max(1, mmToPixels(maxOuterRadiusMm * 2));
-    const targetDiameterPx = Math.min(context.width, context.height) * 0.9;
-    const fitScale = Math.max(1, Math.min(2.6, targetDiameterPx / nominalDiameterPx));
+    const fitScale = fitWatchScale(context.width, context.height, nominalDiameterPx);
     this.latestFitScale = fitScale;
 
     const layer = this.root.group().id('bands');
@@ -229,7 +230,7 @@ export class SvgRenderer implements RendererAdapter {
         .attr('data-band-id', 'band-dial-face')
         .attr('data-label', 'Dial Face');
 
-      const dialFace = dialSurfaceGroup
+      dialSurfaceGroup
         .circle(dialRadiusPx * 2)
         .center(context.centerX, context.centerY)
         .fill({ color: overlay.dialFace.fill, opacity: overlay.dialFace.opacity })
@@ -238,6 +239,16 @@ export class SvgRenderer implements RendererAdapter {
           width: Math.max(1, mmToPixels(overlay.dialFace.borderWidthMm))
         })
         .attr('data-interaction-role', 'rendering-primitive');
+
+      if (overlay.dialFace.texture) {
+        const grain = dialSurfaceGroup.group().id('dial-finish-grain').attr('pointer-events', 'none');
+        const clip = overlayLayer.clip().circle(dialRadiusPx * 2).center(context.centerX, context.centerY);
+        grain.clipWith(clip);
+        for (const line of generateTextureGrain(overlay.dialFace.texture, dialRadiusMm)) {
+          grain.line(context.centerX + mmToPixels(line.x1), context.centerY + mmToPixels(line.y1), context.centerX + mmToPixels(line.x2), context.centerY + mmToPixels(line.y2))
+            .stroke({ color: '#ffffff', width: mmToPixels(line.widthMm), opacity: line.opacity });
+        }
+      }
 
       if (centreHoleRadiusPx > 0) {
         const dialMask = overlayLayer.mask();
@@ -249,7 +260,7 @@ export class SvgRenderer implements RendererAdapter {
           .circle(centreHoleRadiusPx * 2)
           .center(context.centerX, context.centerY)
           .fill({ color: '#000000' });
-        dialFace.maskWith(dialMask);
+        dialSurfaceGroup.maskWith(dialMask);
       }
 
       // Date Window complication aperture (rendered on dial at 3 o'clock)

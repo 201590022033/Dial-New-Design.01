@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { isBrowserZoomGesture, nextZoomValue } from '@/renderer/services/zoomService';
+import { fitWatchScale, isBrowserZoomGesture, nextZoomValue } from '@/renderer/services/zoomService';
 
 describe('zoom service', () => {
+  it('shrinks narrow previews to fit without changing the physical diameter', () => {
+    expect(fitWatchScale(240, 100, 160) * 160).toBeLessThanOrEqual(90);
+    expect(fitWatchScale(800, 800, 160)).toBe(2.6);
+    expect(fitWatchScale(0, 0, 160)).toBeGreaterThan(0);
+  });
   it('keeps browser zoom gestures out of the engineering canvas controls', () => {
     expect(isBrowserZoomGesture({ ctrlKey: true, metaKey: false })).toBe(true);
     expect(isBrowserZoomGesture({ ctrlKey: false, metaKey: true })).toBe(true);

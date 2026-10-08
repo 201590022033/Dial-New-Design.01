@@ -2,7 +2,7 @@ import type { BandEntity } from '@/domain/bands/types';
 import type { RenderContext } from '@/renderer/types';
 import type { ScaleRunResult } from '@/services/scaleEngineService';
 import type { DesignOverlay } from '@/renderer/types';
-import { scaleArtworkLayers, scaleArtworkSvgContent, scaleLabelRotation, scaleLabelBoxSize, scaleTickRadii } from '@/domain/scales/resolvedScaleArtwork';
+import { escapeScaleXml, scaleArtworkLayers, scaleArtworkSvgContent, scaleLabelRotation, scaleLabelBoxSize, scaleTickRadii } from '@/domain/scales/resolvedScaleArtwork';
 import { scalePointerRotation, scalePointerVertices } from '@/domain/scales/pointerGeometry';
 
 export interface ExportMetadata {
@@ -66,11 +66,11 @@ const buildCacheKey = (input: EngineeringExportInput): string => {
 };
 
 const svgCircle = (cx: number, cy: number, radius: number, fill: string, stroke: string, strokeWidth: number, opacity: number): string => {
-  return `<circle cx="${cx}" cy="${cy}" r="${radius}" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}" opacity="${opacity}" />`;
+  return `<circle cx="${cx}" cy="${cy}" r="${radius}" fill="${escapeScaleXml(fill)}" stroke="${escapeScaleXml(stroke)}" stroke-width="${strokeWidth}" opacity="${opacity}" />`;
 };
 
 const svgLine = (x1: number, y1: number, x2: number, y2: number, stroke: string, strokeWidth: number): string => {
-  return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${stroke}" stroke-width="${strokeWidth}" />`;
+  return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${escapeScaleXml(stroke)}" stroke-width="${strokeWidth}" />`;
 };
 
 const polarToCartesianPx = (radiusMm: number, angleDeg: number): { x: number; y: number } => {
@@ -110,11 +110,11 @@ const renderBandGeometrySvg = (bands: BandEntity[], centerX: number, centerY: nu
       const innerR = band.geometry.innerRadius * 10;
       const outer = svgCircle(centerX, centerY, outerR, band.style.fill, band.style.stroke, Math.max(1, band.style.strokeWidth), band.style.opacity);
       if (innerR <= 0) {
-        return `<g id="${band.svgGroupId}" data-band-id="${band.id}">${outer}</g>`;
+        return `<g id="${escapeScaleXml(band.svgGroupId)}" data-band-id="${escapeScaleXml(band.id)}">${outer}</g>`;
       }
 
       const inner = svgCircle(centerX, centerY, innerR, '#0B1224', '#0B1224', 1, 1);
-      return `<g id="${band.svgGroupId}" data-band-id="${band.id}">${outer}${inner}</g>`;
+      return `<g id="${escapeScaleXml(band.svgGroupId)}" data-band-id="${escapeScaleXml(band.id)}">${outer}${inner}</g>`;
     })
     .join('');
 };
@@ -145,7 +145,7 @@ const renderOverlaySvg = (
   const text = (overlay?.typography ?? [])
     .map((entry) => {
       const point = polarToCartesianPx(entry.radiusMm, entry.angleDeg);
-      return `<text x="${centerX + point.x}" y="${centerY + point.y}" fill="${entry.color}" font-size="${Math.max(8, entry.fontSizeMm * 10)}" text-anchor="middle" font-family="${entry.fontFamily}">${entry.text}</text>`;
+      return `<text x="${centerX + point.x}" y="${centerY + point.y}" fill="${escapeScaleXml(entry.color)}" font-size="${Math.max(8, entry.fontSizeMm * 10)}" text-anchor="middle" font-family="${escapeScaleXml(entry.fontFamily)}">${escapeScaleXml(entry.text)}</text>`;
     })
     .join('');
 
@@ -159,7 +159,9 @@ const renderMetadataComment = (metadata?: ExportMetadata): string => {
     return '';
   }
 
-  return `<!-- metadata: ${JSON.stringify(metadata)} -->`;
+  // XML comments cannot contain '--'; escaped metadata also safely retains
+  // arbitrary project names/notes without breaking SVG or vector PDF parsing.
+  return `<metadata>${escapeScaleXml(JSON.stringify(metadata))}</metadata>`;
 };
 
 export const generateEngineeringSvg = (input: EngineeringExportInput): string => {

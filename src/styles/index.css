@@ -7,16 +7,17 @@
 :root {
   color-scheme: dark;
   --dd-bg: #111315;
-  --dd-bg-elevated: #191c1f;
+  /* Mock-up UI references only; never alter Citizen/Navitimer print inks. */
+  --dd-bg-elevated: #1A1D24;
   --dd-panel: #202428;
   --dd-panel-soft: #181b1e;
   --dd-border: #353b40;
   --dd-divider: rgba(148, 163, 184, 0.16);
-  --dd-text: #e5e7eb;
+  --dd-text: #F0F0F0;
   --dd-text-muted: #9ca3af;
   --dd-teal: #14b8a6;
   --dd-amber: #f59e0b;
-  --dd-danger: #ef4444;
+  --dd-danger: #E63946;
   --dd-radius-sm: 8px;
   --dd-radius-md: 12px;
   --dd-radius-lg: 16px;
@@ -40,13 +41,18 @@
   --dd-border: #dbe4ef;
 }
 
+html {
+  overflow: clip;
+}
+
 body {
   @apply m-0 min-h-screen bg-engineering-bg text-engineering-text antialiased;
   background-image: linear-gradient(to bottom right, #151719, #0f1011);
 }
 
 #root {
-  @apply min-h-screen;
+  /* A full-screen editor: only its inspector/navigator panes should scroll. */
+  @apply fixed inset-0 overflow-clip;
 }
 
 * {

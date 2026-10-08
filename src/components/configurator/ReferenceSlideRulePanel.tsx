@@ -1,5 +1,7 @@
 import { useScaleStore } from '@/stores/scaleStore';
-import { useBandsStore } from '@/stores/bandsStore';
+import { useMemo } from 'react';
+import { useWatchAssemblyStore } from '@/stores/watchAssemblyStore';
+import { assemblyToBands } from '@/domain/assembly/assemblyAdapters';
 import { CITIZEN_PALETTE } from '@/domain/scales/citizenReferenceArtwork';
 import { NAVITIMER_PALETTE } from '@/domain/scales/navitimerReferenceArtwork';
 import { slideRuleReferenceGate } from '@/domain/scales/slideRuleLayers';
@@ -31,7 +33,8 @@ export const ReferenceSlideRulePanel = () => {
   const setEnabled = useScaleStore((state) => state.setPreviewEnabled);
   const reset = useScaleStore((state) => state.resetReferenceDesign);
   const preview = useScaleStore((state) => state.preview);
-  const bands = useBandsStore((state) => state.bands);
+  const assembly = useWatchAssemblyStore((state) => state.assembly);
+  const bands = useMemo(() => assemblyToBands(assembly), [assembly]);
   if (!config.referenceDesign || config.referenceDesign === 'simplified') return null;
   const design = config.referenceDesign;
   const palette = design === 'citizen' ? CITIZEN_PALETTE : NAVITIMER_PALETTE;

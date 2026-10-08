@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   ReceiptText,
   ChevronUp,
@@ -25,6 +25,23 @@ export const CostBomSummary: React.FC = () => {
   const [isBreakdownOpen, setIsBreakdownOpen] = useState(false);
   const [isIssuesPanelOpen, setIsIssuesPanelOpen] = useState(false);
   const [activeSensitivityPopover, setActiveSensitivityPopover] = useState<string | null>(null);
+  const barRef = useRef<HTMLDivElement>(null);
+  const [popoverHeight, setPopoverHeight] = useState(240);
+  useEffect(() => {
+    const bar = barRef.current;
+    const centre = bar?.parentElement;
+    if (!bar || !centre) return;
+    const measure = () => {
+      const available = bar.getBoundingClientRect().top - centre.getBoundingClientRect().top - 12;
+      setPopoverHeight(Math.max(0, Math.floor(available)));
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(centre);
+    observer.observe(bar);
+    window.addEventListener('resize', measure);
+    return () => { observer.disconnect(); window.removeEventListener('resize', measure); };
+  }, []);
 
   const getCommittedCost = useConfiguratorUIStore((s) => s.getCommittedCost);
   const getBuildReadiness = useConfiguratorUIStore((s) => s.getBuildReadiness);
@@ -51,12 +68,13 @@ export const CostBomSummary: React.FC = () => {
 
   return (
     <div
-      className="relative flex items-center justify-between px-4 py-2.5 bg-slate-900/95 border-t border-slate-800 text-xs text-slate-300 z-20 shadow-md select-none"
+      ref={barRef}
+      className="relative flex min-w-0 flex-wrap items-center justify-between gap-x-3 gap-y-2 px-2 sm:px-4 py-2.5 bg-slate-900/95 border-t border-slate-800 text-xs text-slate-300 z-20 shadow-md select-none"
       data-testid="cost-bom-summary-bar"
     >
       {/* Left: Headline Cost & Breakdown toggle */}
-      <div className="flex items-center gap-3">
-        <div className="flex items-baseline gap-2">
+      <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
+        <div className="flex flex-wrap items-baseline gap-2">
           <span className="text-[10px] uppercase font-mono tracking-wider text-slate-400">
             Build Cost:
           </span>
@@ -89,12 +107,12 @@ export const CostBomSummary: React.FC = () => {
       </div>
 
       {/* Centre: Build Readiness Summary */}
-      <div className="flex items-center gap-2">
+      <div className="flex min-w-0 max-w-full items-center gap-2">
         <button
           type="button"
           onClick={() => setIsIssuesPanelOpen(!isIssuesPanelOpen)}
           className={cn(
-            'flex items-center gap-2 px-2.5 py-1 rounded-md border text-[11px] transition-colors',
+            'flex min-w-0 max-w-full flex-wrap items-center gap-x-2 gap-y-1 px-2.5 py-1 rounded-md border text-[11px] text-left transition-colors',
             readiness.unresolvedCount > 0
               ? 'bg-rose-950/40 border-rose-800/80 text-rose-300 hover:bg-rose-900/50'
               : readiness.customCount > 0
@@ -102,7 +120,7 @@ export const CostBomSummary: React.FC = () => {
                 : 'bg-slate-800/60 border-slate-700/70 text-slate-300 hover:bg-slate-800'
           )}
         >
-          <span className="font-mono">
+          <span className="min-w-0 break-words font-mono">
             {readiness.sourcedCount} sourced · {readiness.customCount} custom · {readiness.unresolvedCount} unresolved
           </span>
           <span className="text-[10px] text-slate-400 underline">
@@ -112,11 +130,11 @@ export const CostBomSummary: React.FC = () => {
       </div>
 
       {/* Right: Practical Sensitivities */}
-      <div className="flex items-center gap-2">
+      <div className="flex min-w-0 max-w-full flex-wrap items-center gap-2">
         {sensitivities
           .filter((s) => !s.suppressed)
           .map((sens) => (
-            <div key={sens.kind} className="relative">
+            <div key={sens.kind} className="min-w-0 max-w-full">
               <button
                 type="button"
                 onClick={() =>
@@ -124,7 +142,7 @@ export const CostBomSummary: React.FC = () => {
                     activeSensitivityPopover === sens.kind ? null : sens.kind
                   )
                 }
-                className="flex items-center gap-1 text-[10px] font-medium text-teal-300 bg-teal-950/50 border border-teal-800/60 px-2 py-0.5 rounded-full hover:bg-teal-900/50"
+                className="flex min-w-0 max-w-full items-center gap-1 text-[10px] font-medium text-teal-300 bg-teal-950/50 border border-teal-800/60 px-2 py-0.5 rounded-full hover:bg-teal-900/50"
               >
                 <Sparkles className="h-2.5 w-2.5" />
                 <span>{sens.label}</span>
@@ -132,8 +150,8 @@ export const CostBomSummary: React.FC = () => {
 
               {/* Popover explaining sensitivity */}
               {activeSensitivityPopover === sens.kind && (
-                <div className="absolute right-0 bottom-8 w-64 p-2.5 rounded-lg bg-slate-900 border border-slate-700 shadow-2xl z-50 text-[11px]">
-                  <div className="flex items-start justify-between pb-1 border-b border-slate-800">
+                <div style={{ maxHeight: popoverHeight }} className="absolute right-2 bottom-full mb-2 w-64 max-w-[calc(100%-1rem)] overflow-y-auto break-words p-2.5 rounded-lg bg-slate-900 border border-slate-700 shadow-2xl z-50 text-[11px]">
+                  <div className="sticky top-0 z-10 flex items-start justify-between pb-1 border-b border-slate-800 bg-slate-900">
                     <span className="font-semibold text-slate-200">{sens.label}</span>
                     <button
                       type="button"
@@ -176,9 +194,10 @@ export const CostBomSummary: React.FC = () => {
       {isBreakdownOpen && (
         <div
           data-testid="cost-breakdown-modal"
-          className="absolute left-4 bottom-12 w-96 max-w-[calc(100vw-3rem)] max-h-[65vh] overflow-y-auto p-3 rounded-lg bg-slate-950 border border-slate-800 shadow-2xl z-50 text-xs font-sans space-y-2"
+          style={{ maxHeight: popoverHeight }}
+          className="absolute left-2 bottom-full mb-2 w-96 max-w-[calc(100%-1rem)] overflow-y-auto break-words p-3 rounded-lg bg-slate-950 border border-slate-800 shadow-2xl z-50 text-xs font-sans space-y-2"
         >
-          <div className="flex items-center justify-between border-b border-slate-800 pb-1.5">
+          <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-800 pb-1.5 bg-slate-950">
             <h4 className="font-semibold text-slate-100 flex items-center gap-1.5">
               <ReceiptText className="h-3.5 w-3.5 text-teal-400" />
               Build Cost Breakdown
@@ -230,9 +249,10 @@ export const CostBomSummary: React.FC = () => {
       {isIssuesPanelOpen && (
         <div
           data-testid="readiness-issues-panel"
-          className="absolute left-1/2 -translate-x-1/2 bottom-12 w-96 p-3.5 rounded-lg bg-slate-950 border border-slate-800 shadow-2xl z-50 text-xs font-sans space-y-3"
+          style={{ maxHeight: popoverHeight }}
+          className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-96 max-w-[calc(100%-1rem)] overflow-y-auto break-words p-3.5 rounded-lg bg-slate-950 border border-slate-800 shadow-2xl z-50 text-xs font-sans space-y-3"
         >
-          <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+          <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-800 pb-2 bg-slate-950">
             <h4 className="font-semibold text-slate-100 flex items-center gap-1.5">
               <ShieldAlert className="h-4 w-4 text-teal-400" />
               Build Readiness Status
@@ -275,7 +295,7 @@ export const CostBomSummary: React.FC = () => {
                   </div>
                   <p className="text-slate-200">{issue.summary}</p>
 
-                  <div className="flex items-center gap-2 pt-1">
+                  <div className="flex flex-wrap items-center gap-2 pt-1">
                     {issue.affectedPartIds && issue.affectedPartIds[0] && (
                       <button
                         type="button"

@@ -33,6 +33,7 @@ export interface DialFaceOverlay {
   opacity: number;
   borderWidthMm: number;
   centreHoleMm: number;
+  texture?: import('@/domain/generators/textureEngine').TextureEngineConfig;
 }
 
 export interface MarkerOverlay {

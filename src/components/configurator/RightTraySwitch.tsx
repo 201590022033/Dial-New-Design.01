@@ -6,6 +6,7 @@ import { StarterBuildPanel } from './StarterBuildPanel';
 import { RightInspector } from '@/components/layout/RightInspector';
 import { Sliders, Layers } from 'lucide-react';
 import { ControlledBomPanel } from './ControlledBomPanel';
+import { SelectedComponentHeader } from './SelectedComponentHeader';
 
 export const RightTraySwitch: React.FC = () => {
   const workMode = useConfiguratorUIStore((s) => s.workMode);
@@ -22,6 +23,7 @@ export const RightTraySwitch: React.FC = () => {
   if (workMode === 'advanced') {
     return (
       <div className="flex flex-col h-full bg-slate-950 border-l border-slate-800">
+        <SelectedComponentHeader />
         {/* Toggle between Modern Advanced CAD and Full Legacy Inspector */}
         <div className="flex items-center justify-between px-3 py-1.5 bg-slate-900 border-b border-slate-800 text-[11px]">
           <span className="font-mono text-teal-400 uppercase font-semibold">
@@ -49,5 +51,5 @@ export const RightTraySwitch: React.FC = () => {
   }
 
   // For 'parts', 'style', 'research', 'bom', 'manufacture', 'review'
-  return <RightTray />;
+  return <div className="flex h-full min-h-0 flex-col"><SelectedComponentHeader /><div className="min-h-0 flex-1"><RightTray /></div></div>;
 };

@@ -95,7 +95,7 @@ export const RightTray: React.FC = () => {
       </div>
 
       {/* Tabs Header */}
-      <div className="flex items-center border-b border-slate-800/80 bg-slate-900/60 px-2 pt-1 gap-1 overflow-x-auto">
+      <div className="flex shrink-0 flex-wrap items-center border-b border-slate-800/80 bg-slate-900/60 px-2 pt-1 gap-1">
         {TRAY_TABS.map((tab) => {
           const isActive = trayTab === tab.id;
 

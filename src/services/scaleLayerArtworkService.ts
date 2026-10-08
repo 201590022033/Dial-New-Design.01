@@ -34,12 +34,13 @@ export const resolvePhysicalScaleConfig = (assembly: WatchAssembly, bands: BandE
 
 /** Compose saved active layers without mutating the editor or cached run results. */
 export const resolveScaleLayers = (assembly: WatchAssembly, bands: BandEntity[], kind: ScaleKind, config: ScalePluginConfig, context: ScaleMathContext): ScaleRunResult | null => {
-  const active = runScalePlugin(kind, resolvePhysicalScaleConfig(assembly, bands, config, kind), context);
-  if (!active) return null;
-  const layers: ScaleRunResult[] = config.previewEnabled === false ? [] : [active];
+  // Disabled settings are retained for editing, but must never be generated or
+  // validated as printable artwork (old hidden settings may be malformed).
+  const active = config.previewEnabled === false ? null : runScalePlugin(kind, resolvePhysicalScaleConfig(assembly, bands, config, kind), context);
+  const layers: ScaleRunResult[] = active ? [active] : [];
   const occupied = new Set<string>();
   const issues: string[] = [];
-  if (config.placementTargetBandId && !bands.some((band) => band.id === config.placementTargetBandId)) {
+  if (active && config.placementTargetBandId && !bands.some((band) => band.id === config.placementTargetBandId)) {
     issues.push('The selected physical scale target is missing. Select an existing component before exporting.');
   }
   const claim = (result: ScaleRunResult): boolean => {
@@ -52,11 +53,11 @@ export const resolveScaleLayers = (assembly: WatchAssembly, bands: BandEntity[],
     targets.forEach((target) => { if (target) occupied.add(target); });
     return true;
   };
-  if (layers.length) claim(active);
+  if (active) claim(active);
   if (kind === 'slide-rule') for (const layer of assembly.designConfig?.slideRuleLayers?.layers ?? []) {
     if (layer.targetBandId === config.placementTargetBandId || !layer.activeDesign) continue;
     const saved = layer.settings[layer.activeDesign]?.legacy;
-    if (!saved) continue;
+    if (!saved || saved.pluginConfig.previewEnabled === false) continue;
     if (!bands.some((band) => band.id === layer.targetBandId)) {
       issues.push(`Saved scale target ${layer.targetBandId} is missing. Restore the part or disable its layer.`);
       continue;
@@ -66,7 +67,7 @@ export const resolveScaleLayers = (assembly: WatchAssembly, bands: BandEntity[],
   }
   if (!layers.length) return null;
   const structuredWarnings = [...layers.flatMap((layer) => layer.validation.structuredWarnings), ...issues.map((description) => ({ severity: 'error' as const, description, affectedObject: 'scale-envelope', suggestedFix: 'Choose independent physical targets.' }))];
-  const composite = { ...active, layers, validation: { valid: layers.every((layer) => layer.validation.valid) && !issues.length, warnings: structuredWarnings.map((warning) => warning.description), structuredWarnings } };
+  const composite = { ...layers[0]!, layers, validation: { valid: layers.every((layer) => layer.validation.valid) && !issues.length, warnings: structuredWarnings.map((warning) => warning.description), structuredWarnings } };
   composite.svg = resolvedScaleSvg(composite, Math.max(1, assembly.globalDimensions.caseDiameterMm));
   return composite;
 };

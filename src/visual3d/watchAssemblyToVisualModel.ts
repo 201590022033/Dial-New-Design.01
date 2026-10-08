@@ -38,6 +38,7 @@ export type DialVisualDescriptor = {
   textureKind: string;
   textureIntensity: number;
   textureContrast: number;
+  textureDirectionDeg: number;
   artwork: {
     content: string;
     layout: 'straight' | 'arc' | 'circular' | 'radial' | 'vertical' | 'horizontal' | 'inside-circle' | 'outside-circle' | 'future-path';
@@ -294,6 +295,7 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
       textureKind: dialTexture.kind,
       textureIntensity: dialTexture.intensity,
       textureContrast: dialTexture.contrast,
+      textureDirectionDeg: Number.isFinite(dialTexture.directionDeg) ? dialTexture.directionDeg! : 0,
       artwork: {
         content: typography.content.trim(),
         layout: typography.layout,

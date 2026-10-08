@@ -4,6 +4,8 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
 import { useWatchAssemblyStore } from '@/stores/watchAssemblyStore';
 import { ProjectWorkflowDialog } from '@/components/layout/ProjectWorkflowDialog';
+import { CaseDiameterControl } from './CaseDiameterControl';
+import { runToolbarExport } from './toolbarActions';
 import { defaultGeometryParameters } from '@/domain/geometry/geometryEngine';
 import { createBand } from '@/domain/bands/bandRegistry';
 import { deserializeDialProject } from '@/services/projectFileService';
@@ -13,6 +15,16 @@ import { useBandsStore, useDesignEngineStore, useGlobalSettingsStore, useHistory
 
 export const TopToolbar = () => {
   const [projectDialogOpen, setProjectDialogOpen] = useState(false);
+  const [exportFeedback, setExportFeedback] = useState<string | null>(null);
+  const [exportBusy, setExportBusy] = useState(false);
+  const exportFormat = async (format: 'svg' | 'dxf' | 'pdf') => {
+    setExportBusy(true);
+    try {
+      const warnings = await runToolbarExport(format);
+      setExportFeedback(`${format.toUpperCase()} export prepared. ${warnings.length ? warnings.join(' ') : 'Check text outlines and dimensions at 1:1 before manufacture.'}`);
+    } catch (error) { setExportFeedback(error instanceof Error ? error.message : 'Export failed.'); }
+    finally { setExportBusy(false); }
+  };
 
   const setBandsSnapshot = useBandsStore((state) => state.setBandsSnapshot);
   const selectBand = useSelectionStore((state) => state.selectBand);
@@ -62,7 +74,7 @@ export const TopToolbar = () => {
       <motion.header
         initial={{ opacity: 0, y: -6 }}
         animate={{ opacity: 1, y: 0 }}
-        className="ds-panel flex min-h-[68px] max-h-[80px] items-center gap-2 overflow-hidden px-3 py-2"
+        className="ds-panel flex min-h-[68px] flex-wrap items-center gap-2 px-3 py-2"
       >
         <div className="mr-1 flex items-center gap-2 rounded-md border border-engineering-border bg-engineering-bg/45 px-2 py-1.5">
           <Watch className="ds-icon-md text-engineering-amber" />
@@ -75,6 +87,12 @@ export const TopToolbar = () => {
         <Button variant="toolbar" size="sm" onClick={() => setProjectDialogOpen(true)}>
           Project: {projectInfo.name}
         </Button>
+
+        <CaseDiameterControl />
+
+        <div className="flex items-center gap-1" role="group" aria-label="Design exports">
+          {(['svg', 'dxf', 'pdf'] as const).map((format) => <Button key={format} variant="toolbar" size="sm" disabled={exportBusy} onClick={() => { void exportFormat(format); }} title={`Export ${format.toUpperCase()} using the current export target and physical artwork checks`}>{format.toUpperCase()}</Button>)}
+        </div>
 
         <div className="ml-auto flex items-center gap-1.5">
           <Button
@@ -104,6 +122,8 @@ export const TopToolbar = () => {
           </Button>
         </div>
       </motion.header>
+
+      {exportFeedback && <div role="status" className="flex items-start justify-between gap-2 rounded border border-engineering-border bg-engineering-panel px-3 py-1 text-[11px] text-engineering-muted"><span>{exportFeedback}</span><button type="button" aria-label="Dismiss export feedback" onClick={() => setExportFeedback(null)}>×</button></div>}
 
       <ProjectWorkflowDialog
         open={projectDialogOpen}

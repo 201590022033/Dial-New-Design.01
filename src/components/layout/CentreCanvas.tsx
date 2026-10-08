@@ -4,10 +4,10 @@ import { Focus, Maximize2, Minimize2, Move, Ruler, ScanLine, ZoomIn, ZoomOut } f
 import { Button } from '@/components/ui/Button';
 import { useResizeObserver } from '@/hooks/useResizeObserver';
 import { useRenderer } from '@/renderer/useRenderer';
-import { isBrowserZoomGesture, nextZoomValue } from '@/renderer/services/zoomService';
+import { fitWatchScale, isBrowserZoomGesture, nextZoomValue } from '@/renderer/services/zoomService';
 import { createPanState, resolvePan, type PanState } from '@/renderer/services/panService';
 import { resolveHighlightBandIds } from '@/features/shared/objectInspectorSchemas';
-import { useBandsStore, useDesignEngineStore, useGlobalSettingsStore, useScaleStore, useSelectionStore, useViewportStore, useConfiguratorUIStore, useWatchAssemblyStore } from '@/stores';
+import { useBandsStore, useDesignEngineStore, useScaleStore, useSelectionStore, useViewportStore, useConfiguratorUIStore, useWatchAssemblyStore } from '@/stores';
 import { mmToPixels } from '@/utils/math';
 const VisualWatchRenderer = lazy(() => import('@/visual3d/VisualWatchRenderer').then((module) => ({ default: module.VisualWatchRenderer })));
 
@@ -21,6 +21,7 @@ interface CentreCanvasProps {
 export const CentreCanvas = ({ presentationMode, onTogglePresentationMode, visualMode, onToggleVisualMode }: CentreCanvasProps) => {
   const [container, setContainer] = useState<HTMLDivElement | null>(null);
   const [showGrid, setShowGrid] = useState(false);
+  const [compactControlsExpanded, setCompactControlsExpanded] = useState(false);
   const [hoverTarget, setHoverTarget] = useState<{ x: number; y: number; label: string } | null>(null);
   const bands = useBandsStore((s) => s.bands);
   const zoom = useViewportStore((s) => s.zoom);
@@ -31,8 +32,6 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode, visua
   const scalePreview = useScaleStore((s) => s.preview);
   const selectedScaleKind = useScaleStore((s) => s.selectedScaleKind);
   const engineeringReadout = useScaleStore((s) => s.engineeringReadout);
-  const syncScaleFromBand = useScaleStore((s) => s.syncFromBand);
-  const minimumLineWidthMm = useGlobalSettingsStore((s) => s.minimumLineWidthMm);
   const designOverlay = useDesignEngineStore((s) => s.overlay);
   const setZoom = useViewportStore((s) => s.setZoom);
   const selectedBandId = useSelectionStore((s) => s.selectedBandId);
@@ -78,11 +77,8 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode, visua
     lastPan.current = { x: panX, y: panY };
   }, [panX, panY]);
 
-  useEffect(() => {
-    if (!selectedBandId) return;
-    const selectedBand = bands.find((band) => band.id === selectedBandId);
-    if (selectedBand) syncScaleFromBand(selectedBand, minimumLineWidthMm);
-  }, [bands, minimumLineWidthMm, selectedBandId, syncScaleFromBand]);
+  // Canvas selection changes inspection/highlight only. App synchronises the
+  // existing physical scale target; placement changes require its explicit control.
 
   useEffect(() => {
     return () => {
@@ -113,9 +109,8 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode, visua
   const fitMetrics = useMemo(() => {
     const maxOuterRadiusMm = bands.reduce((current, band) => Math.max(current, band.geometry.outerRadius), 20);
     const nominalDiameterPx = Math.max(1, mmToPixels(maxOuterRadiusMm * 2));
-    const minDimension = Math.max(1, Math.min(width, height));
-    const fitToWatchScale = Math.max(1, Math.min(2.6, (minDimension * 0.9) / nominalDiameterPx));
-    const fitWidthScale = Math.max(1, Math.min(2.6, (Math.max(1, width) * 0.94) / nominalDiameterPx));
+    const fitToWatchScale = fitWatchScale(width, height, nominalDiameterPx);
+    const fitWidthScale = Math.max(.05, Math.min(2.6, (Math.max(1, width) * 0.94) / nominalDiameterPx));
 
     return {
       fitToWatchZoom: 1,
@@ -415,7 +410,7 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode, visua
         )}
 
         {presentationMode ? null : (
-          <div className="absolute right-3 bottom-3 flex items-center gap-2 rounded-md border border-engineering-border bg-engineering-panel/80 px-2.5 py-1 font-mono text-[11px] shadow-panel">
+          <div className="absolute right-3 bottom-3 hidden sm:flex items-center gap-2 rounded-md border border-engineering-border bg-engineering-panel/80 px-2.5 py-1 font-mono text-[11px] shadow-panel">
             <span className="text-engineering-muted">Crystal:</span>
             <button
               type="button"
@@ -467,7 +462,8 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode, visua
       </div>
 
       <div className="border-t border-engineering-border/70 bg-engineering-panel/75 px-3 py-2">
-        <div className="mx-auto flex w-full max-w-5xl items-center justify-center gap-2 overflow-x-auto">
+        <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center justify-center gap-1.5">
+        <span className={compactControlsExpanded ? 'contents' : 'hidden sm:contents'}>
         <Button variant="status" size="sm" onClick={() => setZoom(Math.max(0.25, zoom - 0.1))}>
           <ZoomOut className="ds-icon-sm" />
         </Button>
@@ -500,7 +496,11 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode, visua
           {presentationMode ? <Minimize2 className="ds-icon-sm" /> : <Maximize2 className="ds-icon-sm" />}
           {presentationMode ? 'Exit Presentation' : 'Presentation'}
         </Button>
+        <Button variant="status" size="sm" className="sm:hidden" onClick={() => setCrystalSelectionMode(!crystalSelectionMode)}>Crystal: {crystalSelectionMode ? 'Direct Select' : 'Pass-Through'}</Button>
+        </span>
+        {!compactControlsExpanded && <Button variant="status" size="sm" onClick={fitToWatch} className="sm:hidden">Fit</Button>}
         <Button variant="status" size="sm" onClick={onToggleVisualMode}>Visual</Button>
+        <Button variant="status" size="sm" onClick={() => setCompactControlsExpanded(value => !value)} className="sm:hidden">{compactControlsExpanded ? 'Less' : 'More'}</Button>
         </div>
       </div>
     </motion.section>
