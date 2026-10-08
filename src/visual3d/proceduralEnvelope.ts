@@ -1,10 +1,29 @@
-import { BufferGeometry, ExtrudeGeometry, Float32BufferAttribute, Path, Shape } from 'three';
+import { BufferGeometry, ExtrudeGeometry, Float32BufferAttribute, LatheGeometry, Path, Shape, Vector2 } from 'three';
 import type { ParametricCaseV1 } from '@/domain/geometry/parametric';
 import caseFixture from '../../tools/blender/test_case_42.json';
 import faceFixture from '../../tools/blender/reference_42_supplemental.json';
 import attachmentSpec from '../../tools/blender/attachment_preview.json';
 
 const positive = (n: unknown, fallback: number): number => typeof n === 'number' && Number.isFinite(n) && n > 0 ? n : fallback;
+
+export const PREVIEW_CHAPTER_FACE_OFFSET_MM = 0.7;
+/** Flat printable annulus follows the selected part, not a dial-derived torus.
+ * A torus crown previously occluded live print at chapterZ + 0.708 mm.
+ */
+export const createPreviewChapterRingGeometry = (innerRadiusMm: number, outerRadiusMm: number) => {
+  if (!Number.isFinite(innerRadiusMm) || !Number.isFinite(outerRadiusMm) || innerRadiusMm < 0 || outerRadiusMm <= innerRadiusMm)
+    throw new Error('Invalid chapter ring annulus.');
+  const top = PREVIEW_CHAPTER_FACE_OFFSET_MM, bevel = Math.min(0.06, (outerRadiusMm-innerRadiusMm)/4);
+  const geometry = new LatheGeometry([
+    new Vector2(innerRadiusMm, -top), new Vector2(outerRadiusMm, -top),
+    new Vector2(outerRadiusMm, top-bevel), new Vector2(outerRadiusMm-bevel, top),
+    new Vector2(innerRadiusMm+bevel, top), new Vector2(innerRadiusMm, top-bevel),
+    new Vector2(innerRadiusMm, -top)
+  ], 192);
+  geometry.rotateX(Math.PI/2);
+  geometry.computeBoundingBox();
+  return geometry;
+};
 
 /** Presentation envelope only; never writes dimensions or fit evidence back to the assembly. */
 export const resolveProceduralEnvelope = (diameter: number, height: number, parameters?: ParametricCaseV1, faceFrameHeight = height, lugGapMm?: number) => {

@@ -39,9 +39,9 @@ export interface SlideRuleLayersDocument {
   layers: SlideRuleLayer[];
 }
 
-/** No incomplete photographic reference is selectable as faithful artwork. */
+/** Software acceptance for disclosed reconstruction; never a factory-exact fidelity gate. */
 export const slideRuleReferenceGate: Readonly<Record<Exclude<SlideRuleDesign, 'simplified'>, boolean>> =
-  Object.freeze({ citizen: false, navitimer: false });
+  Object.freeze({ citizen: true, navitimer: false });
 
 const clone = <T,>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
 

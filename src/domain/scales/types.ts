@@ -133,6 +133,10 @@ export interface ScaleTick {
 }
 
 export interface ScaleLabel {
+  /** Per-row reference typography and unit boxes; omitted by legacy Simplified artwork. */
+  fontSizeMm?: number;
+  backgroundColour?: string;
+  backgroundPaddingMm?: number;
   hoverPaddingMm?: number;
   id?: string;
   color?: string;
@@ -149,6 +153,14 @@ export interface ScaleLabel {
   placement: LabelPlacement;
   value?: number;
   ringId?: 'outer' | 'inner';
+}
+
+/** Printed substrate regions, not physical case geometry. */
+export interface ScaleSubstrate {
+  ringId: 'outer' | 'inner';
+  innerRadiusMm: number;
+  outerRadiusMm: number;
+  color: string;
 }
 
 /** Source-neutral pointer geometry. No manufacturer positions are guessed. */
@@ -189,6 +201,17 @@ export interface ScaleValidationResult {
 }
 
 export interface ScalePluginConfig {
+  referenceDesign?: 'citizen' | 'navitimer' | 'simplified';
+  referenceColourMode?: 'original' | 'custom';
+  referenceColourOverrides?: Record<string, string>;
+  referenceDistanceVisible?: boolean;
+  referenceLineFactor?: number;
+  referenceTickFactor?: number;
+  referencePixelMm?: number;
+  referenceOuterTickRadiusMm?: number;
+  referenceInnerTickRadiusMm?: number;
+  referenceOuterNumeralRadiusMm?: number;
+  referenceInnerNumeralRadiusMm?: number;
   startValue: number;
   endValue: number;
   majorStep: number;

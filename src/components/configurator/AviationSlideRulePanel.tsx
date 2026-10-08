@@ -41,7 +41,8 @@ export const AviationSlideRulePanel = () => {
   const updateBezel = useDesignEngineStore((state) => state.updateBezelConfig);
   const caseDiameterMm = useGlobalSettingsStore((state) => state.caseDiameterMm);
   const bands = useBandsStore((state) => state.bands);
-  const active = previewEnabled && kind === 'slide-rule' && config.engineeringPreset === 'aviation-slide-rule';
+  const reference = config.referenceDesign === 'citizen' || config.referenceDesign === 'navitimer';
+  const active = !reference && previewEnabled && kind === 'slide-rule' && config.engineeringPreset === 'aviation-slide-rule';
   const activeProgram = !previewEnabled ? 'other' : active ? 'aviation' : kind === 'tachymeter' ? 'chrono' : kind === 'circular' ? 'diver' : kind === 'compass' ? 'compass' : 'other';
   const policy = scalePolicyForArchetype(activeArchetypeId);
   const calculation = aviationCalculations[mode];
@@ -85,7 +86,7 @@ export const AviationSlideRulePanel = () => {
       {activeProgram === 'diver' ? <p>Sixty evenly spaced minute marks. The first 20 minutes are emphasized for visibility; turn/return and decompression decisions still require a dive plan and instruments.</p> : null}
       {activeProgram === 'chrono' ? <p>Reciprocal tachymeter values 60–500 on an open arc. Read average speed after timing a known distance; choose units consistent with that distance.</p> : null}
       {activeProgram === 'compass' ? <p>Cardinal and intercardinal bearings every 45°, with small tick marks between them. This is an orientation aid, not a magnetic compass.</p> : null}
-      {activeProgram === 'other' ? <p>Select a program to generate its markings.</p> : null}
+      {activeProgram === 'other' && !reference ? <p>Select a program to generate its markings.</p> : null}
       {activeProgram !== 'other' && <label className="block">Scale numeral size · {(config.scaleFontSizeMm ?? 0.8).toFixed(2)} mm
         <input className="mt-1 w-full" aria-label="Scale numeral size" type="range" min="0.45" max="1.4" step="0.05" value={config.scaleFontSizeMm ?? 0.8} onChange={(event) => updateConfig({ scaleFontSizeMm: Number(event.target.value) })}/>
         <span className="block text-[10px] text-engineering-muted">{active ? 'Crowded aviation numerals are omitted automatically; tick marks stay in place. ' : ''}Check the artwork at 1:1 before marking.</span>
@@ -109,7 +110,7 @@ export const AviationSlideRulePanel = () => {
               <input type="checkbox" checked={config[key] !== false} onChange={(event) => updateConfig({ [key]: event.target.checked })}/>{title}
             </label>)}
             <button type="button" className={actionClass} onClick={resetBaseline}>Reset Simplified baseline</button>
-            <p className="text-[10px] text-engineering-muted">Citizen Skyhawk and Classic Navitimer remain unavailable until their complete original graduations are verified. This is the existing Simplified design, not original branded artwork.</p>
+            <p className="text-[10px] text-engineering-muted">This is the independently saved Simplified design, not original branded artwork. Select Citizen Skyhawk in Advanced on the left for the reference-derived reconstruction. Classic Navitimer is the next implementation milestone.</p>
           </fieldset>
           <label className="block">Calculation
             <select className="ds-input mt-1" value={mode} onChange={(event) => {

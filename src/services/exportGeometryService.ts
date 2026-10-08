@@ -2,7 +2,7 @@ import type { BandEntity } from '@/domain/bands/types';
 import type { RenderContext } from '@/renderer/types';
 import type { ScaleRunResult } from '@/services/scaleEngineService';
 import type { DesignOverlay } from '@/renderer/types';
-import { scaleArtworkLayers, scaleArtworkSvgContent, scaleLabelRotation, scaleTickRadii } from '@/domain/scales/resolvedScaleArtwork';
+import { scaleArtworkLayers, scaleArtworkSvgContent, scaleLabelRotation, scaleLabelBoxSize, scaleTickRadii } from '@/domain/scales/resolvedScaleArtwork';
 import { scalePointerRotation, scalePointerVertices } from '@/domain/scales/pointerGeometry';
 
 export interface ExportMetadata {
@@ -198,27 +198,47 @@ export const generatePseudoDxf = (input: EngineeringExportInput): string => {
   const targetBand = input.target === 'selected-band' ? input.selectedBandId : { 'dial-face': 'band-dial-face', 'chapter-ring': 'band-chapter-ring', 'inner-bezel': 'band-inner-bezel', 'outer-bezel': 'band-outer-bezel' }[input.target as string];
   const point = (radius: number, angle: number) => [radius * Math.sin(angle * Math.PI / 180), radius * Math.cos(angle * Math.PI / 180)];
   const colour = (hex: string) => String(/^#[0-9a-f]{6}$/i.test(hex) ? parseInt(hex.slice(1), 16) : 0xffffff);
+  const solidPolygon = (points: readonly (readonly [number, number])[], layer: string, hex: string): string[] =>
+    points.slice(1, -1).flatMap((p, index) => {
+      const triangle = [points[0]!, p, points[index+2]!, points[index+2]!];
+      return ['0', 'SOLID', '8', layer, '420', colour(hex),
+        ...triangle.flatMap(([px,py], vertex) => [String(10+vertex), String(px), String(20+vertex), String(py)])];
+    });
   const marks = preview ? scaleArtworkLayers(preview).flatMap((layer) => {
     const include = (ring?: 'outer' | 'inner') => !targetBand || targetBand === (ring === 'inner' ? layer.fixedPlacementTargetBandId ?? 'band-chapter-ring' : layer.placementTargetBandId ?? 'band-outer-bezel');
     return [
+    ...(layer.substrates ?? []).filter((substrate) => include(substrate.ringId)).flatMap((substrate) => {
+      const loop = (radius: number, external: boolean) => ['92', external ? '1' : '0', '93', '1', '72', '2',
+        '10', '0', '20', '0', '40', String(radius), '50', '0', '51', '360', '73', external ? '1' : '0', '97', '0'];
+      // Exact circular-edge solid hatch: no polygonal approximation or filled central disc.
+      return ['0', 'HATCH', '100', 'AcDbEntity', '8', `scale-${substrate.ringId}-substrate`, '420', colour(substrate.color),
+        '100', 'AcDbHatch', '10', '0', '20', '0', '30', '0', '210', '0', '220', '0', '230', '1',
+        '2', 'SOLID', '70', '1', '71', '0', '91', substrate.innerRadiusMm > 0 ? '2' : '1',
+        ...loop(substrate.outerRadiusMm, true), ...(substrate.innerRadiusMm > 0 ? loop(substrate.innerRadiusMm, false) : []),
+        '75', '0', '76', '1', '98', '0'];
+    }),
     ...layer.ticks.filter((tick) => include(tick.ringId)).flatMap((tick) => {
       const [start, end] = scaleTickRadii(tick), [x1, y1] = point(start, tick.angleDeg), [x2, y2] = point(end, tick.angleDeg);
       return ['0', 'LWPOLYLINE', '8', `scale-${tick.ringId ?? 'outer'}`, '420', colour(tick.color ?? preview.color), '90', '2', '70', '0', '43', String(tick.widthMm), '10', String(x1), '20', String(y1), '10', String(x2), '20', String(y2)];
     }),
     ...layer.labels.filter((label) => include(label.ringId)).flatMap((label) => {
       const [x, y] = point(label.radiusMm, label.angleDeg);
-      return ['0', 'TEXT', '8', `scale-${label.ringId ?? 'outer'}`, '420', colour(label.color ?? layer.color), '10', String(x), '20', String(y), '11', String(x), '21', String(y), '40', String(layer.fontSizeMm), '50', String(-scaleLabelRotation(label)), '72', '1', '73', '2', '1', label.text.replace(/[\r\n]/g, ' ')];
+      const angle = scaleLabelRotation(label)*Math.PI/180, box = scaleLabelBoxSize(label, layer.fontSizeMm);
+      const corners = ([[-1,-1], [1,-1], [1,1], [-1,1]] as const).map(([sx,sy]) => {
+        const px = sx*box.width/2, py = sy*box.height/2;
+        return [x!+px*Math.cos(angle)-py*Math.sin(angle), y!-px*Math.sin(angle)-py*Math.cos(angle)] as const;
+      });
+      const background = label.backgroundColour ? solidPolygon(corners, `scale-${label.ringId ?? 'outer'}-unit-box`, label.backgroundColour) : [];
+      return [...background, '0', 'TEXT', '8', `scale-${label.ringId ?? 'outer'}`, '420', colour(label.color ?? layer.color), '10', String(x), '20', String(y), '11', String(x), '21', String(y), '40', String(label.fontSizeMm ?? layer.fontSizeMm), '50', String(-scaleLabelRotation(label)), '72', '1', '73', '2', '1', label.text.replace(/[\r\n]/g, ' ')];
     }),
     ...(layer.pointers ?? []).filter((pointer) => include(pointer.ringId)).flatMap((pointer) => {
       const [x,y] = point(pointer.radiusMm, pointer.angleDeg), angle = scalePointerRotation(pointer) * Math.PI / 180;
       const points = scalePointerVertices(pointer).map(([px,py]) => [x! + px*Math.cos(angle)-py*Math.sin(angle), y! - px*Math.sin(angle)-py*Math.cos(angle)] as const);
       const vertices = points.flatMap(([px,py]) => ['10', String(px), '20', String(py)]);
-      const fills = points.slice(1,-1).flatMap((p,index) => {
-        const triangle = [points[0]!, p, points[index+2]!, points[index+2]!];
-        return ['0', 'SOLID', '8', `scale-${pointer.ringId}-pointer`, '420', colour(pointer.color),
-          ...triangle.flatMap(([px,py], vertex) => [String(10+vertex), String(px), String(20+vertex), String(py)])];
-      });
-      return [...fills, '0', 'LWPOLYLINE', '8', `scale-${pointer.ringId}-pointer`, '420', colour(pointer.strokeColor ?? pointer.color), '90', String(points.length), '70', '1', '43', String(pointer.strokeWidthMm), ...vertices];
+      const fills = pointer.color === 'none' ? [] : solidPolygon(points, `scale-${pointer.ringId}-pointer`, pointer.color);
+      const outline = pointer.strokeWidthMm > 0 && (pointer.strokeColor ?? pointer.color) !== 'none'
+        ? ['0', 'LWPOLYLINE', '8', `scale-${pointer.ringId}-pointer`, '420', colour(pointer.strokeColor ?? pointer.color), '90', String(points.length), '70', '1', '43', String(pointer.strokeWidthMm), ...vertices] : [];
+      return [...fills, ...outline];
     })
   ]; }) : [];
 

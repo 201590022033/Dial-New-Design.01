@@ -4,6 +4,7 @@ import { constrainScaleToPlacementEnvelope } from '@/domain/scales/placementEnve
 import { isForbiddenConversionCaption, logDecadeAngle } from '@/domain/scales/calibratedSlideRule';
 import { pointerHalfExtentMm } from '@/domain/scales/pointerGeometry';
 import { resolvedScaleSvg } from '@/domain/scales/resolvedScaleArtwork';
+import { runReferenceScale } from './referenceScaleArtworkService';
 import type {
   ScaleGeometryOutput,
   ScaleKind,
@@ -25,6 +26,7 @@ export interface ScaleRunResult {
   ticks: ScaleTick[];
   labels: ScaleLabel[];
   pointers?: ScalePointer[];
+  substrates?: import('@/domain/scales/types').ScaleSubstrate[];
   /** Independent active physical layers, not additional overlaid designs on one band. */
   layers?: ScaleRunResult[];
   geometry: ScaleGeometryOutput;
@@ -78,6 +80,7 @@ export const runScalePlugin = (
   config: ScalePluginConfig,
   context: ScaleMathContext
 ): ScaleRunResult | null => {
+  if (kind === 'slide-rule' && config.referenceDesign && config.referenceDesign !== 'simplified') return runReferenceScale(config, context);
   const cacheKey = createCacheKey(kind, config, context);
   const cached = resultCache.get(cacheKey);
   if (cached) {

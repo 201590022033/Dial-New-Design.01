@@ -23,18 +23,24 @@ export const withScaleSnapshot = (assembly: WatchAssembly, snapshot: ScaleSnapsh
   const layer = layers.layers.find((entry) => entry.targetBandId === target);
   if (copy.selectedScaleKind === 'slide-rule') {
     const migrated = migrateSimplifiedLayer(copy, copy.pluginConfig.fixedPlacementTargetBandId ?? 'band-chapter-ring').layers[0]!;
+    const design = copy.pluginConfig.referenceDesign ?? 'simplified';
+    const settings = {
+      ...migrated.settings.simplified!,
+      referenceId: design === 'citizen' ? 'citizen-jy8078-01l-2026-10-07' : design === 'navitimer' ? 'navitimer-booklet-training-disc-2026-10-07' : null,
+      colourMode: design === 'simplified' ? 'custom' as const : copy.pluginConfig.referenceColourMode ?? 'original' as const,
+      colourOverrides: design === 'simplified' ? copy.pluginConfig.markColorOverrides ?? {} : copy.pluginConfig.referenceColourOverrides ?? {},
+      visibility: { outer: copy.pluginConfig.outerScaleVisible !== false, inner: copy.pluginConfig.innerScaleVisible !== false, time: false, distance: copy.pluginConfig.referenceDistanceVisible !== false }
+    };
     if (layer) {
       layer.fixedTargetBandId = migrated.fixedTargetBandId;
-      layer.activeDesign = copy.previewEnabled ? 'simplified' : null;
-      layer.settings.simplified = {
-        ...migrated.settings.simplified!,
-        baseline: layer.settings.simplified?.baseline ?? layer.settings.simplified?.legacy ?? migrated.settings.simplified!.baseline,
-        visibility: { outer: copy.pluginConfig.outerScaleVisible !== false, inner: copy.pluginConfig.innerScaleVisible !== false, time: false, distance: false },
-        colourOverrides: copy.pluginConfig.markColorOverrides ?? {}
+      layer.activeDesign = copy.previewEnabled ? design : null;
+      layer.settings[design] = {
+        ...settings,
+        baseline: layer.settings[design]?.baseline ?? layer.settings[design]?.legacy ?? migrated.settings.simplified!.baseline
       };
-    } else layers.layers.push(migrated);
+    } else layers.layers.push({ ...migrated, activeDesign: copy.previewEnabled ? design : null, settings: { [design]: settings } });
   } else if (layer) layer.activeDesign = null;
-  const savedSettings = layers.layers.find((entry) => entry.targetBandId === target)?.settings.simplified;
+  const savedSettings = layers.layers.find((entry) => entry.targetBandId === target)?.settings[copy.pluginConfig.referenceDesign ?? 'simplified'];
   if (copy.selectedScaleKind === 'slide-rule' && savedSettings) {
     const resolved = runScalePlugin(copy.selectedScaleKind, resolvePhysicalScaleConfig(assembly, assemblyToBands(assembly), copy.pluginConfig, copy.selectedScaleKind), copy.context);
     if (resolved) savedSettings.artwork = {

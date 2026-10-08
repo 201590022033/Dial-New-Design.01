@@ -54,8 +54,8 @@ export const resolveScaleLayers = (assembly: WatchAssembly, bands: BandEntity[],
   };
   if (layers.length) claim(active);
   if (kind === 'slide-rule') for (const layer of assembly.designConfig?.slideRuleLayers?.layers ?? []) {
-    if (layer.targetBandId === config.placementTargetBandId || layer.activeDesign !== 'simplified') continue;
-    const saved = layer.settings.simplified?.legacy;
+    if (layer.targetBandId === config.placementTargetBandId || !layer.activeDesign) continue;
+    const saved = layer.settings[layer.activeDesign]?.legacy;
     if (!saved) continue;
     if (!bands.some((band) => band.id === layer.targetBandId)) {
       issues.push(`Saved scale target ${layer.targetBandId} is missing. Restore the part or disable its layer.`);

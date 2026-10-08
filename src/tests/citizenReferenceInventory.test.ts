@@ -16,7 +16,7 @@ describe('verified Citizen JY8078-01L research inventory', () => {
     expect(packet.verification.readyForMilestone3A).toBe(true);
     expect(packet.verification.factoryExactReproductionCertified).toBe(false);
     expect(packet.runtimeUse).toBe(false);
-    expect(slideRuleReferenceGate).toEqual({ citizen: false, navitimer: false });
+    expect(slideRuleReferenceGate).toEqual({ citizen: true, navitimer: false });
   });
   it.each(['outer', 'inner'])('records all 225 %s positions with only one physical seam', (row) => {
     const ticks = packet.graduations.filter((g) => g.row === row);
@@ -96,7 +96,7 @@ describe('verified Citizen JY8078-01L research inventory', () => {
     for (const row of ['outer', 'inner']) {
       expect(nav.filter((s) => s.row === row).reduce((sum, s) => sum + (s.intervalCount ?? 0), 0)).toBe(210);
     }
-    expect(slideRuleReferenceGate).toEqual({ citizen: false, navitimer: false });
+    expect(slideRuleReferenceGate).toEqual({ citizen: true, navitimer: false });
   });
   it('preserves the native evidence bytes and labels sampled colours as approximations', () => {
     for (const source of packet.sources.filter((s) => s.localFile)) {

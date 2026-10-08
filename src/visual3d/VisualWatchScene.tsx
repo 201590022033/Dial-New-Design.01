@@ -6,7 +6,7 @@ import { visualCategories, type VisualCategory } from './visualAssetRegistry';
 import { componentPlacement } from './componentPlacement';
 import { MM_TO_SCENE } from './assemblyAnchors';
 import { finishProfiles, type FinishProfile } from './finishProfiles';
-import { createPreviewCaseGeometry, createPreviewLugGeometry, createPreviewStrapGeometry } from './proceduralEnvelope';
+import { createPreviewCaseGeometry, createPreviewLugGeometry, createPreviewStrapGeometry, createPreviewChapterRingGeometry } from './proceduralEnvelope';
 import { ACESFilmicToneMapping, CanvasTexture, Color, LinearFilter, PerspectiveCamera, PMREMGenerator, SRGBColorSpace, Vector2 } from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import type { ScaleRunResult } from '@/services/scaleEngineService';
@@ -203,6 +203,13 @@ const PreviewCase = ({ model }: { model: VisualWatchModel }) => {
   return <mesh castShadow geometry={geometry}><meshPhysicalMaterial {...physicalFinish(model.finishes.case)} /></mesh>;
 };
 
+const PreviewChapterRing = ({ model, localZ }: { model: VisualWatchModel; localZ: number }) => {
+  const { innerRadiusMm, outerRadiusMm } = model.chapterRingEnvelope;
+  const geometry = useMemo(() => createPreviewChapterRingGeometry(innerRadiusMm, outerRadiusMm), [innerRadiusMm, outerRadiusMm]);
+  useEffect(() => () => geometry.dispose(), [geometry]);
+  return <mesh geometry={geometry} position={[0, 0, localZ]}><meshStandardMaterial {...finish(model.finishes['chapter-ring'])} /></mesh>;
+};
+
 const PreviewStrap = ({ model, sign }: { model: VisualWatchModel; sign: number }) => {
   const a = model.previewEnvelope.attachment;
   const geometry = useMemo(() => createPreviewStrapGeometry(a, sign), [a, sign]);
@@ -278,9 +285,7 @@ export const ProceduralComponent = ({ category, model }: { category: VisualCateg
       })}
     </group>;
     }
-    case 'chapter-ring': return <mesh position={[0, 0, localZ(envelope.chapterZ)]}>
-      <torusGeometry args={[model.dial.outerDiameterMm / 2 + 0.5, 0.75, 20, 128]} /><meshStandardMaterial {...finish(model.finishes['chapter-ring'])} />
-    </mesh>;
+    case 'chapter-ring': return <PreviewChapterRing model={model} localZ={localZ(envelope.chapterZ)} />;
     case 'dial': return <group position={[0, 0, localZ(envelope.dialZ)]}>
       <mesh rotation={[Math.PI / 2, 0, 0]}>
         <cylinderGeometry args={[model.dial.outerDiameterMm / 2, model.dial.outerDiameterMm / 2, model.dial.thicknessMm, 128]} /><DialSurfaceMaterial model={model} />
@@ -381,7 +386,7 @@ export const VisualComponent = ({ category, model }: { category: VisualCategory;
 const ScaledVisualComponent = ({ category, model, preview }: { category: VisualCategory; model: VisualWatchModel; preview: ScaleRunResult | null }) => {
   const ring = model.assets[category].scaleArtworkSurface;
   const matchingLayer = preview && scaleArtworkLayers(preview).find((layer) => ring === 'outer' ? layer.placementTargetBandId === 'band-outer-bezel' : layer.fixedPlacementTargetBandId === 'band-chapter-ring');
-  const texture = useScaleArtworkTexture(ring ? matchingLayer || null : null, model, ring ?? 'outer', '#080d14');
+  const texture = useScaleArtworkTexture(ring ? matchingLayer || null : null, model, ring ?? 'outer', '#080d14', false);
   if (!ring) return <VisualComponent category={category} model={model} />;
   if (!model.visible[category]) return null;
   const placement = componentPlacement(model, category);

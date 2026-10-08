@@ -10,6 +10,7 @@ import { useWatchAssemblyStore } from '@/stores/watchAssemblyStore';
 import { useGlobalSettingsStore } from '@/stores/globalSettingsStore';
 import { useScaleStore } from '@/stores/scaleStore';
 import { AviationSlideRulePanel } from '@/components/configurator/AviationSlideRulePanel';
+import { ReferenceSlideRulePanel } from './ReferenceSlideRulePanel';
 
 export const AdvancedModePanel: React.FC = () => {
   const overlays = useConfiguratorUIStore((s) => s.overlays);
@@ -26,6 +27,7 @@ export const AdvancedModePanel: React.FC = () => {
   // Scale store
   const scalePreviewEnabled = useScaleStore((s) => s.previewEnabled);
   const setScalePreviewEnabled = useScaleStore((s) => s.setPreviewEnabled);
+  const referenceDesign = useScaleStore((s) => s.pluginConfig.referenceDesign);
 
   // Parametric adjustment state for active component
   const activePart = activePartInstanceId ? assembly.parts[activePartInstanceId] : null;
@@ -161,7 +163,8 @@ export const AdvancedModePanel: React.FC = () => {
         </h4>
         <div className="p-2.5 rounded-lg bg-slate-900 border border-slate-800 space-y-2">
           <AviationSlideRulePanel />
-          <label className="flex items-center gap-2 cursor-pointer pt-1">
+          <ReferenceSlideRulePanel />
+          {(!referenceDesign || referenceDesign === 'simplified') && <label className="flex items-center gap-2 cursor-pointer pt-1">
             <input
               type="checkbox"
               checked={scalePreviewEnabled}
@@ -169,7 +172,7 @@ export const AdvancedModePanel: React.FC = () => {
               className="rounded border-slate-700 text-teal-500 bg-slate-950 focus:ring-0"
             />
             <span className="text-slate-300 text-xs">Enable Live Scale Dial Projection</span>
-          </label>
+          </label>}
         </div>
       </div>
     </div>

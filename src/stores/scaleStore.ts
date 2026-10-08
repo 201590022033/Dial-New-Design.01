@@ -14,7 +14,9 @@ import { getScaleProgram, type ScaleProgram } from '@/domain/scales/scaleProgram
 import { scalePolicyForArchetype } from '@/domain/scales/archetypeScalePolicy';
 import { useBandsStore } from './bandsStore';
 import { useWatchAssemblyStore } from './watchAssemblyStore';
-import { resolveScaleLayers } from '@/services/scaleLayerArtworkService';
+import { resolveScaleLayers, resolvePhysicalScaleConfig } from '@/services/scaleLayerArtworkService';
+import { referenceScaleDefaults } from '@/services/referenceScaleArtworkService';
+import { slideRuleReferenceGate, type SlideRuleDesign } from '@/domain/scales/slideRuleLayers';
 import { getCatalogueItem } from '@/domain/catalogue/catalogueRegistry';
 import { assemblyToBands } from '@/domain/assembly/assemblyAdapters';
 
@@ -47,6 +49,8 @@ interface ScaleState {
   }) => void;
   resetScaleState: () => void;
   resetSimplifiedBaseline: () => void;
+  selectReferenceDesign: (design: SlideRuleDesign | null) => boolean;
+  resetReferenceDesign: () => void;
 }
 
 const fallbackPlugin = getScalePlugin('circular');
@@ -195,9 +199,10 @@ export const useScaleStore = create<ScaleState>((set, get) => ({
     }
     if (band.id !== get().pluginConfig.placementTargetBandId) {
       const layer = useWatchAssemblyStore.getState().assembly.designConfig?.slideRuleLayers?.layers.find((entry) => entry.targetBandId === band.id);
-      const settings = layer?.settings.simplified;
+      const selected = layer?.activeDesign ?? (get().pluginConfig.referenceDesign ?? 'simplified');
+      const settings = layer?.settings[selected];
       if (settings) {
-        get().hydrateScaleState({ ...structuredClone(settings.legacy), previewEnabled: layer?.activeDesign === 'simplified', crossArchetypeUnlocked: get().crossArchetypeUnlocked });
+        get().hydrateScaleState({ ...structuredClone(settings.legacy), previewEnabled: layer?.activeDesign !== null, crossArchetypeUnlocked: get().crossArchetypeUnlocked });
         return;
       }
     }
@@ -259,6 +264,40 @@ export const useScaleStore = create<ScaleState>((set, get) => ({
     const baseline = useWatchAssemblyStore.getState().assembly.designConfig?.slideRuleLayers?.layers
       .find((layer) => layer.targetBandId === target)?.settings.simplified?.baseline;
     if (baseline) get().hydrateScaleState(structuredClone(baseline));
+  },
+  selectReferenceDesign: (design) => {
+    const state = get();
+    if (scaleTargetLocked(state.pluginConfig)) return false;
+    if (design && design !== 'simplified' && !slideRuleReferenceGate[design]) return false;
+    if (!state.crossArchetypeUnlocked && state.activeArchetypeId && !scalePolicyForArchetype(state.activeArchetypeId).allowed.includes('aviation')) return false;
+    if (!design) { get().setPreviewEnabled(false); return true; }
+    const target = state.pluginConfig.placementTargetBandId ?? 'band-outer-bezel';
+    const assembly = useWatchAssemblyStore.getState().assembly;
+    const saved = assembly.designConfig?.slideRuleLayers?.layers.find((layer) => layer.targetBandId === target)?.settings[design];
+    if (saved) {
+      get().hydrateScaleState({ ...structuredClone(saved.legacy), previewEnabled: true, crossArchetypeUnlocked: state.crossArchetypeUnlocked });
+      return true;
+    }
+    const bands = assemblyToBands(assembly);
+    const selection = getScaleProgram('aviation', bands);
+    const config = resolvePhysicalScaleConfig(assembly, bands, {
+      ...(getScalePlugin(selection.kind)?.defaultConfig ?? state.pluginConfig), ...selection.config,
+      placementTargetBandId: target, fixedPlacementTargetBandId: state.pluginConfig.fixedPlacementTargetBandId ?? 'band-chapter-ring',
+      minimumLineWidthMm: state.pluginConfig.minimumLineWidthMm, referenceDesign: design
+    }, 'slide-rule');
+    get().hydrateScaleState({ selectedScaleKind: 'slide-rule', context: selection.context, previewEnabled: true,
+      crossArchetypeUnlocked: state.crossArchetypeUnlocked,
+      pluginConfig: design === 'simplified' ? config : { ...config, ...referenceScaleDefaults(design, config) } });
+    return true;
+  },
+  resetReferenceDesign: () => {
+    const state = get();
+    if (scaleTargetLocked(state.pluginConfig)) return;
+    const design = state.pluginConfig.referenceDesign ?? 'simplified';
+    if (design === 'simplified') { get().resetSimplifiedBaseline(); return; }
+    const assembly = useWatchAssemblyStore.getState().assembly;
+    const config = resolvePhysicalScaleConfig(assembly, assemblyToBands(assembly), state.pluginConfig, 'slide-rule');
+    get().updatePluginConfig(referenceScaleDefaults(design, config));
   },
   resetScaleState: () => {
     set({

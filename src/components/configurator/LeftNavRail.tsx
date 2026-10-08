@@ -18,6 +18,7 @@ import { useWatchAssemblyStore } from '@/stores/watchAssemblyStore';
 import { evaluateAssembly } from '@/domain/compatibility/compatibilityEngine';
 import type { ConfiguratorWorkMode } from '@/domain/configurator/configuratorTypes';
 import { cn } from '@/utils/cn';
+import { ReferenceSlideRuleSelections } from './ReferenceSlideRulePanel';
 
 interface NavRailItem {
   mode: ConfiguratorWorkMode;
@@ -161,6 +162,7 @@ export const LeftNavRail: React.FC = () => {
             </button>
           );
         })}
+        {workMode === 'advanced' && <ReferenceSlideRuleSelections />}
       </div>
 
       {/* Bottom quick helper info */}

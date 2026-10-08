@@ -116,8 +116,8 @@ describe('M2 persisted per-band foundation (not yet the editing adapter)', () =>
     expect(() => assertSlideRuleLayers(document)).toThrow('Duplicate');
     const assembly = createDefaultWatchAssembly();
     const injected = migrateSimplifiedLayer(legacy());
-    injected.layers[0]!.settings.citizen = injected.layers[0]!.settings.simplified;
-    injected.layers[0]!.activeDesign = 'citizen';
+    injected.layers[0]!.settings.navitimer = injected.layers[0]!.settings.simplified;
+    injected.layers[0]!.activeDesign = 'navitimer';
     assembly.designConfig = { ...assembly.designConfig, slideRuleLayers: injected };
     expect(() => deserializeWatchAssembly(JSON.stringify(assembly))).toThrow('Unaccepted');
   });
@@ -134,7 +134,7 @@ describe('M2 persisted per-band foundation (not yet the editing adapter)', () =>
   });
   it('refuses incomplete brand presets rather than silently rendering generic artwork', () => {
     const document = migrateSimplifiedLayer(legacy());
-    for (const design of ['citizen', 'navitimer'] as const) {
+    for (const design of ['navitimer'] as const) {
       expect(() => selectSlideRuleDesign(document, document.layers[0]!.id, design)).toThrow('not accepted');
     }
     expect(() => selectSlideRuleDesign(document, 'missing', null)).toThrow('Unknown');

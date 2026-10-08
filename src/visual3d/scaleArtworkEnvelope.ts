@@ -1,6 +1,7 @@
 import type { ScaleRunResult } from '@/services/scaleEngineService';
 import type { VisualWatchModel } from './watchAssemblyToVisualModel';
 import { estimateLabelRadialHalfExtentMm, tickOuterExtentMm } from '@/domain/scales/placementEnvelope';
+import { PREVIEW_CHAPTER_FACE_OFFSET_MM } from './proceduralEnvelope';
 
 export type ScaleArtworkRing = 'outer' | 'inner';
 
@@ -57,8 +58,8 @@ export const scaleArtworkSurfaceZ = (model: VisualWatchModel, ring: ScaleArtwork
   const envelope = model.previewEnvelope;
   const target = ring === 'inner' ? preview?.fixedPlacementTargetBandId : preview?.placementTargetBandId;
   if (target === 'band-dial-face') return envelope.dialZ + model.dial.thicknessMm / 2 + 0.008;
-  if (target === 'band-chapter-ring') return envelope.chapterZ + 0.708;
-  if (ring === 'inner' && !target) return envelope.chapterZ + 0.7 + 0.008;
+  if (target === 'band-chapter-ring') return envelope.chapterZ + PREVIEW_CHAPTER_FACE_OFFSET_MM + 0.008;
+  if (ring === 'inner' && !target) return envelope.chapterZ + PREVIEW_CHAPTER_FACE_OFFSET_MM + 0.008;
   // Authored inserts and raised pip/scale details extend above the carrier.
   // The procedural insert also sits 0.08 mm above its carrier top.
   const faceOffset = model.assets.bezel.scaleArtworkFaceOffsetMm ?? envelope.bezelHeight / 2 + 0.08;
