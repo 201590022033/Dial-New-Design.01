@@ -361,7 +361,7 @@ export const ProceduralComponent = ({ category, model }: { category: VisualCateg
   }
 };
 
-export const VisualComponent = ({ category, model }: { category: VisualCategory; model: VisualWatchModel }) => {
+export const VisualComponent = ({ category, model, liveOuterArtwork = false }: { category: VisualCategory; model: VisualWatchModel; liveOuterArtwork?: boolean }) => {
   if (!model.visible[category]) return null;
   const placement = componentPlacement(model, category);
   const descriptor = model.assets[category];
@@ -369,7 +369,7 @@ export const VisualComponent = ({ category, model }: { category: VisualCategory;
   // The fallback is outside descriptor corrections; those belong to the authored GLB.
   return <group name={category} position={placement.anchor.positionMm} rotation={placement.anchor.rotationRad}>
     <group position={placement.offset} rotation={placement.rotation}>
-      {placement.glb ? <GlbAsset key={descriptor.assetId + ':' + descriptor.assetPath} descriptor={descriptor} fallback={fallback} appearance={model.archetypeAppearance} dialFinishConfig={category === 'dial' ? { kind: model.dial.textureKind as 'sunburst', intensity: model.dial.textureIntensity, contrast: model.dial.textureContrast, directionDeg: model.dial.textureDirectionDeg } : undefined} dialDiameterMm={model.dial.outerDiameterMm} /> : fallback}
+      {placement.glb ? <GlbAsset key={descriptor.assetId + ':' + descriptor.assetPath} descriptor={descriptor} fallback={fallback} appearance={model.archetypeAppearance} liveOuterArtwork={liveOuterArtwork} dialFinishConfig={category === 'dial' ? { kind: model.dial.textureKind as 'sunburst', intensity: model.dial.textureIntensity, contrast: model.dial.textureContrast, directionDeg: model.dial.textureDirectionDeg } : undefined} dialDiameterMm={model.dial.outerDiameterMm} /> : fallback}
       {category === 'dial' && <group position={placement.glb ? placement.descriptorOffset : [0, 0, model.previewEnvelope.dialZ - placement.anchor.positionMm[2]]}>
         {placement.glb && <LiveHourMarkers model={model} />}
         <DialArtwork model={model} />
@@ -383,7 +383,7 @@ const ScaledVisualComponent = ({ category, model, preview }: { category: VisualC
   const target = ring === 'outer' ? 'band-outer-bezel' : 'band-chapter-ring';
   const binding = scaleArtworkBinding(preview, target);
   const texture = useScaleArtworkTexture(ring ? binding?.layer ?? null : null, model, binding?.ring ?? 'outer', '#080d14', false);
-  if (!ring) return <VisualComponent category={category} model={model} />;
+  if (!ring) return <VisualComponent category={category} model={model} liveOuterArtwork={category === 'bezel' && !!scaleArtworkBinding(preview, 'band-outer-bezel')} />;
   if (!model.visible[category]) return null;
   const placement = componentPlacement(model, category);
   const descriptor = model.assets[category];

@@ -1,0 +1,7009 @@
+{
+  "version": 1,
+  "date": "2026-10-09",
+  "baseline": "6c7204d387bc94a3b5895f07fc063ea0cd66ecb9",
+  "note": "Node/material inventory, not fit certification. Missing explicit names require geometry inspection before offering regions. No GLB is modified.",
+  "assets": [
+    {
+      "path": "public/assets/3d/archetypes/hands-chronograph-baton.glb",
+      "sha256": "e84af883ac9e2712687d79e0acec197ab8fa73f4d34bc112d57a88eaef128b63",
+      "nodes": [
+        {
+          "name": "DD_ARCH_CHRONO_SECONDS",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            -0.9335803985595703,
+            0,
+            0.3583679795265198
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "VK63 register hand",
+              "positionBounds": {
+                "min": [
+                  -0.14000000059604645,
+                  0.6100000143051147,
+                  -13
+                ],
+                "max": [
+                  0.14000000059604645,
+                  0.7099999785423279,
+                  2.25
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_HAND_0",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0.30070579051971436,
+            0,
+            0.9537169933319092
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand metal",
+              "positionBounds": {
+                "min": [
+                  -0.3100000023841858,
+                  0.2199999988079071,
+                  -8.600000381469727
+                ],
+                "max": [
+                  0.3100000023841858,
+                  0.3799999952316284,
+                  1.0499999523162842
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_HAND_1",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            -0.43837109208106995,
+            0,
+            0.8987940549850464
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand metal",
+              "positionBounds": {
+                "min": [
+                  -0.17000000178813934,
+                  0.4000000059604645,
+                  -12
+                ],
+                "max": [
+                  0.17000000178813934,
+                  0.5600000023841858,
+                  1.0499999523162842
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_HAND_HUB",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            0,
+            0.550000011920929,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand metal",
+              "positionBounds": {
+                "min": [
+                  -0.7250000238418579,
+                  -0.25,
+                  -0.7250000238418579
+                ],
+                "max": [
+                  0.7250000238418579,
+                  0.25,
+                  0.7250000238418579
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_HAND_LUME_0",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            -1.6593796014785767,
+            0.4050000011920929,
+            -2.369839668273926
+          ],
+          "rotation": [
+            0,
+            0.30070579051971436,
+            0,
+            0.9537169933319092
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand lume",
+              "positionBounds": {
+                "min": [
+                  -0.0868000015616417,
+                  -0.02250000089406967,
+                  -2.49399995803833
+                ],
+                "max": [
+                  0.0868000015616417,
+                  0.02250000089406967,
+                  2.49399995803833
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_HAND_LUME_1",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            3.181041717529297,
+            0.5849999785423279,
+            -2.485302209854126
+          ],
+          "rotation": [
+            0,
+            -0.43837109208106995,
+            0,
+            0.8987940549850464
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand lume",
+              "positionBounds": {
+                "min": [
+                  -0.047600001096725464,
+                  -0.02250000089406967,
+                  -3.4800000190734863
+                ],
+                "max": [
+                  0.047600001096725464,
+                  0.02250000089406967,
+                  3.4800000190734863
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_VK63_BATON_0",
+          "extras": {
+            "DD_MOVEMENT": "VK63",
+            "DD_REGISTER_HAND_STYLE": "baton",
+            "DD_REGISTER_CENTER_STATUS": "PUBLISHED",
+            "DD_HAND_BORE_MM": 0.37,
+            "DD_HAND_SHAPE_STATUS": "ESTIMATED_NOMINAL",
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            -7.5,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            -0.15643447637557983,
+            0,
+            0.987688422203064
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "VK63 register hand",
+              "positionBounds": {
+                "min": [
+                  -0.17000000178813934,
+                  0.7599999904632568,
+                  -2.450000047683716
+                ],
+                "max": [
+                  0.17000000178813934,
+                  0.8799999952316284,
+                  0.3799999952316284
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_VK63_BATON_1",
+          "extras": {
+            "DD_MOVEMENT": "VK63",
+            "DD_REGISTER_HAND_STYLE": "baton",
+            "DD_REGISTER_CENTER_STATUS": "PUBLISHED",
+            "DD_HAND_BORE_MM": 0.295,
+            "DD_HAND_SHAPE_STATUS": "ESTIMATED_NOMINAL",
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            0,
+            0,
+            7.5
+          ],
+          "rotation": [
+            0,
+            -0.8987941145896912,
+            0,
+            0.4383712410926819
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "VK63 register hand",
+              "positionBounds": {
+                "min": [
+                  -0.17000000178813934,
+                  0.7599999904632568,
+                  -2.450000047683716
+                ],
+                "max": [
+                  0.17000000178813934,
+                  0.8799999952316284,
+                  0.3799999952316284
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_VK63_BATON_2",
+          "extras": {
+            "DD_MOVEMENT": "VK63",
+            "DD_REGISTER_HAND_STYLE": "baton",
+            "DD_REGISTER_CENTER_STATUS": "PUBLISHED",
+            "DD_HAND_BORE_MM": 0.32,
+            "DD_HAND_SHAPE_STATUS": "ESTIMATED_NOMINAL",
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            7.5,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0.3583679795265198,
+            0,
+            0.9335803985595703
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "VK63 register hand",
+              "positionBounds": {
+                "min": [
+                  -0.17000000178813934,
+                  0.7599999904632568,
+                  -2.450000047683716
+                ],
+                "max": [
+                  0.17000000178813934,
+                  0.8799999952316284,
+                  0.3799999952316284
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_VK63_HUB_0",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            -7.5,
+            0.8399999737739563,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand metal",
+              "positionBounds": {
+                "min": [
+                  -0.14000000059604645,
+                  -0.07999999821186066,
+                  -0.14000000059604645
+                ],
+                "max": [
+                  0.14000000059604645,
+                  0.07999999821186066,
+                  0.14000000059604645
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_VK63_HUB_1",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            0,
+            0.8399999737739563,
+            7.5
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand metal",
+              "positionBounds": {
+                "min": [
+                  -0.14000000059604645,
+                  -0.07999999821186066,
+                  -0.14000000059604645
+                ],
+                "max": [
+                  0.14000000059604645,
+                  0.07999999821186066,
+                  0.14000000059604645
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_VK63_HUB_2",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            7.5,
+            0.8399999737739563,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand metal",
+              "positionBounds": {
+                "min": [
+                  -0.14000000059604645,
+                  -0.07999999821186066,
+                  -0.14000000059604645
+                ],
+                "max": [
+                  0.14000000059604645,
+                  0.07999999821186066,
+                  0.14000000059604645
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "capabilities": {
+        "filledLumeNodes": [
+          "DD_ARCH_HAND_LUME_0",
+          "DD_ARCH_HAND_LUME_1"
+        ],
+        "registerNodes": [
+          "DD_ARCH_VK63_BATON_0",
+          "DD_ARCH_VK63_BATON_1",
+          "DD_ARCH_VK63_BATON_2"
+        ],
+        "explicitTipNodes": [],
+        "explicitOutlineLumeNodes": []
+      }
+    },
+    {
+      "path": "public/assets/3d/archetypes/hands-chronograph-needle.glb",
+      "sha256": "cedf9c855b51a1c56fd79092a2a913be5cffcf7fccc046af39ba47eda596c370",
+      "nodes": [
+        {
+          "name": "DD_ARCH_CHRONO_SECONDS",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            -0.9335803985595703,
+            0,
+            0.3583679795265198
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "VK63 register hand",
+              "positionBounds": {
+                "min": [
+                  -0.14000000059604645,
+                  0.6100000143051147,
+                  -13
+                ],
+                "max": [
+                  0.14000000059604645,
+                  0.7099999785423279,
+                  2.25
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_HAND_0",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0.30070579051971436,
+            0,
+            0.9537169933319092
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand metal",
+              "positionBounds": {
+                "min": [
+                  -0.3100000023841858,
+                  0.2199999988079071,
+                  -8.600000381469727
+                ],
+                "max": [
+                  0.3100000023841858,
+                  0.3799999952316284,
+                  1.0499999523162842
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_HAND_1",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            -0.43837109208106995,
+            0,
+            0.8987940549850464
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand metal",
+              "positionBounds": {
+                "min": [
+                  -0.17000000178813934,
+                  0.4000000059604645,
+                  -12
+                ],
+                "max": [
+                  0.17000000178813934,
+                  0.5600000023841858,
+                  1.0499999523162842
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_HAND_HUB",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            0,
+            0.550000011920929,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand metal",
+              "positionBounds": {
+                "min": [
+                  -0.7250000238418579,
+                  -0.25,
+                  -0.7250000238418579
+                ],
+                "max": [
+                  0.7250000238418579,
+                  0.25,
+                  0.7250000238418579
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_HAND_LUME_0",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            -1.6593796014785767,
+            0.4050000011920929,
+            -2.369839668273926
+          ],
+          "rotation": [
+            0,
+            0.30070579051971436,
+            0,
+            0.9537169933319092
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand lume",
+              "positionBounds": {
+                "min": [
+                  -0.0868000015616417,
+                  -0.02250000089406967,
+                  -2.49399995803833
+                ],
+                "max": [
+                  0.0868000015616417,
+                  0.02250000089406967,
+                  2.49399995803833
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_HAND_LUME_1",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            3.181041717529297,
+            0.5849999785423279,
+            -2.485302209854126
+          ],
+          "rotation": [
+            0,
+            -0.43837109208106995,
+            0,
+            0.8987940549850464
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand lume",
+              "positionBounds": {
+                "min": [
+                  -0.047600001096725464,
+                  -0.02250000089406967,
+                  -3.4800000190734863
+                ],
+                "max": [
+                  0.047600001096725464,
+                  0.02250000089406967,
+                  3.4800000190734863
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_VK63_HUB_0",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            -7.5,
+            0.8399999737739563,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand metal",
+              "positionBounds": {
+                "min": [
+                  -0.14000000059604645,
+                  -0.07999999821186066,
+                  -0.14000000059604645
+                ],
+                "max": [
+                  0.14000000059604645,
+                  0.07999999821186066,
+                  0.14000000059604645
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_VK63_HUB_1",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            0,
+            0.8399999737739563,
+            7.5
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand metal",
+              "positionBounds": {
+                "min": [
+                  -0.14000000059604645,
+                  -0.07999999821186066,
+                  -0.14000000059604645
+                ],
+                "max": [
+                  0.14000000059604645,
+                  0.07999999821186066,
+                  0.14000000059604645
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_VK63_HUB_2",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            7.5,
+            0.8399999737739563,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand metal",
+              "positionBounds": {
+                "min": [
+                  -0.14000000059604645,
+                  -0.07999999821186066,
+                  -0.14000000059604645
+                ],
+                "max": [
+                  0.14000000059604645,
+                  0.07999999821186066,
+                  0.14000000059604645
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_VK63_NEEDLE_0",
+          "extras": {
+            "DD_MOVEMENT": "VK63",
+            "DD_REGISTER_HAND_STYLE": "needle",
+            "DD_REGISTER_CENTER_STATUS": "PUBLISHED",
+            "DD_HAND_BORE_MM": 0.37,
+            "DD_HAND_SHAPE_STATUS": "ESTIMATED_NOMINAL",
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            -7.5,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            -0.15643447637557983,
+            0,
+            0.987688422203064
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "VK63 register hand",
+              "positionBounds": {
+                "min": [
+                  -0.09000000357627869,
+                  0.7599999904632568,
+                  -2.450000047683716
+                ],
+                "max": [
+                  0.09000000357627869,
+                  0.8799999952316284,
+                  0.41999998688697815
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_VK63_NEEDLE_1",
+          "extras": {
+            "DD_MOVEMENT": "VK63",
+            "DD_REGISTER_HAND_STYLE": "needle",
+            "DD_REGISTER_CENTER_STATUS": "PUBLISHED",
+            "DD_HAND_BORE_MM": 0.295,
+            "DD_HAND_SHAPE_STATUS": "ESTIMATED_NOMINAL",
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            0,
+            0,
+            7.5
+          ],
+          "rotation": [
+            0,
+            -0.8987941145896912,
+            0,
+            0.4383712410926819
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "VK63 register hand",
+              "positionBounds": {
+                "min": [
+                  -0.09000000357627869,
+                  0.7599999904632568,
+                  -2.450000047683716
+                ],
+                "max": [
+                  0.09000000357627869,
+                  0.8799999952316284,
+                  0.41999998688697815
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_VK63_NEEDLE_2",
+          "extras": {
+            "DD_MOVEMENT": "VK63",
+            "DD_REGISTER_HAND_STYLE": "needle",
+            "DD_REGISTER_CENTER_STATUS": "PUBLISHED",
+            "DD_HAND_BORE_MM": 0.32,
+            "DD_HAND_SHAPE_STATUS": "ESTIMATED_NOMINAL",
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            7.5,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0.3583679795265198,
+            0,
+            0.9335803985595703
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "VK63 register hand",
+              "positionBounds": {
+                "min": [
+                  -0.09000000357627869,
+                  0.7599999904632568,
+                  -2.450000047683716
+                ],
+                "max": [
+                  0.09000000357627869,
+                  0.8799999952316284,
+                  0.41999998688697815
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "capabilities": {
+        "filledLumeNodes": [
+          "DD_ARCH_HAND_LUME_0",
+          "DD_ARCH_HAND_LUME_1"
+        ],
+        "registerNodes": [
+          "DD_ARCH_VK63_NEEDLE_0",
+          "DD_ARCH_VK63_NEEDLE_1",
+          "DD_ARCH_VK63_NEEDLE_2"
+        ],
+        "explicitTipNodes": [],
+        "explicitOutlineLumeNodes": []
+      }
+    },
+    {
+      "path": "public/assets/3d/archetypes/hands-chronograph-syringe.glb",
+      "sha256": "54de2752b1bd06e9b981cb6d63cbd356075c9bdeb71a4c845b8ad886fcfda18c",
+      "nodes": [
+        {
+          "name": "DD_ARCH_CHRONO_SECONDS",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            -0.9335803985595703,
+            0,
+            0.3583679795265198
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "VK63 register hand",
+              "positionBounds": {
+                "min": [
+                  -0.14000000059604645,
+                  0.6100000143051147,
+                  -13
+                ],
+                "max": [
+                  0.14000000059604645,
+                  0.7099999785423279,
+                  2.25
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_HAND_0",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0.30070579051971436,
+            0,
+            0.9537169933319092
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand metal",
+              "positionBounds": {
+                "min": [
+                  -0.3100000023841858,
+                  0.2199999988079071,
+                  -8.600000381469727
+                ],
+                "max": [
+                  0.3100000023841858,
+                  0.3799999952316284,
+                  1.0499999523162842
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_HAND_1",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            -0.43837109208106995,
+            0,
+            0.8987940549850464
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand metal",
+              "positionBounds": {
+                "min": [
+                  -0.17000000178813934,
+                  0.4000000059604645,
+                  -12
+                ],
+                "max": [
+                  0.17000000178813934,
+                  0.5600000023841858,
+                  1.0499999523162842
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_HAND_HUB",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            0,
+            0.550000011920929,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand metal",
+              "positionBounds": {
+                "min": [
+                  -0.7250000238418579,
+                  -0.25,
+                  -0.7250000238418579
+                ],
+                "max": [
+                  0.7250000238418579,
+                  0.25,
+                  0.7250000238418579
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_HAND_LUME_0",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            -1.6593796014785767,
+            0.4050000011920929,
+            -2.369839668273926
+          ],
+          "rotation": [
+            0,
+            0.30070579051971436,
+            0,
+            0.9537169933319092
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand lume",
+              "positionBounds": {
+                "min": [
+                  -0.0868000015616417,
+                  -0.02250000089406967,
+                  -2.49399995803833
+                ],
+                "max": [
+                  0.0868000015616417,
+                  0.02250000089406967,
+                  2.49399995803833
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_HAND_LUME_1",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            3.181041717529297,
+            0.5849999785423279,
+            -2.485302209854126
+          ],
+          "rotation": [
+            0,
+            -0.43837109208106995,
+            0,
+            0.8987940549850464
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand lume",
+              "positionBounds": {
+                "min": [
+                  -0.047600001096725464,
+                  -0.02250000089406967,
+                  -3.4800000190734863
+                ],
+                "max": [
+                  0.047600001096725464,
+                  0.02250000089406967,
+                  3.4800000190734863
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_VK63_HUB_0",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            -7.5,
+            0.8399999737739563,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand metal",
+              "positionBounds": {
+                "min": [
+                  -0.14000000059604645,
+                  -0.07999999821186066,
+                  -0.14000000059604645
+                ],
+                "max": [
+                  0.14000000059604645,
+                  0.07999999821186066,
+                  0.14000000059604645
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_VK63_HUB_1",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            0,
+            0.8399999737739563,
+            7.5
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand metal",
+              "positionBounds": {
+                "min": [
+                  -0.14000000059604645,
+                  -0.07999999821186066,
+                  -0.14000000059604645
+                ],
+                "max": [
+                  0.14000000059604645,
+                  0.07999999821186066,
+                  0.14000000059604645
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_VK63_HUB_2",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            7.5,
+            0.8399999737739563,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand metal",
+              "positionBounds": {
+                "min": [
+                  -0.14000000059604645,
+                  -0.07999999821186066,
+                  -0.14000000059604645
+                ],
+                "max": [
+                  0.14000000059604645,
+                  0.07999999821186066,
+                  0.14000000059604645
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_VK63_SYRINGE_0",
+          "extras": {
+            "DD_MOVEMENT": "VK63",
+            "DD_REGISTER_HAND_STYLE": "syringe",
+            "DD_REGISTER_CENTER_STATUS": "PUBLISHED",
+            "DD_HAND_BORE_MM": 0.37,
+            "DD_HAND_SHAPE_STATUS": "ESTIMATED_NOMINAL",
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            -7.5,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            -0.15643447637557983,
+            0,
+            0.987688422203064
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "VK63 register hand",
+              "positionBounds": {
+                "min": [
+                  -0.23999999463558197,
+                  0.7599999904632568,
+                  -2.450000047683716
+                ],
+                "max": [
+                  0.23999999463558197,
+                  0.8799999952316284,
+                  0.4000000059604645
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_VK63_SYRINGE_1",
+          "extras": {
+            "DD_MOVEMENT": "VK63",
+            "DD_REGISTER_HAND_STYLE": "syringe",
+            "DD_REGISTER_CENTER_STATUS": "PUBLISHED",
+            "DD_HAND_BORE_MM": 0.295,
+            "DD_HAND_SHAPE_STATUS": "ESTIMATED_NOMINAL",
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            0,
+            0,
+            7.5
+          ],
+          "rotation": [
+            0,
+            -0.8987941145896912,
+            0,
+            0.4383712410926819
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "VK63 register hand",
+              "positionBounds": {
+                "min": [
+                  -0.23999999463558197,
+                  0.7599999904632568,
+                  -2.450000047683716
+                ],
+                "max": [
+                  0.23999999463558197,
+                  0.8799999952316284,
+                  0.4000000059604645
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_VK63_SYRINGE_2",
+          "extras": {
+            "DD_MOVEMENT": "VK63",
+            "DD_REGISTER_HAND_STYLE": "syringe",
+            "DD_REGISTER_CENTER_STATUS": "PUBLISHED",
+            "DD_HAND_BORE_MM": 0.32,
+            "DD_HAND_SHAPE_STATUS": "ESTIMATED_NOMINAL",
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            7.5,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0.3583679795265198,
+            0,
+            0.9335803985595703
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "VK63 register hand",
+              "positionBounds": {
+                "min": [
+                  -0.23999999463558197,
+                  0.7599999904632568,
+                  -2.450000047683716
+                ],
+                "max": [
+                  0.23999999463558197,
+                  0.8799999952316284,
+                  0.4000000059604645
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "capabilities": {
+        "filledLumeNodes": [
+          "DD_ARCH_HAND_LUME_0",
+          "DD_ARCH_HAND_LUME_1"
+        ],
+        "registerNodes": [
+          "DD_ARCH_VK63_SYRINGE_0",
+          "DD_ARCH_VK63_SYRINGE_1",
+          "DD_ARCH_VK63_SYRINGE_2"
+        ],
+        "explicitTipNodes": [],
+        "explicitOutlineLumeNodes": []
+      }
+    },
+    {
+      "path": "public/assets/3d/archetypes/hands-chronograph.glb",
+      "sha256": "cedf9c855b51a1c56fd79092a2a913be5cffcf7fccc046af39ba47eda596c370",
+      "nodes": [
+        {
+          "name": "DD_ARCH_CHRONO_SECONDS",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            -0.9335803985595703,
+            0,
+            0.3583679795265198
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "VK63 register hand",
+              "positionBounds": {
+                "min": [
+                  -0.14000000059604645,
+                  0.6100000143051147,
+                  -13
+                ],
+                "max": [
+                  0.14000000059604645,
+                  0.7099999785423279,
+                  2.25
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_HAND_0",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0.30070579051971436,
+            0,
+            0.9537169933319092
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand metal",
+              "positionBounds": {
+                "min": [
+                  -0.3100000023841858,
+                  0.2199999988079071,
+                  -8.600000381469727
+                ],
+                "max": [
+                  0.3100000023841858,
+                  0.3799999952316284,
+                  1.0499999523162842
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_HAND_1",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            -0.43837109208106995,
+            0,
+            0.8987940549850464
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand metal",
+              "positionBounds": {
+                "min": [
+                  -0.17000000178813934,
+                  0.4000000059604645,
+                  -12
+                ],
+                "max": [
+                  0.17000000178813934,
+                  0.5600000023841858,
+                  1.0499999523162842
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_HAND_HUB",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            0,
+            0.550000011920929,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand metal",
+              "positionBounds": {
+                "min": [
+                  -0.7250000238418579,
+                  -0.25,
+                  -0.7250000238418579
+                ],
+                "max": [
+                  0.7250000238418579,
+                  0.25,
+                  0.7250000238418579
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_HAND_LUME_0",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            -1.6593796014785767,
+            0.4050000011920929,
+            -2.369839668273926
+          ],
+          "rotation": [
+            0,
+            0.30070579051971436,
+            0,
+            0.9537169933319092
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand lume",
+              "positionBounds": {
+                "min": [
+                  -0.0868000015616417,
+                  -0.02250000089406967,
+                  -2.49399995803833
+                ],
+                "max": [
+                  0.0868000015616417,
+                  0.02250000089406967,
+                  2.49399995803833
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_HAND_LUME_1",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            3.181041717529297,
+            0.5849999785423279,
+            -2.485302209854126
+          ],
+          "rotation": [
+            0,
+            -0.43837109208106995,
+            0,
+            0.8987940549850464
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand lume",
+              "positionBounds": {
+                "min": [
+                  -0.047600001096725464,
+                  -0.02250000089406967,
+                  -3.4800000190734863
+                ],
+                "max": [
+                  0.047600001096725464,
+                  0.02250000089406967,
+                  3.4800000190734863
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_VK63_HUB_0",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            -7.5,
+            0.8399999737739563,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand metal",
+              "positionBounds": {
+                "min": [
+                  -0.14000000059604645,
+                  -0.07999999821186066,
+                  -0.14000000059604645
+                ],
+                "max": [
+                  0.14000000059604645,
+                  0.07999999821186066,
+                  0.14000000059604645
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_VK63_HUB_1",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            0,
+            0.8399999737739563,
+            7.5
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand metal",
+              "positionBounds": {
+                "min": [
+                  -0.14000000059604645,
+                  -0.07999999821186066,
+                  -0.14000000059604645
+                ],
+                "max": [
+                  0.14000000059604645,
+                  0.07999999821186066,
+                  0.14000000059604645
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_VK63_HUB_2",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            7.5,
+            0.8399999737739563,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand metal",
+              "positionBounds": {
+                "min": [
+                  -0.14000000059604645,
+                  -0.07999999821186066,
+                  -0.14000000059604645
+                ],
+                "max": [
+                  0.14000000059604645,
+                  0.07999999821186066,
+                  0.14000000059604645
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_VK63_NEEDLE_0",
+          "extras": {
+            "DD_MOVEMENT": "VK63",
+            "DD_REGISTER_HAND_STYLE": "needle",
+            "DD_REGISTER_CENTER_STATUS": "PUBLISHED",
+            "DD_HAND_BORE_MM": 0.37,
+            "DD_HAND_SHAPE_STATUS": "ESTIMATED_NOMINAL",
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            -7.5,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            -0.15643447637557983,
+            0,
+            0.987688422203064
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "VK63 register hand",
+              "positionBounds": {
+                "min": [
+                  -0.09000000357627869,
+                  0.7599999904632568,
+                  -2.450000047683716
+                ],
+                "max": [
+                  0.09000000357627869,
+                  0.8799999952316284,
+                  0.41999998688697815
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_VK63_NEEDLE_1",
+          "extras": {
+            "DD_MOVEMENT": "VK63",
+            "DD_REGISTER_HAND_STYLE": "needle",
+            "DD_REGISTER_CENTER_STATUS": "PUBLISHED",
+            "DD_HAND_BORE_MM": 0.295,
+            "DD_HAND_SHAPE_STATUS": "ESTIMATED_NOMINAL",
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            0,
+            0,
+            7.5
+          ],
+          "rotation": [
+            0,
+            -0.8987941145896912,
+            0,
+            0.4383712410926819
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "VK63 register hand",
+              "positionBounds": {
+                "min": [
+                  -0.09000000357627869,
+                  0.7599999904632568,
+                  -2.450000047683716
+                ],
+                "max": [
+                  0.09000000357627869,
+                  0.8799999952316284,
+                  0.41999998688697815
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_VK63_NEEDLE_2",
+          "extras": {
+            "DD_MOVEMENT": "VK63",
+            "DD_REGISTER_HAND_STYLE": "needle",
+            "DD_REGISTER_CENTER_STATUS": "PUBLISHED",
+            "DD_HAND_BORE_MM": 0.32,
+            "DD_HAND_SHAPE_STATUS": "ESTIMATED_NOMINAL",
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            7.5,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0.3583679795265198,
+            0,
+            0.9335803985595703
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "VK63 register hand",
+              "positionBounds": {
+                "min": [
+                  -0.09000000357627869,
+                  0.7599999904632568,
+                  -2.450000047683716
+                ],
+                "max": [
+                  0.09000000357627869,
+                  0.8799999952316284,
+                  0.41999998688697815
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "capabilities": {
+        "filledLumeNodes": [
+          "DD_ARCH_HAND_LUME_0",
+          "DD_ARCH_HAND_LUME_1"
+        ],
+        "registerNodes": [
+          "DD_ARCH_VK63_NEEDLE_0",
+          "DD_ARCH_VK63_NEEDLE_1",
+          "DD_ARCH_VK63_NEEDLE_2"
+        ],
+        "explicitTipNodes": [],
+        "explicitOutlineLumeNodes": []
+      }
+    },
+    {
+      "path": "public/assets/3d/archetypes/hands-diver.glb",
+      "sha256": "8c9649597f9e997f6f9ebac6e950a94f3e1173f2e62ef9dd0386a8323bf331c6",
+      "nodes": [
+        {
+          "name": "DD_ARCH_HAND_0",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            -2.0717580318450928,
+            0.2800000011920929,
+            -2.9587771892547607
+          ],
+          "rotation": [
+            0,
+            0.30070579051971436,
+            0,
+            0.9537169933319092
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand metal",
+              "positionBounds": {
+                "min": [
+                  -0.7749999761581421,
+                  -0.07999999821186066,
+                  -4.300000190734863
+                ],
+                "max": [
+                  0.7749999761581421,
+                  0.07999999821186066,
+                  4.300000190734863
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_HAND_1",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            3.971574306488037,
+            0.46000000834465027,
+            -3.102933883666992
+          ],
+          "rotation": [
+            0,
+            -0.43837109208106995,
+            0,
+            0.8987940549850464
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand metal",
+              "positionBounds": {
+                "min": [
+                  -0.5249999761581421,
+                  -0.07999999821186066,
+                  -6
+                ],
+                "max": [
+                  0.5249999761581421,
+                  0.07999999821186066,
+                  6
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_HAND_2",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            3.6534531116485596,
+            0.6399999856948853,
+            4.057570934295654
+          ],
+          "rotation": [
+            0,
+            -0.9335803985595703,
+            0,
+            0.3583679795265198
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand metal",
+              "positionBounds": {
+                "min": [
+                  -0.09000000357627869,
+                  -0.07999999821186066,
+                  -6.5
+                ],
+                "max": [
+                  0.09000000357627869,
+                  0.07999999821186066,
+                  6.5
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_HAND_HUB",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            0,
+            0.550000011920929,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand metal",
+              "positionBounds": {
+                "min": [
+                  -0.7250000238418579,
+                  -0.25,
+                  -0.7250000238418579
+                ],
+                "max": [
+                  0.7250000238418579,
+                  0.25,
+                  0.7250000238418579
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_HAND_LUME_0",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            -2.0717580318450928,
+            0.38999998569488525,
+            -2.9587771892547607
+          ],
+          "rotation": [
+            0,
+            0.30070579051971436,
+            0,
+            0.9537169933319092
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand lume",
+              "positionBounds": {
+                "min": [
+                  -0.2944999933242798,
+                  -0.02500000037252903,
+                  -2.8380000591278076
+                ],
+                "max": [
+                  0.2944999933242798,
+                  0.02500000037252903,
+                  2.8380000591278076
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_HAND_LUME_1",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            3.971574306488037,
+            0.5699999928474426,
+            -3.102933883666992
+          ],
+          "rotation": [
+            0,
+            -0.43837109208106995,
+            0,
+            0.8987940549850464
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand lume",
+              "positionBounds": {
+                "min": [
+                  -0.19949999451637268,
+                  -0.02500000037252903,
+                  -3.9600000381469727
+                ],
+                "max": [
+                  0.19949999451637268,
+                  0.02500000037252903,
+                  3.9600000381469727
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "capabilities": {
+        "filledLumeNodes": [
+          "DD_ARCH_HAND_LUME_0",
+          "DD_ARCH_HAND_LUME_1"
+        ],
+        "registerNodes": [],
+        "explicitTipNodes": [],
+        "explicitOutlineLumeNodes": []
+      }
+    },
+    {
+      "path": "public/assets/3d/archetypes/hands-dress.glb",
+      "sha256": "a8ba6e4feb6a03ebcd9566a801fbf3e88301185c374ae5e3bdec73c843208be0",
+      "nodes": [
+        {
+          "name": "DD_ARCH_HAND_0",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            -2.0717580318450928,
+            0.2800000011920929,
+            -2.9587771892547607
+          ],
+          "rotation": [
+            0,
+            0.30070579051971436,
+            0,
+            0.9537169933319092
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand metal",
+              "positionBounds": {
+                "min": [
+                  -0.23999999463558197,
+                  -0.07999999821186066,
+                  -4.300000190734863
+                ],
+                "max": [
+                  0.23999999463558197,
+                  0.07999999821186066,
+                  4.300000190734863
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_HAND_1",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            3.971574306488037,
+            0.46000000834465027,
+            -3.102933883666992
+          ],
+          "rotation": [
+            0,
+            -0.43837109208106995,
+            0,
+            0.8987940549850464
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand metal",
+              "positionBounds": {
+                "min": [
+                  -0.14000000059604645,
+                  -0.07999999821186066,
+                  -6
+                ],
+                "max": [
+                  0.14000000059604645,
+                  0.07999999821186066,
+                  6
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_HAND_2",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            3.6534531116485596,
+            0.6399999856948853,
+            4.057570934295654
+          ],
+          "rotation": [
+            0,
+            -0.9335803985595703,
+            0,
+            0.3583679795265198
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand metal",
+              "positionBounds": {
+                "min": [
+                  -0.09000000357627869,
+                  -0.07999999821186066,
+                  -6.5
+                ],
+                "max": [
+                  0.09000000357627869,
+                  0.07999999821186066,
+                  6.5
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_HAND_HUB",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            0,
+            0.550000011920929,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand metal",
+              "positionBounds": {
+                "min": [
+                  -0.7250000238418579,
+                  -0.25,
+                  -0.7250000238418579
+                ],
+                "max": [
+                  0.7250000238418579,
+                  0.25,
+                  0.7250000238418579
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "capabilities": {
+        "filledLumeNodes": [],
+        "registerNodes": [],
+        "explicitTipNodes": [],
+        "explicitOutlineLumeNodes": []
+      }
+    },
+    {
+      "path": "public/assets/3d/archetypes/hands-field.glb",
+      "sha256": "cf2ce42cccddcd72709dd856c57f263f1caae61dd017025cf85da34e9b9bd275",
+      "nodes": [
+        {
+          "name": "DD_ARCH_HAND_0",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            -2.0717580318450928,
+            0.2800000011920929,
+            -2.9587771892547607
+          ],
+          "rotation": [
+            0,
+            0.30070579051971436,
+            0,
+            0.9537169933319092
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand metal",
+              "positionBounds": {
+                "min": [
+                  -0.42500001192092896,
+                  -0.07999999821186066,
+                  -4.300000190734863
+                ],
+                "max": [
+                  0.42500001192092896,
+                  0.07999999821186066,
+                  4.300000190734863
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_HAND_1",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            3.971574306488037,
+            0.46000000834465027,
+            -3.102933883666992
+          ],
+          "rotation": [
+            0,
+            -0.43837109208106995,
+            0,
+            0.8987940549850464
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand metal",
+              "positionBounds": {
+                "min": [
+                  -0.28999999165534973,
+                  -0.07999999821186066,
+                  -6
+                ],
+                "max": [
+                  0.28999999165534973,
+                  0.07999999821186066,
+                  6
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_HAND_2",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            3.6534531116485596,
+            0.6399999856948853,
+            4.057570934295654
+          ],
+          "rotation": [
+            0,
+            -0.9335803985595703,
+            0,
+            0.3583679795265198
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand metal",
+              "positionBounds": {
+                "min": [
+                  -0.09000000357627869,
+                  -0.07999999821186066,
+                  -6.5
+                ],
+                "max": [
+                  0.09000000357627869,
+                  0.07999999821186066,
+                  6.5
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_HAND_HUB",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            0,
+            0.550000011920929,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand metal",
+              "positionBounds": {
+                "min": [
+                  -0.7250000238418579,
+                  -0.25,
+                  -0.7250000238418579
+                ],
+                "max": [
+                  0.7250000238418579,
+                  0.25,
+                  0.7250000238418579
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_HAND_LUME_0",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            -2.0717580318450928,
+            0.38999998569488525,
+            -2.9587771892547607
+          ],
+          "rotation": [
+            0,
+            0.30070579051971436,
+            0,
+            0.9537169933319092
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand lume",
+              "positionBounds": {
+                "min": [
+                  -0.1615000069141388,
+                  -0.02500000037252903,
+                  -2.8380000591278076
+                ],
+                "max": [
+                  0.1615000069141388,
+                  0.02500000037252903,
+                  2.8380000591278076
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_HAND_LUME_1",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            3.971574306488037,
+            0.5699999928474426,
+            -3.102933883666992
+          ],
+          "rotation": [
+            0,
+            -0.43837109208106995,
+            0,
+            0.8987940549850464
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand lume",
+              "positionBounds": {
+                "min": [
+                  -0.11020000278949738,
+                  -0.02500000037252903,
+                  -3.9600000381469727
+                ],
+                "max": [
+                  0.11020000278949738,
+                  0.02500000037252903,
+                  3.9600000381469727
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "capabilities": {
+        "filledLumeNodes": [
+          "DD_ARCH_HAND_LUME_0",
+          "DD_ARCH_HAND_LUME_1"
+        ],
+        "registerNodes": [],
+        "explicitTipNodes": [],
+        "explicitOutlineLumeNodes": []
+      }
+    },
+    {
+      "path": "public/assets/3d/archetypes/hands-pilot.glb",
+      "sha256": "11d0902c8b811c7e66c734c0a00fa503798461cd9421883edfffae38e498cef8",
+      "nodes": [
+        {
+          "name": "DD_ARCH_HAND_0",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            -2.0717580318450928,
+            0.2800000011920929,
+            -2.9587771892547607
+          ],
+          "rotation": [
+            0,
+            0.30070579051971436,
+            0,
+            0.9537169933319092
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand metal",
+              "positionBounds": {
+                "min": [
+                  -0.5249999761581421,
+                  -0.07999999821186066,
+                  -4.300000190734863
+                ],
+                "max": [
+                  0.5249999761581421,
+                  0.07999999821186066,
+                  4.300000190734863
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_HAND_1",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            3.971574306488037,
+            0.46000000834465027,
+            -3.102933883666992
+          ],
+          "rotation": [
+            0,
+            -0.43837109208106995,
+            0,
+            0.8987940549850464
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand metal",
+              "positionBounds": {
+                "min": [
+                  -0.36000001430511475,
+                  -0.07999999821186066,
+                  -6
+                ],
+                "max": [
+                  0.36000001430511475,
+                  0.07999999821186066,
+                  6
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_HAND_2",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            3.6534531116485596,
+            0.6399999856948853,
+            4.057570934295654
+          ],
+          "rotation": [
+            0,
+            -0.9335803985595703,
+            0,
+            0.3583679795265198
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand metal",
+              "positionBounds": {
+                "min": [
+                  -0.09000000357627869,
+                  -0.07999999821186066,
+                  -6.5
+                ],
+                "max": [
+                  0.09000000357627869,
+                  0.07999999821186066,
+                  6.5
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_HAND_HUB",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            0,
+            0.550000011920929,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand metal",
+              "positionBounds": {
+                "min": [
+                  -0.7250000238418579,
+                  -0.25,
+                  -0.7250000238418579
+                ],
+                "max": [
+                  0.7250000238418579,
+                  0.25,
+                  0.7250000238418579
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_HAND_LUME_0",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            -2.0717580318450928,
+            0.38999998569488525,
+            -2.9587771892547607
+          ],
+          "rotation": [
+            0,
+            0.30070579051971436,
+            0,
+            0.9537169933319092
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand lume",
+              "positionBounds": {
+                "min": [
+                  -0.19949999451637268,
+                  -0.02500000037252903,
+                  -2.8380000591278076
+                ],
+                "max": [
+                  0.19949999451637268,
+                  0.02500000037252903,
+                  2.8380000591278076
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_ARCH_HAND_LUME_1",
+          "extras": {
+            "DD_PROVENANCE_STATUS": "provisional-presentation",
+            "DD_PROVENANCE_SOURCE": "Archetype visual library; NMK901 envelope; no fit claim"
+          },
+          "translation": [
+            3.971574306488037,
+            0.5699999928474426,
+            -3.102933883666992
+          ],
+          "rotation": [
+            0,
+            -0.43837109208106995,
+            0,
+            0.8987940549850464
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "archetype hand lume",
+              "positionBounds": {
+                "min": [
+                  -0.13680000603199005,
+                  -0.02500000037252903,
+                  -3.9600000381469727
+                ],
+                "max": [
+                  0.13680000603199005,
+                  0.02500000037252903,
+                  3.9600000381469727
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "capabilities": {
+        "filledLumeNodes": [
+          "DD_ARCH_HAND_LUME_0",
+          "DD_ARCH_HAND_LUME_1"
+        ],
+        "registerNodes": [],
+        "explicitTipNodes": [],
+        "explicitOutlineLumeNodes": []
+      }
+    },
+    {
+      "path": "public/assets/3d/hands/hands_mercedes_42mm_v1.glb",
+      "sha256": "a04b110dbffe379fe27c27ae57e963a77231aef70a5a3f15bde215ed9e00195c",
+      "nodes": [
+        {
+          "name": "DD_HAND_HOUR",
+          "extras": {},
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0.0998334065079689,
+            0,
+            0.9950041770935059
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "hand steel",
+              "positionBounds": {
+                "min": [
+                  -0.574999988079071,
+                  -0.07500000298023224,
+                  -11
+                ],
+                "max": [
+                  0.574999988079071,
+                  0.07500000298023224,
+                  0
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_HOUR_MARKER",
+          "extras": {},
+          "translation": [
+            -1.4105522632598877,
+            0.10000000149011612,
+            -6.958472728729248
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "lume",
+              "positionBounds": {
+                "min": [
+                  -1.2699999809265137,
+                  -0.2199999988079071,
+                  -1.2699999809265137
+                ],
+                "max": [
+                  1.2699999809265137,
+                  0.2199999988079071,
+                  1.2699999809265137
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_HUB",
+          "extras": {},
+          "translation": [
+            0,
+            0.30000001192092896,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "hand steel",
+              "positionBounds": {
+                "min": [
+                  -0.699999988079071,
+                  -0.25,
+                  -0.699999988079071
+                ],
+                "max": [
+                  0.699999988079071,
+                  0.25,
+                  0.699999988079071
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_MINUTE",
+          "extras": {},
+          "translation": [
+            0,
+            0.2199999988079071,
+            0
+          ],
+          "rotation": [
+            0,
+            -0.4349656105041504,
+            0,
+            0.9004471898078918
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "hand steel",
+              "positionBounds": {
+                "min": [
+                  -0.4099999964237213,
+                  -0.07500000298023224,
+                  -15
+                ],
+                "max": [
+                  0.4099999964237213,
+                  0.07500000298023224,
+                  0
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_SECONDS",
+          "extras": {},
+          "translation": [
+            0,
+            0.4399999976158142,
+            0
+          ],
+          "rotation": [
+            0,
+            0.8414710164070129,
+            0,
+            0.5403023362159729
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "hand steel",
+              "positionBounds": {
+                "min": [
+                  -0.10999999940395355,
+                  -0.07500000298023224,
+                  -16.5
+                ],
+                "max": [
+                  0.10999999940395355,
+                  0.07500000298023224,
+                  0
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "capabilities": {
+        "filledLumeNodes": [],
+        "registerNodes": [],
+        "explicitTipNodes": [],
+        "explicitOutlineLumeNodes": []
+      }
+    },
+    {
+      "path": "public/assets/3d/hands/hands_mercedes_v1.glb",
+      "sha256": "ecbc5abc97142c759e6e362086fcbf67c1b2b75a23d18da83a3c3ed85b261cd3",
+      "nodes": [
+        {
+          "name": "DD_HAND_HOUR",
+          "extras": {},
+          "translation": [
+            0,
+            0,
+            -5.5
+          ],
+          "rotation": [
+            0,
+            0.0998334065079689,
+            0,
+            0.9950041770935059
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "hand steel",
+              "positionBounds": {
+                "min": [
+                  -0.574999988079071,
+                  -0.07500000298023224,
+                  -5.5
+                ],
+                "max": [
+                  0.574999988079071,
+                  0.07500000298023224,
+                  5.5
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_HOUR_MARKER",
+          "extras": {},
+          "translation": [
+            0,
+            0.10000000149011612,
+            -7.099999904632568
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "lume",
+              "positionBounds": {
+                "min": [
+                  -1.2699999809265137,
+                  -0.2199999988079071,
+                  -1.2699999809265137
+                ],
+                "max": [
+                  1.2699999809265137,
+                  0.2199999988079071,
+                  1.2699999809265137
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_HUB",
+          "extras": {},
+          "translation": [
+            0,
+            0.30000001192092896,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "hand steel",
+              "positionBounds": {
+                "min": [
+                  -0.699999988079071,
+                  -0.25,
+                  -0.699999988079071
+                ],
+                "max": [
+                  0.699999988079071,
+                  0.25,
+                  0.699999988079071
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_MINUTE",
+          "extras": {},
+          "translation": [
+            0,
+            0.2199999988079071,
+            -7.5
+          ],
+          "rotation": [
+            0,
+            -0.4349656105041504,
+            0,
+            0.9004471898078918
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "hand steel",
+              "positionBounds": {
+                "min": [
+                  -0.4099999964237213,
+                  -0.07500000298023224,
+                  -7.5
+                ],
+                "max": [
+                  0.4099999964237213,
+                  0.07500000298023224,
+                  7.5
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_SECONDS",
+          "extras": {},
+          "translation": [
+            0,
+            0.4399999976158142,
+            -8.25
+          ],
+          "rotation": [
+            0,
+            0.8414710164070129,
+            0,
+            0.5403023362159729
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "hand steel",
+              "positionBounds": {
+                "min": [
+                  -0.10999999940395355,
+                  -0.07500000298023224,
+                  -8.25
+                ],
+                "max": [
+                  0.10999999940395355,
+                  0.07500000298023224,
+                  8.25
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "capabilities": {
+        "filledLumeNodes": [],
+        "registerNodes": [],
+        "explicitTipNodes": [],
+        "explicitOutlineLumeNodes": []
+      }
+    },
+    {
+      "path": "public/assets/3d/reference-42/hands.glb",
+      "sha256": "64aa7a04e3d093f2a459a2e3f2a8e5d55f0c134738d1acf52736e79d32a998d7",
+      "nodes": [
+        {
+          "name": "DD_HAND_HOUR_BODY",
+          "extras": {},
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "HAND_METAL",
+              "positionBounds": {
+                "min": [
+                  -0.6000000238418579,
+                  0.9399999976158142,
+                  -7
+                ],
+                "max": [
+                  0.6000000238418579,
+                  1.059999942779541,
+                  0
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_HOUR_HUB",
+          "extras": {},
+          "translation": [
+            0,
+            1,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "HAND_METAL",
+              "positionBounds": {
+                "min": [
+                  -1,
+                  -0.10000000149011612,
+                  -1
+                ],
+                "max": [
+                  1,
+                  0.10000000149011612,
+                  1
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_HOUR_LUME_BODY",
+          "extras": {},
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "HAND_LUME",
+              "positionBounds": {
+                "min": [
+                  -0.19599999487400055,
+                  1.0413999557495117,
+                  -6.019999980926514
+                ],
+                "max": [
+                  0.19599999487400055,
+                  1.083400011062622,
+                  -0.5600000023841858
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_HOUR_TIP",
+          "extras": {},
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "HAND_METAL",
+              "positionBounds": {
+                "min": [
+                  -0.3499999940395355,
+                  0.9399999976158142,
+                  -8.5
+                ],
+                "max": [
+                  0.3499999940395355,
+                  1.059999942779541,
+                  -7
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_MINUTE_BODY",
+          "extras": {},
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "HAND_METAL",
+              "positionBounds": {
+                "min": [
+                  -0.5,
+                  1.3899999856948853,
+                  -11
+                ],
+                "max": [
+                  0.5,
+                  1.5099999904632568,
+                  0
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_MINUTE_HUB",
+          "extras": {},
+          "translation": [
+            0,
+            1.4500000476837158,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "HAND_METAL",
+              "positionBounds": {
+                "min": [
+                  -1,
+                  -0.10000000149011612,
+                  -1
+                ],
+                "max": [
+                  1,
+                  0.10000000149011612,
+                  1
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_MINUTE_LUME_BODY",
+          "extras": {},
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "HAND_LUME",
+              "positionBounds": {
+                "min": [
+                  -0.14000000059604645,
+                  1.4914000034332275,
+                  -9.460000038146973
+                ],
+                "max": [
+                  0.14000000059604645,
+                  1.533400058746338,
+                  -0.8799999952316284
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_MINUTE_LUME_TIP",
+          "extras": {},
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "HAND_LUME",
+              "positionBounds": {
+                "min": [
+                  -0.20000000298023224,
+                  1.4914000034332275,
+                  -12.600000381469727
+                ],
+                "max": [
+                  0.20000000298023224,
+                  1.533400058746338,
+                  -11.199999809265137
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_MINUTE_TAIL",
+          "extras": {},
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "HAND_METAL",
+              "positionBounds": {
+                "min": [
+                  -0.125,
+                  1.3899999856948853,
+                  0
+                ],
+                "max": [
+                  0.125,
+                  1.5099999904632568,
+                  1.5
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_MINUTE_TIP",
+          "extras": {},
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "HAND_METAL",
+              "positionBounds": {
+                "min": [
+                  -0.4000000059604645,
+                  1.3899999856948853,
+                  -13.300000190734863
+                ],
+                "max": [
+                  0.4000000059604645,
+                  1.5099999904632568,
+                  -11
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_SECONDS_BODY",
+          "extras": {},
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "HAND_METAL",
+              "positionBounds": {
+                "min": [
+                  -0.22499999403953552,
+                  1.8600000143051147,
+                  -11.5
+                ],
+                "max": [
+                  0.22499999403953552,
+                  1.940000057220459,
+                  0
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_SECONDS_HUB",
+          "extras": {},
+          "translation": [
+            0,
+            1.899999976158142,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "HAND_METAL",
+              "positionBounds": {
+                "min": [
+                  -0.699999988079071,
+                  -0.07500000298023224,
+                  -0.699999988079071
+                ],
+                "max": [
+                  0.699999988079071,
+                  0.07500000298023224,
+                  0.699999988079071
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_SECONDS_TAIL",
+          "extras": {},
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "HAND_METAL",
+              "positionBounds": {
+                "min": [
+                  -0.17499999701976776,
+                  1.8600000143051147,
+                  0
+                ],
+                "max": [
+                  0.17499999701976776,
+                  1.940000057220459,
+                  2
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_SECONDS_TAIL_COUNTERWEIGHT",
+          "extras": {},
+          "translation": [
+            0,
+            -0.10000000149011612,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "HAND_METAL",
+              "positionBounds": {
+                "min": [
+                  -0.699999988079071,
+                  -0.03999999910593033,
+                  -0.699999988079071
+                ],
+                "max": [
+                  0.699999988079071,
+                  0.03999999910593033,
+                  0.699999988079071
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_SECONDS_TIP",
+          "extras": {},
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "HAND_METAL",
+              "positionBounds": {
+                "min": [
+                  -0.125,
+                  1.8600000143051147,
+                  -13
+                ],
+                "max": [
+                  0.125,
+                  1.940000057220459,
+                  -11.5
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "capabilities": {
+        "filledLumeNodes": [
+          "DD_HAND_HOUR_LUME_BODY",
+          "DD_HAND_MINUTE_LUME_BODY",
+          "DD_HAND_MINUTE_LUME_TIP"
+        ],
+        "registerNodes": [],
+        "explicitTipNodes": [],
+        "explicitOutlineLumeNodes": []
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/hands/hands-baton-42.glb",
+      "sha256": "ee9689269724a0c754aa6d0ed1507f3b7156945dc42b1219ceb50d6d4b3cb913",
+      "nodes": [
+        {
+          "name": "DD_HAND_HOUR",
+          "extras": {
+            "DD_HAND_STYLE": "baton",
+            "DD_ROLE": "hour",
+            "DD_ASSET_ID": "hands-baton-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            -0.27563735842704773,
+            0,
+            0.9612616896629333
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -0.675000011920929,
+                  -0.07500000298023224,
+                  -9
+                ],
+                "max": [
+                  0.675000011920929,
+                  0.07500000298023224,
+                  1.1699999570846558
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_HOUR_LUME",
+          "extras": {
+            "DD_ASSET_ID": "hands-baton-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            2.1938657760620117,
+            0.10000000149011612,
+            -3.5109190940856934
+          ],
+          "rotation": [
+            0,
+            -0.27563735842704773,
+            0,
+            0.9612616896629333
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_LUME",
+              "positionBounds": {
+                "min": [
+                  -0.1889999955892563,
+                  -0.02250000089406967,
+                  -2.1600000858306885
+                ],
+                "max": [
+                  0.1889999955892563,
+                  0.02250000089406967,
+                  2.1600000858306885
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_HUB",
+          "extras": {
+            "DD_ASSET_ID": "hands-baton-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            0,
+            0.3499999940395355,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -0.675000011920929,
+                  -0.25999999046325684,
+                  -0.675000011920929
+                ],
+                "max": [
+                  0.675000011920929,
+                  0.25999999046325684,
+                  0.675000011920929
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_MINUTE",
+          "extras": {
+            "DD_HAND_STYLE": "baton",
+            "DD_ROLE": "minute",
+            "DD_ASSET_ID": "hands-baton-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0.40673667192459106,
+            0,
+            0.9135454297065735
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -0.4399999976158142,
+                  0.125,
+                  -12.699999809265137
+                ],
+                "max": [
+                  0.4399999976158142,
+                  0.2750000059604645,
+                  1.6510000228881836
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_MINUTE_LUME",
+          "extras": {
+            "DD_ASSET_ID": "hands-baton-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            -4.341452121734619,
+            0.30000001192092896,
+            -3.9090609550476074
+          ],
+          "rotation": [
+            0,
+            0.40673667192459106,
+            0,
+            0.9135454297065735
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_LUME",
+              "positionBounds": {
+                "min": [
+                  -0.12319999933242798,
+                  -0.02250000089406967,
+                  -3.0480000972747803
+                ],
+                "max": [
+                  0.12319999933242798,
+                  0.02250000089406967,
+                  3.0480000972747803
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_SECONDS",
+          "extras": {
+            "DD_HAND_STYLE": "baton",
+            "DD_ROLE": "seconds",
+            "DD_ASSET_ID": "hands-baton-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0.9304175972938538,
+            0,
+            0.36650118231773376
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -0.10000000149011612,
+                  0.3499999940395355,
+                  -13.800000190734863
+                ],
+                "max": [
+                  0.10000000149011612,
+                  0.44999998807907104,
+                  1.7940000295639038
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "capabilities": {
+        "filledLumeNodes": [
+          "DD_HAND_HOUR_LUME",
+          "DD_HAND_MINUTE_LUME"
+        ],
+        "registerNodes": [],
+        "explicitTipNodes": [],
+        "explicitOutlineLumeNodes": []
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/hands/hands-baton-nh05-34.glb",
+      "sha256": "9bef317f30bb6ba236bb271a9bea5c1b21692bcc56e70c7f5de5b0de4c0c139c",
+      "nodes": [
+        {
+          "name": "DD_HAND_HOUR",
+          "extras": {
+            "DD_HAND_STYLE": "baton",
+            "DD_ROLE": "hour",
+            "DD_ASSET_ID": "hands-baton-nh05-34",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            -0.27563735842704773,
+            0,
+            0.9612616896629333
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -0.4860000014305115,
+                  -0.07500000298023224,
+                  -6.480000019073486
+                ],
+                "max": [
+                  0.4860000014305115,
+                  0.07500000298023224,
+                  0.8424000144004822
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_HOUR_LUME",
+          "extras": {
+            "DD_ASSET_ID": "hands-baton-nh05-34",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            1.5795832872390747,
+            0.10000000149011612,
+            -2.5278618335723877
+          ],
+          "rotation": [
+            0,
+            -0.27563735842704773,
+            0,
+            0.9612616896629333
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_LUME",
+              "positionBounds": {
+                "min": [
+                  -0.13607999682426453,
+                  -0.02250000089406967,
+                  -1.5551999807357788
+                ],
+                "max": [
+                  0.13607999682426453,
+                  0.02250000089406967,
+                  1.5551999807357788
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_HUB",
+          "extras": {
+            "DD_ASSET_ID": "hands-baton-nh05-34",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            0,
+            0.3499999940395355,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -0.4860000014305115,
+                  -0.25999999046325684,
+                  -0.4860000014305115
+                ],
+                "max": [
+                  0.4860000014305115,
+                  0.25999999046325684,
+                  0.4860000014305115
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_MINUTE",
+          "extras": {
+            "DD_HAND_STYLE": "baton",
+            "DD_ROLE": "minute",
+            "DD_ASSET_ID": "hands-baton-nh05-34",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0.40673667192459106,
+            0,
+            0.9135454297065735
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -0.31679999828338623,
+                  0.125,
+                  -9.144000053405762
+                ],
+                "max": [
+                  0.31679999828338623,
+                  0.2750000059604645,
+                  1.1887199878692627
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_MINUTE_LUME",
+          "extras": {
+            "DD_ASSET_ID": "hands-baton-nh05-34",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            -3.125845432281494,
+            0.30000001192092896,
+            -2.814523935317993
+          ],
+          "rotation": [
+            0,
+            0.40673667192459106,
+            0,
+            0.9135454297065735
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_LUME",
+              "positionBounds": {
+                "min": [
+                  -0.08870399743318558,
+                  -0.02250000089406967,
+                  -2.1945600509643555
+                ],
+                "max": [
+                  0.08870399743318558,
+                  0.02250000089406967,
+                  2.1945600509643555
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_SECONDS",
+          "extras": {
+            "DD_HAND_STYLE": "baton",
+            "DD_ROLE": "seconds",
+            "DD_ASSET_ID": "hands-baton-nh05-34",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0.9304175972938538,
+            0,
+            0.36650118231773376
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -0.07199999690055847,
+                  0.3499999940395355,
+                  -9.935999870300293
+                ],
+                "max": [
+                  0.07199999690055847,
+                  0.44999998807907104,
+                  1.2916799783706665
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "capabilities": {
+        "filledLumeNodes": [
+          "DD_HAND_HOUR_LUME",
+          "DD_HAND_MINUTE_LUME"
+        ],
+        "registerNodes": [],
+        "explicitTipNodes": [],
+        "explicitOutlineLumeNodes": []
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/hands/hands-broad-arrow-42.glb",
+      "sha256": "ef461c599784f08b4b8d6e957ab2c8c1a2929f3c3749368a78c3f94b71cd951b",
+      "nodes": [
+        {
+          "name": "DD_HAND_HOUR",
+          "extras": {
+            "DD_HAND_STYLE": "broad-arrow",
+            "DD_ROLE": "hour",
+            "DD_ASSET_ID": "hands-broad-arrow-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            -0.27563735842704773,
+            0,
+            0.9612616896629333
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -0.972000002861023,
+                  -0.07500000298023224,
+                  -9
+                ],
+                "max": [
+                  0.972000002861023,
+                  0.07500000298023224,
+                  1.1699999570846558
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_HOUR_LUME",
+          "extras": {
+            "DD_ASSET_ID": "hands-broad-arrow-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            2.1938657760620117,
+            0.10000000149011612,
+            -3.5109190940856934
+          ],
+          "rotation": [
+            0,
+            -0.27563735842704773,
+            0,
+            0.9612616896629333
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_LUME",
+              "positionBounds": {
+                "min": [
+                  -0.1889999955892563,
+                  -0.02250000089406967,
+                  -2.1600000858306885
+                ],
+                "max": [
+                  0.1889999955892563,
+                  0.02250000089406967,
+                  2.1600000858306885
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_HUB",
+          "extras": {
+            "DD_ASSET_ID": "hands-broad-arrow-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            0,
+            0.3499999940395355,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -0.675000011920929,
+                  -0.25999999046325684,
+                  -0.675000011920929
+                ],
+                "max": [
+                  0.675000011920929,
+                  0.25999999046325684,
+                  0.675000011920929
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_MINUTE",
+          "extras": {
+            "DD_HAND_STYLE": "broad-arrow",
+            "DD_ROLE": "minute",
+            "DD_ASSET_ID": "hands-broad-arrow-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0.40673667192459106,
+            0,
+            0.9135454297065735
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -0.6335999965667725,
+                  0.125,
+                  -12.699999809265137
+                ],
+                "max": [
+                  0.6335999965667725,
+                  0.2750000059604645,
+                  1.6510000228881836
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_MINUTE_LUME",
+          "extras": {
+            "DD_ASSET_ID": "hands-broad-arrow-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            -4.341452121734619,
+            0.30000001192092896,
+            -3.9090609550476074
+          ],
+          "rotation": [
+            0,
+            0.40673667192459106,
+            0,
+            0.9135454297065735
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_LUME",
+              "positionBounds": {
+                "min": [
+                  -0.12319999933242798,
+                  -0.02250000089406967,
+                  -3.0480000972747803
+                ],
+                "max": [
+                  0.12319999933242798,
+                  0.02250000089406967,
+                  3.0480000972747803
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_SECONDS",
+          "extras": {
+            "DD_HAND_STYLE": "broad-arrow",
+            "DD_ROLE": "seconds",
+            "DD_ASSET_ID": "hands-broad-arrow-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0.9304175972938538,
+            0,
+            0.36650118231773376
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -0.14399999380111694,
+                  0.3499999940395355,
+                  -13.800000190734863
+                ],
+                "max": [
+                  0.14399999380111694,
+                  0.44999998807907104,
+                  1.7940000295639038
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "capabilities": {
+        "filledLumeNodes": [
+          "DD_HAND_HOUR_LUME",
+          "DD_HAND_MINUTE_LUME"
+        ],
+        "registerNodes": [],
+        "explicitTipNodes": [],
+        "explicitOutlineLumeNodes": []
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/hands/hands-cathedral-42.glb",
+      "sha256": "9b8c6a48bd566316408a079c20d5a4a6f7c26b1c7c3d212b1ab5791e306e8a80",
+      "nodes": [
+        {
+          "name": "DD_HAND_HOUR",
+          "extras": {
+            "DD_HAND_STYLE": "cathedral",
+            "DD_ROLE": "hour",
+            "DD_ASSET_ID": "hands-cathedral-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            -0.27563735842704773,
+            0,
+            0.9612616896629333
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -0.7020000219345093,
+                  -0.07500000298023224,
+                  -9
+                ],
+                "max": [
+                  0.7020000219345093,
+                  0.07500000298023224,
+                  1.1699999570846558
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_HOUR_LUME",
+          "extras": {
+            "DD_ASSET_ID": "hands-cathedral-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            2.1938657760620117,
+            0.10000000149011612,
+            -3.5109190940856934
+          ],
+          "rotation": [
+            0,
+            -0.27563735842704773,
+            0,
+            0.9612616896629333
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_LUME",
+              "positionBounds": {
+                "min": [
+                  -0.1889999955892563,
+                  -0.02250000089406967,
+                  -2.1600000858306885
+                ],
+                "max": [
+                  0.1889999955892563,
+                  0.02250000089406967,
+                  2.1600000858306885
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_HUB",
+          "extras": {
+            "DD_ASSET_ID": "hands-cathedral-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            0,
+            0.3499999940395355,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -0.675000011920929,
+                  -0.25999999046325684,
+                  -0.675000011920929
+                ],
+                "max": [
+                  0.675000011920929,
+                  0.25999999046325684,
+                  0.675000011920929
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_MINUTE",
+          "extras": {
+            "DD_HAND_STYLE": "cathedral",
+            "DD_ROLE": "minute",
+            "DD_ASSET_ID": "hands-cathedral-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0.40673667192459106,
+            0,
+            0.9135454297065735
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -0.4575999975204468,
+                  0.125,
+                  -12.699999809265137
+                ],
+                "max": [
+                  0.4575999975204468,
+                  0.2750000059604645,
+                  1.6510000228881836
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_MINUTE_LUME",
+          "extras": {
+            "DD_ASSET_ID": "hands-cathedral-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            -4.341452121734619,
+            0.30000001192092896,
+            -3.9090609550476074
+          ],
+          "rotation": [
+            0,
+            0.40673667192459106,
+            0,
+            0.9135454297065735
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_LUME",
+              "positionBounds": {
+                "min": [
+                  -0.12319999933242798,
+                  -0.02250000089406967,
+                  -3.0480000972747803
+                ],
+                "max": [
+                  0.12319999933242798,
+                  0.02250000089406967,
+                  3.0480000972747803
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_SECONDS",
+          "extras": {
+            "DD_HAND_STYLE": "cathedral",
+            "DD_ROLE": "seconds",
+            "DD_ASSET_ID": "hands-cathedral-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0.9304175972938538,
+            0,
+            0.36650118231773376
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -0.10400000214576721,
+                  0.3499999940395355,
+                  -13.800000190734863
+                ],
+                "max": [
+                  0.10400000214576721,
+                  0.44999998807907104,
+                  1.7940000295639038
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "capabilities": {
+        "filledLumeNodes": [
+          "DD_HAND_HOUR_LUME",
+          "DD_HAND_MINUTE_LUME"
+        ],
+        "registerNodes": [],
+        "explicitTipNodes": [],
+        "explicitOutlineLumeNodes": []
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/hands/hands-dauphine-42.glb",
+      "sha256": "e82e2c680bbf55e18fb9b3a46b5885e39cb67b8ed1f15d9714c5b5a852de2735",
+      "nodes": [
+        {
+          "name": "DD_HAND_HOUR",
+          "extras": {
+            "DD_HAND_STYLE": "dauphine",
+            "DD_ROLE": "hour",
+            "DD_ASSET_ID": "hands-dauphine-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            -0.27563735842704773,
+            0,
+            0.9612616896629333
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -0.7425000071525574,
+                  -0.07500000298023224,
+                  -9
+                ],
+                "max": [
+                  0.7425000071525574,
+                  0.07500000298023224,
+                  1.1699999570846558
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_HUB",
+          "extras": {
+            "DD_ASSET_ID": "hands-dauphine-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            0,
+            0.3499999940395355,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -0.675000011920929,
+                  -0.25999999046325684,
+                  -0.675000011920929
+                ],
+                "max": [
+                  0.675000011920929,
+                  0.25999999046325684,
+                  0.675000011920929
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_MINUTE",
+          "extras": {
+            "DD_HAND_STYLE": "dauphine",
+            "DD_ROLE": "minute",
+            "DD_ASSET_ID": "hands-dauphine-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0.40673667192459106,
+            0,
+            0.9135454297065735
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -0.48399999737739563,
+                  0.125,
+                  -12.699999809265137
+                ],
+                "max": [
+                  0.48399999737739563,
+                  0.2750000059604645,
+                  1.6510000228881836
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_SECONDS",
+          "extras": {
+            "DD_HAND_STYLE": "dauphine",
+            "DD_ROLE": "seconds",
+            "DD_ASSET_ID": "hands-dauphine-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0.9304175972938538,
+            0,
+            0.36650118231773376
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -0.10999999940395355,
+                  0.3499999940395355,
+                  -13.800000190734863
+                ],
+                "max": [
+                  0.10999999940395355,
+                  0.44999998807907104,
+                  1.7940000295639038
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "capabilities": {
+        "filledLumeNodes": [],
+        "registerNodes": [],
+        "explicitTipNodes": [],
+        "explicitOutlineLumeNodes": []
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/hands/hands-mercedes-42.glb",
+      "sha256": "48b8f82cc174f56c1c04522238eb06dc6e37fbc1e0378ce36ff54d86d74b8495",
+      "nodes": [
+        {
+          "name": "DD_HAND_HOUR",
+          "extras": {
+            "DD_HAND_STYLE": "mercedes",
+            "DD_ROLE": "hour",
+            "DD_ASSET_ID": "hands-mercedes-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            -0.27563735842704773,
+            0,
+            0.9612616896629333
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -0.8774999976158142,
+                  -0.07500000298023224,
+                  -9
+                ],
+                "max": [
+                  0.8774999976158142,
+                  0.07500000298023224,
+                  1.1699999570846558
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_HOUR_LUME",
+          "extras": {
+            "DD_ASSET_ID": "hands-mercedes-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            2.1938657760620117,
+            0.10000000149011612,
+            -3.5109190940856934
+          ],
+          "rotation": [
+            0,
+            -0.27563735842704773,
+            0,
+            0.9612616896629333
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_LUME",
+              "positionBounds": {
+                "min": [
+                  -0.1889999955892563,
+                  -0.02250000089406967,
+                  -2.1600000858306885
+                ],
+                "max": [
+                  0.1889999955892563,
+                  0.02250000089406967,
+                  2.1600000858306885
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_HOUR_MERCEDES_LUME",
+          "extras": {
+            "DD_ASSET_ID": "hands-mercedes-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            2.766178607940674,
+            0.12999999523162842,
+            -4.426811218261719
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_LUME",
+              "positionBounds": {
+                "min": [
+                  -0.949999988079071,
+                  -0.017500000074505806,
+                  -0.949999988079071
+                ],
+                "max": [
+                  0.949999988079071,
+                  0.017500000074505806,
+                  0.949999988079071
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_HOUR_MERCEDES_RIM",
+          "extras": {
+            "DD_ASSET_ID": "hands-mercedes-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            2.766178607940674,
+            0,
+            -4.426811218261719
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -1.100000023841858,
+                  0.11500000208616257,
+                  -1.100000023841858
+                ],
+                "max": [
+                  1.100000023841858,
+                  0.19499999284744263,
+                  1.100000023841858
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_HOUR_MERCEDES_SPOKE_0",
+          "extras": {
+            "DD_ASSET_ID": "hands-mercedes-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            2.9887447357177734,
+            0.1899999976158142,
+            -4.782991409301758
+          ],
+          "rotation": [
+            0,
+            -0.27563735842704773,
+            0,
+            0.9612616896629333
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -0.07999999821186066,
+                  -0.027499999850988388,
+                  -0.49000000953674316
+                ],
+                "max": [
+                  0.07999999821186066,
+                  0.027499999850988388,
+                  0.49000000953674316
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_HOUR_MERCEDES_SPOKE_1",
+          "extras": {
+            "DD_ASSET_ID": "hands-mercedes-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            2.3464343547821045,
+            0.1899999976158142,
+            -4.441468715667725
+          ],
+          "rotation": [
+            0,
+            0.6946583986282349,
+            0,
+            0.7193397879600525
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -0.07999999821186066,
+                  -0.027499999850988388,
+                  -0.49000000953674316
+                ],
+                "max": [
+                  0.07999999821186066,
+                  0.027499999850988388,
+                  0.49000000953674316
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_HOUR_MERCEDES_SPOKE_2",
+          "extras": {
+            "DD_ASSET_ID": "hands-mercedes-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            2.9633567333221436,
+            0.1899999976158142,
+            -4.055973052978516
+          ],
+          "rotation": [
+            0,
+            -0.9702957272529602,
+            0,
+            0.24192187190055847
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -0.07999999821186066,
+                  -0.027499999850988388,
+                  -0.49000000953674316
+                ],
+                "max": [
+                  0.07999999821186066,
+                  0.027499999850988388,
+                  0.49000000953674316
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_HUB",
+          "extras": {
+            "DD_ASSET_ID": "hands-mercedes-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            0,
+            0.3499999940395355,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -0.675000011920929,
+                  -0.25999999046325684,
+                  -0.675000011920929
+                ],
+                "max": [
+                  0.675000011920929,
+                  0.25999999046325684,
+                  0.675000011920929
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_MINUTE",
+          "extras": {
+            "DD_HAND_STYLE": "mercedes",
+            "DD_ROLE": "minute",
+            "DD_ASSET_ID": "hands-mercedes-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0.40673667192459106,
+            0,
+            0.9135454297065735
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -0.5720000267028809,
+                  0.125,
+                  -12.699999809265137
+                ],
+                "max": [
+                  0.5720000267028809,
+                  0.2750000059604645,
+                  1.6510000228881836
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_MINUTE_LUME",
+          "extras": {
+            "DD_ASSET_ID": "hands-mercedes-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            -4.341452121734619,
+            0.30000001192092896,
+            -3.9090609550476074
+          ],
+          "rotation": [
+            0,
+            0.40673667192459106,
+            0,
+            0.9135454297065735
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_LUME",
+              "positionBounds": {
+                "min": [
+                  -0.12319999933242798,
+                  -0.02250000089406967,
+                  -3.0480000972747803
+                ],
+                "max": [
+                  0.12319999933242798,
+                  0.02250000089406967,
+                  3.0480000972747803
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_SECONDS",
+          "extras": {
+            "DD_HAND_STYLE": "mercedes",
+            "DD_ROLE": "seconds",
+            "DD_ASSET_ID": "hands-mercedes-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0.9304175972938538,
+            0,
+            0.36650118231773376
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -0.12999999523162842,
+                  0.3499999940395355,
+                  -13.800000190734863
+                ],
+                "max": [
+                  0.12999999523162842,
+                  0.44999998807907104,
+                  1.7940000295639038
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "capabilities": {
+        "filledLumeNodes": [
+          "DD_HAND_HOUR_LUME",
+          "DD_HAND_HOUR_MERCEDES_LUME",
+          "DD_HAND_MINUTE_LUME"
+        ],
+        "registerNodes": [],
+        "explicitTipNodes": [],
+        "explicitOutlineLumeNodes": []
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/hands/hands-nh05-luminous-588.glb",
+      "sha256": "898f3d58ecf0c97f89c9b49e4d3d8f9d85ab2698b1e60e6cd688ca58773bb82d",
+      "nodes": [
+        {
+          "name": "DD_HAND_HOUR",
+          "extras": {
+            "DD_HAND_STYLE": "baton",
+            "DD_ROLE": "hour",
+            "DD_TIP_LENGTH_MM": 5,
+            "DD_ASSET_ID": "hands-nh05-luminous-588",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            -0.27563735842704773,
+            0,
+            0.9612616896629333
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -0.2750000059604645,
+                  -0.07500000298023224,
+                  -5
+                ],
+                "max": [
+                  0.2750000059604645,
+                  0.07500000298023224,
+                  0.6499999761581421
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_HOUR_LUME",
+          "extras": {
+            "DD_ASSET_ID": "hands-nh05-luminous-588",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            1.2188142538070679,
+            0.10000000149011612,
+            -1.9505106210708618
+          ],
+          "rotation": [
+            0,
+            -0.27563735842704773,
+            0,
+            0.9612616896629333
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_LUME",
+              "positionBounds": {
+                "min": [
+                  -0.07699999958276749,
+                  -0.02250000089406967,
+                  -1.2000000476837158
+                ],
+                "max": [
+                  0.07699999958276749,
+                  0.02250000089406967,
+                  1.2000000476837158
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_HUB",
+          "extras": {
+            "DD_ASSET_ID": "hands-nh05-luminous-588",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            0,
+            0.3499999940395355,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -0.675000011920929,
+                  -0.25999999046325684,
+                  -0.675000011920929
+                ],
+                "max": [
+                  0.675000011920929,
+                  0.25999999046325684,
+                  0.675000011920929
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_MINUTE",
+          "extras": {
+            "DD_HAND_STYLE": "baton",
+            "DD_ROLE": "minute",
+            "DD_TIP_LENGTH_MM": 8,
+            "DD_ASSET_ID": "hands-nh05-luminous-588",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0.40673667192459106,
+            0,
+            0.9135454297065735
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -0.17499999701976776,
+                  0.125,
+                  -8
+                ],
+                "max": [
+                  0.17499999701976776,
+                  0.2750000059604645,
+                  1.0399999618530273
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_MINUTE_LUME",
+          "extras": {
+            "DD_ASSET_ID": "hands-nh05-luminous-588",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            -2.7347729206085205,
+            0.30000001192092896,
+            -2.4624006748199463
+          ],
+          "rotation": [
+            0,
+            0.40673667192459106,
+            0,
+            0.9135454297065735
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_LUME",
+              "positionBounds": {
+                "min": [
+                  -0.04899999871850014,
+                  -0.02250000089406967,
+                  -1.9199999570846558
+                ],
+                "max": [
+                  0.04899999871850014,
+                  0.02250000089406967,
+                  1.9199999570846558
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_SECONDS",
+          "extras": {
+            "DD_HAND_STYLE": "baton",
+            "DD_ROLE": "seconds",
+            "DD_TIP_LENGTH_MM": 8,
+            "DD_ASSET_ID": "hands-nh05-luminous-588",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0.9304175972938538,
+            0,
+            0.36650118231773376
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -0.05999999865889549,
+                  0.3499999940395355,
+                  -8
+                ],
+                "max": [
+                  0.05999999865889549,
+                  0.44999998807907104,
+                  1.0399999618530273
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "capabilities": {
+        "filledLumeNodes": [
+          "DD_HAND_HOUR_LUME",
+          "DD_HAND_MINUTE_LUME"
+        ],
+        "registerNodes": [],
+        "explicitTipNodes": [],
+        "explicitOutlineLumeNodes": []
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/hands/hands-pencil-42.glb",
+      "sha256": "084a960978517cb9d3d5e2f8226856873d3f457087d94f3e66eac4474a950bee",
+      "nodes": [
+        {
+          "name": "DD_HAND_HOUR",
+          "extras": {
+            "DD_HAND_STYLE": "pencil",
+            "DD_ROLE": "hour",
+            "DD_ASSET_ID": "hands-pencil-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            -0.27563735842704773,
+            0,
+            0.9612616896629333
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -0.4320000112056732,
+                  -0.07500000298023224,
+                  -9
+                ],
+                "max": [
+                  0.4320000112056732,
+                  0.07500000298023224,
+                  1.1699999570846558
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_HOUR_LUME",
+          "extras": {
+            "DD_ASSET_ID": "hands-pencil-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            2.1938657760620117,
+            0.10000000149011612,
+            -3.5109190940856934
+          ],
+          "rotation": [
+            0,
+            -0.27563735842704773,
+            0,
+            0.9612616896629333
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_LUME",
+              "positionBounds": {
+                "min": [
+                  -0.1889999955892563,
+                  -0.02250000089406967,
+                  -2.1600000858306885
+                ],
+                "max": [
+                  0.1889999955892563,
+                  0.02250000089406967,
+                  2.1600000858306885
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_HUB",
+          "extras": {
+            "DD_ASSET_ID": "hands-pencil-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            0,
+            0.3499999940395355,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -0.675000011920929,
+                  -0.25999999046325684,
+                  -0.675000011920929
+                ],
+                "max": [
+                  0.675000011920929,
+                  0.25999999046325684,
+                  0.675000011920929
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_MINUTE",
+          "extras": {
+            "DD_HAND_STYLE": "pencil",
+            "DD_ROLE": "minute",
+            "DD_ASSET_ID": "hands-pencil-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0.40673667192459106,
+            0,
+            0.9135454297065735
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -0.2815999984741211,
+                  0.125,
+                  -12.699999809265137
+                ],
+                "max": [
+                  0.2815999984741211,
+                  0.2750000059604645,
+                  1.6510000228881836
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_MINUTE_LUME",
+          "extras": {
+            "DD_ASSET_ID": "hands-pencil-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            -4.341452121734619,
+            0.30000001192092896,
+            -3.9090609550476074
+          ],
+          "rotation": [
+            0,
+            0.40673667192459106,
+            0,
+            0.9135454297065735
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_LUME",
+              "positionBounds": {
+                "min": [
+                  -0.12319999933242798,
+                  -0.02250000089406967,
+                  -3.0480000972747803
+                ],
+                "max": [
+                  0.12319999933242798,
+                  0.02250000089406967,
+                  3.0480000972747803
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_SECONDS",
+          "extras": {
+            "DD_HAND_STYLE": "pencil",
+            "DD_ROLE": "seconds",
+            "DD_ASSET_ID": "hands-pencil-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0.9304175972938538,
+            0,
+            0.36650118231773376
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -0.06400000303983688,
+                  0.3499999940395355,
+                  -13.800000190734863
+                ],
+                "max": [
+                  0.06400000303983688,
+                  0.44999998807907104,
+                  1.7940000295639038
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "capabilities": {
+        "filledLumeNodes": [
+          "DD_HAND_HOUR_LUME",
+          "DD_HAND_MINUTE_LUME"
+        ],
+        "registerNodes": [],
+        "explicitTipNodes": [],
+        "explicitOutlineLumeNodes": []
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/hands/hands-skeleton-42.glb",
+      "sha256": "90538649857b9cb739f7bfce95a17929bed0a426bba03daa285c27c3021068ef",
+      "nodes": [
+        {
+          "name": "DD_HAND_HOUR",
+          "extras": {
+            "DD_HAND_STYLE": "skeleton",
+            "DD_ROLE": "hour",
+            "DD_ASSET_ID": "hands-skeleton-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            -0.27563735842704773,
+            0,
+            0.9612616896629333
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -0.675000011920929,
+                  -0.07500000298023224,
+                  -9
+                ],
+                "max": [
+                  0.675000011920929,
+                  0.07500000298023224,
+                  1.1699999570846558
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_HUB",
+          "extras": {
+            "DD_ASSET_ID": "hands-skeleton-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            0,
+            0.3499999940395355,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -0.675000011920929,
+                  -0.25999999046325684,
+                  -0.675000011920929
+                ],
+                "max": [
+                  0.675000011920929,
+                  0.25999999046325684,
+                  0.675000011920929
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_MINUTE",
+          "extras": {
+            "DD_HAND_STYLE": "skeleton",
+            "DD_ROLE": "minute",
+            "DD_ASSET_ID": "hands-skeleton-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0.40673667192459106,
+            0,
+            0.9135454297065735
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -0.4399999976158142,
+                  0.125,
+                  -12.699999809265137
+                ],
+                "max": [
+                  0.4399999976158142,
+                  0.2750000059604645,
+                  1.6510000228881836
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_SECONDS",
+          "extras": {
+            "DD_HAND_STYLE": "skeleton",
+            "DD_ROLE": "seconds",
+            "DD_ASSET_ID": "hands-skeleton-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0.9304175972938538,
+            0,
+            0.36650118231773376
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -0.10000000149011612,
+                  0.3499999940395355,
+                  -13.800000190734863
+                ],
+                "max": [
+                  0.10000000149011612,
+                  0.44999998807907104,
+                  1.7940000295639038
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "capabilities": {
+        "filledLumeNodes": [],
+        "registerNodes": [],
+        "explicitTipNodes": [],
+        "explicitOutlineLumeNodes": []
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/hands/hands-sword-42.glb",
+      "sha256": "6e0453b209e06ff2074b3a5c50e0a377ea904b70aae326844264fd64b9865715",
+      "nodes": [
+        {
+          "name": "DD_HAND_HOUR",
+          "extras": {
+            "DD_HAND_STYLE": "sword",
+            "DD_ROLE": "hour",
+            "DD_ASSET_ID": "hands-sword-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            -0.27563735842704773,
+            0,
+            0.9612616896629333
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -0.6480000019073486,
+                  -0.07500000298023224,
+                  -9
+                ],
+                "max": [
+                  0.6480000019073486,
+                  0.07500000298023224,
+                  1.1699999570846558
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_HOUR_LUME",
+          "extras": {
+            "DD_ASSET_ID": "hands-sword-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            2.1938657760620117,
+            0.10000000149011612,
+            -3.5109190940856934
+          ],
+          "rotation": [
+            0,
+            -0.27563735842704773,
+            0,
+            0.9612616896629333
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_LUME",
+              "positionBounds": {
+                "min": [
+                  -0.1889999955892563,
+                  -0.02250000089406967,
+                  -2.1600000858306885
+                ],
+                "max": [
+                  0.1889999955892563,
+                  0.02250000089406967,
+                  2.1600000858306885
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_HUB",
+          "extras": {
+            "DD_ASSET_ID": "hands-sword-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            0,
+            0.3499999940395355,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -0.675000011920929,
+                  -0.25999999046325684,
+                  -0.675000011920929
+                ],
+                "max": [
+                  0.675000011920929,
+                  0.25999999046325684,
+                  0.675000011920929
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_MINUTE",
+          "extras": {
+            "DD_HAND_STYLE": "sword",
+            "DD_ROLE": "minute",
+            "DD_ASSET_ID": "hands-sword-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0.40673667192459106,
+            0,
+            0.9135454297065735
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -0.42239999771118164,
+                  0.125,
+                  -12.699999809265137
+                ],
+                "max": [
+                  0.42239999771118164,
+                  0.2750000059604645,
+                  1.6510000228881836
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_MINUTE_LUME",
+          "extras": {
+            "DD_ASSET_ID": "hands-sword-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            -4.341452121734619,
+            0.30000001192092896,
+            -3.9090609550476074
+          ],
+          "rotation": [
+            0,
+            0.40673667192459106,
+            0,
+            0.9135454297065735
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_LUME",
+              "positionBounds": {
+                "min": [
+                  -0.12319999933242798,
+                  -0.02250000089406967,
+                  -3.0480000972747803
+                ],
+                "max": [
+                  0.12319999933242798,
+                  0.02250000089406967,
+                  3.0480000972747803
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_SECONDS",
+          "extras": {
+            "DD_HAND_STYLE": "sword",
+            "DD_ROLE": "seconds",
+            "DD_ASSET_ID": "hands-sword-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0.9304175972938538,
+            0,
+            0.36650118231773376
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -0.09600000083446503,
+                  0.3499999940395355,
+                  -13.800000190734863
+                ],
+                "max": [
+                  0.09600000083446503,
+                  0.44999998807907104,
+                  1.7940000295639038
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "capabilities": {
+        "filledLumeNodes": [
+          "DD_HAND_HOUR_LUME",
+          "DD_HAND_MINUTE_LUME"
+        ],
+        "registerNodes": [],
+        "explicitTipNodes": [],
+        "explicitOutlineLumeNodes": []
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/hands/hands-syringe-42.glb",
+      "sha256": "1151d8919f04d09fa46615e3ec1ec59cc8ebaddcc78ccc05a10fc68bb46d3b0d",
+      "nodes": [
+        {
+          "name": "DD_HAND_HOUR",
+          "extras": {
+            "DD_HAND_STYLE": "syringe",
+            "DD_ROLE": "hour",
+            "DD_ASSET_ID": "hands-syringe-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            -0.27563735842704773,
+            0,
+            0.9612616896629333
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -0.6075000166893005,
+                  -0.07500000298023224,
+                  -9
+                ],
+                "max": [
+                  0.6075000166893005,
+                  0.07500000298023224,
+                  1.1699999570846558
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_HOUR_LUME",
+          "extras": {
+            "DD_ASSET_ID": "hands-syringe-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            2.1938657760620117,
+            0.10000000149011612,
+            -3.5109190940856934
+          ],
+          "rotation": [
+            0,
+            -0.27563735842704773,
+            0,
+            0.9612616896629333
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_LUME",
+              "positionBounds": {
+                "min": [
+                  -0.1889999955892563,
+                  -0.02250000089406967,
+                  -2.1600000858306885
+                ],
+                "max": [
+                  0.1889999955892563,
+                  0.02250000089406967,
+                  2.1600000858306885
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_HUB",
+          "extras": {
+            "DD_ASSET_ID": "hands-syringe-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            0,
+            0.3499999940395355,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -0.675000011920929,
+                  -0.25999999046325684,
+                  -0.675000011920929
+                ],
+                "max": [
+                  0.675000011920929,
+                  0.25999999046325684,
+                  0.675000011920929
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_MINUTE",
+          "extras": {
+            "DD_HAND_STYLE": "syringe",
+            "DD_ROLE": "minute",
+            "DD_ASSET_ID": "hands-syringe-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0.40673667192459106,
+            0,
+            0.9135454297065735
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -0.3959999978542328,
+                  0.125,
+                  -12.699999809265137
+                ],
+                "max": [
+                  0.3959999978542328,
+                  0.2750000059604645,
+                  1.6510000228881836
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_MINUTE_LUME",
+          "extras": {
+            "DD_ASSET_ID": "hands-syringe-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            -4.341452121734619,
+            0.30000001192092896,
+            -3.9090609550476074
+          ],
+          "rotation": [
+            0,
+            0.40673667192459106,
+            0,
+            0.9135454297065735
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_LUME",
+              "positionBounds": {
+                "min": [
+                  -0.12319999933242798,
+                  -0.02250000089406967,
+                  -3.0480000972747803
+                ],
+                "max": [
+                  0.12319999933242798,
+                  0.02250000089406967,
+                  3.0480000972747803
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DD_HAND_SECONDS",
+          "extras": {
+            "DD_HAND_STYLE": "syringe",
+            "DD_ROLE": "seconds",
+            "DD_ASSET_ID": "hands-syringe-42",
+            "DD_CATEGORY": "hands",
+            "DD_UNITS": "millimetres",
+            "DD_PROVENANCE_STATUS": "provisional-presentation"
+          },
+          "translation": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0.9304175972938538,
+            0,
+            0.36650118231773376
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "primitives": [
+            {
+              "material": "DD_HAND_STEEL",
+              "positionBounds": {
+                "min": [
+                  -0.09000000357627869,
+                  0.3499999940395355,
+                  -13.800000190734863
+                ],
+                "max": [
+                  0.09000000357627869,
+                  0.44999998807907104,
+                  1.7940000295639038
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "capabilities": {
+        "filledLumeNodes": [
+          "DD_HAND_HOUR_LUME",
+          "DD_HAND_MINUTE_LUME"
+        ],
+        "registerNodes": [],
+        "explicitTipNodes": [],
+        "explicitOutlineLumeNodes": []
+      }
+    }
+  ]
+}

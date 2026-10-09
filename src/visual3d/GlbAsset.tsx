@@ -7,6 +7,7 @@ import { glbLoadUrl } from './glbLoadUrl';
 import type { TextureEngineConfig } from '@/domain/generators/textureEngine';
 import { createDialFinishTexture, dialFinishBumpScale } from './dialFinishTexture';
 import { isAuthoredHourMarker } from '@/domain/generators/markerAppearance';
+import { hideAuthoredBezelMarking } from './authoredBezelMarkings';
 
 type AssetAppearance = {
   caseColor?: string;
@@ -26,7 +27,7 @@ type AssetAppearance = {
   lumeColor: string;
 };
 
-export const LoadedGlbAsset = ({ descriptor, appearance, scaleTexture, dialFinishConfig, dialDiameterMm = 28.5 }: { descriptor: VisualAssetDescriptor; appearance?: AssetAppearance; scaleTexture?: Texture | null; dialFinishConfig?: TextureEngineConfig; dialDiameterMm?: number }) => {
+export const LoadedGlbAsset = ({ descriptor, appearance, scaleTexture, liveOuterArtwork = false, dialFinishConfig, dialDiameterMm = 28.5 }: { descriptor: VisualAssetDescriptor; appearance?: AssetAppearance; scaleTexture?: Texture | null; liveOuterArtwork?: boolean; dialFinishConfig?: TextureEngineConfig; dialDiameterMm?: number }) => {
   const finishKind = dialFinishConfig?.kind;
   const finishIntensity = dialFinishConfig?.intensity ?? 0;
   const finishContrast = dialFinishConfig?.contrast ?? 0;
@@ -61,6 +62,7 @@ export const LoadedGlbAsset = ({ descriptor, appearance, scaleTexture, dialFinis
       // GLBs include authored default relief for standalone Blender review.
       // The live surface print replaces it so edits do not double the artwork.
       if (descriptor.scaleArtworkSurface && objectName.startsWith('DD_PILOT_SCALE_')) object.visible = false;
+      if (descriptor.category === 'bezel' && hideAuthoredBezelMarking(objectName, liveOuterArtwork)) object.visible = false;
       object.castShadow = true;
       object.receiveShadow = true;
       const sourceMaterials = (Array.isArray(object.material) ? object.material : [object.material]) as Material[];
@@ -219,7 +221,7 @@ export const LoadedGlbAsset = ({ descriptor, appearance, scaleTexture, dialFinis
     });
     if (!hasMesh) throw new Error('GLB has no mesh');
     return clone;
-  }, [appearance?.caseColor, appearance?.handsColor, appearance?.markerColor, appearance?.markerColorExplicit, appearance?.bezelMetalColor, appearance?.dialTextureIntensity, appearance?.dialTextureKind, appearance?.lumeColor, appearance?.lumeEnabled, appearance?.strapStyleId, bezelColor, descriptor.assetId, descriptor.category, descriptor.scaleArtworkSurface, dialColor, gltf, scaleTexture, dialFinishTexture, finishBumpScale, strapColor]);
+  }, [appearance?.caseColor, appearance?.handsColor, appearance?.markerColor, appearance?.markerColorExplicit, appearance?.bezelMetalColor, appearance?.dialTextureIntensity, appearance?.dialTextureKind, appearance?.lumeColor, appearance?.lumeEnabled, appearance?.strapStyleId, bezelColor, descriptor.assetId, descriptor.category, descriptor.scaleArtworkSurface, dialColor, gltf, scaleTexture, liveOuterArtwork, dialFinishTexture, finishBumpScale, strapColor]);
   // Loading can complete after the frame triggered by a Style click. Demand
   // rendering must capture the new mesh (including sapphire transmission).
   useEffect(() => {
@@ -232,11 +234,11 @@ export const LoadedGlbAsset = ({ descriptor, appearance, scaleTexture, dialFinis
   </group>;
 };
 
-export class GlbAsset extends React.Component<{ descriptor: VisualAssetDescriptor; fallback: React.ReactNode; appearance?: AssetAppearance; scaleTexture?: Texture | null; dialFinishConfig?: TextureEngineConfig; dialDiameterMm?: number }, { failed: boolean }> {
+export class GlbAsset extends React.Component<{ descriptor: VisualAssetDescriptor; fallback: React.ReactNode; appearance?: AssetAppearance; scaleTexture?: Texture | null; liveOuterArtwork?: boolean; dialFinishConfig?: TextureEngineConfig; dialDiameterMm?: number }, { failed: boolean }> {
   state = { failed: false };
   static getDerivedStateFromError() { return { failed: true }; }
   componentDidCatch(error: unknown) { console.warn('[visual3d] GLB unavailable; using procedural fallback.', error); }
   render() {
-    return this.state.failed ? this.props.fallback : <Suspense fallback={this.props.fallback}><LoadedGlbAsset descriptor={this.props.descriptor} appearance={this.props.appearance} scaleTexture={this.props.scaleTexture} dialFinishConfig={this.props.dialFinishConfig} dialDiameterMm={this.props.dialDiameterMm} /></Suspense>;
+    return this.state.failed ? this.props.fallback : <Suspense fallback={this.props.fallback}><LoadedGlbAsset descriptor={this.props.descriptor} appearance={this.props.appearance} scaleTexture={this.props.scaleTexture} liveOuterArtwork={this.props.liveOuterArtwork} dialFinishConfig={this.props.dialFinishConfig} dialDiameterMm={this.props.dialDiameterMm} /></Suspense>;
   }
 }
