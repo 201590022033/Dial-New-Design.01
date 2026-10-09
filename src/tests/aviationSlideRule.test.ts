@@ -38,15 +38,15 @@ describe('aviation slide rule', () => {
     const minuteRing = runScalePlugin(diver.kind, { ...getScalePlugin(diver.kind)!.defaultConfig, ...diver.config }, diver.context);
     expect(minuteRing?.ticks).toHaveLength(60);
   });
-  it('uses five independent flight-planning relationships and matching bezel alignments', () => {
+  it('uses six independent flight-planning relationships and matching bezel alignments', () => {
     for (const [mode, meta] of Object.entries(aviationCalculations)) {
       const typedMode = mode as keyof typeof aviationCalculations;
       const [first, second] = meta.defaults;
       const answer = calculateAviation(typedMode, first, second);
       expect(Number.isFinite(answer)).toBe(true);
-      const rate = typedMode === 'time' || typedMode === 'endurance' ? second : typedMode === 'groundspeed' ? answer : first;
-      const quantity = typedMode === 'time' || typedMode === 'groundspeed' || typedMode === 'endurance' ? first : answer;
-      const minutes = typedMode === 'distance' || typedMode === 'fuel-used' || typedMode === 'groundspeed' ? second : answer;
+      const rate = typedMode === 'time' || typedMode === 'endurance' ? second : typedMode === 'groundspeed' || typedMode === 'burn-rate' ? answer : first;
+      const quantity = typedMode === 'time' || typedMode === 'groundspeed' || typedMode === 'endurance' || typedMode === 'burn-rate' ? first : answer;
+      const minutes = typedMode === 'distance' || typedMode === 'fuel-used' || typedMode === 'groundspeed' || typedMode === 'burn-rate' ? second : answer;
       const rotation = aviationBezelAlignment(typedMode, first, second);
       expect(circularError(aviationAngle(rate) + rotation, aviationAngle(60))).toBeLessThan(0.001);
       expect(circularError(aviationAngle(quantity) + rotation, aviationAngle(minutes))).toBeLessThan(0.001);

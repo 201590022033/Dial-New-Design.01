@@ -11,7 +11,7 @@ import { ACESFilmicToneMapping, CanvasTexture, Color, LinearFilter, PerspectiveC
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import type { ScaleRunResult } from '@/services/scaleEngineService';
 import { ScaleArtwork3D } from './ScaleArtwork3D';
-import { scaleArtworkLayers } from '@/domain/scales/resolvedScaleArtwork';
+import { scaleArtworkBinding } from './scaleArtworkBinding';
 import { useScaleArtworkTexture } from './useScaleArtworkTexture';
 import { createDialFinishTexture, dialFinishBumpScale } from './dialFinishTexture';
 import { markerNumeralLayout } from '@/domain/generators/markerAppearance';
@@ -380,8 +380,9 @@ export const VisualComponent = ({ category, model }: { category: VisualCategory;
 
 const ScaledVisualComponent = ({ category, model, preview }: { category: VisualCategory; model: VisualWatchModel; preview: ScaleRunResult | null }) => {
   const ring = model.assets[category].scaleArtworkSurface;
-  const matchingLayer = preview && scaleArtworkLayers(preview).find((layer) => ring === 'outer' ? layer.placementTargetBandId === 'band-outer-bezel' : layer.fixedPlacementTargetBandId === 'band-chapter-ring');
-  const texture = useScaleArtworkTexture(ring ? matchingLayer || null : null, model, ring ?? 'outer', '#080d14', false);
+  const target = ring === 'outer' ? 'band-outer-bezel' : 'band-chapter-ring';
+  const binding = scaleArtworkBinding(preview, target);
+  const texture = useScaleArtworkTexture(ring ? binding?.layer ?? null : null, model, binding?.ring ?? 'outer', '#080d14', false);
   if (!ring) return <VisualComponent category={category} model={model} />;
   if (!model.visible[category]) return null;
   const placement = componentPlacement(model, category);

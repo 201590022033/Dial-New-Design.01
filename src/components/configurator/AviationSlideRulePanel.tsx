@@ -13,7 +13,7 @@ import { useScaleStore } from '@/stores/scaleStore';
 import { useWatchAssemblyStore } from '@/stores/watchAssemblyStore';
 import { assemblyToBands } from '@/domain/assembly/assemblyAdapters';
 
-const modes: AviationCalculation[] = ['time', 'distance', 'groundspeed', 'fuel-used', 'endurance'];
+const modes: AviationCalculation[] = ['time', 'distance', 'groundspeed', 'fuel-used', 'endurance', 'burn-rate'];
 
 const saveSvg = (markup: string, name: string) => {
   const url = URL.createObjectURL(new Blob([markup], { type: 'image/svg+xml;charset=utf-8' }));

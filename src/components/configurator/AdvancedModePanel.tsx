@@ -11,6 +11,7 @@ import { useGlobalSettingsStore } from '@/stores/globalSettingsStore';
 import { useScaleStore } from '@/stores/scaleStore';
 import { AviationSlideRulePanel } from '@/components/configurator/AviationSlideRulePanel';
 import { ReferenceSlideRulePanel } from './ReferenceSlideRulePanel';
+import { CustomAviationPanel } from './CustomAviationPanel';
 
 export const AdvancedModePanel: React.FC = () => {
   const overlays = useConfiguratorUIStore((s) => s.overlays);
@@ -164,6 +165,7 @@ export const AdvancedModePanel: React.FC = () => {
         <div className="p-2.5 rounded-lg bg-slate-900 border border-slate-800 space-y-2">
           <AviationSlideRulePanel />
           <ReferenceSlideRulePanel />
+          <CustomAviationPanel />
           {(!referenceDesign || referenceDesign === 'simplified') && <label className="flex items-center gap-2 cursor-pointer pt-1">
             <input
               type="checkbox"

@@ -56,6 +56,7 @@ export const syncAssemblyDownstream = (assembly: WatchAssembly): void => {
       scale.applyScaleProgram('diver', bands);
     }
 
+    useScaleStore.getState().regeneratePreview(bands);
     // 3. Sync watchComponentStore (DERIVED / ADAPTER)
     try {
       const components = assemblyToWatchComponentEntities(assembly);

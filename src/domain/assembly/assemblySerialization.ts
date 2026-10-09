@@ -11,6 +11,7 @@ import { createDefaultWatchAssembly, WATCH_ASSEMBLY_VERSION } from './assemblyFa
 import { assemblyToBands } from './assemblyAdapters';
 import type { WatchAssembly } from './assemblyTypes';
 import { assertSlideRuleLayers, migrateSimplifiedLayer } from '@/domain/scales/slideRuleLayers';
+import { assertCustomAviation } from '@/domain/scales/customAviation';
 
 const BANNED_TRANSIENT_KEYS = [
   'zoom',
@@ -62,6 +63,7 @@ export const assertNoTransientState = (data: unknown): void => {
 export const serializeWatchAssembly = (assembly: WatchAssembly): string => {
   assertNoTransientState(assembly);
   if (assembly.designConfig?.slideRuleLayers) assertSlideRuleLayers(assembly.designConfig.slideRuleLayers);
+  if (assembly.designConfig?.customAviationLayers) assertCustomAviation(assembly.designConfig.customAviationLayers);
 
   const cleanDocument: WatchAssembly = {
     version: assembly.version || WATCH_ASSEMBLY_VERSION,
@@ -121,6 +123,7 @@ export const deserializeWatchAssembly = (jsonString: string): WatchAssembly => {
   // Ensure no transient state was injected
   assertNoTransientState(raw);
   if (raw.designConfig?.slideRuleLayers) assertSlideRuleLayers(raw.designConfig.slideRuleLayers);
+  if (raw.designConfig?.customAviationLayers) assertCustomAviation(raw.designConfig.customAviationLayers);
 
   return raw as WatchAssembly;
 };

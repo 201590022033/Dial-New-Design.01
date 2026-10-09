@@ -4,6 +4,7 @@ import type { ScalePluginConfig, ScaleMathContext, ScaleKind } from '@/domain/sc
 import { resolvedScaleSvg } from '@/domain/scales/resolvedScaleArtwork';
 import { runScalePlugin, type ScaleRunResult } from './scaleEngineService';
 import { watchAssemblyToVisualModel } from '@/visual3d/watchAssemblyToVisualModel';
+import { runCustomAviation } from '@/domain/scales/customAviation';
 
 /** Resolve physical dimensions once, identically for the editor and saved layers. */
 export const resolvePhysicalScaleConfig = (assembly: WatchAssembly, bands: BandEntity[], config: ScalePluginConfig, kind: ScaleKind): ScalePluginConfig => {
@@ -19,6 +20,10 @@ export const resolvePhysicalScaleConfig = (assembly: WatchAssembly, bands: BandE
     next.bandInnerRadiusMm = Math.max(next.bandInnerRadiusMm, model.bezelEnvelope.innerRadiusMm, model.assets.bezel.scaleArtworkInnerRadiusMm ?? 0);
     const surfaceOuter = model.assets.bezel.scaleArtworkOuterRadiusMm ?? (model.assets.bezel.assetType === 'procedural' ? model.previewEnvelope.bezelOuterRadius - 0.7 : model.bezelEnvelope.outerRadiusMm);
     next.bandOuterRadiusMm = Math.min(next.bandOuterRadiusMm, model.bezelEnvelope.outerRadiusMm, surfaceOuter);
+  }
+  if (target.kind === 'chapter-ring') {
+    next.bandInnerRadiusMm = Math.max(next.bandInnerRadiusMm, model.assets['chapter-ring'].scaleArtworkInnerRadiusMm ?? 0);
+    next.bandOuterRadiusMm = Math.min(next.bandOuterRadiusMm, model.assets['chapter-ring'].scaleArtworkOuterRadiusMm ?? Infinity);
   }
   if (kind === 'slide-rule' && fixed) {
     next.fixedPlacementTargetBandId = fixed.id;
@@ -64,6 +69,13 @@ export const resolveScaleLayers = (assembly: WatchAssembly, bands: BandEntity[],
     }
     const resolved = runScalePlugin(saved.selectedScaleKind, resolvePhysicalScaleConfig(assembly, bands, saved.pluginConfig, saved.selectedScaleKind), saved.context);
     if (resolved && claim(resolved)) layers.push(resolved);
+  }
+  for (const layer of assembly.designConfig?.customAviationLayers?.layers ?? []) {
+    if (!layer.enabled) continue;
+    const target = bands.find(band => band.id === layer.targetBandId);
+    const physical = resolvePhysicalScaleConfig(assembly, bands, { ...config, placementTargetBandId: layer.targetBandId }, 'custom');
+    const resolved = runCustomAviation(layer, target ? { ...target, geometry: { ...target.geometry, innerRadius: physical.bandInnerRadiusMm, outerRadius: physical.bandOuterRadiusMm } } : undefined);
+    if (claim(resolved)) layers.push(resolved);
   }
   if (!layers.length) return null;
   const structuredWarnings = [...layers.flatMap((layer) => layer.validation.structuredWarnings), ...issues.map((description) => ({ severity: 'error' as const, description, affectedObject: 'scale-envelope', suggestedFix: 'Choose independent physical targets.' }))];

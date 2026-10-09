@@ -3,14 +3,15 @@ import { resolvedScaleSvg } from './resolvedScaleArtwork';
 import { runScalePlugin } from '@/services/scaleEngineService';
 import { logDecadeAngle } from './calibratedSlideRule';
 
-export type AviationCalculation = 'time' | 'distance' | 'groundspeed' | 'fuel-used' | 'endurance';
+export type AviationCalculation = 'time' | 'distance' | 'groundspeed' | 'fuel-used' | 'endurance' | 'burn-rate';
 
 export const aviationCalculations: Record<AviationCalculation, { title: string; first: string; second: string; unit: string; defaults: [number, number] }> = {
   time: { title: 'Time en route', first: 'Distance (NM)', second: 'Groundspeed (kt)', unit: 'min', defaults: [80, 120] },
   distance: { title: 'Distance flown', first: 'Groundspeed (kt)', second: 'Time (min)', unit: 'NM', defaults: [120, 40] },
   groundspeed: { title: 'Groundspeed', first: 'Distance (NM)', second: 'Time (min)', unit: 'kt', defaults: [80, 40] },
   'fuel-used': { title: 'Fuel used', first: 'Burn rate (US gal/h)', second: 'Time (min)', unit: 'US gal', defaults: [9, 40] },
-  endurance: { title: 'Fuel endurance', first: 'Usable fuel (US gal)', second: 'Burn rate (US gal/h)', unit: 'min', defaults: [24, 8] }
+  endurance: { title: 'Fuel endurance', first: 'Usable fuel (US gal)', second: 'Burn rate (US gal/h)', unit: 'min', defaults: [24, 8] },
+  'burn-rate': { title: 'Fuel burn rate', first: 'Fuel used (US gal)', second: 'Time (min)', unit: 'US gal/h', defaults: [6, 40] }
 };
 
 export const calculateAviation = (mode: AviationCalculation, first: number, second: number): number => {
@@ -21,6 +22,7 @@ export const calculateAviation = (mode: AviationCalculation, first: number, seco
     case 'groundspeed': return 60 * first / second;
     case 'fuel-used': return first * second / 60;
     case 'endurance': return 60 * first / second;
+    case 'burn-rate': return 60 * first / second;
   }
 };
 
@@ -31,7 +33,7 @@ export const aviationAngle = (value: number): number => {
 };
 
 export const aviationBezelAlignment = (mode: AviationCalculation, first: number, second: number): number => {
-  const rate = mode === 'time' || mode === 'endurance' ? second : mode === 'groundspeed' ? 60 * first / second : first;
+  const rate = mode === 'time' || mode === 'endurance' ? second : mode === 'groundspeed' || mode === 'burn-rate' ? 60 * first / second : first;
   const angle = aviationAngle(60) - aviationAngle(rate);
   return ((angle % 360) + 360) % 360;
 };

@@ -74,7 +74,7 @@ The exact user's prompt is a requirements document for future milestones. Its in
 | 3A | Citizen Skyhawk preset and Advanced controls | Runtime/state/shared-export wiring complete;568 tests and browser40/42mm checks. Disclosed font/ink/radial/readability limits remain, not factory certification. See [checkpoint](M3A-CITIZEN-IMPLEMENTATION-2026-10-08.md) |
 | 3B | Classic Navitimer preset and comparison | Functional runtime/state/shared-export wiring complete with independent420-position training-disc inventory and Engineering/HD checks. Disclosed font/ink/anchor/readability limits remain; separate1967AOPA variant is not verified/replaced. See [checkpoint](M3B-NAVITIMER-IMPLEMENTATION-2026-10-08.md) |
 | 4 | Hybrid shell, contextual inspector and fully wired writing/detail controls | Implemented and published as 531bf2f; visual exception repairs verified in the follow-up checkpoint. See [repair checkpoint](M4-VISUAL-REPAIRS-2026-10-08.md) |
-| 5 | Custom decimal-hour / knots-MPH and rate calculators | Not started |
+| 5 | Custom decimal-hour / knots-MPH and rate calculators | Implemented; 701 tests/typecheck/lint/build/diff checks, live Engineering/HD/calculator/refusal checks and two inspected 42mm vector export sets. Small-font/laser-readability limits remain disclosed. Uncommitted. See [checkpoint](M5-CUSTOM-AVIATION-2026-10-08.md) |
 | 6 | Lume modes, hand tips and targeted GLB work | Not started |
 | 7 | Full browser, export and cross-archetype acceptance | Not started |
 

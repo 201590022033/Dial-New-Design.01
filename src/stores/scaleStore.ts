@@ -236,14 +236,10 @@ export const useScaleStore = create<ScaleState>((set, get) => ({
   regeneratePreview: (sourceBands) => {
     const state = get();
     const permitted = state.crossArchetypeUnlocked || !state.activeArchetypeId || scalePolicyForArchetype(state.activeArchetypeId).allowed.some((program) => getScaleProgram(program, []).kind === state.selectedScaleKind);
-    if (!permitted) {
-      set({ preview: null, validation: null, engineeringReadout: null });
-      return;
-    }
 
     const physicalBands = assemblyToBands(useWatchAssemblyStore.getState().assembly);
     const bands = sourceBands ?? [...physicalBands, ...useBandsStore.getState().bands.filter((band) => !physicalBands.some((entry) => entry.id === band.id))];
-    const result = resolveScaleLayers(useWatchAssemblyStore.getState().assembly, bands, state.selectedScaleKind, { ...state.pluginConfig, previewEnabled: state.previewEnabled }, state.context);
+    const result = resolveScaleLayers(useWatchAssemblyStore.getState().assembly, bands, state.selectedScaleKind, { ...state.pluginConfig, previewEnabled: state.previewEnabled && permitted }, state.context);
     set({
       preview: result,
       validation: result?.validation ?? null

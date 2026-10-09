@@ -4,7 +4,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 const output = fileURLToPath(new URL('../output/pdf/', import.meta.url));
-const names = new Set(['m4-pilot42-navitimer', 'm4-pilot42-citizen', 'm4-ladies34-simplified'].flatMap(id => ['svg', 'dxf', 'pdf'].map(format => `${id}.${format}`)));
+const names = new Set(['m4-pilot42-navitimer', 'm4-pilot42-citizen', 'm4-ladies34-simplified', 'm5-decimal-hour', 'm5-knots-mph'].flatMap(id => ['svg', 'dxf', 'pdf'].map(format => `${id}.${format}`)));
 const server = http.createServer(async (request, response) => {
   const origin = request.headers.origin ?? '';
   if (!/^http:\/\/(127\.0\.0\.1|localhost):3000$/.test(origin)) { response.writeHead(403).end('Use the local Dial Designer QA page on port 3000.'); return; }

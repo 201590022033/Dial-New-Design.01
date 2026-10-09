@@ -74,6 +74,7 @@ export interface WatchAssemblyGlobalDimensions {
  * - Ring/dial geometry parameters
  */
 export interface WatchAssemblyDesignConfig {
+  customAviationLayers?: import('@/domain/scales/customAviation').CustomAviationDocument;
   /** M2 versioned per-target configuration; legacy rendering remains until shared artwork integration. */
   slideRuleLayers?: import('@/domain/scales/slideRuleLayers').SlideRuleLayersDocument;
   /** One purchased component per mutually exclusive procurement slot. */

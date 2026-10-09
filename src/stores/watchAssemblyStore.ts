@@ -20,6 +20,8 @@ import { createBand } from '@/domain/bands/bandRegistry';
 import { applyReference42Preview, useProceduralReference42 } from '@/domain/presets/reference3d';
 import { resolveAssemblyGeometry, type ResolvedAssemblyGeometry } from '@/domain/geometry/boundaryResolver';
 import { applyArchetypeVisualProfile } from '@/domain/configurator/archetypeProfiles';
+import { assertCustomAviation, customAviationDefaults, type CustomAviationLayer, type CustomAviationProgram } from '@/domain/scales/customAviation';
+import { getCatalogueItem } from '@/domain/catalogue/catalogueRegistry';
 
 export interface WatchAssemblyStoreState {
   assembly: WatchAssembly;
@@ -63,6 +65,7 @@ export interface WatchAssemblyStoreState {
   updateDialFaceConfig: (patch: Partial<DialFaceConfig>) => void;
   updateVisualReferenceConfig: (patch: NonNullable<WatchAssembly['designConfig']>['visualReferenceConfig']) => void;
   updateTextureConfig: (patch: Partial<TextureEngineConfig>) => void;
+  updateCustomAviationLayer: (id: CustomAviationProgram, patch: Partial<CustomAviationLayer>) => void;
   setScaleSnapshot: (snapshot: import('@/domain/scales/scaleDocumentAdapter').ScaleSnapshot, previous?: import('@/domain/scales/scaleDocumentAdapter').ScaleSnapshot) => void;
   applyTemplate: (templateId: TemplateId, colors?: { primary: string; secondary: string; accent: string }) => void;
 
@@ -339,6 +342,17 @@ export const useWatchAssemblyStore = create<WatchAssemblyStoreState>((set, get) 
     }));
   },
 
+  updateCustomAviationLayer: (id, patch) => {
+    const assembly = get().assembly;
+    const existing = assembly.designConfig?.customAviationLayers?.layers ?? [];
+    const current = existing.find(layer => layer.id === id) ?? customAviationDefaults(id);
+    const next = { ...current, ...patch, id };
+    const targetKinds = [current.targetBandId, next.targetBandId].map(target => target.replace(/^band-/, ''));
+    if (Object.values(assembly.parts).some(part => part.locked && targetKinds.includes(getCatalogueItem(part.catalogueItemId)?.linkedBandKind ?? ''))) return;
+    const document = { version: 1 as const, layers: [...existing.filter(layer => layer.id !== id), next] };
+    assertCustomAviation(document);
+    set({ assembly: { ...assembly, designConfig: { ...assembly.designConfig, customAviationLayers: document } }, dirty: true });
+  },
   updateMarkerConfig: (patch) => {
     set((state) => {
       const current = state.assembly.designConfig?.markerConfig;

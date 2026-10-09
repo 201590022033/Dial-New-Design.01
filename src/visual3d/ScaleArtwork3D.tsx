@@ -23,7 +23,8 @@ export const ScaleArtwork3D = ({ preview, model }: { preview: ScaleRunResult | n
   if (preview.layers) return <group name="live-scale-layers">{scaleArtworkLayers(preview).map((layer) =>
     <ScaleArtwork3D key={layer.placementTargetBandId} preview={layer} model={model} />)}</group>;
   return <group name="live-scale-artwork">
-    {(model.assets.bezel.scaleArtworkSurface !== 'outer' || preview.placementTargetBandId !== 'band-outer-bezel') && <RingArtwork preview={preview} model={model} ring="outer" />}
+    {!(model.assets.bezel.scaleArtworkSurface === 'outer' && preview.placementTargetBandId === 'band-outer-bezel') &&
+      !(model.assets['chapter-ring'].scaleArtworkSurface === 'inner' && preview.placementTargetBandId === 'band-chapter-ring') && <RingArtwork preview={preview} model={model} ring="outer" />}
     {preview.kind === 'slide-rule' && (model.assets['chapter-ring'].scaleArtworkSurface !== 'inner' || (preview.fixedPlacementTargetBandId && preview.fixedPlacementTargetBandId !== 'band-chapter-ring')) && <RingArtwork preview={preview} model={model} ring="inner" />}
   </group>;
 };
