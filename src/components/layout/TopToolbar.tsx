@@ -8,7 +8,7 @@ import { CaseDiameterControl } from './CaseDiameterControl';
 import { runToolbarExport } from './toolbarActions';
 import { defaultGeometryParameters } from '@/domain/geometry/geometryEngine';
 import { createBand } from '@/domain/bands/bandRegistry';
-import { deserializeDialProject } from '@/services/projectFileService';
+import { deserializeDialProject, downloadProjectText } from '@/services/projectFileService';
 import { hydrateRuntimeProject } from '@/services/runtimeProjectHydrationService';
 import { useBandsStore, useDesignEngineStore, useGlobalSettingsStore, useHistoryStore, useProjectStore, useScaleStore, useSelectionStore, useViewportStore } from '@/stores';
 
@@ -166,13 +166,7 @@ export const TopToolbar = () => {
         }}
         onExportProjectJson={() => {
           const payload = exportProjectJson();
-          const blob = new Blob([payload], { type: 'application/json;charset=utf-8' });
-          const url = URL.createObjectURL(blob);
-          const link = document.createElement('a');
-          link.href = url;
-          link.download = `${projectInfo.name.replace(/\s+/g, '-').toLowerCase() || 'dial-project'}.json`;
-          link.click();
-          URL.revokeObjectURL(url);
+          downloadProjectText(payload, `${projectInfo.name.trim().replace(/\s+/g, '-').toLowerCase() || 'dial-project'}.json`);
         }}
         onImportProject={() => projectImportInputRef.current?.click()}
         onToggleAutosave={setAutosaveEnabled}

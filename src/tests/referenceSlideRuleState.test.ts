@@ -6,6 +6,7 @@ import { getScaleProgram } from '@/domain/scales/scalePrograms';
 import { getScalePlugin } from '@/domain/scales/scaleRegistry';
 import { useScaleStore } from '@/stores/scaleStore';
 import { useWatchAssemblyStore } from '@/stores/watchAssemblyStore';
+import { useConfiguratorUIStore } from '@/stores/configuratorUIStore';
 import { ReferenceSlideRulePanel, ReferenceSlideRuleSelections } from '@/components/configurator/ReferenceSlideRulePanel';
 import React, { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
@@ -22,6 +23,7 @@ const layer = () => useWatchAssemblyStore.getState().assembly.designConfig!.slid
 describe('reference scale state, isolated designs and authoritative history', () => {
   afterEach(() => vi.restoreAllMocks());
   beforeEach(() => {
+    useConfiguratorUIStore.setState({ lockedPartIds: new Set() });
     useScaleStore.setState({ activeArchetypeId: undefined, crossArchetypeUnlocked: false });
     useWatchAssemblyStore.getState().setAssembly(withScaleSnapshot(createDefaultWatchAssembly(), {
       selectedScaleKind: 'slide-rule', pluginConfig: { ...baseConfig }, context
@@ -141,6 +143,35 @@ describe('reference scale state, isolated designs and authoritative history', ()
     expect(left).toMatch(/aria-label="Classic Navitimer"[^>]*checked/);
     expect(left).not.toMatch(/aria-label="Citizen Skyhawk"[^>]*checked/);
     serverSnapshot.mockRestore();
+  });
+  it.each(['inst-rotating-bezel', 'inst-chapter-ring'])('visibly disables both reference panels when %s is locked', (part) => {
+    vi.spyOn(React, 'useSyncExternalStore').mockImplementation((_subscribe, getSnapshot) => getSnapshot());
+    useScaleStore.getState().selectReferenceDesign('navitimer');
+    useWatchAssemblyStore.getState().setPartLocked(part, true);
+    for (const Panel of [ReferenceSlideRulePanel, ReferenceSlideRuleSelections]) {
+      const markup = renderToStaticMarkup(createElement(Panel));
+      expect(markup).toMatch(/<fieldset[^>]*disabled=""/);
+      expect(markup).toContain('Scale target locked.');
+    }
+    expect(useScaleStore.getState().selectReferenceDesign('citizen')).toBe(false);
+    useWatchAssemblyStore.getState().setPartLocked(part, false);
+    expect(renderToStaticMarkup(createElement(ReferenceSlideRulePanel))).not.toMatch(/<fieldset[^>]*disabled/);
+    expect(useScaleStore.getState().selectReferenceDesign('citizen')).toBe(true);
+  });
+  it.each(['inst-rotating-bezel', 'inst-chapter-ring'])('honours the actual right-tray lock for %s in both controls and write guards', (part) => {
+    vi.spyOn(React, 'useSyncExternalStore').mockImplementation((_subscribe, getSnapshot) => getSnapshot());
+    useScaleStore.getState().selectReferenceDesign('navitimer');
+    useConfiguratorUIStore.getState().togglePartLock(part);
+    for (const Panel of [ReferenceSlideRulePanel, ReferenceSlideRuleSelections]) {
+      expect(renderToStaticMarkup(createElement(Panel))).toMatch(/<fieldset[^>]*disabled=""/);
+    }
+    expect(useScaleStore.getState().selectReferenceDesign('citizen')).toBe(false);
+    useScaleStore.getState().updatePluginConfig({ outerRotationOffsetDeg: 44 });
+    useScaleStore.getState().resetReferenceDesign();
+    expect(useScaleStore.getState().pluginConfig.outerRotationOffsetDeg).toBe(0);
+    useConfiguratorUIStore.getState().togglePartLock(part);
+    expect(renderToStaticMarkup(createElement(ReferenceSlideRulePanel))).not.toMatch(/<fieldset[^>]*disabled/);
+    expect(useScaleStore.getState().selectReferenceDesign('citizen')).toBe(true);
   });
   it('keeps separately edited physical bands isolated when reopening their selection', () => {
     useScaleStore.getState().selectReferenceDesign('navitimer');

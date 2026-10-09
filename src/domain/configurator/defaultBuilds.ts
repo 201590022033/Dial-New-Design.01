@@ -2,6 +2,10 @@ import type { WatchAssembly } from '@/domain/assembly/assemblyTypes';
 import { createDefaultWatchAssembly } from '@/domain/assembly/assemblyFactory';
 import { applyArchetypeVisualProfile } from './archetypeProfiles';
 import { applyCatalogueVisualSelection, visualVariantCatalogueItems } from '@/domain/catalogue';
+import { assemblyToBands } from '@/domain/assembly/assemblyAdapters';
+import { getScalePlugin } from '@/domain/scales/scaleRegistry';
+import { getScaleProgram } from '@/domain/scales/scalePrograms';
+import { withScaleSnapshot } from '@/domain/scales/scaleDocumentAdapter';
 
 export type StarterBuildType = 'diver' | 'pilot' | 'dress' | 'ladies-dress' | 'field' | 'chronograph';
 
@@ -105,6 +109,24 @@ export const createStarterBuild = (
         ? { ...base.parts, 'inst-pushers': { ...pushers, visible: true } }
         : base.parts
     };
+    // A newly loaded baseline owns its scale settings even when its source was
+    // already a chronograph. Saved projects still hydrate their explicit choices.
+    const bands = assemblyToBands(base);
+    const selection = getScaleProgram('chrono', bands);
+    const target = bands.find(band => band.kind === 'outer-bezel');
+    base = withScaleSnapshot(base, {
+      selectedScaleKind: selection.kind,
+      pluginConfig: {
+        ...getScalePlugin('tachymeter')!.defaultConfig,
+        ...selection.config,
+        placementTargetBandId: target?.id ?? 'band-outer-bezel',
+        bandInnerRadiusMm: target?.geometry.innerRadius ?? 14,
+        bandOuterRadiusMm: target?.geometry.outerRadius ?? 21
+      },
+      context: selection.context,
+      previewEnabled: true,
+      crossArchetypeUnlocked: false
+    });
   }
 
   const nh35PartExplanations: StarterPartExplanation[] = [

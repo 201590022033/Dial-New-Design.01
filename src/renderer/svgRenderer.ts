@@ -18,6 +18,9 @@ import { resolveCanvasHit } from '@/renderer/services/canvasHitResolver';
 import { useWatchAssemblyStore } from '@/stores/watchAssemblyStore';
 import type { WatchAssembly } from '@/domain/assembly/assemblyTypes';
 import { watchAssemblyToVisualModel } from '@/visual3d/watchAssemblyToVisualModel';
+import { clampTipExtentMm } from '@/domain/appearance/appearance';
+import { handLumeCapability } from '@/visual3d/handAppearanceRegions';
+import { useAppearancePreviewStore } from '@/stores/appearancePreviewStore';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -51,6 +54,7 @@ export class SvgRenderer implements RendererAdapter {
     this.latestAssembly = assembly;
 
     const renderKey = JSON.stringify({
+      night: useAppearancePreviewStore.getState().night,
       assembly,
       bands: bands.map((band) => ({
         id: band.id,
@@ -234,7 +238,7 @@ export class SvgRenderer implements RendererAdapter {
       dialSurfaceGroup
         .circle(dialRadiusPx * 2)
         .center(context.centerX, context.centerY)
-        .fill({ color: overlay.dialFace.fill, opacity: overlay.dialFace.opacity })
+        .fill({ color: useAppearancePreviewStore.getState().night ? '#090D13' : overlay.dialFace.fill, opacity: overlay.dialFace.opacity })
         .stroke({
           color: overlay.dialFace.stroke,
           width: Math.max(1, mmToPixels(overlay.dialFace.borderWidthMm))
@@ -325,6 +329,31 @@ export class SvgRenderer implements RendererAdapter {
         const inner = polarToCartesian(mmToPixels(innerRadiusMm), marker.angleDeg);
         const outer = polarToCartesian(mmToPixels(outerRadiusMm), marker.angleDeg);
         const color = resolveMarkerColour(overlay.dialFace.fill, assembly.designConfig?.visualReferenceConfig?.markerColor, entry.lumed);
+        const markerAppearance = assembly.designConfig?.appearance?.markers;
+        if (markerAppearance) {
+          const mode = markerAppearance.lumeMode;
+          const luminous = mode !== 'off';
+          const x = context.centerX, y = context.centerY;
+          if (marker.text) {
+            const glyph = markerNumeralLayout({ ...marker, innerRadiusMm, outerRadiusMm }, dialRadiusMm);
+            if (markerGlyphOverlapsCutout(glyph, [{ xMm: 10.5, yMm: 0, widthMm: 3.2, heightMm: 2.6 }])) return;
+            const midpoint = polarToCartesian(mmToPixels(glyph.radiusMm), marker.angleDeg);
+            markersGroup.text(marker.text).font({ size: mmToPixels(glyph.fontSizeMm), family: entry.kind === 'roman-numeral' ? 'Georgia, serif' : 'Arial, sans-serif', anchor: 'middle', weight: 'bold' })
+              .fill(mode === 'outline' ? 'none' : luminous ? markerAppearance.lumeColor : markerAppearance.printColor)
+              .stroke({ color: luminous ? markerAppearance.lumeColor : markerAppearance.printColor, width: mode === 'outline' ? .35 : 0 })
+              .center(x + midpoint.x, y + midpoint.y).attr('data-appearance-region', 'marker').attr('data-lume-mode', mode);
+          } else {
+            const midpoint = polarToCartesian(mmToPixels((innerRadiusMm + outerRadiusMm) / 2), marker.angleDeg);
+            const width = Math.max(1, mmToPixels(marker.widthMm));
+            const markerShape = entry.kind === 'round'
+              ? markersGroup.circle(width * 2).center(x + midpoint.x, y + midpoint.y)
+              : markersGroup.rect(width, mmToPixels(outerRadiusMm - innerRadiusMm)).center(x + midpoint.x, y + midpoint.y).rotate(marker.angleDeg, x + midpoint.x, y + midpoint.y);
+            markerShape.fill(mode === 'outline' ? 'none' : luminous ? markerAppearance.lumeColor : markerAppearance.metalColor)
+              .stroke({ color: mode === 'outline' ? markerAppearance.lumeColor : markerAppearance.metalColor, width: .35 })
+              .attr('data-appearance-region', 'marker').attr('data-lume-mode', mode);
+          }
+          return;
+        }
 
         if (marker.text) {
           const glyph = markerNumeralLayout({ ...marker, innerRadiusMm, outerRadiusMm }, dialRadiusMm);
@@ -481,11 +510,31 @@ export class SvgRenderer implements RendererAdapter {
       .attr('data-part-category', 'hands')
       .attr('data-interaction-role', 'physical-part')
       .attr('data-z-layer', '700');
-    const visualHands = watchAssemblyToVisualModel(assembly).hands;
+    const visualModel = watchAssemblyToVisualModel(assembly);
+    const visualHands = visualModel.hands;
+    const regionAppearance = visualModel.archetypeAppearance.regions?.mainHands;
+    const nightPreview = useAppearancePreviewStore.getState().night;
+    // The visual adapter owns movement register centres and reach; appearance never relocates them.
+    visualModel.dial.subdials.forEach((register, index) => {
+      const center = polarToCartesian(mmToPixels(register.centerRadiusMm), register.angleDeg);
+      const x = context.centerX + center.x, y = context.centerY + center.y;
+      const group = handsLayer.group().attr('data-appearance-scope', 'registerHands').attr('data-register-index', index);
+      group.circle(mmToPixels(register.radiusMm) * 2).center(x, y).fill('none').stroke({ color: '#64748B', width: .5 });
+      const angle = index * 40;
+      const tip = polarToCartesian(mmToPixels(register.handRadiusMm), angle);
+      const appearance = visualModel.archetypeAppearance.regions?.registerHands;
+      const width = register.handStyle === 'baton' ? .28 : register.handStyle === 'syringe' ? .22 : .14;
+      group.line(x, y, x + tip.x, y + tip.y).stroke({ color: appearance?.metalColor ?? visualModel.archetypeAppearance.accentColor, width: mmToPixels(width), linecap: 'butt' });
+      if (appearance && appearance.tipExtentMm > 0) {
+        const start = polarToCartesian(mmToPixels(register.handRadiusMm - clampTipExtentMm(appearance.tipExtentMm, register.handRadiusMm)), angle);
+        group.line(x + start.x, y + start.y, x + tip.x, y + tip.y).stroke({ color: appearance.tipColor, width: mmToPixels(width), linecap: 'butt' }).attr('data-appearance-region', 'tip');
+      }
+      group.circle(mmToPixels(.56)).center(x, y).fill(appearance?.metalColor ?? '#CBD5E1');
+    });
     const handStyle = visualHands.style;
     handsLayer.attr('data-hand-style', handStyle);
     const drawHand = (group: ReturnType<typeof handsLayer.group>, angleDeg: number, lengthPx: number, widthPx: number) => {
-      const handMetalColor = assembly.designConfig?.visualReferenceConfig?.handsColor ?? (assembly.designConfig?.visualReferenceConfig?.handsFinish === 'rose-gold' ? '#c08a76' : '#E2E8F0');
+      const handMetalColor = regionAppearance ? (nightPreview ? '#252B34' : regionAppearance.metalColor) : assembly.designConfig?.visualReferenceConfig?.handsColor ?? (assembly.designConfig?.visualReferenceConfig?.handsFinish === 'rose-gold' ? '#c08a76' : '#E2E8F0');
       const point = (radial: number, lateral: number) => {
         const along = polarToCartesian(radial, angleDeg);
         const across = polarToCartesian(lateral, angleDeg + 90);
@@ -494,11 +543,27 @@ export class SvgRenderer implements RendererAdapter {
       const base = widthPx / 2;
       const blade = handStyle === 'needle' ? base * 0.38 : handStyle === 'pencil' || handStyle === 'baton' ? base : base * 1.35;
       const shoulder = handStyle === 'sword' || handStyle === 'dauphine' || handStyle === 'broad-arrow' ? lengthPx * 0.54 : lengthPx * 0.72;
-      group.polygon([
+      const bladePoints = [
         point(-lengthPx * 0.12, -base), point(shoulder, -blade), point(lengthPx, 0),
         point(shoulder, blade), point(-lengthPx * 0.12, base)
-      ].join(' ')).fill(handMetalColor).stroke({ color: '#94A3B8', width: 0.45 })
+      ].join(' ');
+      group.polygon(bladePoints).fill(handMetalColor).stroke({ color: '#94A3B8', width: 0.45 })
         .attr('data-interaction-role', 'rendering-primitive');
+      if (regionAppearance) {
+        const lume = regionAppearance.lumeMode;
+        if (lume !== 'off' && handLumeCapability(visualModel.assets.hands.assetId)) {
+          const inlay = [point(lengthPx * .28, -base * .38), point(lengthPx * .79, -base * .38), point(lengthPx * .79, base * .38), point(lengthPx * .28, base * .38)].join(' ');
+          group.polygon(inlay).fill(lume === 'outline' ? 'none' : regionAppearance.lumeColor)
+            .stroke({ color: regionAppearance.lumeColor, width: lume === 'outline' ? .35 : 0 })
+            .attr('data-appearance-region', 'lume').attr('data-lume-mode', lume);
+        }
+        const extent = Math.min(lengthPx, mmToPixels(regionAppearance.tipExtentMm));
+        if (extent > 0) {
+          const tip = group.polygon([point(lengthPx - extent, -blade * 2), point(lengthPx, -blade * 2), point(lengthPx, blade * 2), point(lengthPx - extent, blade * 2)].join(' ')).fill(regionAppearance.tipColor).attr('data-appearance-region', 'tip');
+          tip.clipWith(group.polygon(bladePoints));
+        }
+        return;
+      }
       if (handStyle === 'mercedes') {
         const hub = polarToCartesian(lengthPx * 0.58, angleDeg);
         group.circle(widthPx * 2.4).center(context.centerX + hub.x, context.centerY + hub.y)
@@ -573,7 +638,7 @@ export class SvgRenderer implements RendererAdapter {
       .attr('data-band-id', 'band-hands')
       .attr('data-label', 'Central Seconds');
 
-    secondGroup
+    const secondLine = secondGroup
       .line(
         context.centerX + secondTailTip.x,
         context.centerY + secondTailTip.y,
@@ -582,6 +647,14 @@ export class SvgRenderer implements RendererAdapter {
       )
       .stroke({ color: assembly.designConfig?.visualReferenceConfig?.handsColor ?? (assembly.designConfig?.visualReferenceConfig?.handsFinish === 'rose-gold' ? '#c08a76' : '#EF4444'), width: 1.0, linecap: 'round' })
       .attr('data-interaction-role', 'rendering-primitive');
+
+    if (regionAppearance) {
+      const extent = mmToPixels(clampTipExtentMm(regionAppearance.tipExtentMm, visualHands.secondLengthMm));
+      const start = polarToCartesian(secondHandLengthPx - extent, secondAngleDeg);
+      secondLine.stroke({ color: nightPreview ? '#252B34' : regionAppearance.metalColor });
+      if (extent > 0) secondGroup.line(context.centerX + start.x, context.centerY + start.y, context.centerX + secondHandTip.x, context.centerY + secondHandTip.y)
+        .stroke({ color: regionAppearance.tipColor, width: 1, linecap: 'butt' }).attr('data-appearance-region', 'tip');
+    }
 
     // Center Collet & Pin Cap
     handsLayer

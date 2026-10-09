@@ -43,6 +43,7 @@ export interface MarkerOverlay {
 }
 
 export interface DesignOverlay {
+  markerAppearance?: import('@/domain/appearance/appearance').RegionAppearance;
   /** Explicit user choice only; absence enables presentation contrast against the dial. */
   markerColour?: string;
   dialFace: DialFaceOverlay;

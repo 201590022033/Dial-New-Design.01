@@ -8,6 +8,7 @@ import type { WatchAssembly, WatchAssemblyPartInstance } from '@/domain/assembly
 import { movementLibrary, type MovementTemplate } from '@/domain/movements/movementLibrary';
 import type { ComponentCatalogueItem } from '@/domain/catalogue/types';
 import { getCatalogueItem } from '@/domain/catalogue/catalogueRegistry';
+import { applyCatalogueVisualSelection } from '@/domain/catalogue/applyCatalogueVisualSelection';
 import type { ComponentEngineeringSpecs } from './compatibilityTypes';
 
 /**
@@ -163,6 +164,17 @@ export const createProvisionalAssemblyWithCandidate = (
       (p) => p.category === candidate.category || p.catalogueItemId === candidate.id
     );
     targetId = match ? match.instanceId : `inst-${candidate.kind}`;
+  }
+
+  // Preview/Apply replaces a whole hand set and may update case envelope and
+  // visual geometry. Evaluate that exact transition, not a nominal one-part
+  // stand-in which can falsely retain the old seconds hand or old interfaces.
+  if (cloned.parts[targetId]) {
+    const provisional = applyCatalogueVisualSelection(assembly, targetId, candidate);
+    if (candidate.category === 'case' && candidate.kind.includes('movement')) {
+      provisional.metadata.movement = candidate.id.replace(/^cat-/, '');
+    }
+    return provisional;
   }
 
   // If candidate is a movement, update assembly metadata movement

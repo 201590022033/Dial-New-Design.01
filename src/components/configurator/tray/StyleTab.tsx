@@ -7,11 +7,14 @@ import { cn } from '@/utils/cn';
 import { useScaleStore } from '@/stores/scaleStore';
 import { HexColourField } from './HexColourField';
 import { FinishSample } from './FinishSample';
+import { AppearanceControls } from './AppearanceControls';
 import type { TextureKind } from '@/domain/generators/textureEngine';
 import { getCatalogueItem } from '@/domain/catalogue/catalogueRegistry';
 import { resolveMarkerColour } from '@/domain/generators/markerAppearance';
 import { useSelectionStore } from '@/stores/selectionStore';
 import { buildComponentNavigatorItems, resolveNavigatorSelection } from '@/domain/configurator/componentNavigator';
+import { movementLibrary } from '@/domain/movements/movementLibrary';
+import { resolveAppearance } from '@/domain/appearance/appearance';
 
 const FINISH_PRESETS = [
   { id: 'matte', name: 'Matte Finish', texture: 'matte', description: 'Non-reflective micro-bead blasted surface' },
@@ -88,8 +91,10 @@ export const StyleTab: React.FC = () => {
   const bezelContext = !activePart || visualCategory === 'bezel' || activeKind.includes('bezel');
   const caseContext = !activePart || visualCategory === 'case' || visualCategory === 'crown' || ['midcase', 'lugs', 'caseback', 'crown'].includes(activeKind);
   const handsContext = !activePart || activePart.category.includes('hand');
+  const hasRegisters = Boolean(movementLibrary.find(item => item.id === assembly.metadata.movement)?.subdials?.length);
   const strapContext = !activePart || visualCategory === 'strap' || activeKind.includes('strap') || activeKind.includes('bracelet');
   const editingLocked = activePart?.locked || (activePartInstanceId ? lockedPartIds.has(activePartInstanceId) : false);
+  const authoredAppearance = assembly.designConfig?.appearance ? resolveAppearance(assembly) : undefined;
 
   const handleApplyFinish = (finishTexture: string) => {
     if (!activePartInstanceId) return;
@@ -158,6 +163,9 @@ export const StyleTab: React.FC = () => {
 
       {editingLocked && <p role="status" className="text-xs text-amber-200">This component is locked. Unlock it before changing its style.</p>}
       <fieldset disabled={editingLocked} className="contents">
+      {dialContext && <AppearanceControls scope="markers" />}
+      {handsContext && <AppearanceControls scope="mainHands" />}
+      {handsContext && hasRegisters && <AppearanceControls scope="registerHands" />}
       {dialContext && <section aria-label="Dial background and finish" className="space-y-2">
         <h4 className="text-xs text-teal-300">Background · Dial finish</h4>
         <div className="grid grid-cols-2 gap-2">{([['matte', 'Matte'], ['sunburst', 'Satin sunburst'], ['brushed-metal', 'Directional brushed']] as [TextureKind, string][]).map(([kind, title]) => <button key={kind} type="button" aria-pressed={dialTexture.kind === kind} onClick={() => updateDialFaceConfig({ texture: { ...dialTexture, kind } })} className={cn('flex items-center gap-2 rounded border p-2 text-left text-xs', dialTexture.kind === kind ? 'border-teal-400' : 'border-slate-700')}><FinishSample kind={kind} colour={dialColor} direction={dialTexture.directionDeg ?? 0} />{title}</button>)}</div>
@@ -170,7 +178,7 @@ export const StyleTab: React.FC = () => {
       <div className="space-y-2">
         <h4 className="text-[11px] font-mono text-slate-400 uppercase">Independent Colours &amp; Bezel</h4>
         <p className="text-[10px] text-slate-400">Presentation only; no plating, gemstone or supplier-fit claim.</p>
-        <p className="text-[10px] text-slate-400">Mix a silver dial with a rose-gold case. Plain or diamond-set bezels can have either metal colour. Custom marker colour replaces the marker lume appearance, not hand lume.</p>
+        <p className="text-[10px] text-slate-400">Mix a silver dial with a rose-gold case. Plain or diamond-set bezels can have either metal colour. Marker metal/print colours are separate from lume and main/register hand colours in the region controls above.</p>
         {caseContext && <label className="block text-xs text-slate-300">Case &amp; crown
           <select aria-label="Case metal colour" className="ml-2 bg-slate-900" value={visualReferenceConfig?.caseFinish ?? 'steel'}
             onChange={(event) => updateVisualReferenceConfig({ caseFinish: event.target.value as 'steel' | 'rose-gold' | 'black-pvd' })}>
@@ -191,8 +199,8 @@ export const StyleTab: React.FC = () => {
         </label>}
         {([
           { label: 'Dial surface', value: dialColor, apply: (color: string) => updateDialFaceConfig({ color, secondaryColor: color }) },
-          { label: 'Main hand colour', value: visualReferenceConfig?.handsColor ?? (visualReferenceConfig?.handsFinish === 'rose-gold' ? '#c08a76' : '#e2e8f0'), apply: (color: string) => updateVisualReferenceConfig({ handsColor: color }) },
-          { label: 'Hour markers / numerals', value: resolveMarkerColour(dialColor, visualReferenceConfig?.markerColor, markerLume), apply: (color: string) => updateVisualReferenceConfig({ markerColor: color }) },
+          { label: 'Main hand colour', value: authoredAppearance?.mainHands.metalColor ?? visualReferenceConfig?.handsColor ?? (visualReferenceConfig?.handsFinish === 'rose-gold' ? '#c08a76' : '#e2e8f0'), apply: (color: string) => updateVisualReferenceConfig({ handsColor: color }) },
+          { label: 'Hour markers / numerals', value: authoredAppearance?.markers.printColor ?? resolveMarkerColour(dialColor, visualReferenceConfig?.markerColor, markerLume), apply: (color: string) => updateVisualReferenceConfig({ markerColor: color }) },
           { label: 'Scale ticks / numerals', value: scaleColor, apply: (color: string) => updateScale({ color }) }
         ]).filter(control => control.label === 'Dial surface' || control.label === 'Hour markers / numerals' ? dialContext : control.label === 'Main hand colour' ? handsContext : (!activePart || bezelContext || activeKind === 'chapter-ring') && referenceDesign !== 'citizen' && referenceDesign !== 'navitimer').map((control) => <div key={control.label} className="flex flex-wrap items-center gap-1 text-xs text-slate-300">
           <HexColourField label={control.label} value={control.value} onChange={control.apply} />

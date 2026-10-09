@@ -9,6 +9,7 @@ import { createPanState, resolvePan, type PanState } from '@/renderer/services/p
 import { resolveHighlightBandIds } from '@/features/shared/objectInspectorSchemas';
 import { useBandsStore, useDesignEngineStore, useScaleStore, useSelectionStore, useViewportStore, useConfiguratorUIStore, useWatchAssemblyStore } from '@/stores';
 import { mmToPixels } from '@/utils/math';
+import { useAppearancePreviewStore } from '@/stores/appearancePreviewStore';
 const VisualWatchRenderer = lazy(() => import('@/visual3d/VisualWatchRenderer').then((module) => ({ default: module.VisualWatchRenderer })));
 
 interface CentreCanvasProps {
@@ -19,6 +20,7 @@ interface CentreCanvasProps {
 }
 
 export const CentreCanvas = ({ presentationMode, onTogglePresentationMode, visualMode, onToggleVisualMode }: CentreCanvasProps) => {
+  const appearanceNight = useAppearancePreviewStore((state) => state.night);
   const [container, setContainer] = useState<HTMLDivElement | null>(null);
   const [showGrid, setShowGrid] = useState(false);
   const [compactControlsExpanded, setCompactControlsExpanded] = useState(false);
@@ -166,7 +168,8 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode, visua
     activeAssembly,
     selectedHit,
     hoveredHit,
-    crystalSelectionMode
+    crystalSelectionMode,
+    appearanceNight
   ]);
 
   if (visualMode === 'visual') {

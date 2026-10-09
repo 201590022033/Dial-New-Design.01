@@ -33,6 +33,14 @@ import type {
   TrayTab
 } from '@/domain/configurator/configuratorTypes';
 
+/** Whole-set replacement must honour every replaced physical hand's lock. */
+function candidateHasLockedTarget(assembly: WatchAssembly, targetId: string, candidate: ComponentCatalogueItem, trayLocks: ReadonlySet<string>) {
+  const targets = candidate.kind === 'hand-set'
+    ? [targetId, 'inst-hour-hand', 'inst-minute-hand', 'inst-central-seconds']
+    : [targetId];
+  return targets.some(id => trayLocks.has(id) || assembly.parts[id]?.locked);
+}
+
 export interface AdvancedOverlaysState {
   datums: boolean;
   radii: boolean;
@@ -308,7 +316,7 @@ export const useConfiguratorUIStore = create<ConfiguratorUIStoreState>((set, get
       previewPartInstanceId: partInstanceId,
       previewCandidateItem: candidateItem,
       previewStatus: 'previewing',
-      previewError: get().lockedPartIds.has(partInstanceId) ? 'This component is physically locked. Unlock it before applying a change.'
+      previewError: candidateHasLockedTarget(current, partInstanceId, candidateItem, get().lockedPartIds) ? 'This component or a hand replaced by this set is physically locked. Unlock it before applying a change.'
         : evaluation?.status === 'red' ? `Cannot apply an incompatible part. ${evaluation.summary}` : null
     });
   },
@@ -323,7 +331,7 @@ export const useConfiguratorUIStore = create<ConfiguratorUIStoreState>((set, get
     }
 
     // Check physical lock
-    if (lockedPartIds.has(previewPartInstanceId)) {
+    if (candidateHasLockedTarget(useWatchAssemblyStore.getState().assembly, previewPartInstanceId, previewCandidateItem, lockedPartIds)) {
       set({ previewError: 'This component is physically locked. Unlock it before applying a replacement.' });
       return false;
     }

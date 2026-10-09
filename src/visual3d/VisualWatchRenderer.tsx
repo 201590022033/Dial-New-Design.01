@@ -142,7 +142,17 @@ export const VisualWatchRenderer = ({ assembly, presentationMode, onTogglePresen
     <details className="absolute left-3 top-3 max-w-[min(320px,70%)] rounded-lg border border-slate-500/40 bg-slate-950/85 text-xs text-white shadow-lg" onPointerDown={(event) => event.stopPropagation()}>
       <summary className="cursor-pointer px-3 py-2 font-semibold">3D reference preview · controls</summary>
       <div className="border-t border-slate-500/30 px-3 pb-3">
-      <p className="mt-1 text-slate-300">Dark dramatic studio · 42 mm case · provisional geometry.</p>
+      <p className="mt-1 text-slate-300">Dark dramatic studio · {model.caseDiameterMm} mm preview · provisional geometry.</p>
+      <details className="mt-2 text-slate-300">
+        <summary className="cursor-pointer">Render placement diagnostics</summary>
+        <pre className="max-h-48 overflow-auto whitespace-pre-wrap text-[9px]">{JSON.stringify({
+          dialAsset: model.assets.dial.assetId, handAsset: model.assets.hands.assetId,
+          handVisible: model.visible.hands, handTransform: model.transforms.hands ?? null,
+          handAnchor: model.anchors[model.assets.hands.anchor ?? 'hand-stack'],
+          dialThicknessMm: model.dial.thicknessMm, handLengths: model.hands,
+          dialZ: model.previewEnvelope.dialZ, handsZ: model.previewEnvelope.handsZ
+        }, null, 2)}</pre>
+      </details>
       <p className="mt-1 capitalize text-cyan-100">{lugSlug} lugs{savedRender?.archetypeId === 'archetype-chronograph' ? ` · ${savedRender.subdialHandStyle ?? 'needle'} subdial hands` : ''}</p>
       <div className="mt-1 flex flex-wrap gap-1 text-[9px] font-semibold uppercase"><span className="rounded border border-amber-500/40 px-1.5 py-0.5 text-amber-200">{platform.evidenceStatus.replaceAll('_', ' ')}</span>{activeKit && <span className={activeKit.status === 'COMPATIBLE_KIT' ? 'rounded border border-emerald-500/40 px-1.5 py-0.5 text-emerald-200' : 'rounded border border-rose-500/40 px-1.5 py-0.5 text-rose-200'}>{activeKit.status.replaceAll('_', ' ')}</span>}</div>
       {!referenceSelected && <p className="mt-1 text-slate-300">Loading applies the 42 mm case, face stack, crown, hand set, caseback and strap preview.</p>}

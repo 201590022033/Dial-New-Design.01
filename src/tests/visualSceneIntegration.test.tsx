@@ -12,7 +12,8 @@ import { createPreviewCaseGeometry } from '@/visual3d/proceduralEnvelope';
 import { categoryAnchor, visualCategories, type VisualAssetDescriptor } from '@/visual3d/visualAssetRegistry';
 
 const loader = vi.hoisted(() => ({ load: vi.fn() }));
-vi.mock('@react-three/fiber', () => ({ Canvas: () => null, useLoader: loader.load, useThree: () => vi.fn() }));
+const canvasCapture: { props: unknown } = vi.hoisted(() => ({ props: undefined }));
+vi.mock('@react-three/fiber', () => ({ Canvas: (props: unknown) => { canvasCapture.props = props; return null; }, useLoader: loader.load, useThree: () => vi.fn() }));
 
 const child = (element: ReactElement) => (element.props as { children: ReactElement }).children;
 const glbChild = (element: ReactElement) => {
@@ -48,7 +49,8 @@ describe('P4 scene integration and GLB failure boundaries', () => {
 
   it('keeps exactly one demand-driven canvas with all supported categories', () => {
     const model = watchAssemblyToVisualModel(createDefaultWatchAssembly());
-    const scene = VisualWatchScene({ model, rotation: [0, 0, 0], cameraDistance: 7 }) as ReactElement<{ frameloop: string; gl: { preserveDrawingBuffer: boolean }; children: ReactElement[] }>;
+    renderToStaticMarkup(<VisualWatchScene model={model} rotation={[0, 0, 0]} cameraDistance={7} />);
+    const scene = { type: Canvas, props: canvasCapture.props } as ReactElement<{ frameloop: string; gl: { preserveDrawingBuffer: boolean }; children: ReactElement[] }>;
     expect(scene.type).toBe(Canvas);
     expect(scene.props.frameloop).toBe('demand');
     expect(scene.props.gl.preserveDrawingBuffer).toBe(true);

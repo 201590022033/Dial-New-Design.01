@@ -7,6 +7,9 @@ import { NAVITIMER_PALETTE } from '@/domain/scales/navitimerReferenceArtwork';
 import { slideRuleReferenceGate } from '@/domain/scales/slideRuleLayers';
 import { scalePolicyForArchetype } from '@/domain/scales/archetypeScalePolicy';
 import type { ScalePluginConfig } from '@/domain/scales/types';
+import { isScaleTargetLocked } from '@/domain/scales/scaleTargetLock';
+import { useBandsStore } from '@/stores/bandsStore';
+import { useConfiguratorUIStore } from '@/stores/configuratorUIStore';
 
 /** The narrow left rail expands its reference choices only while Advanced is open. */
 export const ReferenceSlideRuleSelections = () => {
@@ -15,9 +18,14 @@ export const ReferenceSlideRuleSelections = () => {
   const select = useScaleStore((state) => state.selectReferenceDesign);
   const archetype = useScaleStore((state) => state.activeArchetypeId);
   const unlocked = useScaleStore((state) => state.crossArchetypeUnlocked);
+  const assembly = useWatchAssemblyStore((state) => state.assembly);
+  const legacyBands = useBandsStore((state) => state.bands);
+  const trayLocks = useConfiguratorUIStore((state) => state.lockedPartIds);
+  const locked = isScaleTargetLocked(assembly, config, legacyBands, trayLocks);
   const allowed = unlocked || !archetype || scalePolicyForArchetype(archetype).allowed.includes('aviation');
-  return <fieldset className="mt-2 space-y-2 border-t border-slate-700 pt-2 text-[10px]" data-testid="advanced-reference-selections">
+  return <fieldset disabled={locked} className="mt-2 space-y-2 border-t border-slate-700 pt-2 text-[10px]" data-testid="advanced-reference-selections">
     <legend className="sr-only">Slide-rule marking system</legend>
+    {locked && <p className="text-amber-200">Scale target locked. Unlock the component in Parts to edit.</p>}
     {(['citizen', 'navitimer'] as const).map((design) => <label key={design} className="flex items-start gap-1 text-slate-300" title={!allowed ? 'Unlock the cross-archetype scale guard on the right first.' : !slideRuleReferenceGate[design] ? 'Implementation acceptance pending.' : 'Reference-derived reconstruction; factory font and ink are not verified.'}>
       <input type="checkbox" aria-label={design === 'citizen' ? 'Citizen Skyhawk' : 'Classic Navitimer'} disabled={!allowed || !slideRuleReferenceGate[design]} checked={enabled && config.referenceDesign === design} onChange={(event) => select(event.target.checked ? design : null)} />
       <span>{design === 'citizen' ? 'Citizen Skyhawk' : 'Classic Navitimer'}</span>
@@ -34,6 +42,9 @@ export const ReferenceSlideRulePanel = () => {
   const reset = useScaleStore((state) => state.resetReferenceDesign);
   const preview = useScaleStore((state) => state.preview);
   const assembly = useWatchAssemblyStore((state) => state.assembly);
+  const legacyBands = useBandsStore((state) => state.bands);
+  const trayLocks = useConfiguratorUIStore((state) => state.lockedPartIds);
+  const locked = isScaleTargetLocked(assembly, config, legacyBands, trayLocks);
   const bands = useMemo(() => assemblyToBands(assembly), [assembly]);
   if (!config.referenceDesign || config.referenceDesign === 'simplified') return null;
   const design = config.referenceDesign;
@@ -41,8 +52,9 @@ export const ReferenceSlideRulePanel = () => {
   const numeric = (key: keyof ScalePluginConfig, title: string, value: number, step: number, min = .01) => <label className="flex items-center justify-between gap-2" key={key}>
     <span>{title}</span><input aria-label={title} type="number" className="ds-input w-24" min={min} step={step} value={value} onChange={(event) => { if (!event.target.value.trim()) return; const next = Number(event.target.value); if (Number.isFinite(next)) update({ [key]: Math.max(min, next) }); }} />
   </label>;
-  return <fieldset data-testid="reference-slide-rule-panel" className="space-y-3 rounded border border-teal-700 bg-slate-950 p-3 text-xs">
+  return <fieldset disabled={locked} data-testid="reference-slide-rule-panel" className="space-y-3 rounded border border-teal-700 bg-slate-950 p-3 text-xs">
     <legend className="px-1 text-teal-300">{design === 'citizen' ? 'Citizen Skyhawk' : 'Classic Navitimer'}</legend>
+    {locked && <p role="status" className="text-amber-200">Scale target locked. Unlock the rotating or fixed component in Parts to edit these markings.</p>}
     <p>{design === 'citizen' ? 'JY8078-01L · Canada/Europe product photographs' : 'Classic instruction-booklet training-disc · viewer page 2 (not the 1967 AOPA cover)'}</p>
     <p className="text-[10px] text-amber-200">Reference-derived reconstruction, not factory-exact artwork or supplier-fit approval. Fonts, ink colours and physical print dimensions are approximations.</p>
     <label className="flex gap-2"><input aria-label="Reference markings enabled" type="checkbox" checked={enabled} onChange={(event) => setEnabled(event.target.checked)} />Enable markings</label>

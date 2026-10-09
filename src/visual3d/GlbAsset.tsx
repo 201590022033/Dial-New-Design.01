@@ -8,8 +8,12 @@ import type { TextureEngineConfig } from '@/domain/generators/textureEngine';
 import { createDialFinishTexture, dialFinishBumpScale } from './dialFinishTexture';
 import { isAuthoredHourMarker } from '@/domain/generators/markerAppearance';
 import { hideAuthoredBezelMarking } from './authoredBezelMarkings';
+import type { AppearanceDocument } from '@/domain/appearance/appearance';
+import { applyHandAppearance } from './handAppearanceRegions';
+import { useAppearancePreviewStore } from '@/stores/appearancePreviewStore';
 
 type AssetAppearance = {
+  regions?: AppearanceDocument;
   caseColor?: string;
   handsColor?: string;
   markerColor?: string;
@@ -28,6 +32,7 @@ type AssetAppearance = {
 };
 
 export const LoadedGlbAsset = ({ descriptor, appearance, scaleTexture, liveOuterArtwork = false, dialFinishConfig, dialDiameterMm = 28.5 }: { descriptor: VisualAssetDescriptor; appearance?: AssetAppearance; scaleTexture?: Texture | null; liveOuterArtwork?: boolean; dialFinishConfig?: TextureEngineConfig; dialDiameterMm?: number }) => {
+  const night = useAppearancePreviewStore((state) => state.night);
   const finishKind = dialFinishConfig?.kind;
   const finishIntensity = dialFinishConfig?.intensity ?? 0;
   const finishContrast = dialFinishConfig?.contrast ?? 0;
@@ -61,8 +66,8 @@ export const LoadedGlbAsset = ({ descriptor, appearance, scaleTexture, liveOuter
       if (descriptor.category === 'dial' && isAuthoredHourMarker(objectName)) object.visible = false;
       // GLBs include authored default relief for standalone Blender review.
       // The live surface print replaces it so edits do not double the artwork.
-      if (descriptor.scaleArtworkSurface && objectName.startsWith('DD_PILOT_SCALE_')) object.visible = false;
-      if (descriptor.category === 'bezel' && hideAuthoredBezelMarking(objectName, liveOuterArtwork)) object.visible = false;
+      if (scaleTexture && descriptor.scaleArtworkSurface && objectName.startsWith('DD_PILOT_SCALE_')) object.visible = false;
+      if (descriptor.category === 'bezel' && hideAuthoredBezelMarking(objectName, liveOuterArtwork || !!scaleTexture, descriptor.assetId)) object.visible = false;
       object.castShadow = true;
       object.receiveShadow = true;
       const sourceMaterials = (Array.isArray(object.material) ? object.material : [object.material]) as Material[];
@@ -219,14 +224,40 @@ export const LoadedGlbAsset = ({ descriptor, appearance, scaleTexture, liveOuter
         }
       }
     });
+    if (descriptor.category === 'hands' && appearance?.regions) {
+      // Collect first: newly derived child regions must not re-enter the traversal.
+      const hands: Mesh[] = [];
+      clone.traverse((object) => { if (object instanceof Mesh) hands.push(object as Mesh); });
+      hands.forEach((mesh) => {
+        // Reference-42 splits each blade into BODY and TIP in one shared local frame.
+        // Clip both against the complete reviewed blade endpoint, not two independent tips.
+        const role = /^DD_HAND_(HOUR|MINUTE|SECONDS)_(BODY|TIP)$/.exec(mesh.name);
+        const absoluteEnd = descriptor.assetId === 'reference-42-hands-preview' && role ? { HOUR: -8.5, MINUTE: -13.3, SECONDS: -13 }[role[1] as 'HOUR' | 'MINUTE' | 'SECONDS'] : undefined;
+        applyHandAppearance(mesh, appearance.regions!, absoluteEnd);
+      });
+    }
+    if (night) clone.traverse((object) => {
+      if (!(object instanceof Mesh)) return;
+      for (const material of Array.isArray(object.material) ? object.material : [object.material]) {
+        if (!(material instanceof MeshStandardMaterial)) continue;
+        material.envMapIntensity = 0;
+        if (object.userData.DD_REGION === 'lume') material.emissiveIntensity = 1.5;
+      }
+    });
     if (!hasMesh) throw new Error('GLB has no mesh');
     return clone;
-  }, [appearance?.caseColor, appearance?.handsColor, appearance?.markerColor, appearance?.markerColorExplicit, appearance?.bezelMetalColor, appearance?.dialTextureIntensity, appearance?.dialTextureKind, appearance?.lumeColor, appearance?.lumeEnabled, appearance?.strapStyleId, bezelColor, descriptor.assetId, descriptor.category, descriptor.scaleArtworkSurface, dialColor, gltf, scaleTexture, liveOuterArtwork, dialFinishTexture, finishBumpScale, strapColor]);
+  }, [night, appearance?.regions, appearance?.caseColor, appearance?.handsColor, appearance?.markerColor, appearance?.markerColorExplicit, appearance?.bezelMetalColor, appearance?.dialTextureIntensity, appearance?.dialTextureKind, appearance?.lumeColor, appearance?.lumeEnabled, appearance?.strapStyleId, bezelColor, descriptor.assetId, descriptor.category, descriptor.scaleArtworkSurface, dialColor, gltf, scaleTexture, liveOuterArtwork, dialFinishTexture, finishBumpScale, strapColor]);
   // Loading can complete after the frame triggered by a Style click. Demand
   // rendering must capture the new mesh (including sapphire transmission).
   useEffect(() => {
     invalidate();
   }, [descriptor.assetId, descriptor.category, invalidate, scene]);
+  useEffect(() => () => scene.traverse((object) => {
+    if (!(object instanceof Mesh)) return;
+    const mesh = object as Mesh;
+    if (mesh.userData.DD_DERIVED_GEOMETRY) mesh.geometry.dispose();
+    for (const material of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) material.dispose();
+  }), [scene]);
   return <group position={descriptor.offset} rotation={descriptor.rotation} scale={descriptor.scale}>
     <group rotation={descriptor.upAxis === 'Z' ? [0, 0, 0] : [Math.PI / 2, 0, 0]} scale={descriptor.units === 'metres' ? 1000 : 1}>
       <primitive object={scene} dispose={null} />

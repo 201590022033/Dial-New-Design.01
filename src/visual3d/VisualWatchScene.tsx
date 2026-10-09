@@ -5,7 +5,7 @@ import { GlbAsset } from './GlbAsset';
 import { visualCategories, type VisualCategory } from './visualAssetRegistry';
 import { componentPlacement } from './componentPlacement';
 import { MM_TO_SCENE } from './assemblyAnchors';
-import { finishProfiles, type FinishProfile } from './finishProfiles';
+import { type FinishProfile } from './finishProfiles';
 import { createPreviewCaseGeometry, createPreviewLugGeometry, createPreviewStrapGeometry, createPreviewChapterRingGeometry } from './proceduralEnvelope';
 import { ACESFilmicToneMapping, CanvasTexture, Color, LinearFilter, PerspectiveCamera, PMREMGenerator, SRGBColorSpace, Vector2 } from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
@@ -15,6 +15,10 @@ import { scaleArtworkBinding } from './scaleArtworkBinding';
 import { useScaleArtworkTexture } from './useScaleArtworkTexture';
 import { createDialFinishTexture, dialFinishBumpScale } from './dialFinishTexture';
 import { markerNumeralLayout } from '@/domain/generators/markerAppearance';
+import { useAppearancePreviewStore } from '@/stores/appearancePreviewStore';
+import type { RegionAppearance } from '@/domain/appearance/appearance';
+import { clampTipExtentMm } from '@/domain/appearance/appearance';
+import { handLumeCapability } from './handAppearanceRegions';
 
 const finish = (profile: FinishProfile, color?: string) => ({ color: color ?? profile.color, metalness: profile.metalness, roughness: profile.roughness });
 const physicalFinish = (profile: FinishProfile, color?: string) => ({
@@ -42,6 +46,7 @@ const Cylinder = ({ radius, depth, position = [0, 0, 0], axis = 'Z', material }:
 </mesh>;
 
 export const DialArtwork = ({ model }: { model: VisualWatchModel }) => {
+  const night = useAppearancePreviewStore((state) => state.night);
   const artwork = model.dial.artwork;
   const [customImage, setCustomImage] = useState<HTMLImageElement | null>(null);
   useEffect(() => {
@@ -71,13 +76,9 @@ export const DialArtwork = ({ model }: { model: VisualWatchModel }) => {
     context.lineWidth = Math.max(2, pixelsPerMm * 0.08);
     context.textAlign = 'center';
     context.textBaseline = 'middle';
-    if (!usesArchetypeDial && !model.dial.customMarkerOverride && archetype === 'archetype-chronograph') {
-      ([[-0.22, 0], [0.22, 0], [0, 0.24]] as Array<[number, number]>).forEach(([x, y]) => {
-        context.beginPath();
-        context.arc(centre + centre * x, centre + centre * y, centre * 0.16, 0, Math.PI * 2);
-        context.stroke();
-      });
-    } else if (!usesArchetypeDial && !model.dial.customMarkerOverride && archetype === 'archetype-dive') {
+    // Register geometry belongs to the authored dial or its procedural fallback.
+    // Decorative normalized circles here duplicated it at incorrect centres.
+    if (!usesArchetypeDial && !model.dial.customMarkerOverride && archetype === 'archetype-dive') {
       context.beginPath();
       context.moveTo(centre, centre * 0.14);
       context.lineTo(centre - centre * 0.055, centre * 0.24);
@@ -95,14 +96,20 @@ export const DialArtwork = ({ model }: { model: VisualWatchModel }) => {
     context.textAlign = 'center';
     context.textBaseline = 'middle';
     {
-      context.fillStyle = model.archetypeAppearance.markerColor ?? model.archetypeAppearance.accentColor;
+      const markerAppearance = model.archetypeAppearance.regions?.markers;
+      context.fillStyle = markerAppearance ? (markerAppearance.lumeMode === 'off' ? (night ? '#11151b' : markerAppearance.printColor) : markerAppearance.lumeColor) : model.archetypeAppearance.markerColor ?? model.archetypeAppearance.accentColor;
       for (const marker of model.dial.markers) {
         if (!marker.text) continue;
         const glyph = markerNumeralLayout(marker, model.dial.outerDiameterMm / 2);
         context.font = `700 ${glyph.fontSizeMm * pixelsPerMm}px ${model.dial.markerKind === 'roman-numeral' ? 'Georgia, serif' : artwork.fontFamily}`;
         const theta = marker.angleDeg * Math.PI / 180;
         const r = glyph.radiusMm * pixelsPerMm;
-        context.fillText(marker.text, centre + Math.sin(theta) * r, centre - Math.cos(theta) * r);
+        const x = centre + Math.sin(theta) * r, y = centre - Math.cos(theta) * r;
+        if (markerAppearance?.lumeMode === 'outline') {
+          context.strokeStyle = markerAppearance.lumeColor;
+          context.lineWidth = .035 * pixelsPerMm;
+          context.strokeText(marker.text, x, y);
+        } else context.fillText(marker.text, x, y);
       }
     }
     // Source GLBs have presentation-only apertures, or none. The current assembly
@@ -146,7 +153,7 @@ export const DialArtwork = ({ model }: { model: VisualWatchModel }) => {
     result.magFilter = LinearFilter;
     result.needsUpdate = true;
     return result;
-  }, [artwork, customImage, model.archetypeAppearance, model.assets.dial, model.dial, model.referenceProfiles.archetypeId]);
+  }, [night, artwork, customImage, model.archetypeAppearance, model.assets.dial, model.dial, model.referenceProfiles.archetypeId]);
   useEffect(() => () => texture?.dispose(), [texture]);
   if (!texture) return null;
   return <mesh position={[0, 0, model.dial.thicknessMm / 2 + 0.34]}>
@@ -155,16 +162,34 @@ export const DialArtwork = ({ model }: { model: VisualWatchModel }) => {
   </mesh>;
 };
 
+/** Inlay coverage is actual geometry; Outline has an empty centre. */
+const RegionInlay = ({ width, length, round = false, appearance }: { width: number; length: number; round?: boolean; appearance: RegionAppearance }) => {
+  const night = useAppearancePreviewStore((state) => state.night);
+  if (appearance.lumeMode === 'off') return null;
+  const material = <meshStandardMaterial color={appearance.lumeColor} emissive={appearance.lumeColor} emissiveIntensity={night ? 1.5 : .25} metalness={0} roughness={.5} />;
+  const wall = Math.min(.05, width * .18, length * .18);
+  if (round) return <mesh rotation={[0, 0, 0]}>{appearance.lumeMode === 'outline' ? <torusGeometry args={[Math.max(.01, width / 2 - wall), wall, 6, 32]} /> : <circleGeometry args={[width / 2, 32]} />}{material}</mesh>;
+  if (appearance.lumeMode === 'filled') return <mesh><boxGeometry args={[width, length, .025]} />{material}</mesh>;
+  return <group>{[-1, 1].map(sign => <group key={sign}>
+    <mesh position={[sign * (width - wall) / 2, 0, 0]}><boxGeometry args={[wall, length, .025]} />{material}</mesh>
+    <mesh position={[0, sign * (length - wall) / 2, 0]}><boxGeometry args={[Math.max(.01, width - 2 * wall), wall, .025]} />{material}</mesh>
+  </group>)}</group>;
+};
+
 export const LiveHourMarkers = ({ model }: { model: VisualWatchModel }) => <group name="canonical-hour-markers">
   {model.dial.markers.map((marker, index) => {
     if (marker.text) return null;
     const theta = marker.angleDeg * Math.PI / 180, radius = (marker.innerRadiusMm + marker.outerRadiusMm) / 2;
     const color = model.archetypeAppearance.markerColor ?? '#e5e7eb';
-    return <mesh key={index} position={[radius * Math.sin(theta), radius * Math.cos(theta), model.dial.thicknessMm / 2 + .28]} rotation={[0, 0, -theta]}>
+    const appearance = model.archetypeAppearance.regions?.markers;
+    const round = model.dial.markerKind === 'round';
+    const width = round ? Math.max(.36, marker.widthMm) * 2 : marker.widthMm;
+    const length = Math.max(.35, marker.outerRadiusMm - marker.innerRadiusMm);
+    return <group key={index} position={[radius * Math.sin(theta), radius * Math.cos(theta), model.dial.thicknessMm / 2 + .28]} rotation={[0, 0, -theta]}><mesh>
       {model.dial.markerKind === 'round' ? <sphereGeometry args={[Math.max(.36, marker.widthMm), 18, 12]} />
         : <boxGeometry args={[marker.widthMm, Math.max(.35, marker.outerRadiusMm - marker.innerRadiusMm), .14]} />}
-      <meshPhysicalMaterial color={color} metalness={model.archetypeAppearance.markerColorExplicit ? .35 : 0} roughness={.6} />
-    </mesh>;
+      <meshPhysicalMaterial color={appearance?.metalColor ?? color} metalness={model.archetypeAppearance.markerColorExplicit ? .35 : 0} roughness={.6} />
+    </mesh>{appearance && <group position={[0, 0, round ? width / 2 + .01 : .085]}><RegionInlay width={width * .78} length={length * .85} round={round} appearance={appearance} /></group>}</group>;
   })}
 </group>;
 
@@ -282,17 +307,7 @@ export const ProceduralComponent = ({ category, model }: { category: VisualCateg
       <mesh rotation={[Math.PI / 2, 0, 0]}>
         <cylinderGeometry args={[model.dial.outerDiameterMm / 2, model.dial.outerDiameterMm / 2, model.dial.thicknessMm, 128]} /><DialSurfaceMaterial model={model} />
       </mesh>
-      {model.dial.markers.map((marker, index) => {
-        if (marker.text) return null;
-        const theta = (marker.angleDeg * Math.PI) / 180;
-        const markerRadius = (marker.innerRadiusMm + marker.outerRadiusMm) / 2;
-        if (model.dial.markerKind === 'round') return <mesh key={index} position={[markerRadius * Math.sin(theta), markerRadius * Math.cos(theta), 0.28]}>
-          <sphereGeometry args={[Math.max(0.36, marker.widthMm), 18, 12]} /><meshPhysicalMaterial {...physicalFinish(model.finishes.hands, model.archetypeAppearance.markerColor ?? model.referenceProfiles.lumeColor ?? '#e5e7eb')} />
-        </mesh>;
-        return <mesh key={index} position={[markerRadius * Math.sin(theta), markerRadius * Math.cos(theta), 0.28]} rotation={[0, 0, -theta]}>
-          <boxGeometry args={[marker.widthMm, Math.max(0.35, marker.outerRadiusMm - marker.innerRadiusMm), 0.14]} /><meshPhysicalMaterial {...physicalFinish(marker.lumed && !model.archetypeAppearance.markerColorExplicit ? { ...finishProfiles.lume, color: model.referenceProfiles.lumeColor ?? finishProfiles.lume.color } : model.finishes.hands, model.archetypeAppearance.markerColor ?? (marker.lumed ? model.referenceProfiles.lumeColor ?? finishProfiles.lume.color : '#e5e7eb'))} />
-        </mesh>;
-      })}
+      <LiveHourMarkers model={model} />
       {model.dial.subdials.map((subdial, index) => {
         const theta = (subdial.angleDeg * Math.PI) / 180;
         const x = subdial.centerRadiusMm * Math.sin(theta);
@@ -301,9 +316,11 @@ export const ProceduralComponent = ({ category, model }: { category: VisualCateg
         return <group key={`subdial-${index}`} position={[x, y, 0.34]}>
           <mesh rotation={[Math.PI / 2, 0, 0]}><cylinderGeometry args={[subdial.radiusMm, subdial.radiusMm, 0.08, 64]} /><meshStandardMaterial {...finish(model.finishes.dial, '#111827')} /></mesh>
           <mesh><torusGeometry args={[subdial.radiusMm * 0.82, 0.12, 12, 48]} /><meshStandardMaterial {...finish(model.finishes.bezel, '#94a3b8')} /></mesh>
-          <mesh position={[0, subdial.handRadiusMm * 0.42, 0.14]} rotation={[0, 0, index * 0.7]}>
-            <boxGeometry args={[handWidth, subdial.handRadiusMm, 0.12]} /><meshStandardMaterial {...finish(model.finishes.hands, model.archetypeAppearance.accentColor)} />
-          </mesh>
+          <group rotation={[0, 0, index * .7]}><mesh position={[0, subdial.handRadiusMm / 2, .14]}>
+            <boxGeometry args={[handWidth, subdial.handRadiusMm, .12]} /><meshStandardMaterial {...finish(model.finishes.hands, model.archetypeAppearance.regions?.registerHands.metalColor ?? model.archetypeAppearance.accentColor)} />
+          </mesh>{model.archetypeAppearance.regions && model.archetypeAppearance.regions.registerHands.tipExtentMm > 0 && <mesh position={[0, subdial.handRadiusMm - clampTipExtentMm(model.archetypeAppearance.regions.registerHands.tipExtentMm, subdial.handRadiusMm) / 2, .205]}>
+            <boxGeometry args={[handWidth, clampTipExtentMm(model.archetypeAppearance.regions.registerHands.tipExtentMm, subdial.handRadiusMm), .01]} /><meshStandardMaterial color={model.archetypeAppearance.regions.registerHands.tipColor} />
+          </mesh>}</group>
           <mesh position={[0, 0, 0.18]} rotation={[Math.PI / 2, 0, 0]}><cylinderGeometry args={[0.28, 0.28, 0.14, 32]} /><meshStandardMaterial {...finish(model.finishes.hands)} /></mesh>
         </group>;
       })}
@@ -341,7 +358,7 @@ export const ProceduralComponent = ({ category, model }: { category: VisualCateg
           <mesh position={[0, hand.length / 2, 0]}>
             <boxGeometry args={[hand.width, hand.length, 0.15]} />
             <meshPhysicalMaterial
-              color={model.archetypeAppearance.handsColor ?? (index === 2 ? model.archetypeAppearance.accentColor : handContrastColor(model.dialColor))}
+              color={model.archetypeAppearance.regions?.mainHands.metalColor ?? model.archetypeAppearance.handsColor ?? (index === 2 ? model.archetypeAppearance.accentColor : handContrastColor(model.dialColor))}
               metalness={index === 2 ? 0.55 : 0.88}
               roughness={index === 2 ? 0.24 : 0.14}
               clearcoat={0.32}
@@ -349,6 +366,12 @@ export const ProceduralComponent = ({ category, model }: { category: VisualCateg
               envMapIntensity={2.1}
             />
           </mesh>
+          {model.archetypeAppearance.regions && <>
+            {index < 2 && handLumeCapability(model.assets.hands.assetId) && <group position={[0, hand.length * .54, .085]}><RegionInlay width={hand.width * .45} length={hand.length * .48} appearance={model.archetypeAppearance.regions.mainHands} /></group>}
+            {model.archetypeAppearance.regions.mainHands.tipExtentMm > 0 && <mesh position={[0, hand.length - clampTipExtentMm(model.archetypeAppearance.regions.mainHands.tipExtentMm, hand.length) / 2, .085]}>
+              <boxGeometry args={[hand.width, clampTipExtentMm(model.archetypeAppearance.regions.mainHands.tipExtentMm, hand.length), .01]} /><meshStandardMaterial color={model.archetypeAppearance.regions.mainHands.tipColor} />
+            </mesh>}
+          </>}
           {model.hands.style === 'mercedes' && index === 0 && <mesh position={[0, hand.length * 0.65, 0]}>
             <torusGeometry args={[1, 0.25, 8, 24]} /><meshStandardMaterial {...finish(model.finishes.hands)} />
           </mesh>}
@@ -396,13 +419,14 @@ const ScaledVisualComponent = ({ category, model, preview }: { category: VisualC
 };
 
 const DarkDramaticEnvironment = () => {
+  const night = useAppearancePreviewStore((state) => state.night);
   const { gl, scene, invalidate } = useThree();
   useEffect(() => {
     const pmrem = new PMREMGenerator(gl);
     const environment = new RoomEnvironment();
     const target = pmrem.fromScene(environment, 0.04);
     scene.environment = target.texture;
-    scene.environmentIntensity = 0.82;
+    scene.environmentIntensity = night ? .01 : .82;
     invalidate();
     return () => {
       scene.environment = null;
@@ -410,7 +434,7 @@ const DarkDramaticEnvironment = () => {
       target.dispose();
       pmrem.dispose();
     };
-  }, [gl, invalidate, scene]);
+  }, [gl, invalidate, scene, night]);
   return null;
 };
 
@@ -458,14 +482,16 @@ const StillExporterBridge = ({ onReady }: { onReady?: (exporter: StillExporter |
   return null;
 };
 
-export const VisualWatchScene = ({ model, rotation, cameraDistance, scalePreview, onExporterReady }: { model: VisualWatchModel; rotation: [number, number, number]; cameraDistance: number; scalePreview?: ScaleRunResult | null; onExporterReady?: (exporter: StillExporter | null) => void }) => (
+export const VisualWatchScene = ({ model, rotation, cameraDistance, scalePreview, onExporterReady }: { model: VisualWatchModel; rotation: [number, number, number]; cameraDistance: number; scalePreview?: ScaleRunResult | null; onExporterReady?: (exporter: StillExporter | null) => void }) => {
+  const night = useAppearancePreviewStore((state) => state.night);
+  return (
   <Canvas frameloop="demand" shadows camera={{ position: [0, 0, cameraDistance], fov: 29 }} dpr={[1, 1.75]} gl={{ antialias: true, powerPreference: 'high-performance', preserveDrawingBuffer: true }}
     onCreated={({ gl }) => { gl.toneMapping = ACESFilmicToneMapping; gl.toneMappingExposure = 0.94; gl.outputColorSpace = SRGBColorSpace; }}>
     <DarkDramaticEnvironment />
     <CameraDistanceController distance={cameraDistance} />
     <StillExporterBridge onReady={onExporterReady} />
     <color attach="background" args={['#05070b']} />
-    <hemisphereLight args={['#dce8ff', '#020307', 0.38]} />
+    {!night && <group><hemisphereLight args={['#dce8ff', '#020307', 0.38]} />
     <ambientLight intensity={0.08} />
     <directionalLight castShadow position={[5.5, -4, 8]} intensity={3.4} color="#fff3df" shadow-mapSize={[2048, 2048]} shadow-bias={-0.00015} />
     <rectAreaLight position={[4.5, -2.8, 6.5]} rotation={[-0.2, 0.45, 0.18]} width={3.2} height={8} intensity={7.2} color="#fff4df" />
@@ -473,10 +499,11 @@ export const VisualWatchScene = ({ model, rotation, cameraDistance, scalePreview
     <rectAreaLight position={[0.5, 5.5, 3.2]} rotation={[0.8, 0, Math.PI]} width={6} height={2} intensity={4.1} color="#ffad73" />
     <directionalLight position={[-6, -1, 5]} intensity={1.15} color="#6e9fff" />
     <directionalLight position={[1, 6, 4]} intensity={1.0} color="#ffb477" />
-    <pointLight position={[0, -4, 5]} intensity={1.1} color="#ffffff" distance={18} decay={2} />
+    <pointLight position={[0, -4, 5]} intensity={1.1} color="#ffffff" distance={18} decay={2} /></group>}
     <group rotation={rotation} scale={MM_TO_SCENE}>
       {visualCategories.map((category) => <ScaledVisualComponent key={category} category={category} model={model} preview={scalePreview ?? null} />)}
       <ScaleArtwork3D preview={scalePreview ?? null} model={model} />
     </group>
   </Canvas>
-);
+  );
+};

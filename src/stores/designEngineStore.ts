@@ -44,6 +44,8 @@ import type { DesignOverlay } from '@/renderer/types';
 import type { CollisionWarning } from '@/domain/geometry/collisionEngine';
 import { useWatchAssemblyStore } from '@/stores/watchAssemblyStore';
 import type { WatchAssembly } from '@/domain/assembly/assemblyTypes';
+import { appearanceScopeLocked, type RegionAppearance } from '@/domain/appearance/appearance';
+import { useConfiguratorUIStore } from '@/stores/configuratorUIStore';
 
 interface DesignEngineState {
   dialFaceConfig: DialFaceConfig;
@@ -104,7 +106,8 @@ const createOverlay = (
   lumeResult: LumeResult,
   chapterRingVisible = true,
   texture = defaultDialFaceConfig.texture,
-  markerColour?: string
+  markerColour?: string,
+  markerAppearance?: RegionAppearance
 ): DesignOverlay => {
   const markers = generateMarkers(markerConfig).map((marker) => ({
     marker,
@@ -114,6 +117,7 @@ const createOverlay = (
 
   return {
     markerColour,
+    markerAppearance,
     dialFace: {
       fill: dialFaceResult.background.style.fill,
       stroke: dialFaceResult.background.style.stroke,
@@ -201,6 +205,11 @@ export const useDesignEngineStore = create<DesignEngineState>((set, get) => ({
     get().regenerate();
   },
   updateLumeConfig: (patch) => {
+    if (appearanceScopeLocked(useWatchAssemblyStore.getState().assembly, 'markers', useConfiguratorUIStore.getState().lockedPartIds)) return;
+    useWatchAssemblyStore.getState().updateAppearance('markers', {
+      ...(patch.mode ? { lumeMode: patch.mode === 'no-lume' ? 'off' : patch.mode === 'outline' ? 'outline' : 'filled' } : {}),
+      ...(patch.color ? { lumeColor: patch.color } : {})
+    });
     set((state) => ({
       lumeConfig: {
         ...state.lumeConfig,
@@ -355,7 +364,9 @@ export const useDesignEngineStore = create<DesignEngineState>((set, get) => ({
     const dialFaceResult = generateDialFace(state.dialFaceConfig);
     const chapterRingResult = generateChapterRing(state.chapterRingConfig);
     const bezelResult = generateBezel(state.bezelConfig);
-    const lumeResult = generateLume(state.lumeConfig);
+    const markerAppearance = useWatchAssemblyStore.getState().assembly.designConfig?.appearance?.markers;
+    const lumeResult = generateLume(markerAppearance ? { ...state.lumeConfig, color: markerAppearance.lumeColor,
+      mode: markerAppearance.lumeMode === 'off' ? 'no-lume' : markerAppearance.lumeMode } : state.lumeConfig);
 
     set({
       dialFaceResult,
@@ -370,7 +381,8 @@ export const useDesignEngineStore = create<DesignEngineState>((set, get) => ({
         lumeResult,
         state.chapterRingVisible,
         state.dialFaceConfig.texture,
-        state.visualReferenceConfig?.markerColor
+        state.visualReferenceConfig?.markerColor,
+        useWatchAssemblyStore.getState().assembly.designConfig?.appearance?.markers
       ),
       warnings: collectWarnings(dialFaceResult, chapterRingResult, bezelResult)
     });

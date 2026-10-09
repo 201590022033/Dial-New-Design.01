@@ -1,4 +1,5 @@
 import type { WatchAssembly, WatchAssemblyPartInstance } from '@/domain/assembly/assemblyTypes';
+import { resolveAppearance, type AppearanceDocument } from '@/domain/appearance/appearance';
 import { getCatalogueItem } from '@/domain/catalogue/catalogueRegistry';
 import type { AssemblyAnchors, ComponentTransform, ParametricCrownV1 } from '@/domain/geometry/parametric';
 import { validateParametricCrownV1 } from '@/domain/geometry/parametric';
@@ -86,6 +87,7 @@ export type VisualWatchModel = {
     lumeColor?: string;
   };
   archetypeAppearance: {
+    regions?: AppearanceDocument;
     caseColor?: string;
     handsColor?: string;
     markerColor?: string;
@@ -275,10 +277,20 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
   // The authored 42 mm face components have fixed watch-axis coordinates. Keep
   // any missing component in that same frame, even without the opt-in fixture.
   const hasFixedFaceFrame = [assets.dial, assets.bezel, assets.crystal].some(asset => asset.assetType === 'glb' && asset.referenceCaseDiameterMm === 42);
+  const previewEnvelope = resolveProceduralEnvelope(positive(assembly.globalDimensions.caseDiameterMm, 40), caseHeight, caseParams, hasFixedFaceFrame ? 10.2 : caseHeight, find('strap')?.dimensions.widthMm);
+  const authoredHandDialZ = assets.hands.authoredDialCenterZMm;
+  if (assets.hands.assetType === 'glb' && assets.hands.anchor === 'watch-axis' && authoredHandDialZ !== undefined) {
+    // The selected blade keeps its physical silhouette and length when the case
+    // preview changes. Only its axial placement follows the procedural dial frame.
+    const offset = assets.hands.offset ?? [0, 0, 0];
+    const dialFrameZ = assets.dial.assetType === 'glb' && assets.dial.anchor === 'watch-axis'
+      ? assets.dial.offset?.[2] ?? previewEnvelope.dialZ : previewEnvelope.dialZ;
+    assets.hands = { ...assets.hands, offset: [offset[0], offset[1], offset[2] + dialFrameZ - authoredHandDialZ] };
+  }
   return {
     caseDiameterMm: positive(assembly.globalDimensions.caseDiameterMm, 40),
     caseThicknessMm: caseHeight,
-    previewEnvelope: resolveProceduralEnvelope(positive(assembly.globalDimensions.caseDiameterMm, 40), caseHeight, caseParams, hasFixedFaceFrame ? 10.2 : caseHeight, find('strap')?.dimensions.widthMm),
+    previewEnvelope,
     caseMaterial: materialProfile(casePart, 'brushed-steel'),
     dialColor: effectiveDialColor,
     dial: {
@@ -381,6 +393,7 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
       lumeColor: lumeReference?.visualColor
     },
     archetypeAppearance: {
+      regions: assembly.designConfig?.appearance ? resolveAppearance(assembly) : undefined,
       caseColor: visualReferences.caseFinish === 'rose-gold' || visualReferences.caseFinish === 'black-pvd' ? finishes.case.color : undefined,
       handsColor: visualReferences.handsColor ?? (visualReferences.handsFinish === 'rose-gold' ? finishes.hands.color : undefined),
       markerColor: resolveMarkerColour(effectiveDialColor, visualReferences.markerColor, markerConfig.style.lumed),

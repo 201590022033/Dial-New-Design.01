@@ -107,14 +107,23 @@ export const deserializeDialProject = (input: string): DialProjectFile => {
 
 export const downloadDialFile = (project: DialProjectFile): void => {
   const payload = serializeDialProject(project);
-  const blob = new Blob([payload], { type: 'application/json;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const anchor = document.createElement('a');
   const safeName = project.info.name.trim().replace(/\s+/g, '-').toLowerCase() || 'dial-project';
+  downloadProjectText(payload, `${safeName}.dial`);
+};
+
+/** Keep the URL alive until the browser has consumed the user-initiated click. */
+export const downloadProjectText = (payload: string, filename: string): void => {
+  const url = URL.createObjectURL(new Blob([payload], { type: 'application/json;charset=utf-8' }));
+  const anchor = document.createElement('a');
   anchor.href = url;
-  anchor.download = `${safeName}.dial`;
-  anchor.click();
-  URL.revokeObjectURL(url);
+  anchor.download = filename;
+  anchor.style.display = 'none';
+  document.body.appendChild(anchor);
+  try { anchor.click(); }
+  finally {
+    anchor.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
 };
 
 export const readFileAsText = (file: File): Promise<string> => {
@@ -169,12 +178,6 @@ export {
 } from '@/domain/assembly/assemblySerialization';
 
 export const downloadWatchAssemblyFile = (assemblyJson: string, name: string): void => {
-  const blob = new Blob([assemblyJson], { type: 'application/json;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const anchor = document.createElement('a');
   const safeName = name.trim().replace(/\s+/g, '-').toLowerCase() || 'watch-design';
-  anchor.href = url;
-  anchor.download = `${safeName}.watch`;
-  anchor.click();
-  URL.revokeObjectURL(url);
+  downloadProjectText(assemblyJson, `${safeName}.watch`);
 };

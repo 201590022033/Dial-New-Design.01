@@ -17,7 +17,8 @@ import { useWatchAssemblyStore } from './watchAssemblyStore';
 import { resolveScaleLayers, resolvePhysicalScaleConfig } from '@/services/scaleLayerArtworkService';
 import { referenceScaleDefaults } from '@/services/referenceScaleArtworkService';
 import { slideRuleReferenceGate, type SlideRuleDesign } from '@/domain/scales/slideRuleLayers';
-import { getCatalogueItem } from '@/domain/catalogue/catalogueRegistry';
+import { isScaleTargetLocked } from '@/domain/scales/scaleTargetLock';
+import { useConfiguratorUIStore } from './configuratorUIStore';
 import { assemblyToBands } from '@/domain/assembly/assemblyAdapters';
 
 interface ScaleState {
@@ -83,15 +84,7 @@ const fallbackConfig: ScalePluginConfig = fallbackPlugin?.defaultConfig ?? {
 
 const defaultContext: ScaleMathContext = fullMinuteRingContext;
 const scaleTargetLocked = (config: ScalePluginConfig): boolean => {
-  const assembly = useWatchAssemblyStore.getState().assembly;
-  const bands = [...assemblyToBands(assembly), ...useBandsStore.getState().bands];
-  const targets = [config.placementTargetBandId,
-    ...(config.engineeringPreset === 'aviation-slide-rule' ? [config.fixedPlacementTargetBandId ?? 'band-chapter-ring'] : [])];
-  return targets.some((target) => {
-    const kind = bands.find((band) => band.id === target)?.kind;
-    return bands.some((band) => band.id === target && band.locked) ||
-      Boolean(kind && Object.values(assembly.parts).some((part) => part.locked && getCatalogueItem(part.catalogueItemId)?.linkedBandKind === kind));
-  });
+  return isScaleTargetLocked(useWatchAssemblyStore.getState().assembly, config, useBandsStore.getState().bands, useConfiguratorUIStore.getState().lockedPartIds);
 };
 
 export const useScaleStore = create<ScaleState>((set, get) => ({

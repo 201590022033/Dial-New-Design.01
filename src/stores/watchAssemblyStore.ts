@@ -22,6 +22,8 @@ import { resolveAssemblyGeometry, type ResolvedAssemblyGeometry } from '@/domain
 import { applyArchetypeVisualProfile } from '@/domain/configurator/archetypeProfiles';
 import { assertCustomAviation, customAviationDefaults, type CustomAviationLayer, type CustomAviationProgram } from '@/domain/scales/customAviation';
 import { getCatalogueItem } from '@/domain/catalogue/catalogueRegistry';
+import { appearanceScopeLocked, assertAppearance, resolveAppearance, type AppearanceScope, type RegionAppearance } from '@/domain/appearance/appearance';
+import { useConfiguratorUIStore } from '@/stores/configuratorUIStore';
 
 export interface WatchAssemblyStoreState {
   assembly: WatchAssembly;
@@ -65,6 +67,7 @@ export interface WatchAssemblyStoreState {
   updateDialFaceConfig: (patch: Partial<DialFaceConfig>) => void;
   updateVisualReferenceConfig: (patch: NonNullable<WatchAssembly['designConfig']>['visualReferenceConfig']) => void;
   updateTextureConfig: (patch: Partial<TextureEngineConfig>) => void;
+  updateAppearance: (scope: AppearanceScope, patch: Partial<RegionAppearance>) => void;
   updateCustomAviationLayer: (id: CustomAviationProgram, patch: Partial<CustomAviationLayer>) => void;
   setScaleSnapshot: (snapshot: import('@/domain/scales/scaleDocumentAdapter').ScaleSnapshot, previous?: import('@/domain/scales/scaleDocumentAdapter').ScaleSnapshot) => void;
   applyTemplate: (templateId: TemplateId, colors?: { primary: string; secondary: string; accent: string }) => void;
@@ -416,6 +419,16 @@ export const useWatchAssemblyStore = create<WatchAssemblyStoreState>((set, get) 
     });
   },
 
+  updateAppearance: (scope, patch) => {
+    const assembly = get().assembly;
+    if (appearanceScopeLocked(assembly, scope, useConfiguratorUIStore.getState().lockedPartIds)) return;
+    const current = resolveAppearance(assembly);
+    const appearance = { ...current, [scope]: { ...current[scope], ...patch } };
+    assertAppearance(appearance);
+    set({ assembly: { ...assembly, designConfig: { ...assembly.designConfig, appearance },
+      metadata: { ...assembly.metadata, updatedAtIso: new Date().toISOString() } }, dirty: true });
+  },
+
   updateVisualReferenceConfig: (patch) => {
     if (!patch) return;
     set((state) => {
@@ -425,15 +438,27 @@ export const useWatchAssemblyStore = create<WatchAssemblyStoreState>((set, get) 
       const styled = requestedArchetype
         ? applyArchetypeVisualProfile(state.assembly, requestedArchetype)
         : state.assembly;
+      const visualReferenceConfig = { ...styled.designConfig?.visualReferenceConfig, ...patch };
+      // Older colour controls remain live after the first semantic-region edit.
+      // Only their own metal/print scope changes; lume/tips and registers stay independent.
+      let appearance = styled.designConfig?.appearance;
+      if (appearance) {
+        const fallback = resolveAppearance({ ...styled, designConfig: { ...styled.designConfig, appearance: undefined, visualReferenceConfig } });
+        if ((Object.hasOwn(patch, 'handsColor') || Object.hasOwn(patch, 'handsFinish')) &&
+          !appearanceScopeLocked(styled, 'mainHands', useConfiguratorUIStore.getState().lockedPartIds)) {
+          appearance = { ...appearance, mainHands: { ...appearance.mainHands, metalColor: fallback.mainHands.metalColor, printColor: fallback.mainHands.printColor } };
+        }
+        if (Object.hasOwn(patch, 'markerColor') && !appearanceScopeLocked(styled, 'markers', useConfiguratorUIStore.getState().lockedPartIds)) {
+          appearance = { ...appearance, markers: { ...appearance.markers, metalColor: fallback.markers.metalColor, printColor: fallback.markers.printColor } };
+        }
+      }
       return {
         assembly: {
           ...styled,
           designConfig: {
             ...styled.designConfig,
-            visualReferenceConfig: {
-              ...styled.designConfig?.visualReferenceConfig,
-              ...patch
-            }
+            ...(appearance ? { appearance } : {}),
+            visualReferenceConfig
           },
           metadata: { ...styled.metadata, updatedAtIso: new Date().toISOString() }
         },

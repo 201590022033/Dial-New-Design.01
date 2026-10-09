@@ -28,7 +28,11 @@ export const getScaleProgram = (program: ScaleProgram, bands: BandEntity[]): Sca
     kind: 'tachymeter',
     config: {
       startValue: 60, endValue: 500, majorStep: 20, minorStep: 10,
-      radiusMm: outer ? (outer.innerRadius + outer.outerRadius) / 2 : 18.7
+      labelOrientation: 'horizontal',
+      labelPlacement: 'inside', tickDirection: 'outside',
+      majorTickLengthMm: 0.55, minorTickLengthMm: 0.3,
+      majorTickWidthMm: 0.12, minorTickWidthMm: 0.1,
+      radiusMm: outer ? outer.outerRadius - 0.7 : 18.7
     },
     // A 60–500 tachymeter is an open reciprocal-time arc, not a closed dial.
     context: { startAngleDeg: -140, endAngleDeg: 140 },

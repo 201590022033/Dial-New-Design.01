@@ -33,9 +33,16 @@ export const checkHandsClearanceCompatibility = (
   const candidateHandsSpec = candidateItem?.engineeringSpecs?.hands;
   const centralHands = Object.values(assembly.parts).filter((part) => part.visible &&
     ['inst-hour-hand', 'inst-minute-hand', 'inst-central-seconds'].includes(part.instanceId));
-  const handCandidateLength = candidateHandsSpec?.lengthMm ??
-    (candidateItem?.category === 'hands' ? candidateItem.nominalDimensions.diameterMm :
-      centralHands.length ? Math.max(...centralHands.map((part) => part.dimensions.diameterMm)) : undefined);
+  // A set's nominal diameter describes its catalogue envelope, not each blade's
+  // radial reach. Its three applied lengths are authoritative (including NH05
+  // supplier-specific 5/8/8mm), as they are for the render and final assembly.
+  const candidateReach = candidateItem?.kind === 'hand-set' ? undefined
+    : candidateHandsSpec?.lengthMm ?? (candidateItem?.category === 'hands' ? candidateItem.nominalDimensions.diameterMm : undefined);
+  const reaches = centralHands.map((part) => part.dimensions.diameterMm);
+  if (candidateReach !== undefined) reaches.push(candidateReach);
+  // Replacing only the hour hand must not conceal an unchanged oversized
+  // seconds hand elsewhere in the provisional assembly.
+  const handCandidateLength = reaches.length ? Math.max(...reaches) : undefined;
 
   if (typeof handCandidateLength === 'number' && handCandidateLength > 0) {
     const radialDiff = handCandidateLength - usableDialRadiusMm;

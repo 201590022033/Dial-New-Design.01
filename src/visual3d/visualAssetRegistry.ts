@@ -25,6 +25,8 @@ export type VisualAssetDescriptor = {
   upAxis?: 'Y' | 'Z';
   /** A reviewed, fixed-size preview must fall back when the assembly size changes. */
   referenceCaseDiameterMm?: number;
+  /** Dial centre used when authoring a watch-axis hand asset; permits axial relocation without resizing. */
+  authoredDialCenterZMm?: number;
   /** Highest authored bezel face detail above the bezel centre, in millimetres. */
   scaleArtworkFaceOffsetMm?: number;
   /** Outer radius of the flat marking surface, which can be smaller than the carrier OD. */
@@ -38,7 +40,7 @@ const variantRoot = '/assets/3d/variants';
 const handVariantIds: VisualHandStyle[] = ['baton', 'mercedes', 'sword', 'dauphine', 'syringe', 'cathedral', 'pencil', 'broad-arrow', 'skeleton'];
 const generatedHandAssets = Object.fromEntries(handVariantIds.map((style) => {
   const assetId = `hands-${style}-42`;
-  return [assetId, { assetId, category: 'hands', assetType: 'glb', assetPath: `${variantRoot}/hands/${assetId}.glb`, handStyle: style, anchor: 'watch-axis', offset: [0, 0, 4.25], units: 'millimetres', upAxis: 'Y' } satisfies VisualAssetDescriptor];
+  return [assetId, { assetId, category: 'hands', assetType: 'glb', assetPath: `${variantRoot}/hands/${assetId}.glb`, handStyle: style, anchor: 'watch-axis', offset: [0, 0, 4.25], units: 'millimetres', upAxis: 'Y', authoredDialCenterZMm: 3.7 } satisfies VisualAssetDescriptor];
 }));
 const generatedBezelAssets = Object.fromEntries(['dive-coin-edge', 'dive-scalloped', 'pilot-smooth', 'dress-fluted', 'tachymeter-fixed', 'gmt', 'slide-rule'].map((style) => {
   const assetId = `bezel-${style}-42`;

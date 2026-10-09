@@ -6,6 +6,19 @@ import { escapeScaleXml, scaleArtworkLayers, scaleArtworkSvgContent, scaleLabelR
 import { scalePointerRotation, scalePointerVertices } from '@/domain/scales/pointerGeometry';
 import { resolveMarkerColour, markerNumeralLayout } from '@/domain/generators/markerAppearance';
 
+const markerCoveragePolygon = (entry: NonNullable<DesignOverlay>['markers'][number]): Array<[number, number]> => {
+  const angle = entry.marker.angleDeg * Math.PI / 180;
+  const radius = (entry.marker.innerRadiusMm + entry.marker.outerRadiusMm) / 2;
+  const cx = radius * Math.sin(angle), cy = radius * Math.cos(angle);
+  if (entry.kind === 'round') return Array.from({ length: 40 }, (_, index) => {
+    const theta = index / 40 * Math.PI * 2;
+    return [cx + entry.marker.widthMm * Math.cos(theta), cy + entry.marker.widthMm * Math.sin(theta)];
+  });
+  const half = entry.marker.widthMm / 2;
+  const corners: Array<[number, number]> = [[entry.marker.innerRadiusMm, -half], [entry.marker.outerRadiusMm, -half], [entry.marker.outerRadiusMm, half], [entry.marker.innerRadiusMm, half]];
+  return corners.map(([r, lateral]) => [r * Math.sin(angle) + lateral * Math.cos(angle), r * Math.cos(angle) - lateral * Math.sin(angle)]);
+};
+
 export interface ExportMetadata {
   projectName?: string;
   movement?: string;
@@ -139,6 +152,18 @@ const renderOverlaySvg = (
   const markerLines = (overlay?.markers ?? [])
     .map((entry) => {
       const colour = resolveMarkerColour(overlay?.dialFace.fill ?? '#18202b', overlay?.markerColour, entry.lumed);
+      const appearance = overlay?.markerAppearance;
+      if (appearance) {
+        const mode = appearance.lumeMode;
+        const ink = mode === 'off' ? (entry.marker.text ? appearance.printColor : appearance.metalColor) : appearance.lumeColor;
+        if (entry.marker.text) {
+          const glyph = markerNumeralLayout(entry.marker, dialRadiusMm);
+          const font = entry.kind === 'roman-numeral' ? 'Georgia, serif' : 'Arial, sans-serif';
+          return `<text data-lume-mode="${mode}" x="${centerX + glyph.xMm * 10}" y="${centerY + glyph.yMm * 10}" fill="${mode === 'outline' ? 'none' : escapeScaleXml(ink)}" stroke="${mode === 'outline' ? escapeScaleXml(ink) : 'none'}" stroke-width="0.35" font-size="${glyph.fontSizeMm * 10}" text-anchor="middle" dominant-baseline="central" font-family="${font}">${escapeScaleXml(entry.marker.text)}</text>`;
+        }
+        const points = markerCoveragePolygon(entry).map(([x, y]) => `${centerX + x * 10},${centerY - y * 10}`).join(' ');
+        return `<polygon data-lume-mode="${mode}" points="${points}" fill="${mode === 'outline' ? 'none' : escapeScaleXml(ink)}" stroke="${mode === 'outline' ? escapeScaleXml(ink) : 'none'}" stroke-width="0.35" />`;
+      }
       if (entry.marker.text && (entry.kind === 'arabic-numeral' || entry.kind === 'roman-numeral')) {
         const glyph = markerNumeralLayout(entry.marker, dialRadiusMm);
         const font = entry.kind === 'roman-numeral' ? 'Georgia, serif' : 'Arial, sans-serif';
@@ -293,6 +318,19 @@ export const generatePseudoDxf = (input: EngineeringExportInput): string => {
   const dialArtwork = !includeDialArtwork || !overlay ? [] : [
     ...overlay.markers.flatMap(entry => {
       const hex = resolveMarkerColour(overlay.dialFace.fill, overlay.markerColour, entry.lumed);
+      const appearance = overlay.markerAppearance;
+      if (appearance) {
+        const mode = appearance.lumeMode;
+        const ink = mode === 'off' ? (entry.marker.text ? appearance.printColor : appearance.metalColor) : appearance.lumeColor;
+        if (entry.marker.text) {
+          if (mode === 'outline') throw new Error('Outline numeral lume requires outlined glyphs. Export SVG/PDF and outline text in the manufacturing application; DXF TEXT cannot represent hollow glyph coverage.');
+          const glyph = markerNumeralLayout(entry.marker, dialRadius);
+          return textEntity('dial-hour-markers', entry.marker.text, glyph.xMm, -glyph.yMm, glyph.fontSizeMm, ink);
+        }
+        const points = markerCoveragePolygon(entry);
+        if (mode === 'outline') return ['0', 'LWPOLYLINE', '8', 'dial-marker-lume-outline', '420', colour(ink), '90', String(points.length), '70', '1', '43', '.035', ...points.flatMap(([x, y]) => ['10', String(x), '20', String(y)])];
+        return solidPolygon(points, 'dial-hour-markers', ink);
+      }
       if (entry.marker.text && (entry.kind === 'roman-numeral' || entry.kind === 'arabic-numeral')) {
         const glyph = markerNumeralLayout(entry.marker, dialRadius);
         return textEntity('dial-hour-markers', entry.marker.text, glyph.xMm, -glyph.yMm, glyph.fontSizeMm, hex);

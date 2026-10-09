@@ -244,8 +244,10 @@ describe('Phase 5: Deterministic Physical Compatibility Engine', () => {
         candidateCatalogueItemId: 'cat-hand-ai-extracted'
       });
 
-      // Even though the dimension might match, the unverified check forces aggregate UNKNOWN
-      expect(evaluation.status).toBe('unknown');
+      // A short unverified candidate cannot hide the unchanged oversized seconds
+      // hand. RED retains precedence, while missing evidence remains recorded.
+      expect(evaluation.status).toBe('red');
+      expect(evaluation.checks.some((check) => check.code === 'HAND_LENGTH_EXCEEDS_DIAL_RADIUS')).toBe(true);
       expect(evaluation.counts.unknown).toBeGreaterThan(0);
     });
   });

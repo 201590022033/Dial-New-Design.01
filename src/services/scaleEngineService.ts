@@ -3,6 +3,7 @@ import { styleScaleTicks } from '@/domain/scales/markingStyle';
 import { constrainScaleToPlacementEnvelope } from '@/domain/scales/placementEnvelope';
 import { isForbiddenConversionCaption, logDecadeAngle } from '@/domain/scales/calibratedSlideRule';
 import { pointerHalfExtentMm } from '@/domain/scales/pointerGeometry';
+import { selectReadableTachymeterLabels } from '@/domain/scales/tachymeterLabels';
 import { resolvedScaleSvg } from '@/domain/scales/resolvedScaleArtwork';
 import { runReferenceScale } from './referenceScaleArtworkService';
 import type {
@@ -122,6 +123,24 @@ export const runScalePlugin = (
       hoverPaddingMm: config.hoverPaddingMm, color: config.markColorOverrides?.[id] ?? label.color ?? config.color };
   });
   const constrained = constrainScaleToPlacementEnvelope(generatedTicks, generatedLabels, config);
+  if (kind === 'tachymeter' && config.optimizeLayout !== false && config.allowAdaptiveLabelOmission !== false) {
+    if (config.labelPlacement === 'inside' && constrained.ticks.length) {
+      // Reserve a separate inner writing row. The generic envelope clamps ticks
+      // and labels independently, which otherwise pushes text onto long ticks.
+      const tickInnerRadius = Math.min(...constrained.ticks.map(tick => tick.radiusMm -
+        (tick.direction === 'inside' ? tick.lengthMm : tick.direction === 'bidirectional' ? tick.lengthMm / 2 : 0) - tick.widthMm / 2));
+      constrained.labels = constrained.labels.map(label => {
+        const half = Math.hypot(label.boundsMm!.width, label.boundsMm!.height) / 2;
+        const radiusMm = tickInnerRadius - Math.max(0.12, config.minimumLineWidthMm) - half;
+        if (radiusMm - half < constrained.envelope.innerRadiusMm + constrained.envelope.safetyMarginMm) {
+          constrained.issues.push(`Tachymeter label ${label.text} cannot fit a separate writing row inside its ticks.`);
+          return label;
+        }
+        return { ...label, radiusMm };
+      });
+    }
+    constrained.labels = selectReadableTachymeterLabels(constrained.labels, Math.max(0.12, config.minimumLineWidthMm));
+  }
   const pointers = (config.pointers ?? []).filter((pointer) =>
     visible(pointer.ringId) && (!pointer.dedicatedConversion || pointer.dedicatedConversion === 'distance')).map((pointer) => {
     const envelope = pointer.ringId === 'inner' && config.fixedBandOuterRadiusMm !== undefined

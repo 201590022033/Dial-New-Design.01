@@ -52,6 +52,38 @@ describe('hybrid Style inspector uses real authoritative catalogue contexts', ()
   });
   afterEach(() => vi.restoreAllMocks());
 
+  it('exposes independent main-hand hex, coverage and physical tip controls', () => {
+    const html = renderPart('inst-hour-hand');
+    expect(html).toContain('aria-label="Main hands metal hex"');
+    expect(html).not.toContain('aria-label="Main hands print hex"');
+    expect(html).toContain('No separately printed hand region exists in this asset');
+    expect(html).toContain('aria-label="Main hands lume hex"');
+    expect(html).toContain('aria-label="Main hands tip hex"');
+    expect(html).toContain('aria-label="Main hands coloured tip extent mm"');
+    expect(html).toContain('Hollow outline');
+    expect(html).toContain('preview lume at night');
+    expect(html).not.toContain('aria-label="Register hands region appearance"');
+  });
+  it('exposes marker scope on the dial without main-hand tip controls', () => {
+    const html = renderPart('inst-dial-blank');
+    expect(html).toContain('aria-label="Hour markers metal hex"');
+    expect(html).toContain('aria-label="Hour markers print hex"');
+    expect(html).toContain('aria-label="Hour markers lume coverage"');
+    expect(html).not.toContain('aria-label="Main hands coloured tip extent mm"');
+  });
+  it('shows the same authored metal hex in both new and legacy main-hand controls', () => {
+    useWatchAssemblyStore.getState().updateAppearance('mainHands', { metalColor: '#123456' });
+    const html = renderPart('inst-hour-hand');
+    expect(html).toMatch(/aria-label="Main hands metal hex"[^>]*value="#123456"/);
+    expect(html).toMatch(/aria-label="Main hand colour hex"[^>]*value="#123456"/);
+  });
+  it('does not pretend an unreviewed dress-hand asset has luminous channels', () => {
+    useWatchAssemblyStore.getState().updateVisualReferenceConfig({ componentAssetOverrides: { hands: 'hands-dauphine-42' } });
+    const html = renderPart('inst-hour-hand');
+    expect(html).toContain('This asset has no reviewed luminous region');
+    expect(html).toMatch(/<option value="outline" disabled="">/);
+  });
+
   it('shows dial finish/colour/artwork, not strap, main-hand or case selectors, for the actual dial', () => {
     const html = renderPart('inst-dial-blank');
     expect(html).toContain('aria-label="Dial background and finish"');
