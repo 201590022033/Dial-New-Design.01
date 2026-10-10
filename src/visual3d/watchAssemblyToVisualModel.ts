@@ -5,7 +5,11 @@ import type { AssemblyAnchors, ComponentTransform, ParametricCrownV1 } from '@/d
 import { validateParametricCrownV1 } from '@/domain/geometry/parametric';
 import { visualAssetRegistry, resolveVisualAssetByCategory, visualCategories, type VisualCategory, type VisualAssetDescriptor, type VisualHandStyle } from './visualAssetRegistry';
 import { resolveAssemblyAnchors } from './assemblyAnchors';
-import { matchesReference42Parameters } from '@/domain/presets/reference3d';
+import { resolveCanonicalCrownAxis } from './canonicalCrownAxis';
+import type { CrownSpecificationV1 } from '@/domain/crown';
+import { matchesReference42Parameters, reference42Parameters } from '@/domain/presets/reference3d';
+import type { CrownSurface } from './crownGeometry';
+import { crownSpecificationForPart } from '@/domain/crown/selection';
 import { resolveFinishProfile, type FinishProfile, type FinishProfileId } from './finishProfiles';
 import { defaultMarkerConfig, generateMarkers, type MarkerEngineConfig, type MarkerKind } from '@/domain/generators/markerEngine';
 import { movementLibrary } from '@/domain/movements/movementLibrary';
@@ -72,7 +76,7 @@ export type VisualWatchModel = {
     hourLengthMm: number; minuteLengthMm: number; secondLengthMm: number;
     hourWidthMm: number; minuteWidthMm: number; secondWidthMm: number;
   };
-  crown: { diameterMm: number; lengthMm: number; material: string; parameters?: ParametricCrownV1; provisional: boolean };
+  crown: { diameterMm: number; lengthMm: number; material: string; surface: CrownSurface; parameters?: ParametricCrownV1; provisional: boolean; specification?: CrownSpecificationV1; axisStatus?: 'legacy' | 'resolved' | 'unknown' };
   pushers: PusherVisualDescriptor;
   finishes: Record<VisualCategory, FinishProfile>;
   anchors: AssemblyAnchors;
@@ -87,6 +91,7 @@ export type VisualWatchModel = {
     lumeColor?: string;
   };
   archetypeAppearance: {
+    crownColor?: string; crownMetalness?: number; crownRoughness?: number;
     regions?: AppearanceDocument;
     caseColor?: string;
     handsColor?: string;
@@ -194,7 +199,7 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
     const id = explicitOverride ?? archetypeAssets[category] ?? part?.visual?.assetId ?? part?.customProperties?.visualAssetId;
     const fallbackId = category === 'hands' ? `visual-hands-${style === 'mercedes' ? 'mercedes' : 'baton'}` : `visual-${category}-default`;
     const resolved = resolveVisualAssetByCategory(typeof id === 'string' ? id : undefined, category, visualAssetRegistry[fallbackId]!);
-    const referenceOnly = resolved.assetId.startsWith('reference-42-');
+    const referenceOnly = resolved.assetId.startsWith('reference-42-') && category !== 'crown';
     const diameterMatches = resolved.referenceCaseDiameterMm === undefined ||
       (assembly.globalDimensions.caseDiameterMm === resolved.referenceCaseDiameterMm && (!referenceOnly || referenceIsCurrent));
     // Gem-set presentation bases may be resized radially; supplier cases must
@@ -227,6 +232,22 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
   if (visualReferences.handsFinish === 'rose-gold') finishes.hands = resolveFinishProfile('rose-gold', 'rose-gold');
   if (visualReferences.bezelFinish) finishes.bezel = resolveFinishProfile(visualReferences.bezelFinish === 'rose-gold' ? 'rose-gold' : 'polished-steel', 'polished-steel');
   const crownParams = candidate?.schema === 'parametric-crown/v1' && validateParametricCrownV1(candidate).status !== 'invalid' ? candidate : undefined;
+  const crownSpec = crownSpecificationForPart(crownPart);
+  const specValue = <T,>(value: { status: 'known'; value: T } | { status: 'unknown' } | undefined, fallback: T): T => value?.status === 'known' ? value.value : fallback;
+  const core = specValue(crownSpec?.coreDiameterMm, positive(crownParams?.headDiameterMm, positive(crownPart?.dimensions.diameterMm, 6.5)));
+  const crownLength = specValue(crownSpec?.headLengthMm, positive(crownParams?.headLengthMm, positive(crownPart?.dimensions.thicknessMm, 3.5)));
+  const gripDepth = typeof crownParams?.gripDepthMm === 'number' ? crownParams.gripDepthMm : 0;
+  const surface: CrownSurface = { shape: specValue(crownSpec?.shape, 'cylindrical'), grip: specValue(crownSpec?.grip, crownParams ? crownParams.gripCount ? 'fine-fluted' : 'smooth' : /knurl/.test(crownPart?.texture ?? '') ? 'cross-knurled' : 'smooth'), coreDiameterMm: core, maximumOuterDiameterMm: specValue(crownSpec?.maximumOuterDiameterMm, core + (crownParams ? 2 * gripDepth : /knurl/.test(crownPart?.texture ?? '') ? .4 : 0)), lengthMm: crownLength };
+  // Crown geometry survives hand swaps and is never scaled by case diameter.
+  const referenceCrownMatches = crownParams && JSON.stringify(crownParams) === JSON.stringify(reference42Parameters.crown);
+  if (!referenceCrownMatches && ['reference-42-crown-preview', 'crown-reference-v1'].includes(assets.crown.assetId)) assets.crown = visualAssetRegistry['visual-crown-default']!;
+  if (assets.crown.assetId.startsWith('crown-') && crownSpec) {
+    const authored = getCatalogueItem(crownPart?.catalogueItemId ?? '')?.crownSpecification;
+    const size = (s: CrownSpecificationV1) => [specValue(s.coreDiameterMm, 0), specValue(s.maximumOuterDiameterMm, 0), specValue(s.headLengthMm, 0)];
+    if (!authored || JSON.stringify(size(authored)) !== JSON.stringify(size(crownSpec))) assets.crown = visualAssetRegistry['visual-crown-default']!;
+  }
+  if (crownSpec?.finish.mode === 'inherit-case') finishes.crown = finishes.case;
+  if (crownSpec?.finish.mode === 'override') finishes.crown = { ...resolveFinishProfile(crownSpec.finish.material === 'rose-gold' || crownSpec.finish.material === 'black-pvd' ? crownSpec.finish.material : crownSpec.finish.texture === 'polished' ? 'polished-steel' : 'brushed-steel', 'polished-steel'), color: crownSpec.finish.color };
   const caseParams = casePart?.parametricGeometry?.schema === 'parametric-case/v1' ? casePart.parametricGeometry : undefined;
   const casePusherCount = caseParams?.pusherCount === undefined ? undefined : Math.max(0, Math.min(2, Math.round(Number(caseParams.pusherCount) || 0)));
   const pusherCount = casePusherCount ?? Math.max(0, Math.min(2, Math.round(Number(movement?.pusherCount) || 0)));
@@ -287,6 +308,11 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
       ? assets.dial.offset?.[2] ?? previewEnvelope.dialZ : previewEnvelope.dialZ;
     assets.hands = { ...assets.hands, offset: [offset[0], offset[1], offset[2] + dialFrameZ - authoredHandDialZ] };
   }
+  const canonicalCrown = resolveCanonicalCrownAxis(assembly);
+  // A legacy authored placement stays in the saved part but cannot compete
+  // with the modern case axis. Asset-local corrections remain descriptor-owned.
+  if (canonicalCrown.present) delete transforms.crown;
+  if (canonicalCrown.present && !canonicalCrown.frame) visible.crown = false;
   return {
     caseDiameterMm: positive(assembly.globalDimensions.caseDiameterMm, 40),
     caseThicknessMm: caseHeight,
@@ -368,8 +394,11 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
       secondWidthMm: movement?.id === 'nh05' ? 0.12 : 0.2
     },
     crown: {
-      diameterMm: positive(crownParams?.headDiameterMm, positive(crownPart?.dimensions.diameterMm, 6.5)),
-      lengthMm: positive(crownParams?.headLengthMm, positive(crownPart?.dimensions.thicknessMm, 3.5)),
+      specification: crownSpec,
+      surface,
+      axisStatus: canonicalCrown.present ? canonicalCrown.frame ? 'resolved' : 'unknown' : 'legacy',
+      diameterMm: core,
+      lengthMm: crownLength,
       material: materialProfile(crownPart, 'polished-steel'), parameters: crownParams,
       provisional: !crownParams || crownParams.provenance.status === 'provisional' || validateParametricCrownV1(crownParams).status === 'unknown'
     },
@@ -393,6 +422,7 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
       lumeColor: lumeReference?.visualColor
     },
     archetypeAppearance: {
+      crownColor: finishes.crown.color, crownMetalness: finishes.crown.metalness, crownRoughness: finishes.crown.roughness,
       regions: assembly.designConfig?.appearance ? resolveAppearance(assembly) : undefined,
       caseColor: visualReferences.caseFinish === 'rose-gold' || visualReferences.caseFinish === 'black-pvd' ? finishes.case.color : undefined,
       handsColor: visualReferences.handsColor ?? (visualReferences.handsFinish === 'rose-gold' ? finishes.hands.color : undefined),

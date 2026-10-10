@@ -1,4 +1,5 @@
 import type { AnchorId, ComponentCategory } from '@/domain/geometry/parametric';
+import { crownPresentations } from '@/domain/crown/catalogue';
 export type VisualCategory = ComponentCategory;
 export type VisualHandStyle = 'baton' | 'mercedes' | 'needle' | 'sword' | 'dauphine' | 'syringe' | 'cathedral' | 'pencil' | 'broad-arrow' | 'skeleton';
 export const visualCategories: VisualCategory[] = ['strap', 'caseback', 'case', 'dial', 'chapter-ring', 'bezel', 'hands', 'crystal', 'crown', 'pushers'];
@@ -63,6 +64,7 @@ const generatedCaseAssets: Record<string, VisualAssetDescriptor> = Object.fromEn
 }));
 
 export const visualAssetRegistry: Record<string, VisualAssetDescriptor> = {
+  ...Object.fromEntries(crownPresentations.map(p => [`crown-${p.id}`, { assetId: `crown-${p.id}`, category: 'crown', assetType: 'glb', assetPath: `/assets/3d/crowns/crown-${p.id}.glb`, anchor: 'crown-interface', units: 'millimetres', upAxis: 'Y' } satisfies VisualAssetDescriptor])),
   'case-namoki-nmk903-black-38': { assetId: 'case-namoki-nmk903-black-38', category: 'case', assetType: 'glb', assetPath: `${variantRoot}/cases/case-namoki-nmk903-black-38.glb`, anchor: 'watch-axis', units: 'millimetres', upAxis: 'Y', referenceCaseDiameterMm: 38, materialProfile: 'black-pvd' },
   'dial-namoki-108-silver-285': { assetId: 'dial-namoki-108-silver-285', category: 'dial', assetType: 'glb', assetPath: `${variantRoot}/dials/dial-namoki-108-silver-285.glb`, anchor: 'watch-axis', offset: [0, 0, 3.7], units: 'millimetres', upAxis: 'Y' },
   'case-tandorio-nh05-research-34': { assetId: 'case-tandorio-nh05-research-34', category: 'case', assetType: 'glb', assetPath: `${variantRoot}/cases/case-tandorio-nh05-research-34.glb`, anchor: 'watch-axis', units: 'millimetres', upAxis: 'Y', referenceCaseDiameterMm: 34 },
@@ -83,10 +85,10 @@ export const visualAssetRegistry: Record<string, VisualAssetDescriptor> = {
   'reference-42-chapter-ring-preview': { assetId: 'reference-42-chapter-ring-preview', category: 'chapter-ring', assetType: 'glb', assetPath: '/assets/3d/reference-42/chapter-ring.glb', anchor: 'watch-axis', offset: [0, 0, 4.75], units: 'millimetres', upAxis: 'Y', referenceCaseDiameterMm: 42 },
   'reference-42-bezel-preview': { assetId: 'reference-42-bezel-preview', category: 'bezel', assetType: 'glb', assetPath: '/assets/3d/reference-42/bezel.glb', anchor: 'watch-axis', offset: [0, 0, 5.65], units: 'millimetres', upAxis: 'Y', referenceCaseDiameterMm: 42, scaleArtworkFaceOffsetMm: 2.09, scaleArtworkOuterRadiusMm: 19 },
   'reference-42-crystal-preview': { assetId: 'reference-42-crystal-preview', category: 'crystal', assetType: 'glb', assetPath: '/assets/3d/reference-42/crystal.glb', anchor: 'watch-axis', offset: [0, 0, 6.25], units: 'millimetres', upAxis: 'Y', referenceCaseDiameterMm: 42 },
-  'reference-42-crown-preview': { assetId: 'reference-42-crown-preview', category: 'crown', assetType: 'glb', assetPath: '/assets/3d/reference-42/crown.glb', anchor: 'crown-interface', units: 'millimetres', upAxis: 'Y', referenceCaseDiameterMm: 42 },
+  'reference-42-crown-preview': { assetId: 'reference-42-crown-preview', category: 'crown', assetType: 'glb', assetPath: '/assets/3d/reference-42/crown.glb', anchor: 'crown-interface', units: 'millimetres', upAxis: 'Y' },
   'reference-42-hands-preview': { assetId: 'reference-42-hands-preview', category: 'hands', assetType: 'glb', assetPath: '/assets/3d/reference-42/hands.glb', anchor: 'hand-stack', units: 'millimetres', upAxis: 'Y', referenceCaseDiameterMm: 42 },
   // Opt-in path only: review fixture output is not automatically published here.
-  'crown-reference-v1': { assetId: 'crown-reference-v1', category: 'crown', assetType: 'glb', assetPath: '/assets/3d/generated/crowns/crown-v1.glb', anchor: 'crown-interface', units: 'millimetres', upAxis: 'Y' },
+  'crown-reference-v1': { assetId: 'crown-reference-v1', category: 'crown', assetType: 'glb', assetPath: '/assets/3d/reference-42/crown.glb', anchor: 'crown-interface', units: 'millimetres', upAxis: 'Y' },
   'visual-crown-default': { assetId: 'visual-crown-default', category: 'crown', assetType: 'procedural', materialProfile: 'polished-steel', anchor: 'crown-interface' },
   'visual-pushers-default': { assetId: 'visual-pushers-default', category: 'pushers', assetType: 'procedural', materialProfile: 'polished-steel', anchor: 'watch-axis' },
   'visual-case-default': { assetId: 'visual-case-default', category: 'case', assetType: 'procedural', materialProfile: 'brushed-steel' },

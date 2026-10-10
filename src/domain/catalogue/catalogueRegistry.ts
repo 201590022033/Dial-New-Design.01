@@ -2,6 +2,7 @@ import type { ComponentCatalogueItem, CatalogueManufacturingMetadata, Manufactur
 import { visualVariantCatalogueItems } from './visualVariantCatalogue';
 import { nh05SupplierCandidateItems } from './nh05SupplierCandidates';
 import { supplierExpansionCandidateItems } from './supplierExpansionCandidates';
+import { crownCatalogueItems } from '@/domain/crown/catalogue';
 
 const defaultManufacturing = (processProfile: ManufacturingProcessProfile): CatalogueManufacturingMetadata => ({
   processProfile,
@@ -600,10 +601,10 @@ export const defaultCatalogueItems: ComponentCatalogueItem[] = [
     linkedBandKind: 'outer-bezel',
     nominalDimensions: { diameterMm: 6.5, widthMm: 4.0, thicknessMm: 3.5 },
     manufacturing: defaultManufacturing('cnc'),
-    softStyles: ['screw-down', 'fluted', 'gasketed'],
-    status: 'verified',
-    metadata: { tags: ['external', 'crown'], revision: 'A', notes: 'Winding crown with double O-ring seal' },
-    exportEnabled: true
+    softStyles: ['crown', 'knurled', 'presentation'],
+    status: 'draft',
+    metadata: { tags: ['external', 'crown'], revision: 'C2', notes: 'Legacy presentation crown. Closure, stem/thread, tube and gaskets are unknown; no sealing or fit qualification.' },
+    exportEnabled: false
   },
   {
     id: 'cat-pushers',
@@ -838,6 +839,7 @@ export const compatibilityFixtureCatalogueItems: ComponentCatalogueItem[] = [
 ];
 
 export const catalogueItemById = new Map<string, ComponentCatalogueItem>([
+  ...crownCatalogueItems.map((item) => [item.id, item] as [string, ComponentCatalogueItem]),
   ...defaultCatalogueItems.map((item) => [item.id, item] as [string, ComponentCatalogueItem]),
   ...visualVariantCatalogueItems.map((item) => [item.id, item] as [string, ComponentCatalogueItem]),
   ...nh05SupplierCandidateItems.map((item) => [item.id, item] as [string, ComponentCatalogueItem]),

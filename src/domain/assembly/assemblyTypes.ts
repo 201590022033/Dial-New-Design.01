@@ -1,4 +1,5 @@
 import type { CatalogueItemCategory } from '@/domain/catalogue/types';
+import type { CrownAxisDatumV1, CrownChoiceV1, CrownSpecificationV1 } from '@/domain/crown';
 import type { MarkerEngineConfig } from '@/domain/generators/markerEngine';
 import type { TypographyConfig } from '@/domain/generators/typographyEngine';
 import type { TextureEngineConfig } from '@/domain/generators/textureEngine';
@@ -43,6 +44,10 @@ export interface WatchAssemblyPartInstance {
   visual?: ComponentVisualBinding;
   parametricGeometry?: ParametricCaseV1 | ParametricCrownV1 | ParametricDialV1 | ParametricHandSetV1;
   geometryProvenance?: GeometryProvenance;
+  /** Case-owned authored axes. Absent legacy documents keep their original placement behavior. */
+  crownAxes?: CrownAxisDatumV1[];
+  /** Removable head contract; axisId references a case-owned datum, never a second transform. */
+  crownSpecification?: CrownSpecificationV1;
 }
 
 export interface WatchAssemblyMetadata {
@@ -74,6 +79,8 @@ export interface WatchAssemblyGlobalDimensions {
  * - Ring/dial geometry parameters
  */
 export interface WatchAssemblyDesignConfig {
+  /** Authored selection and advisory recommendation are separate; loading never applies a recommendation. */
+  crownChoice?: CrownChoiceV1;
   /** Canonical, independent semantic region settings; absent documents retain legacy defaults. */
   appearance?: import('@/domain/appearance/appearance').AppearanceDocument;
   customAviationLayers?: import('@/domain/scales/customAviation').CustomAviationDocument;

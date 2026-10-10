@@ -1,6 +1,7 @@
 import type { WatchAssembly } from '@/domain/assembly/assemblyTypes';
 import { createTemplatePayload, getTemplateById, type TemplateId } from '@/domain/generators/templateLibrary';
 import { getArchetypeKit } from '@/domain/library/watchPlatformLibrary';
+import { withCrownDefault } from '@/domain/crown/selection';
 
 export interface ArchetypeVisualProfile {
   archetypeId: string;
@@ -56,7 +57,7 @@ export const applyArchetypeVisualProfile = (assembly: WatchAssembly, archetypeId
   if (strap) parts['inst-strap-integration'] = { ...strap, color: profile.strapColor };
   if (pushers) parts['inst-pushers'] = { ...pushers, visible: Boolean(profile.pusherAssetId) };
   const dialRadius = Math.max(8, (dial?.dimensions.diameterMm ?? 28.5) / 2);
-  return {
+  return withCrownDefault({
     ...assembly,
     templateId: profile.templateId,
     parts,
@@ -89,5 +90,5 @@ export const applyArchetypeVisualProfile = (assembly: WatchAssembly, archetypeId
         strapStyleId: profile.strapStyleId
       }
     }
-  };
+  });
 };

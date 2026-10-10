@@ -19,6 +19,14 @@ import { useAppearancePreviewStore } from '@/stores/appearancePreviewStore';
 import type { RegionAppearance } from '@/domain/appearance/appearance';
 import { clampTipExtentMm } from '@/domain/appearance/appearance';
 import { handLumeCapability } from './handAppearanceRegions';
+import { createCrownGeometry } from './crownGeometry';
+
+const ProceduralCrown = ({ model }: { model: VisualWatchModel }) => {
+  const { shape, grip, coreDiameterMm, maximumOuterDiameterMm, lengthMm } = model.crown.surface;
+  const geometry = useMemo(() => createCrownGeometry({ shape, grip, coreDiameterMm, maximumOuterDiameterMm, lengthMm }), [shape, grip, coreDiameterMm, maximumOuterDiameterMm, lengthMm]);
+  useEffect(() => () => geometry.dispose(), [geometry]);
+  return <mesh name="DD_CROWN_HEAD_FALLBACK" geometry={geometry} castShadow receiveShadow><meshStandardMaterial {...finish(model.finishes.crown)} /></mesh>;
+};
 
 const finish = (profile: FinishProfile, color?: string) => ({ color: color ?? profile.color, metalness: profile.metalness, roughness: profile.roughness });
 const physicalFinish = (profile: FinishProfile, color?: string) => ({
@@ -335,7 +343,7 @@ export const ProceduralComponent = ({ category, model }: { category: VisualCateg
     case 'crystal': return <mesh position={[0, 0, localZ(envelope.crystalZ)]} rotation={[Math.PI / 2, 0, 0]}>
       <cylinderGeometry args={[envelope.crystalRadius, envelope.crystalRadius, envelope.crystalThickness, 128]} /><meshPhysicalMaterial {...physicalFinish(model.finishes.crystal)} transparent opacity={model.finishes.crystal.opacity ?? 0.1} depthWrite={false} envMapIntensity={2.25} />
     </mesh>;
-    case 'crown': return <Cylinder axis="X" radius={model.crown.diameterMm / 2} depth={model.crown.lengthMm} position={[model.crown.lengthMm / 2, 0, 0]} material={model.finishes.crown} />;
+    case 'crown': return <ProceduralCrown model={model} />;
     case 'pushers': return <group>
       {model.pushers.count > 0 ? model.pushers.positionsDeg.map((angleDeg, index) => {
         const theta = (angleDeg * Math.PI) / 180;

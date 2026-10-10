@@ -50,7 +50,8 @@ describe('P5 reviewed reference configuration', () => {
     const resized = structuredClone(selected);
     resized.globalDimensions.caseDiameterMm = 44;
     expect(watchAssemblyToVisualModel(resized).assets.case.assetType).toBe('procedural');
-    expect(watchAssemblyToVisualModel(resized).assets.crown.assetType).toBe('procedural');
+    // C3: a removable crown keeps its own authored size independently of the case.
+    expect(watchAssemblyToVisualModel(resized).assets.crown.assetId).toBe('reference-42-crown-preview');
     expect(watchAssemblyToVisualModel(resized).assets.hands.assetType).toBe('procedural');
     expect(watchAssemblyToVisualModel(resized).assets.dial.assetType).toBe('procedural');
     expect(watchAssemblyToVisualModel(resized).assets.crystal.assetType).toBe('procedural');

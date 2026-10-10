@@ -1,0 +1,65 @@
+[
+  {
+    "file": "NH35_SS.pdf",
+    "url": "https://www.timemodule.com/upload/category/24/spec_sheet/NH35_SS.pdf",
+    "sha256": "ef1a20e566691b887d1de947de0fe3786bddba2e5084055f7632831a261a748d",
+    "bytes": 1534449,
+    "retrievedUTC": "2026-10-09T23:29:13.635847+00:00"
+  },
+  {
+    "file": "NH35_PL.pdf",
+    "url": "https://www.timemodule.com/upload/category/24/parts_list/NH35_PL.pdf",
+    "sha256": "bb9629cc348b2a87c5b4760aab69f8f72affd052c03fcfdf729d6837e2697d55",
+    "bytes": 134256,
+    "retrievedUTC": "2026-10-09T23:28:52.605093+00:00"
+  },
+  {
+    "file": "NH34_SS.pdf",
+    "url": "https://www.timemodule.com/upload/category/23/spec_sheet/NH34_SS.pdf",
+    "sha256": "1f9917c2d3495896637354934efc657dd7c0da60eaf07054d49afee3a85b12df",
+    "bytes": 1400453,
+    "retrievedUTC": "2026-10-09T23:28:58.286899+00:00"
+  },
+  {
+    "file": "NH34_PL.pdf",
+    "url": "https://www.timemodule.com/upload/category/23/parts_list/NH34_PL.pdf",
+    "sha256": "4f1adde999933be1f359102255dc87876a0f9063c2193e06bc404c3726448f3a",
+    "bytes": 133270,
+    "retrievedUTC": "2026-10-09T23:28:46.930055+00:00"
+  },
+  {
+    "file": "VK63_SS.pdf",
+    "url": "https://www.timemodule.com/upload/category/33/spec_sheet/VK63_SS.pdf",
+    "sha256": "45ca75e4e674c445675665e7a7f2a84fb33a0e908f7afed4d12f2906887758df",
+    "bytes": 585860,
+    "retrievedUTC": "2026-10-09T23:28:51.704942+00:00"
+  },
+  {
+    "file": "VK63_PL.pdf",
+    "url": "https://www.timemodule.com/upload/category/33/parts_list/VK63_PL.pdf",
+    "sha256": "a41a4a25c5abba774bad700d31674e884f6172c692aaa32ee449f0dfbf5e821e",
+    "bytes": 94710,
+    "retrievedUTC": "2026-10-09T23:28:54.204094+00:00"
+  },
+  {
+    "file": "nmk920.json",
+    "url": "https://www.namokimods.com/products/nmk920-tuna-skx007-srpd-watch-case-brushed-finish.js",
+    "sha256": "3082cb684ebd9a7d109c83a2e6bf4f79efdce8032ff64ca19c0753fe37b8a58b",
+    "bytes": 4374,
+    "retrievedUTC": "2026-10-09T23:28:53.018035+00:00"
+  },
+  {
+    "file": "tandorio465.json",
+    "url": "https://tandoriowatch.com/products/tuna-can-watch-case-46-5mm.js",
+    "sha256": "81f4f61fe0ebd0926f240bb2defb6cc6dcdf265dead95c144331628b75317cbb",
+    "bytes": 21944,
+    "retrievedUTC": "2026-10-09T23:28:53.404987+00:00"
+  },
+  {
+    "file": "nmk920-old-drawing.png",
+    "url": "https://cdn.shopify.com/s/files/1/0139/0434/7193/files/image_393d712f-eeae-4b1e-8028-3f021f774d1b_600x600.png?v=1625647458",
+    "sha256": "dbc2a56f11e4275362015611ca38fb1c547796426262b66efbc82ba68261a0fe",
+    "bytes": 113350,
+    "retrievedUTC": "2026-10-09T23:28:54.200094+00:00"
+  }
+]

@@ -1,0 +1,66 @@
+[
+  {
+    "file": "coarse-fluted-hd-front.jpg",
+    "sha256": "4902954f3adf1c1cb97d08a1998ef3b4fd6f2e4ad06d90cfa32d10b53a761f33"
+  },
+  {
+    "file": "coarse-fluted-hd-side.jpg",
+    "sha256": "0e07cfc4a3c3a139ce265ddcc585067939ba4af14707c411584f2bcf234d3afa"
+  },
+  {
+    "file": "compact-dress-engineering-front.jpg",
+    "sha256": "c69cec3a510be763cffbe11b8e12d551c0aaf63d0e722cc6ec8a53d9fbf22474"
+  },
+  {
+    "file": "compact-dress-hd-front.jpg",
+    "sha256": "b0c286ee9d2d08be5ad6ae46013e648e2b654a4b7d82bf87905a6bd88a5fa5b5"
+  },
+  {
+    "file": "compact-dress-hd-side.jpg",
+    "sha256": "51a3bb919713fe0f34385310f2fd5817b0a7c7dd55abce3f9a31406a2b2ca9c7"
+  },
+  {
+    "file": "fine-fluted-hd-front.jpg",
+    "sha256": "82e2f5cb5dbefa36d43cb078a025ba9ce40c284bfd014f25c5df3146b636cb14"
+  },
+  {
+    "file": "fine-fluted-hd-side.jpg",
+    "sha256": "bd4a8663ce91bf697186afb8c0e028d50cc2d9c2017186134f1e090f9139c9c8"
+  },
+  {
+    "file": "knurled-hd-front.jpg",
+    "sha256": "c209b6040d79ca0f2bec17fb1814a928034a84a0218596492970638247c57f7a"
+  },
+  {
+    "file": "knurled-hd-side.jpg",
+    "sha256": "2cd21bfe0c58f377bd70b007aef6508e78a9d5a66f82788a850e758430dad2fa"
+  },
+  {
+    "file": "ladies34-engineering-front.jpg",
+    "sha256": "4d8c48e31942356e7ccae80128e023f4d96cc8cc53edd80632c67fc7e602be84"
+  },
+  {
+    "file": "ladies34-hd-front.jpg",
+    "sha256": "b6fb4915685aa128c6ee3bb45cf41cd2f0986c5af95c6479beb7199a9dd895b0"
+  },
+  {
+    "file": "ladies34-hd-side.jpg",
+    "sha256": "fb38e31f2ca4e8cbe3850bac8ced322d5cd63331bb1fd07e01a3798ec836217a"
+  },
+  {
+    "file": "onion-hd-front.jpg",
+    "sha256": "cf96334f47cd47f7cc4aa67487454368e8b79b279cd4c68954453ce63b323d0d"
+  },
+  {
+    "file": "onion-hd-side.jpg",
+    "sha256": "181291789cb67c628e3252f8842acc883e75dfccfd019f6850f3cdf0e1aada66"
+  },
+  {
+    "file": "smooth-hd-front.jpg",
+    "sha256": "6f9f0277b65f4ab41d763bcb420aa03dc382b40821783758eef283e47df166c3"
+  },
+  {
+    "file": "smooth-hd-side.jpg",
+    "sha256": "46511cda5ea550ff29973f73cd88174d1c427596d874b4b97bfd2a628f506fbe"
+  }
+]

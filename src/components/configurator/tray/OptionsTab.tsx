@@ -23,6 +23,7 @@ import { applyArchetypeVisualProfile, getArchetypeVisualProfile } from '@/domain
 import { defaultMarkerConfig, type MarkerKind } from '@/domain/generators/markerEngine';
 import type { TypographyFontCategory } from '@/domain/generators/typographyEngine';
 import { formatListingPrice } from '@/domain/catalogue/pricing';
+import { crownSlotError } from '@/domain/crown/selection';
 
 const indexChoices: Array<{ id: 'auto' | 'dots' | 'arabic' | 'roman' | 'ticks'; label: string; kind?: MarkerKind }> = [
   { id: 'auto', label: 'Archetype default' },
@@ -115,7 +116,7 @@ export const OptionsTab: React.FC = () => {
   const evaluatedCandidates = useMemo(() => {
     if (!activePartInstanceId) return [];
 
-    let filtered = catalogueItems;
+    let filtered = catalogueItems.filter(item => !crownSlotError(assembly, activePartInstanceId, item));
 
     // Filter by category unless searching all
     if (targetCategory) {

@@ -6,6 +6,7 @@ import { assemblyToBands } from '@/domain/assembly/assemblyAdapters';
 import { getScalePlugin } from '@/domain/scales/scaleRegistry';
 import { getScaleProgram } from '@/domain/scales/scalePrograms';
 import { withScaleSnapshot } from '@/domain/scales/scaleDocumentAdapter';
+import { isCrownPart, resolveCrownDefault } from '@/domain/crown/selection';
 
 export type StarterBuildType = 'diver' | 'pilot' | 'dress' | 'ladies-dress' | 'field' | 'chronograph';
 
@@ -47,6 +48,21 @@ export const createStarterBuild = (
   };
   // A starter replaces its platform, rather than inheriting NH05/VK63 parts.
   const fresh = createDefaultWatchAssembly();
+  const legacyCrown = resolveCrownDefault(sourceAssembly).source === 'legacy-preserved' ? Object.values(sourceAssembly.parts).find(isCrownPart) : undefined;
+  const savedCrownChoice = sourceAssembly.designConfig?.crownChoice ?? (legacyCrown ? { schema: 'crown-choice/v1' as const, selected: { crownInstanceId: legacyCrown.instanceId, source: 'legacy-preserved' as const } } : undefined);
+  if (savedCrownChoice?.selected?.source === 'explicit-user' || savedCrownChoice?.selected?.source === 'legacy-preserved') {
+    const saved = sourceAssembly.parts[savedCrownChoice.selected.crownInstanceId];
+    if (saved) {
+      fresh.parts['inst-crown'] = { ...structuredClone(saved), instanceId: 'inst-crown' };
+      // A new platform needs its own axis, but retains the crown's physical evidence.
+      if (fresh.parts['inst-crown'].crownSpecification) {
+        fresh.parts['inst-crown'].customProperties = { ...fresh.parts['inst-crown'].customProperties, detachedCrownSpecification: fresh.parts['inst-crown'].crownSpecification };
+        fresh.parts['inst-crown'].crownSpecification = undefined;
+      }
+      if (fresh.parts['inst-crown'].visual) delete fresh.parts['inst-crown'].visual.crownAxisId;
+      fresh.designConfig = { ...fresh.designConfig, crownChoice: { ...savedCrownChoice, selected: { ...savedCrownChoice.selected, crownInstanceId: 'inst-crown' } } };
+    }
+  }
   fresh.metadata = { ...fresh.metadata, id: sourceAssembly.metadata.id, name: sourceAssembly.metadata.name,
     designer: sourceAssembly.metadata.designer, revision: sourceAssembly.metadata.revision };
   // Retain the authored 40/42 mm render frame for NH35 sources; do not carry
@@ -78,7 +94,7 @@ export const createStarterBuild = (
     const strap = parts['inst-strap-integration'];
     if (strap) parts['inst-strap-integration'] = { ...strap, dimensions: { ...strap.dimensions, widthMm: 16 } };
     const crown = parts['inst-crown'];
-    if (crown) parts['inst-crown'] = {
+    if (crown && !['explicit-user', 'legacy-preserved'].includes(base.designConfig?.crownChoice?.selected?.source ?? '')) parts['inst-crown'] = {
       ...crown,
       dimensions: { ...crown.dimensions, diameterMm: 5, thicknessMm: 2.5 },
       parametricGeometry: undefined,

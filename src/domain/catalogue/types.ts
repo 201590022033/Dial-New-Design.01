@@ -1,6 +1,8 @@
 import type { ComponentEngineeringSpecs } from '@/domain/compatibility/compatibilityTypes';
+import type { CrownAxisDatumV1, CrownSpecificationV1, EvidenceValue } from '@/domain/crown';
 import type { ComponentCategory } from '@/domain/geometry/parametric';
 import type { TextureKind } from '@/domain/generators/textureEngine';
+import type { CrownPlatformInterface } from '@/domain/crown/compatibility';
 
 export type CatalogueItemCategory =
   | 'hands'
@@ -68,6 +70,14 @@ export interface CatalogueVisualMetadata {
  * Exists independently of any one watch design or assembly project.
  */
 export interface ComponentCatalogueItem {
+  /** Only populate for an identified exact case package, never from a product photo. */
+  suppliedCrown?: { catalogueItemId: string; evidence: EvidenceValue<string> };
+  recommendedCrown?: { catalogueItemId: string; evidence: EvidenceValue<string> };
+  crownInterface?: CrownPlatformInterface;
+  /** Optional versioned crown metadata; schema validity does not qualify mechanical fit. */
+  crownSpecification?: CrownSpecificationV1;
+  /** Case datums for later validated supplier-to-assembly transitions. */
+  crownAxes?: CrownAxisDatumV1[];
   /** Discovery record with incomplete dimensions or no supported assembly slot. */
   researchOnly?: boolean;
   id: string; // e.g. "cat-hour-hand"

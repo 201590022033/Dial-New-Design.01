@@ -1,0 +1,14 @@
+[
+  {
+    "file": "nh34-package.json",
+    "url": "https://www.namokimods.com/products/seiko-sii-nh34a-gmt-automatic-movement.js",
+    "sha256": "eff9c0d5d295357f6161c715f09d907da2bd68729a43161f5d97aea9a81e9285",
+    "retrievedUTC": "2026-10-09T23:31:47.663043+00:00"
+  },
+  {
+    "file": "vk63-package.json",
+    "url": "https://www.namokimods.com/products/seiko-sii-vk63-mechaquartz-watch-movement-black.js",
+    "sha256": "c1017b06ab83db2ae84efe6b4eb490ce42e212ef396b02a3543f74d787f4580b",
+    "retrievedUTC": "2026-10-09T23:31:47.668693+00:00"
+  }
+]

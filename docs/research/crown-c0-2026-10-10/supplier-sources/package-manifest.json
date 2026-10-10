@@ -1,0 +1,38 @@
+[
+  {
+    "file": "nh35-package.json",
+    "url": "https://www.namokimods.com/products/seiko-sii-nh35a-automatic-movement.js",
+    "sha256": "0a5ae49af9b061ef7259830c8dfce1257ff7db2f17d7d5bc0e9cf0fc47c2f22e",
+    "retrievedUTC": "2026-10-09T23:30:56.210835+00:00"
+  },
+  {
+    "file": "nmk932.json",
+    "url": "https://www.namokimods.com/products/nmk932-field-watch-case-bundle-steel-finish.js",
+    "sha256": "f7344b68d2deec30c36882ed0738bd5b9807f0876c3c1a5cc143d1de921a4ffd",
+    "retrievedUTC": "2026-10-09T23:30:56.210835+00:00"
+  },
+  {
+    "file": "nmk950.json",
+    "url": "https://www.namokimods.com/products/nmk950-pilot-tonneau-case-steel-finish.js",
+    "sha256": "b6f8d97f1ef8c877d71efad7b36fcf18578d588fb80516b8cd4c99cac8a90464",
+    "retrievedUTC": "2026-10-09T23:30:56.144715+00:00"
+  },
+  {
+    "file": "nmk955.json",
+    "url": "https://www.namokimods.com/products/nmk955-vk-chronograph-case-steel-finish.js",
+    "sha256": "71e68b38f3abe12547da360c33bcd2634c645c735bb466bf1a5387ab9e5cdb42",
+    "retrievedUTC": "2026-10-09T23:30:56.083567+00:00"
+  },
+  {
+    "file": "nh05-case.json",
+    "url": "https://tandoriowatch.com/products/34mm-nh05-watch-case-bezel-insert-ring-sapphire-glass.js",
+    "sha256": "d12c50d20f768ad536cb3990798731656b814baf496f68956ec20af834fde573",
+    "retrievedUTC": "2026-10-09T23:30:56.766459+00:00"
+  },
+  {
+    "file": "skx-crown.json",
+    "url": "https://www.namokimods.com/products/skx-knurled-crown-sandblasted-finish.js",
+    "sha256": "4082f538f7fbcc9b48466f36e72dd1b67d94231643331a13377072e57eb2e631",
+    "retrievedUTC": "2026-10-09T23:30:56.515862+00:00"
+  }
+]

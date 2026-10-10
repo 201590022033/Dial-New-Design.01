@@ -1,0 +1,60 @@
+{
+  "generator": "tools/blender/generate_crown_family.py",
+  "generatorSha256": "2b2eec802372056cfe4b7881a76bbb0b360d6c861b33f1ad52adf43dd389dc08",
+  "assets": [
+    {
+      "asset": "public/assets/3d/crowns/crown-smooth.glb",
+      "sha256": "4a3c074b995a7c222ddc74176cf670c7ce97d25c8d37d136365413d63794c41b",
+      "shape": "cylindrical",
+      "grip": "smooth",
+      "coreDiameterMm": 6.5,
+      "maximumOuterDiameterMm": 6.5,
+      "headLengthMm": 3.5
+    },
+    {
+      "asset": "public/assets/3d/crowns/crown-fine-fluted.glb",
+      "sha256": "7e9daeb3429539823261feecae3ca4a27d3b4a4a0acb2de356b721599df7b5e6",
+      "shape": "cylindrical",
+      "grip": "fine-fluted",
+      "coreDiameterMm": 6.5,
+      "maximumOuterDiameterMm": 6.9,
+      "headLengthMm": 3.5
+    },
+    {
+      "asset": "public/assets/3d/crowns/crown-coarse-fluted.glb",
+      "sha256": "c264217680bf79c235ee6e0410496f0f1a0201360063bbccc7f2a1b8f866bb0c",
+      "shape": "cylindrical",
+      "grip": "coarse-fluted",
+      "coreDiameterMm": 6.5,
+      "maximumOuterDiameterMm": 7.1,
+      "headLengthMm": 3.5
+    },
+    {
+      "asset": "public/assets/3d/crowns/crown-knurled.glb",
+      "sha256": "d2ecd96893e5acc796acd41151c35b575ad8d5c933b9df93b4936341f5227912",
+      "shape": "cylindrical",
+      "grip": "cross-knurled",
+      "coreDiameterMm": 6.5,
+      "maximumOuterDiameterMm": 6.9,
+      "headLengthMm": 3.5
+    },
+    {
+      "asset": "public/assets/3d/crowns/crown-onion.glb",
+      "sha256": "4c73d1dc015c6dd262408b25832d9e80f36eb42e3ba8670b6e0d6b201bc10ea9",
+      "shape": "onion",
+      "grip": "fine-fluted",
+      "coreDiameterMm": 6,
+      "maximumOuterDiameterMm": 7,
+      "headLengthMm": 4
+    },
+    {
+      "asset": "public/assets/3d/crowns/crown-compact-dress.glb",
+      "sha256": "7edc10939063d72ad1396a4c3c719f5bb13e3201e9e4bcb48c46a090e9d531bb",
+      "shape": "compact-dress",
+      "grip": "fine-fluted",
+      "coreDiameterMm": 5,
+      "maximumOuterDiameterMm": 5.2,
+      "headLengthMm": 2.5
+    }
+  ]
+}

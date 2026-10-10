@@ -9,6 +9,8 @@ import { evaluateAssembly, evaluateCandidate } from '@/domain/compatibility/comp
 import { useWatchAssemblyStore } from '@/stores/watchAssemblyStore';
 import { useCatalogueStore } from '@/stores/catalogueStore';
 import { useSourcingStore } from '@/stores/sourcingStore';
+import { applyCatalogueVisualSelection } from '@/domain/catalogue/applyCatalogueVisualSelection';
+import { crownSlotError, isCrownPart } from '@/domain/crown/selection';
 import {
   calculatePracticalSensitivities
 } from '@/domain/configurator/practicalSensitivities';
@@ -37,7 +39,7 @@ import type {
 function candidateHasLockedTarget(assembly: WatchAssembly, targetId: string, candidate: ComponentCatalogueItem, trayLocks: ReadonlySet<string>) {
   const targets = candidate.kind === 'hand-set'
     ? [targetId, 'inst-hour-hand', 'inst-minute-hand', 'inst-central-seconds']
-    : [targetId];
+    : ['case', 'midcase'].includes(candidate.kind) ? [targetId, ...Object.values(assembly.parts).filter(isCrownPart).map(p => p.instanceId)] : [targetId];
   return targets.some(id => trayLocks.has(id) || assembly.parts[id]?.locked);
 }
 
@@ -344,6 +346,8 @@ export const useConfiguratorUIStore = create<ConfiguratorUIStoreState>((set, get
     const currentAssembly = watchAssemblyStore.assembly;
     const currentSourcing = useSourcingStore.getState().sourcingPlan.selections;
     const isFinish = previewCandidateItem.kind === 'style-finish';
+    const slotError = !isFinish ? crownSlotError(currentAssembly, previewPartInstanceId, previewCandidateItem) : undefined;
+    if (slotError) { set({ previewError: slotError }); return false; }
     // A presentation-only finish must not bypass validation for a geometry swap.
     if (isFinish) {
       const normalized = JSON.parse(JSON.stringify(previewAssembly)) as WatchAssembly;
@@ -385,7 +389,14 @@ export const useConfiguratorUIStore = create<ConfiguratorUIStoreState>((set, get
     }
 
     // Commit to canonical WatchAssemblyStore
-    watchAssemblyStore.setAssembly(previewAssembly);
+    // A crown transition is rebuilt against current state; a stale preview cannot
+    // overwrite a newly selected case, its datum or unrelated edits.
+    const committed = !isFinish && (isCrownPart(currentAssembly.parts[previewPartInstanceId]!) || previewCandidateItem.visual?.category === 'case')
+      ? applyCatalogueVisualSelection(currentAssembly, previewPartInstanceId, previewCandidateItem) : previewAssembly;
+    if (previewCandidateItem.visual?.category === 'case' && previewAssembly.designConfig?.visualReferenceConfig?.caseFinish) {
+      committed.designConfig = { ...committed.designConfig, visualReferenceConfig: { ...committed.designConfig?.visualReferenceConfig, caseFinish: previewAssembly.designConfig.visualReferenceConfig.caseFinish } };
+    }
+    watchAssemblyStore.setAssembly(committed);
 
     // Track decision record
     const updatedCost = get().getCommittedCost().grandTotal;

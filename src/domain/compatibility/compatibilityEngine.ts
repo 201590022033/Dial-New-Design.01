@@ -25,6 +25,8 @@ import { checkDateWindowMovementCompatibility } from './rules/dateWindowMovement
 import { checkCatalogueVerificationState } from './rules/catalogueVerificationRule';
 import { checkTemplateRequiredComponents } from './rules/templateRequiredComponentsRule';
 import { checkMovementPusherCompatibility } from './rules/movementPusherRule';
+import { checkCrownCompatibility } from '@/domain/crown/compatibility';
+import { crownSlotError } from '@/domain/crown/selection';
 
 /**
  * Executes all physical compatibility rules against an assembly and optional candidate item.
@@ -62,6 +64,7 @@ export const runCompatibilityRules = (
   checks.push(...checkDateWindowMovementCompatibility(assembly, candidateItem));
   checks.push(...checkTemplateRequiredComponents(assembly, candidateItem));
   checks.push(...checkMovementPusherCompatibility(assembly, candidateItem));
+  checks.push(...checkCrownCompatibility(assembly));
 
   // 4. Map any severe 2.5D cylindrical CAD collision diagnostics
   for (const diag of geometry.diagnostics) {
@@ -122,6 +125,8 @@ export const evaluateCandidate = (
     };
   }
 
+  const slotError = targetPartInstanceId ? crownSlotError(assembly, targetPartInstanceId, candidate) : undefined;
+  if (slotError) return aggregateCompatibility([{ status: 'red', code: 'CROWN_SLOT_MISMATCH', category: 'crown-interface', summary: slotError }]);
   // Create an immutable provisional assembly with candidate component applied
   const provisionalAssembly = createProvisionalAssemblyWithCandidate(
     assembly,
@@ -130,7 +135,12 @@ export const evaluateCandidate = (
   );
 
   // Run all deterministic compatibility checks
-  const checks = runCompatibilityRules(provisionalAssembly, candidate);
+  const allChecks = runCompatibilityRules(provisionalAssembly, candidate);
+  // A concept crown swap must not be labelled incompatible by an unchanged
+  // hand/dial failure. The full build evaluation still reports those failures.
+  // New failures and all crown-interface contradictions remain hard refusals.
+  const existingRed = candidate.kind === 'crown' ? runCompatibilityRules(assembly).filter(c => c.status === 'red') : [];
+  const checks = candidate.kind === 'crown' ? allChecks.filter(c => c.status !== 'red' || c.category === 'crown-interface' || !existingRed.some(old => old.code === c.code && old.summary === c.summary && JSON.stringify(old.affectedPartIds) === JSON.stringify(c.affectedPartIds))) : allChecks;
 
   const candidateInfo = {
     catalogueItemId: candidate.id,

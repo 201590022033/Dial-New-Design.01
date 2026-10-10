@@ -18,6 +18,8 @@ export interface AssemblyAnchor {
 export type AssemblyAnchors = Record<AnchorId, AssemblyAnchor>;
 export interface ComponentVisualBinding {
   category: ComponentCategory;
+  /** References the selected case's crown axis; no independent angle or position is stored here. */
+  crownAxisId?: string;
   assetId?: string;
   transform?: ComponentTransform;
 }

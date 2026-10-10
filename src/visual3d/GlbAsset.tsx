@@ -11,8 +11,12 @@ import { hideAuthoredBezelMarking } from './authoredBezelMarkings';
 import type { AppearanceDocument } from '@/domain/appearance/appearance';
 import { applyHandAppearance } from './handAppearanceRegions';
 import { useAppearancePreviewStore } from '@/stores/appearancePreviewStore';
+import { hideEmbeddedCrownPreview } from './crownAssetOwnership';
 
 type AssetAppearance = {
+  crownColor?: string;
+  crownMetalness?: number;
+  crownRoughness?: number;
   regions?: AppearanceDocument;
   caseColor?: string;
   handsColor?: string;
@@ -63,6 +67,7 @@ export const LoadedGlbAsset = ({ descriptor, appearance, scaleTexture, liveOuter
       if (!(object instanceof Mesh)) return;
       hasMesh = true;
       const objectName = object.name.toUpperCase();
+      if (descriptor.category === 'case' && hideEmbeddedCrownPreview(descriptor.assetId, object.name)) object.visible = false;
       if (descriptor.category === 'dial' && isAuthoredHourMarker(objectName)) object.visible = false;
       // GLBs include authored default relief for standalone Blender review.
       // The live surface print replaces it so edits do not double the artwork.
@@ -218,7 +223,8 @@ export const LoadedGlbAsset = ({ descriptor, appearance, scaleTexture, liveOuter
           material.opacity = 1;
         }
         material.needsUpdate = true;
-        const metalColor = descriptor.category === 'bezel' ? appearance?.bezelMetalColor ?? appearance?.caseColor : appearance?.caseColor;
+        const metalColor = descriptor.category === 'crown' ? appearance?.crownColor : descriptor.category === 'bezel' ? appearance?.bezelMetalColor ?? appearance?.caseColor : appearance?.caseColor;
+        if (descriptor.category === 'crown') { material.roughness = appearance?.crownRoughness ?? material.roughness; material.metalness = appearance?.crownMetalness ?? material.metalness; }
         if (metalColor && ['case', 'caseback', 'crown', 'pushers', 'bezel'].includes(descriptor.category) && material.metalness > 0.5) {
           material.color = new Color(metalColor);
         }
@@ -246,7 +252,7 @@ export const LoadedGlbAsset = ({ descriptor, appearance, scaleTexture, liveOuter
     });
     if (!hasMesh) throw new Error('GLB has no mesh');
     return clone;
-  }, [night, appearance?.regions, appearance?.caseColor, appearance?.handsColor, appearance?.markerColor, appearance?.markerColorExplicit, appearance?.bezelMetalColor, appearance?.dialTextureIntensity, appearance?.dialTextureKind, appearance?.lumeColor, appearance?.lumeEnabled, appearance?.strapStyleId, bezelColor, descriptor.assetId, descriptor.category, descriptor.scaleArtworkSurface, dialColor, gltf, scaleTexture, liveOuterArtwork, dialFinishTexture, finishBumpScale, strapColor]);
+  }, [night, appearance?.regions, appearance?.caseColor, appearance?.crownColor, appearance?.crownMetalness, appearance?.crownRoughness, appearance?.handsColor, appearance?.markerColor, appearance?.markerColorExplicit, appearance?.bezelMetalColor, appearance?.dialTextureIntensity, appearance?.dialTextureKind, appearance?.lumeColor, appearance?.lumeEnabled, appearance?.strapStyleId, bezelColor, descriptor.assetId, descriptor.category, descriptor.scaleArtworkSurface, dialColor, gltf, scaleTexture, liveOuterArtwork, dialFinishTexture, finishBumpScale, strapColor]);
   // Loading can complete after the frame triggered by a Style click. Demand
   // rendering must capture the new mesh (including sapphire transmission).
   useEffect(() => {

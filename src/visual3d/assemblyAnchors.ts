@@ -1,5 +1,6 @@
 import type { WatchAssembly } from '@/domain/assembly/assemblyTypes';
 import type { AssemblyAnchors, ParametricCaseV1, Vector3Tuple } from '@/domain/geometry/parametric';
+import { resolveCanonicalCrownAxis } from './canonicalCrownAxis';
 
 export const MM_TO_SCENE = 0.1;
 export const finiteVector = (v: unknown): v is Vector3Tuple => Array.isArray(v) && v.length === 3 && v.every((n) => typeof n === 'number' && Number.isFinite(n));
@@ -51,6 +52,14 @@ export const resolveAssemblyAnchors = (assembly: WatchAssembly, caseParams?: Par
   for (const id of Object.keys(anchors) as (keyof AssemblyAnchors)[]) {
     const supplied = assembly.designConfig?.assemblyAnchors?.[id];
     if (supplied && finiteVector(supplied.positionMm) && finiteVector(supplied.rotationRad) && supplied.provenance?.source && ['specified', 'provisional'].includes(supplied.provenance.status)) anchors[id] = supplied;
+  }
+  const canonical = resolveCanonicalCrownAxis(assembly);
+  if (canonical.present) {
+    // Modern case datum is the single source. Legacy saved anchors remain stored
+    // but inactive for this axis; unknown datums must not masquerade as 3h fit.
+    anchors['crown-interface'] = canonical.frame
+      ? { ...canonical.frame, provenance: { status: 'provisional', source: `crown-axis/v1 ${canonical.datum!.axisId}; authored placement, not mechanical fit verification` } }
+      : { ...preview([0, 0, 0]), provenance: { status: 'provisional', source: 'crown-axis/v1 unresolved; operating head is omitted from visual preview' } };
   }
   return anchors;
 };

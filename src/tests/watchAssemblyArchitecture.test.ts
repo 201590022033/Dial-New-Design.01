@@ -40,6 +40,7 @@ import { defaultTypographyConfig } from '@/domain/generators/typographyEngine';
 import { visualVariantCatalogueItems } from '@/domain/catalogue/visualVariantCatalogue';
 import { nh05SupplierCandidateItems } from '@/domain/catalogue/nh05SupplierCandidates';
 import { supplierExpansionCandidateItems } from '@/domain/catalogue/supplierExpansionCandidates';
+import { crownCatalogueItems } from '@/domain/crown/catalogue';
 
 describe('Watch Designer Foundation: Authoritative Architecture & Decoupled Domain', () => {
   // Test 1: Every existing default component maps to a valid catalogue item
@@ -53,7 +54,7 @@ describe('Watch Designer Foundation: Authoritative Architecture & Decoupled Doma
       expect(catItem?.displayName).toBe(legacyDef.displayName);
       expect(catItem?.defaultMaterial).toBe(legacyDef.defaultMaterial);
       expect(catItem?.defaultTexture).toBe(legacyDef.defaultTexture);
-      expect(catItem?.status).toBe('verified');
+      expect(catItem?.status).toBe(legacyDef.kind === 'crown' ? 'draft' : 'verified');
       expect(catItem?.nominalDimensions.diameterMm).toBeGreaterThan(0);
       expect(catItem?.nominalDimensions.thicknessMm).toBeGreaterThan(0);
       expect(catItem?.manufacturing.minimumFeatureMm).toBeGreaterThan(0);
@@ -68,7 +69,7 @@ describe('Watch Designer Foundation: Authoritative Architecture & Decoupled Doma
   // Test 2: Catalogue items exist independently from WatchAssembly
   it('ensures catalogue items exist independently from WatchAssembly', () => {
     const catalogueStore = useCatalogueStore.getState();
-    expect(catalogueStore.items.length).toBe(defaultCatalogueItems.length + visualVariantCatalogueItems.length + nh05SupplierCandidateItems.length + supplierExpansionCandidateItems.length);
+    expect(catalogueStore.items.length).toBe(defaultCatalogueItems.length + crownCatalogueItems.length + visualVariantCatalogueItems.length + nh05SupplierCandidateItems.length + supplierExpansionCandidateItems.length);
 
     const item = catalogueStore.getItem('cat-hour-hand');
     expect(item).toBeDefined();
@@ -208,7 +209,8 @@ describe('Watch Designer Foundation: Authoritative Architecture & Decoupled Doma
 
     const legacyEntities = assemblyToWatchComponentEntities(assembly);
     expect(legacyEntities.length).toBe(assembly.partOrder.length);
-    expect(legacyEntities.filter((e) => e.exportEnabled)).toHaveLength(43);
+    expect(legacyEntities.filter((e) => e.exportEnabled)).toHaveLength(42);
+    expect(legacyEntities.find((e) => e.definition.kind === 'crown')!.exportEnabled).toBe(false);
     expect(legacyEntities.find((e) => e.definition.kind === 'midcase')!.exportEnabled).toBe(false);
     expect(assembly.parts['inst-midcase']!.catalogueItemId).toBe('cat-midcase');
   });

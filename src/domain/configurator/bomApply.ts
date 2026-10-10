@@ -2,6 +2,7 @@ import type { WatchAssembly } from '@/domain/assembly/assemblyTypes';
 import type { ComponentCatalogueItem, SupplierListing } from '@/domain/catalogue/types';
 import { applyCatalogueVisualSelection } from '@/domain/catalogue/applyCatalogueVisualSelection';
 import { bomChoiceGroup } from './bomChoices';
+import { crownSlotError } from '@/domain/crown/selection';
 
 /** Explicit Apply transition; choosing a price alone never mutates the watch. */
 export function prepareBomApply(assembly: WatchAssembly, partId: string, items: ComponentCatalogueItem[], listing?: SupplierListing) {
@@ -14,6 +15,9 @@ export function prepareBomApply(assembly: WatchAssembly, partId: string, items: 
   const group = bomChoiceGroup(item.kind);
   // Renderers use the canonical crystal slot; do not leave a second active crystal.
   const targetId = group === 'crystal' && assembly.parts['inst-crystal'] ? 'inst-crystal' : partId;
+  const slotError = crownSlotError(assembly, targetId, item);
+  if (slotError) throw new Error(slotError);
+  if (assembly.parts[targetId]?.locked) throw new Error('This component is physically locked.');
   const candidate = applyCatalogueVisualSelection(assembly, targetId, item);
   candidate.parts[targetId]!.visible = true;
   if (group) {

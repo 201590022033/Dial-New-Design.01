@@ -4,6 +4,9 @@ import type { WatchAssembly } from '@/domain/assembly/assemblyTypes';
 export type CompatibilityStatus = 'green' | 'yellow' | 'red' | 'unknown';
 
 export type CompatibilityRuleCode =
+  | 'CROWN_SLOT_MISMATCH'
+  | 'CROWN_INTERFACE_MISMATCH'
+  | 'CROWN_INTERFACE_UNKNOWN'
   | 'MOVEMENT_EXCEEDS_CASE_CAVITY'
   | 'MOVEMENT_REQUIRES_CASING_SPACER'
   | 'MOVEMENT_CASE_FIT_VALID'
