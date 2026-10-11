@@ -1,5 +1,7 @@
 # Crown continuation ledger
 
+Later 11 October reconciliation: the separate local case-size slider D1–D2 work is consolidated in the commit containing CASE-DIAMETER-RECONCILIATION-2026-10-11.md. Earlier statements that it remains excluded/local refer to crown-only commit 0d710ad. The local slider is the sole retained implementation; do not import the superseded cloud bundle. Crown C0–C7 remains complete within its documented presentation/qualification limits.
+
 Current authority, 11 October 2026: the user requested “please push and commit and give me a reportf what still needs doing”. C4–C7 publication to origin/main is authorized and performed by the commit containing CROWN-PUBLICATION-2026-10-11.md. That report supersedes the historical local/uncommitted and await-publication statements below. Verify live Git state for the resulting commit. Separate case-diameter work is excluded; scheduler remains paused. Remaining work is supplier and physical qualification plus optional later scope, not repetition of completed crown milestones.
 
 Updated: 10 October 2026, Africa/Johannesburg.

@@ -1,5 +1,7 @@
 # Project Crown and Namokimods - portable context cache
 
+Later 11 October reconciliation: separate case-size slider D1–D2 work is consolidated by CASE-DIAMETER-RECONCILIATION-2026-10-11.md. Earlier excluded/local statements refer to crown-only commit 0d710ad. Do not import the obsolete cloud slider bundle or repeat either completed implementation.
+
 Publication update, 11 October 2026: the user explicitly authorized committing and pushing C4–C7. Read CROWN-PUBLICATION-2026-10-11.md and live Git state; this supersedes historical unpublished/await-authorization statements below. Separate case-diameter work is excluded. Scheduler remains paused.
 
 Updated 10 October 2026, Africa/Johannesburg. This file is an explicit disk-backed handoff, not an internal model cache. Read the live ledger and Git state before trusting this snapshot.

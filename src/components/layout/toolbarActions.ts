@@ -26,10 +26,11 @@ export const resizeCasePreview = (assembly: WatchAssembly, diameter: number, loc
   };
 };
 
-export const applyToolbarDiameter = (diameter: number): void => {
+export const applyToolbarDiameter = (diameter: number, expectedAssembly?: WatchAssembly): void => {
   const ui = useConfiguratorUIStore.getState();
   if (ui.previewStatus === 'previewing' || ui.archetypePreviewAssembly) throw new Error('Apply or cancel the component/build preview before resizing.');
   const store = useWatchAssemblyStore.getState();
+  if (expectedAssembly && expectedAssembly !== store.assembly) throw new Error('The design changed during resizing. Start a new drag.');
   const assembly = resizeCasePreview(store.assembly, diameter, ui.lockedPartIds);
   if (assembly !== store.assembly) store.setAssembly(assembly);
 };

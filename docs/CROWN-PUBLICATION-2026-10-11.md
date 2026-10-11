@@ -1,5 +1,7 @@
 # Crown publication and remaining work — 11 October 2026
 
+Later reconciliation: CASE-DIAMETER-RECONCILIATION-2026-10-11.md records consolidation of the separately excluded slider work. The exclusion/local status below describes crown-only commit 0d710ad.
+
 The user authorized committing and pushing completed C4–C7 to origin/main. C0–C3 were already published at b5c313bf95e1b47c68d8bee1412cac46cbd32122. This checkpoint publishes crown controls, protected-cap presentation, persistence and supplier snapshots, package pricing, regression coverage, and the two provisional off-axis case platforms, with their acceptance evidence.
 
 ## Validation

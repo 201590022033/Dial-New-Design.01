@@ -72,6 +72,31 @@ describe('hybrid toolbar authoritative preview geometry', () => {
     expect(useWatchAssemblyStore.getState().assembly.globalDimensions.caseDiameterMm).toBe(34);
   });
 
+  it('rejects a stale assembly identity at the same diameter without changing assembly or history', () => {
+    const stale = useWatchAssemblyStore.getState().assembly;
+    const replacement = structuredClone(stale);
+    useWatchAssemblyStore.getState().setAssembly(replacement);
+    const before = useWatchAssemblyStore.getState();
+    expect(before.assembly.globalDimensions.caseDiameterMm).toBe(stale.globalDimensions.caseDiameterMm);
+    expect(() => applyToolbarDiameter(46.5, stale)).toThrow('The design changed during resizing');
+    const after = useWatchAssemblyStore.getState();
+    expect(after.assembly).toBe(replacement);
+    expect(after.assembly).toEqual(stale);
+    expect(after.historyPast).toBe(before.historyPast);
+    expect(after.historyFuture).toBe(before.historyFuture);
+  });
+
+  it('accepts the current assembly identity and creates one canonical resize history entry', () => {
+    const current = useWatchAssemblyStore.getState().assembly;
+    applyToolbarDiameter(46.5, current);
+    const after = useWatchAssemblyStore.getState();
+    expect(after.assembly.globalDimensions.caseDiameterMm).toBe(46.5);
+    expect(after.assembly.parts).toBe(current.parts);
+    expect(after.historyPast).toHaveLength(1);
+    expect(after.historyPast[0]).toEqual(current);
+    expect(after.historyFuture).toHaveLength(0);
+  });
+
   it('refuses diameter/export writes while a component or build preview is unapplied', () => {
     useConfiguratorUIStore.setState({ previewStatus: 'previewing' });
     expect(() => applyToolbarDiameter(46)).toThrow('Apply or cancel');
