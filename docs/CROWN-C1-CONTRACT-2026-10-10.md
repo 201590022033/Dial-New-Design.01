@@ -50,4 +50,14 @@ Production build includes `tsc -b`; final lint/build/whitespace results are reco
 
 C0 sources and limitations remain in `CROWN-C0-EVIDENCE-2026-10-10.md`, the asset inventory, supplier evidence ledger and `docs/research/crown-c0-2026-10-10/`. Unknown exact case angles and mating interfaces remain unknown. No source GLB was rewritten. The missing reference asset path, embedded head suppression, appearance meshes, Apply/default rules, BOM and off-axis platform implementation remain subsequent milestones.
 
-Next implementation gate: separately authorize C2 and/or C3 against these frozen contracts. Changes remain uncommitted; the continuation scheduler stays paused.
+Historical C1 gate above is superseded by the live ledger: C0-C3 are published, and approved C4/C5 are complete locally. The continuation scheduler stays paused.
+
+## C4/C5 additive extension, 10 October 2026
+
+The frozen physical contracts remain unchanged. A separately validated `crown-cap-concept/v1` part field stores open/closed presentation, clearance and wall assumptions; it does not qualify physical protection or add a second axis. Case/starter replacement clears the case-owned holder concept. Detached crown specs and cap ownership are validated before serialization/hydration. Replayable `CrownEdit` intents retain physical evidence while changing appearance or concept closure.
+
+Selected supplier/package/price snapshots are validated commercial metadata outside the engineering contracts. Project files and saved versions preserve the exact selected record, timestamped FX and unknown shipping. Whole-plan restore prevents stale sourcing selections. Current verification and limitations: CROWN-C4-C5-HANDOFF-2026-10-10.md.
+
+## C7 additive extension, 10 October 2026
+
+`off-axis-platform/v1` is an optional case-owned contract validated before hydration: exact case identity/source, supplier envelope and dial/movement claims, bounded software movement scope, independent unknown installation/calendar/stem/spacer/dial-feet/loading fields. Identity remains requires-confirmation and physicalFit unqualified. Existing crown-axis/v1 remains the sole numeric placement; render angles/radii are explicitly approximate. One datum and one operating head are required. Generic NH35 physical-seat fallbacks cannot certify this platform. Legacy records without the new field are unchanged. Supplier snapshots additionally admit a bezel package role; included hardware is commercial metadata, not a fit declaration. Current tests and exclusions: CROWN-C7-ACCEPTANCE-2026-10-10.md.

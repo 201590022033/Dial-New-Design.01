@@ -64,6 +64,8 @@ const generatedCaseAssets: Record<string, VisualAssetDescriptor> = Object.fromEn
 }));
 
 export const visualAssetRegistry: Record<string, VisualAssetDescriptor> = {
+  'case-namoki-nmk920-offaxis-v1': { assetId: 'case-namoki-nmk920-offaxis-v1', category: 'case', assetType: 'glb', assetPath: '/assets/3d/variants/cases/case-namoki-nmk920-offaxis-v1.glb', anchor: 'watch-axis', units: 'millimetres', upAxis: 'Y', referenceCaseDiameterMm: 47 },
+  'case-tandorio-tuna-465-offaxis-v1': { assetId: 'case-tandorio-tuna-465-offaxis-v1', category: 'case', assetType: 'glb', assetPath: '/assets/3d/variants/cases/case-tandorio-tuna-465-offaxis-v1.glb', anchor: 'watch-axis', units: 'millimetres', upAxis: 'Y', referenceCaseDiameterMm: 46.5 },
   ...Object.fromEntries(crownPresentations.map(p => [`crown-${p.id}`, { assetId: `crown-${p.id}`, category: 'crown', assetType: 'glb', assetPath: `/assets/3d/crowns/crown-${p.id}.glb`, anchor: 'crown-interface', units: 'millimetres', upAxis: 'Y' } satisfies VisualAssetDescriptor])),
   'case-namoki-nmk903-black-38': { assetId: 'case-namoki-nmk903-black-38', category: 'case', assetType: 'glb', assetPath: `${variantRoot}/cases/case-namoki-nmk903-black-38.glb`, anchor: 'watch-axis', units: 'millimetres', upAxis: 'Y', referenceCaseDiameterMm: 38, materialProfile: 'black-pvd' },
   'dial-namoki-108-silver-285': { assetId: 'dial-namoki-108-silver-285', category: 'dial', assetType: 'glb', assetPath: `${variantRoot}/dials/dial-namoki-108-silver-285.glb`, anchor: 'watch-axis', offset: [0, 0, 3.7], units: 'millimetres', upAxis: 'Y' },

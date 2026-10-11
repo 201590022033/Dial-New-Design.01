@@ -46,8 +46,11 @@ export interface WatchAssemblyPartInstance {
   geometryProvenance?: GeometryProvenance;
   /** Case-owned authored axes. Absent legacy documents keep their original placement behavior. */
   crownAxes?: CrownAxisDatumV1[];
+  offAxisPlatform?: import('@/domain/crown/offAxisPlatform').OffAxisCasePlatform;
   /** Removable head contract; axisId references a case-owned datum, never a second transform. */
   crownSpecification?: CrownSpecificationV1;
+  /** Generic presentation concept; never orderable matched hardware. */
+  crownCapConcept?: import('@/domain/crown/edit').CrownCapConcept;
 }
 
 export interface WatchAssemblyMetadata {

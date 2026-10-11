@@ -1,10 +1,12 @@
 # Crown continuation ledger
 
+Current authority, 11 October 2026: the user requested “please push and commit and give me a reportf what still needs doing”. C4–C7 publication to origin/main is authorized and performed by the commit containing CROWN-PUBLICATION-2026-10-11.md. That report supersedes the historical local/uncommitted and await-publication statements below. Verify live Git state for the resulting commit. Separate case-diameter work is excluded; scheduler remains paused. Remaining work is supplier and physical qualification plus optional later scope, not repetition of completed crown milestones.
+
 Updated: 10 October 2026, Africa/Johannesburg.
 
-- Baseline HEAD: `6931131420adb5606323f8c8db54dc4c76604f8d` on main.
-- Overall state: C0 COMPLETE WITH EXPLICIT EVIDENCE LIMITATIONS / C1 COMPLETE / C2 COMPLETE / C3 COMPLETE.
-- Authority: human approved C0 followed by C1, requesting GPT-6.1 Sol light mode, then explicitly requested C2 and C3 followed by commit/push on 10 October. The coordinator cannot switch its own running model through available tools. No C4-C7 implementation, supplier onboarding, contacts, purchases or scheduler activation approved. C2/C3 were completed without new delegation.
+- Published baseline HEAD: `b5c313bf95e1b47c68d8bee1412cac46cbd32122` on main/origin/main (C0-C3).
+- Overall state: C0-C4 COMPLETE WITH EXPLICIT EVIDENCE LIMITATIONS / C5 PRESENTATION CONCEPT COMPLETE / C7A-E PROVISIONAL PRESENTATION COMPLETE / C6 REGRESSION PASS INCLUDING C7.
+- Authority: human approved C0/C1, C2/C3 with commit/push, C4/C5, C6, then “So can we do c7” and “please fcomplete” on 10 October. Bounded provisional supplier/catalogue integration is included in C7. C4-C7 remain local and uncommitted; publication, contacts, purchases and scheduler activation were not requested. No new delegation was used for C4-C7. The coordinator cannot switch its own running model through available tools.
 - Plan: `docs/CROWN-ROADMAP-2026-10-09.md`.
 - Scheduler ID: `resume-dial-designer-crown-roadmap`; status PAUSED, five-hour cadence. Not an active guarantee of restart.
 - Research complete: movement/stem versus case-crown distinction, case-first default rule, archetype recommendations, supplied-package examples, U-BOAT cap/inner-crown distinction, repository architecture review.
@@ -16,15 +18,38 @@ Updated: 10 October 2026, Africa/Johannesburg.
 - New task requested: Project Crown and Namokimods. Portable context cache and per-milestone execution prompts prepared, including suggested 1-3 subagents, role/file ownership, applicable skills/tools, gates and handoff. Task creation/identity recorded below when confirmed.
 - New planning task CREATED: Project Crown and Namokimods, thread `01a12229-68af-7e33-9201-87330c04d8b7`, host local. No saved repository projects were available; task is projectless planning with the exact existing repo path, not repository-linked. It is instructed to read/check context read-only and wait for C0/C1 approval. Origin heartbeat remains paused and has not been retargeted/duplicated.
 - Off-axis research: existing NMK920 has a baked generic3h head and missing exact angle; live SKU differs from repo. Old external-envelope sketch recovered and bounded, with current variant linkage and hidden mating dimensions unresolved. Tandorio46.5 supplier states4h, but no genuine case-interface drawing recovered. Prices/time/stock conflicts retained in supplier evidence; no ZAR or SA shipping invented.
-- Remaining limitations: no measured mechanical-fit certification, no modern crown UI/default resolution or mesh changes. Engineering has no side/crown viewport. Multiple-axis documents persist but the one-slot visual adapter omits the crown until later renderer support; unknown modern placement never falls back to invented coordinates.
-- Next safe action: verify publication against origin/main, then await approval for the next milestone. C2/C3 completion and evidence are recorded in CROWN-C2-C3-HANDOFF-2026-10-10.md. Do not repeat completed C0 broad research without a named stale evidence gap. Scheduler remains paused; activation/retargeting needs separate explicit approval.
+- Remaining limitations: no measured mechanical-fit certification or orderable protected-cap hardware. The main Engineering view has no side/crown viewport; C4 adds a crown front-projection detail beside the controls. Multiple-axis documents persist but the one-slot visual adapter omits the crown until later renderer support; unknown modern placement never falls back to invented coordinates.
+- Next safe action: read CROWN-C7-ACCEPTANCE-2026-10-10.md and current Git state; await new scope or publication authorization. Do not repeat completed milestones. Exact supplier identity/physical hardware needs external evidence. Scheduler remains paused.
 - Continuation rule: if approval absent or quota exhausted, do not start implementation or expensive repeated research. Stay quiet on unchanged state. If approved, resume next incomplete item with bounded agents, recording results before handoff.
 - Publication: user explicitly authorized committing and pushing the complete C0-C3 checkpoint to origin/main. The baseline above is historical; verify current local and remote HEAD before continuation. Our temporary localhost:3017 baseline server was stopped after evidence capture. C3 used an isolated localhost:3018 origin. No scheduler action was performed.
 - Historical planning QA: independent agent reviewed new prompts/cache/C7. Added serialized browser ownership and presentation-only acceptance for approximate axes. The original planning-only pass checked four Markdown files without application tests; the current C0/C1 verification above supersedes that checkpoint.
 
-## Current C2/C3 checkpoint (supersedes earlier C1-only status)
+## Historical C2/C3 checkpoint (superseded by C4/C5 below)
 
 - C2: six draft concept choices, crown-only search/Apply, saved-choice preservation, evidence-gated case/platform defaults, ten provisional archetype defaults, physical interface unknown/mismatch checks and independent finish. No production supplied-case bundle was newly verified.
 - C3: six reproducible Blender GLBs with matching shaped fallback; independent asset eligibility; exact reviewed embedded-head suppression; original case hashes unchanged; corrected reference crown path. Custom/cap and off-axis supplier work remains later scope.
 - Final checks: 103 files / 884 tests passed (40 C2 + 18 C3 additions); lint and production build including TypeScript passed. Current handoff contains screenshot paths, asset hash manifest, limitations and acceptance details.
 - Browser: six front/side HD options, Search all, keyboard and double-click Apply and fresh ladies34 fixture passed with no browser errors. Engineering has no side/crown viewport. Multiple-axis rendering and measured mechanical-fit certification remain unavailable.
+
+## Current C4/C5 checkpoint
+
+- C4: dedicated shape, closure/protection, independent finish and source/fit controls; validated replayable Preview/Apply intent; lock checks; explicit default restore; shared-geometry front engineering detail. Exact selected commercial snapshots survive project autosave/import, durable versions and Undo.
+- BOM: evidence-backed case package accounting avoids charging the included crown twice; explicit separate replacements retain their own price. Snapshot FX, tax assumptions and SA shipping preserve unknowns. Synthetic verification fixtures do not onboard production offers.
+- C5: separate generic cap and case-owned holder, transparent closed and exploded open states, shared crown datum, no left-side relocation. Actual procedural meshes clear the head envelope; case/guard/attachment/sealing and hardware fit remain unqualified. Concept labels persist in HD, controls, BOM, suppliers and render metadata; cap is unpriced and has no physical supplier/Apply action. Existing GLBs unchanged.
+- Final verification: 104 files / 911 tests passed; lint and TypeScript/production build passed. Actual localhost:3019 browser acceptance covered cancel/Apply/Enter/double-click, locks, Undo/Redo, durable versions/reload, case-holder clearing, default restore, HD front/side, engineering detail and unpriced BOM. Final browser error log empty; temporary tab/viewport/server cleaned up.
+- Handoff and evidence: CROWN-C4-C5-HANDOFF-2026-10-10.md and docs/research/crown-c4-c5-2026-10-10/manifest.json. Current slice remains local and uncommitted on published C0-C3 baseline. No scheduler action performed.
+
+## Historical C6 checkpoint before C7
+
+- User explicitly instructed "go c6". C6 passed for approved C0-C5 ordinary-crown/protected-cap presentation scope; C7 remains excluded and unimplemented. No publication instruction was given for C4-C6.
+- Added crownReleaseGate.test.ts: 29 tests covering six starters at 34/38/42 mm, 1,620 shape/closure/finish combinations, 216 cap states, ten profiles with 100 inherited-profile transitions and unchanged legacy documents. Surrounding parts, physical evidence and unknown fit are preserved after imports.
+- Fresh final checks: 105 files / 940 tests passed; lint, separate typecheck, TypeScript/production build and diff/whitespace/conflict checks passed. All 30 C4/C5 source hashes unchanged; no production-code fix was needed.
+- Actual browser: six starter Engineering/front/side HD views, all exposed head/closure/finish choices across representative fixtures, reference42 and custom38, full-screen concept labels, versions/restore/reload, cancel and locks. Researched38 provisional preview retains incompatible Apply gate. Final browser error log empty; temporary tab/server closed.
+- Audit and pinned evidence: CROWN-C6-ACCEPTANCE-2026-10-10.md and docs/research/crown-c6-2026-10-10/manifest.json. Main Engineering remains dial-only with a separate crown detail; exact off-axis cases and physical cap hardware remain outside acceptance. C4-C6 remain local and uncommitted; scheduler unchanged and paused.
+
+## Current C7 and C6 rerun checkpoint
+
+- C7 authorized and complete for provisional presentation: existing NMK920 47 mm identity plus Tandorio black 46.5 mm; shared approximate datum, new Blender assets, separate evidence/installation contract, case/crown projection, 22 mm strap and movement/dial gates, shared Apply, supplier/FX/BOM package accounting and persistence. Exact variant confirmation, installation and physical fit remain unqualified.
+- Final fresh checks: 106 files / 965 tests; lint, separate typecheck, production build and diff checks passed. New 25-test off-axis audit includes actual binary geometry and all C6 regression tests rerun. Browser covers both front/side models, Enter/double-click/cancel/locks, sourcing/BOM, explicit crown/finish, Undo/Redo, version/reload/restore and actual render-package export. Original C0/C3 GLBs preserved.
+- Acceptance: CROWN-C7-ACCEPTANCE-2026-10-10.md; pinned evidence, selected fixture and binary/source hashes: docs/research/crown-c7-2026-10-10/. Final supplier exact identity, stock and SA shipping remain unknown. No hardware certification or orderable cap claim.
+- C0-C3 published HEAD unchanged. C4-C7 local and uncommitted. Scheduler paused; no contacts/purchases. Next action requires new user scope or publication authorization.

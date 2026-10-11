@@ -37,13 +37,14 @@ describe('all-archetype lug and rose-gold regressions', () => {
     expect(model.assets.case.assetId).toBe('case-nh05-ladies-dress-34');
   });
 
-  it('records connected root envelopes on all nine supplier case GLBs', () => {
+  it('records connected root envelopes on all eleven supplier case GLBs, including the smaller off-axis midcase inside its shroud', () => {
     const cases = Object.values(visualAssetRegistry).filter(asset => asset.category === 'case' && asset.assetPath?.includes('/variants/cases/'));
-    expect(cases).toHaveLength(9);
+    expect(cases).toHaveLength(11);
     for (const asset of cases) {
       const lugs = glb(asset.assetPath!).nodes.filter(node => node.name.startsWith('DD_CASE_LUG_'));
       expect(lugs).toHaveLength(4);
-      for (const lug of lugs) expect(lug.extras?.DD_ROOT_OUTER_RADIUS_MM).toBeCloseTo(asset.referenceCaseDiameterMm! / 2 - .8);
+      const bodyDiameter = asset.assetId.includes('offaxis-v1') ? 42 : asset.referenceCaseDiameterMm!;
+      for (const lug of lugs) expect(lug.extras?.DD_ROOT_OUTER_RADIUS_MM).toBeCloseTo(bodyDiameter / 2 - .8);
     }
   });
 

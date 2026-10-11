@@ -14,6 +14,8 @@ import { materialById } from '@/domain/materials/materialLibrary';
 import { hydrateRuntimeProject } from '@/services/runtimeProjectHydrationService';
 import { clearScaleEngineCache } from '@/services/scaleEngineService';
 import { useWatchAssemblyStore } from '@/stores/watchAssemblyStore';
+import { useSourcingStore } from '@/stores/sourcingStore';
+import { useCatalogueStore } from '@/stores/catalogueStore';
 import {
   useBandsStore,
   useDesignEngineStore,
@@ -32,6 +34,8 @@ const HelpCenter = lazy(() =>
 
 export const App = () => {
   const assembly = useWatchAssemblyStore((state) => state.assembly);
+  const sourcingPlan = useSourcingStore(state => state.sourcingPlan);
+  const supplierListings = useCatalogueStore(state => state.supplierListings);
   const [hydrated, setHydrated] = useState(false);
   const [presentationMode, setPresentationMode] = useState(false);
   const [visualMode, setVisualMode] = useState<'engineering' | 'visual'>('engineering');
@@ -218,6 +222,8 @@ export const App = () => {
     autosaveNow();
   }, [
     autosaveNow,
+    sourcingPlan,
+    supplierListings,
     assembly,
     hydrated,
     bands,

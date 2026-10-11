@@ -1,0 +1,24 @@
+[
+  {
+    "id": "nmk920-brushed", "caseId": "cat-case-namoki-nmk920-tuna-47", "crownId": "cat-crown-nmk920-package",
+    "assetId": "case-namoki-nmk920-offaxis-v1", "name": "namokiMODS NMK920 Tuna 47mm Case — provisional off-axis",
+    "source": "https://www.namokimods.com/products/nmk920-tuna-skx007-srpd-watch-case-brushed-finish",
+    "variantId": "40465538744495", "sku": "NMK920-PL", "legacySku": "NMK920-BRUSHED",
+    "shroudMm": 47, "heightMm": 11.3, "heightBasis": "without caseback", "lugWidthMm": 22, "lugToLugMm": 46.5, "renderLugToLugMm": 46.5,
+    "clockwiseDeg": 30, "positionWording": "Exact angle unpublished; approximate 4h presentation", "axisEvidence": "visual-approximation",
+    "bodyMm": 42, "openingMm": 34.5, "interfaceRadiusMm": 23.8, "cutoutHalfAngleDeg": 15,
+    "dialMinMm": null, "dialMaxMm": null, "movementClaims": ["nh35"], "finish": "steel",
+    "notes": "Old supplier-hosted envelope sketch is not linked to the current SKU. Body, opening, tube, cutout and axis are presentation assumptions. SKU alias/current variant identity unresolved. Crown and bezel included; not a matched hardware certificate."
+  },
+  {
+    "id": "tandorio465-black", "caseId": "cat-case-tandorio-tuna-465-black", "crownId": "cat-crown-tandorio465-package",
+    "assetId": "case-tandorio-tuna-465-offaxis-v1", "name": "Tandorio Tuna 46.5mm Black — provisional 4h",
+    "source": "https://tandoriowatch.com/products/tuna-can-watch-case-46-5mm",
+    "variantId": "50602694836509", "sku": "1005010072446013-black", "legacySku": null,
+    "shroudMm": 46.5, "heightMm": 15.4, "heightBasis": "supplier total thickness", "lugWidthMm": 22, "lugToLugMm": null, "renderLugToLugMm": 49,
+    "clockwiseDeg": 30, "positionWording": "4 o'clock", "axisEvidence": "supplier-statement",
+    "bodyMm": 42, "openingMm": 34.5, "interfaceRadiusMm": 23.55, "cutoutHalfAngleDeg": 15,
+    "dialMinMm": 27, "dialMaxMm": 29, "movementClaims": ["nh34", "nh35", "nh36", "nh38"], "finish": "black-pvd",
+    "notes": "Supplier-stated 4h is represented as 30 degrees clockwise, not measured angle/tolerance. Body, opening, tube, cutout and lug-to-lug are presentation assumptions. No interface drawing. Prior JSON stock conflicts with sold-out page; current exact variant metadata unavailable."
+  }
+]

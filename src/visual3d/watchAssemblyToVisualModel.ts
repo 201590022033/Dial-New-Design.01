@@ -10,6 +10,7 @@ import type { CrownSpecificationV1 } from '@/domain/crown';
 import { matchesReference42Parameters, reference42Parameters } from '@/domain/presets/reference3d';
 import type { CrownSurface } from './crownGeometry';
 import { crownSpecificationForPart } from '@/domain/crown/selection';
+import { validCapConcept, type CrownCapConcept } from '@/domain/crown/edit';
 import { resolveFinishProfile, type FinishProfile, type FinishProfileId } from './finishProfiles';
 import { defaultMarkerConfig, generateMarkers, type MarkerEngineConfig, type MarkerKind } from '@/domain/generators/markerEngine';
 import { movementLibrary } from '@/domain/movements/movementLibrary';
@@ -60,6 +61,7 @@ export type DialVisualDescriptor = {
 };
 
 export type VisualWatchModel = {
+  offAxisPlatform?: import('@/domain/crown/offAxisPlatform').OffAxisCasePlatform;
   caseDiameterMm: number;
   caseThicknessMm: number;
   previewEnvelope: ReturnType<typeof resolveProceduralEnvelope>;
@@ -76,7 +78,7 @@ export type VisualWatchModel = {
     hourLengthMm: number; minuteLengthMm: number; secondLengthMm: number;
     hourWidthMm: number; minuteWidthMm: number; secondWidthMm: number;
   };
-  crown: { diameterMm: number; lengthMm: number; material: string; surface: CrownSurface; parameters?: ParametricCrownV1; provisional: boolean; specification?: CrownSpecificationV1; axisStatus?: 'legacy' | 'resolved' | 'unknown' };
+  crown: { diameterMm: number; lengthMm: number; material: string; surface: CrownSurface; capConcept?: CrownCapConcept; parameters?: ParametricCrownV1; provisional: boolean; specification?: CrownSpecificationV1; axisStatus?: 'legacy' | 'resolved' | 'unknown' };
   pushers: PusherVisualDescriptor;
   finishes: Record<VisualCategory, FinishProfile>;
   anchors: AssemblyAnchors;
@@ -315,6 +317,7 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
   if (canonicalCrown.present && !canonicalCrown.frame) visible.crown = false;
   return {
     caseDiameterMm: positive(assembly.globalDimensions.caseDiameterMm, 40),
+    offAxisPlatform: casePart?.offAxisPlatform,
     caseThicknessMm: caseHeight,
     previewEnvelope,
     caseMaterial: materialProfile(casePart, 'brushed-steel'),
@@ -395,6 +398,7 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
     },
     crown: {
       specification: crownSpec,
+      capConcept: validCapConcept(crownPart?.crownCapConcept) ? crownPart.crownCapConcept : undefined,
       surface,
       axisStatus: canonicalCrown.present ? canonicalCrown.frame ? 'resolved' : 'unknown' : 'legacy',
       diameterMm: core,

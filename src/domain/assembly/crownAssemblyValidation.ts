@@ -1,6 +1,8 @@
 import { getCatalogueItem } from '@/domain/catalogue/catalogueRegistry';
 import { assertCrownAxis, assertCrownChoice, assertCrownSpecification } from '@/domain/crown';
 import type { WatchAssembly, WatchAssemblyPartInstance } from './assemblyTypes';
+import { validCapConcept } from '@/domain/crown/edit';
+import { offAxisPlatformSchema } from '@/domain/crown/offAxisPlatform';
 
 /** Only applies to opt-in crown contracts; legacy documents are never rewritten. */
 export const assertAssemblyCrownContracts = (assembly: WatchAssembly): void => {
@@ -11,6 +13,15 @@ export const assertAssemblyCrownContracts = (assembly: WatchAssembly): void => {
   const isCase = (part: WatchAssemblyPartInstance) => kind(part) ? ['case', 'midcase'].includes(kind(part)!) : part.visual?.category === 'case';
   const isCrown = (part: WatchAssemblyPartInstance) => kind(part) ? kind(part) === 'crown' : part.visual?.category === 'crown';
   for (const part of parts) {
+    if (part.offAxisPlatform !== undefined) {
+      const platform = offAxisPlatformSchema.parse(part.offAxisPlatform);
+      if (!isCase(part) || platform.caseCatalogueId !== part.catalogueItemId || part.crownAxes?.length !== 1) throw new Error('Off-axis platform must belong to its exact case with one canonical datum');
+    }
+    if (part.crownCapConcept !== undefined && (!isCrown(part) || !validCapConcept(part.crownCapConcept))) throw new Error('Invalid crown cap presentation concept');
+    if (part.customProperties?.detachedCrownSpecification !== undefined) {
+      if (!isCrown(part)) throw new Error('Detached crown specification must belong to a crown');
+      assertCrownSpecification(part.customProperties.detachedCrownSpecification);
+    }
     if (part.crownAxes !== undefined) {
       if (!isCase(part)) throw new Error('Crown axes must belong to a case part');
       if (part.visual && part.visual.category !== 'case') throw new Error('Case crown axes conflict with visual component category');

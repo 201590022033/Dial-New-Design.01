@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { offAxisPackageCrowns } from '@/domain/catalogue/offAxisCatalogue';
 import {
   defaultCatalogueItems,
   getCatalogueItem,
@@ -69,7 +70,7 @@ describe('Watch Designer Foundation: Authoritative Architecture & Decoupled Doma
   // Test 2: Catalogue items exist independently from WatchAssembly
   it('ensures catalogue items exist independently from WatchAssembly', () => {
     const catalogueStore = useCatalogueStore.getState();
-    expect(catalogueStore.items.length).toBe(defaultCatalogueItems.length + crownCatalogueItems.length + visualVariantCatalogueItems.length + nh05SupplierCandidateItems.length + supplierExpansionCandidateItems.length);
+    expect(catalogueStore.items.length).toBe(defaultCatalogueItems.length + crownCatalogueItems.length + offAxisPackageCrowns.length + 2 + visualVariantCatalogueItems.length + nh05SupplierCandidateItems.length + supplierExpansionCandidateItems.length);
 
     const item = catalogueStore.getItem('cat-hour-hand');
     expect(item).toBeDefined();

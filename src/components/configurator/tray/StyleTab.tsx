@@ -15,6 +15,8 @@ import { useSelectionStore } from '@/stores/selectionStore';
 import { buildComponentNavigatorItems, resolveNavigatorSelection } from '@/domain/configurator/componentNavigator';
 import { movementLibrary } from '@/domain/movements/movementLibrary';
 import { resolveAppearance } from '@/domain/appearance/appearance';
+import { isCrownPart } from '@/domain/crown/selection';
+import { CrownControls } from './CrownControls';
 
 const FINISH_PRESETS = [
   { id: 'matte', name: 'Matte Finish', texture: 'matte', description: 'Non-reflective micro-bead blasted surface' },
@@ -152,6 +154,7 @@ export const StyleTab: React.FC = () => {
     reader.readAsDataURL(file);
   };
 
+  if (activePartInstanceId && activePart && isCrownPart(activePart)) return <CrownControls id={activePartInstanceId} />;
   return (
     <div className="flex flex-col h-full overflow-y-auto p-3 gap-4" data-testid="style-tab">
       <div className="border-b border-slate-800 pb-2">

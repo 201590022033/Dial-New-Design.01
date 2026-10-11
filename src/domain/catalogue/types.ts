@@ -70,8 +70,12 @@ export interface CatalogueVisualMetadata {
  * Exists independently of any one watch design or assembly project.
  */
 export interface ComponentCatalogueItem {
+  offAxisPlatform?: import('@/domain/crown/offAxisPlatform').OffAxisCasePlatform;
+  /** Transient UI intent; never a supplier listing or replacement component. */
+  crownEdit?: import('@/domain/crown/edit').CrownEdit;
   /** Only populate for an identified exact case package, never from a product photo. */
   suppliedCrown?: { catalogueItemId: string; evidence: EvidenceValue<string> };
+  suppliedBezel?: { catalogueItemId: string; evidence: EvidenceValue<string> };
   recommendedCrown?: { catalogueItemId: string; evidence: EvidenceValue<string> };
   crownInterface?: CrownPlatformInterface;
   /** Optional versioned crown metadata; schema validity does not qualify mechanical fit. */
@@ -132,6 +136,8 @@ export interface SupplierListingProvenance {
  * Supports partial, unverified, or stale data without fabricating prices or stock.
  */
 export interface SupplierListing {
+  packageContents?: Array<{ role: 'crown' | 'tube' | 'stem' | 'bezel'; catalogueItemId?: string; description: string; evidence: EvidenceValue<string> }>;
+  priceSnapshot?: { variant: string; checkedAtIso: string; fx?: { currency: string; zarPerUnit: number; sourceUrl: string; checkedAtIso: string }; taxAssumptions: string; shippingToSa: 'unknown' | 'quoted' | 'unavailable' };
   id: string; // e.g. "supp-nh35-case-01"
   catalogueItemId: string; // References ComponentCatalogueItem.id
   supplierName: string; // e.g. "NamokiMODS", "AliExpress Seller A"

@@ -3,6 +3,7 @@ import { visualVariantCatalogueItems } from './visualVariantCatalogue';
 import { nh05SupplierCandidateItems } from './nh05SupplierCandidates';
 import { supplierExpansionCandidateItems } from './supplierExpansionCandidates';
 import { crownCatalogueItems } from '@/domain/crown/catalogue';
+import { offAxisPackageCrowns, offAxisStrapItem, offAxisPackageBezel } from './offAxisCatalogue';
 
 const defaultManufacturing = (processProfile: ManufacturingProcessProfile): CatalogueManufacturingMetadata => ({
   processProfile,
@@ -839,6 +840,7 @@ export const compatibilityFixtureCatalogueItems: ComponentCatalogueItem[] = [
 ];
 
 export const catalogueItemById = new Map<string, ComponentCatalogueItem>([
+  ...[...offAxisPackageCrowns, offAxisStrapItem, offAxisPackageBezel].map((item) => [item.id, item] as [string, ComponentCatalogueItem]),
   ...crownCatalogueItems.map((item) => [item.id, item] as [string, ComponentCatalogueItem]),
   ...defaultCatalogueItems.map((item) => [item.id, item] as [string, ComponentCatalogueItem]),
   ...visualVariantCatalogueItems.map((item) => [item.id, item] as [string, ComponentCatalogueItem]),

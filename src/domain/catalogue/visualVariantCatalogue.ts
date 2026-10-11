@@ -1,4 +1,5 @@
 import type { CatalogueManufacturingMetadata, ComponentCatalogueItem } from './types';
+import { offAxisCaseItems } from './offAxisCatalogue';
 
 const cnc: CatalogueManufacturingMetadata = {
   processProfile: 'cnc',
@@ -29,6 +30,7 @@ const handManufacturing: CatalogueManufacturingMetadata = {
  * creation does not instantiate every option as a physical watch part.
  */
 export const visualVariantCatalogueItems: ComponentCatalogueItem[] = [
+  ...offAxisCaseItems,
   ...([34, 42] as const).map((size): ComponentCatalogueItem => ({
     id: `cat-bezel-diamond-rose-gold-${size}`, kind: 'fixed-bezel', displayName: `${size}mm Diamond-set Rose-gold Bezel Preview`,
     category: 'rings', defaultMaterial: 'rose-gold', defaultTexture: 'polished', linkedBandKind: 'outer-bezel',
@@ -77,12 +79,6 @@ export const visualVariantCatalogueItems: ComponentCatalogueItem[] = [
       material: 'steel', texture: 'brushed', styles: ['pilot', 'tool-watch', 'nh35-compatible'],
       tags: ['case', 'pilot', '40.2mm', 'tandorio', 'dimensioned-drawing', 'nh34', 'nh35', 'nh36', 'nh38'],
       note: 'Exact Tandorio product and drawing: 40.20 mm OD, 12.30 mm thick, 20 mm lugs and 33.5–34.3 mm dial range.'
-    },
-    {
-      id: 'cat-case-namoki-nmk920-tuna-47', name: 'namokiMODS NMK920 Tuna 47mm Case', diameter: 47, thickness: 11.3,
-      material: 'steel', texture: 'brushed', styles: ['diver', 'tuna', 'oversize', 'skx-compatible'],
-      tags: ['case', 'diver', '47mm', 'nmk920', 'dimensioned-drawing', 'skx007', 'srpd'],
-      note: 'Exact NMK920 product and dimension drawing: 47 mm including shroud, 46.5 mm lug-to-lug, 11.3 mm without caseback and 22 mm lugs.'
     },
     {
       id: 'cat-case-feiyashi-samurai-438', name: 'FEIYASHI 43.8mm Samurai Case', diameter: 43.8, thickness: 13.65,

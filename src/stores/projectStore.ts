@@ -1,4 +1,7 @@
 import { create } from 'zustand';
+import { useSourcingStore } from './sourcingStore';
+import { useCatalogueStore } from './catalogueStore';
+import { selectedSupplierSnapshots } from '@/domain/sourcing/snapshots';
 import type { WatchAssembly } from '@/domain/assembly/assemblyTypes';
 import { createBand } from '@/domain/bands/bandRegistry';
 import type { BandEntity } from '@/domain/bands/types';
@@ -193,6 +196,8 @@ export const useProjectStore = create<ProjectStoreState>((set, get) => ({
     const state = get();
     return {
       version: DIAL_FILE_VERSION,
+      sourcing: structuredClone(useSourcingStore.getState().sourcingPlan),
+      supplierSnapshots: selectedSupplierSnapshots(useSourcingStore.getState().sourcingPlan.selections, useCatalogueStore.getState().supplierListings),
       assembly: state.assembly,
       info: {
         ...state.info,

@@ -1,6 +1,8 @@
 import type { WatchAssembly } from '@/domain/assembly/assemblyTypes';
 import type { ComponentCatalogueItem } from './types';
 import { crownSlotError, withCrownDefault, crownSpecificationForPart, isCrownPart } from '@/domain/crown/selection';
+import { applyCrownEdit } from '@/domain/crown/edit';
+import { getCatalogueItem } from './catalogueRegistry';
 
 /** Builds the same provisional assembly used by Preview and Apply. */
 export const applyCatalogueVisualSelection = (
@@ -14,6 +16,9 @@ export const applyCatalogueVisualSelection = (
   const part = provisional.parts[partInstanceId];
   if (!part) return provisional;
   if (part.locked) return provisional;
+  if (item.crownEdit) {
+    return applyCrownEdit(assembly, partInstanceId, item.crownEdit);
+  }
   const previousCrown = crownSpecificationForPart(part);
   const wasAttached = part.crownSpecification !== undefined;
 
@@ -44,14 +49,23 @@ export const applyCatalogueVisualSelection = (
   }
 
   if (item.kind === 'case' || item.kind === 'midcase') {
+    part.offAxisPlatform = item.offAxisPlatform ? structuredClone(item.offAxisPlatform) : undefined;
     part.crownAxes = item.crownAxes ? structuredClone(item.crownAxes) : undefined;
     // A previous platform's physical interface and authored placement are stale.
     const oldAnchors = provisional.designConfig?.assemblyAnchors;
     if (oldAnchors) {
-      const anchors = { ...oldAnchors }; delete anchors['crown-interface'];
+      const anchors = { ...oldAnchors }; delete anchors['crown-interface']; delete anchors['dial-seat']; delete anchors['hand-stack'];
       provisional.designConfig = { ...provisional.designConfig, assemblyAnchors: anchors };
     }
+    provisional.designConfig = { ...provisional.designConfig, fitEvidence: undefined, controlledOrderId: undefined, visualReferenceId: undefined };
+    const bezel = provisional.parts['inst-rotating-bezel'];
+    if (bezel && !bezel.locked && ['cat-rotating-bezel', 'cat-bezel-nmk920-package'].includes(bezel.catalogueItemId)) {
+      const bundle = item.suppliedBezel;
+      const bezelItem = getCatalogueItem(bundle?.evidence.status === 'known' && bundle.evidence.evidence.kind === 'supplier-statement' ? bundle.catalogueItemId : 'cat-rotating-bezel');
+      if (bezelItem) { bezel.catalogueItemId = bezelItem.id; bezel.name = bezelItem.displayName; }
+    }
     for (const crown of Object.values(provisional.parts).filter(isCrownPart)) {
+      crown.crownCapConcept = undefined;
       if (crown.crownSpecification) {
         crown.customProperties = { ...crown.customProperties, detachedCrownSpecification: crown.crownSpecification };
         crown.crownSpecification = undefined;

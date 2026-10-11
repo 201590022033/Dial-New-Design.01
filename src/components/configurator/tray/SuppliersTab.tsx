@@ -70,6 +70,7 @@ export const SuppliersTab: React.FC = () => {
   return (
     <div className="flex flex-col h-full overflow-y-auto p-3 gap-4" data-testid="suppliers-tab">
       <div className="border-b border-slate-800 pb-2">
+        {activePart?.crownCapConcept && <p role="status" className="text-xs text-amber-200">Protected cap/holder is a presentation concept with no orderable hardware. Listings below price only the operating crown; they do not qualify the cap or holder.</p>}
         <h3 className="text-xs font-semibold text-slate-200">
           Suppliers for {activePart?.name ?? 'Component'}
         </h3>
@@ -119,7 +120,7 @@ export const SuppliersTab: React.FC = () => {
           <HelpCircle className="h-6 w-6 text-slate-400 mx-auto mb-2" />
           <p>No saved commercial listings for this component ID.</p>
           <p className="text-[11px] text-slate-400 mt-1">
-            Component is currently priced using standard catalog estimates.
+            Price and South Africa shipping remain unknown until a matching offer is recorded.
           </p>
         </div>
       ) : (

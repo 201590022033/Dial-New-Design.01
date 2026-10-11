@@ -21,6 +21,11 @@ export const calculateBomCost = (
   const centralHandIds = ['inst-hour-hand', 'inst-minute-hand', 'inst-central-seconds'];
   const lineItems: BomCostLine[] = [];
   const choices = resolveBomChoices(assembly, catalogueItems);
+  const casePart = assembly.parts['inst-midcase'];
+  const caseOffer = casePart ? supplierListings.find(l => l.id === sourcingSelections[casePart.instanceId] && (l.catalogueItemId === casePart.catalogueItemId || l.replacementCatalogueItemId === casePart.catalogueItemId))
+    ?? (!sourcingSelections[casePart.instanceId] ? supplierListings.find(l => l.catalogueItemId === casePart.catalogueItemId && l.unitPrice !== null && !l.manualSelectionOnly && (!l.caseFinish || l.caseFinish === (assembly.designConfig?.visualReferenceConfig?.caseFinish ?? 'steel'))) : undefined) : undefined;
+  const packageContents = caseOffer?.packageContents?.filter(c => c.evidence.status === 'known' && ['drawing', 'supplier-statement'].includes(c.evidence.evidence.kind)) ?? [];
+  const usedPackageRoles = new Set<string>();
   const componentName = (kind: string, category: string) => {
     if (kind === 'case' || kind === 'midcase') return 'Case';
     if (kind === 'dial-blank') return 'Dial';
@@ -33,20 +38,24 @@ export const calculateBomCost = (
     return kind.replaceAll('-', ' ') || category;
   };
   const addLine = (part: typeof parts[number], listing: SupplierListing | undefined, selected: boolean, ids = [part.instanceId], set = false) => {
-    const priceZar = listing ? listingPriceZar(listing) : null;
-    const shippingZar = listing ? listingShippingZar(listing) : null;
+    let priceZar = listing ? listingPriceZar(listing) : null;
+    let shippingZar = listing ? listingShippingZar(listing) : null;
     const item = catalogueItems.find(i => i.id === part.catalogueItemId);
+    const bundled = packageContents.find(c => c.catalogueItemId === part.catalogueItemId && (c.role === item?.kind || c.role === 'tube' && item?.kind === 'crown-tube' || c.role === 'bezel' && item?.kind === 'rotating-bezel') && (!selected || listing?.id === caseOffer?.id));
+    if (bundled) { priceZar = 0; shippingZar = 0; usedPackageRoles.add(bundled.role); }
     const choiceGroup = bomChoiceGroup(item?.kind ?? '');
     const included = choiceGroup ? choices[choiceGroup] === part.instanceId : ids.some(id => assembly.parts[id]?.visible);
     lineItems.push({ id: part.instanceId, partInstanceIds: ids, name: set ? item?.displayName ?? part.name : part.name,
       component: set ? 'Main hand set (hour, minute & seconds)' : componentName(item?.kind ?? '', part.category),
       priceZar, shippingZar, listingId: listing?.id, supplierName: listing?.supplierName,
       supplierSku: listing?.sku, productUrl: listing?.productUrl, alternativePriceNote: listing?.alternativePriceNote,
+      packageNote: bundled ? `Included with case bundle ${caseOffer?.sku ?? caseOffer?.id}; charged in case price. Physical fit remains unverified.` : undefined,
+      priceProvenance: listing?.priceSnapshot ? `Variant: ${listing.priceSnapshot.variant}; checked ${listing.priceSnapshot.checkedAtIso}; FX: ${listing.priceSnapshot.fx ? `${listing.priceSnapshot.fx.zarPerUnit} ZAR/${listing.priceSnapshot.fx.currency}, ${listing.priceSnapshot.fx.sourceUrl}, ${listing.priceSnapshot.fx.checkedAtIso}` : 'not recorded / ZAR native'}; SA shipping: ${listing.priceSnapshot.shippingToSa}; tax/import assumptions: ${listing.priceSnapshot.taxAssumptions}` : undefined,
       nativePrice: listing?.unitPrice, currency: listing?.currency, lastCheckedIso: listing?.lastCheckedIso ?? undefined,
       included, choiceGroup, catalogueItemId: part.catalogueItemId, fitWarning: crystalChoiceWarning(assembly, catalogueItems, part.instanceId),
       status: priceZar === null ? 'unpriced' : selected ? 'selected' : 'estimate', visible: ids.some(id => assembly.parts[id]?.visible) });
     if (included && priceZar !== null) partsTotal += priceZar;
-    if (included && listing) {
+    if (included && listing && !bundled) {
       if (shippingZar === null) shippingUnknownCount++;
       else shippingEstimate += shippingZar;
     }
@@ -81,6 +90,14 @@ export const calculateBomCost = (
     const firstListing = fallbackListings[0];
     addLine(part, firstListing, false);
   }
+  for (const content of packageContents.filter(c => !usedPackageRoles.has(c.role))) {
+    lineItems.push({ id: `case-package-${content.role}`, partInstanceIds: [], name: content.description, component: `Included ${content.role}`, priceZar: 0, shippingZar: 0,
+      status: 'estimate', visible: true, included: true, supplierSku: caseOffer?.sku, supplierName: caseOffer?.supplierName,
+      packageNote: `Included with case bundle ${caseOffer?.sku ?? caseOffer?.id}; charged in case price. A separately selected ${content.role} is an additional replacement, not a bundle discount.` });
+    usedPackageRoles.add(content.role);
+  }
+  if (parts.some(p => p.visible && p.crownCapConcept)) lineItems.push({ id: 'crown-cap-concept', partInstanceIds: [], name: 'Generic protected cap and holder concept', component: 'Protection concept', priceZar: null, shippingZar: null, status: 'unpriced', visible: true, included: true,
+    fitWarning: 'Presentation concept only — no matched supplier hardware, physical Apply or ordering. Cap/holder cost and South Africa shipping are unknown.' });
   if (!lineItems.some(line => line.component === 'Movement')) {
     const offers = supplierListings.filter(l => l.movementCalibre === assembly.metadata.movement);
     const selectedId = sourcingSelections['movement-calibre'];

@@ -1,0 +1,172 @@
+{
+  "format": "dial-designer-render-package-v1",
+  "generatedAt": "2026-10-10T14:43:06.248Z",
+  "project": "Custom Watch Design",
+  "archetype": "archetype-dive",
+  "platform": {
+    "id": "nmk920-brushed",
+    "evidenceStatus": "OFF_AXIS_PRESENTATION_UNQUALIFIED"
+  },
+  "archetypeKit": null,
+  "studio": "dark-dramatic",
+  "camera": {
+    "preset": "face",
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "distance": 13.4
+  },
+  "offAxisPlatform": {
+    "schema": "off-axis-platform/v1",
+    "id": "nmk920-brushed",
+    "caseCatalogueId": "cat-case-namoki-nmk920-tuna-47",
+    "sourceUrl": "https://www.namokimods.com/products/nmk920-tuna-skx007-srpd-watch-case-brushed-finish",
+    "variantId": "40465538744495",
+    "sku": "NMK920-PL",
+    "identityStatus": "requires-confirmation",
+    "physicalFit": "unqualified",
+    "presentationMovementIds": [
+      "nh35"
+    ],
+    "envelope": {
+      "shroudDiameterMm": {
+        "status": "known",
+        "value": 47,
+        "evidence": {
+          "kind": "supplier-statement",
+          "source": "https://www.namokimods.com/products/nmk920-tuna-skx007-srpd-watch-case-brushed-finish",
+          "retrievedAtIso": "2026-10-10T10:27:19Z"
+        }
+      },
+      "midcaseDiameterMm": {
+        "status": "unknown",
+        "reason": "No exact mating drawing or measured installation recovered."
+      },
+      "bezelOuterMm": {
+        "status": "unknown",
+        "reason": "No exact mating drawing or measured installation recovered."
+      },
+      "bezelInnerMm": {
+        "status": "unknown",
+        "reason": "No exact mating drawing or measured installation recovered."
+      },
+      "dialSeatMm": {
+        "status": "unknown",
+        "reason": "No exact mating drawing or measured installation recovered."
+      },
+      "crystalSeatMm": {
+        "status": "unknown",
+        "reason": "No exact mating drawing or measured installation recovered."
+      },
+      "casebackDiameterMm": {
+        "status": "unknown",
+        "reason": "No exact mating drawing or measured installation recovered."
+      },
+      "lugWidthMm": {
+        "status": "known",
+        "value": 22,
+        "evidence": {
+          "kind": "supplier-statement",
+          "source": "https://www.namokimods.com/products/nmk920-tuna-skx007-srpd-watch-case-brushed-finish",
+          "retrievedAtIso": "2026-10-10T10:27:19Z"
+        }
+      },
+      "lugToLugMm": {
+        "status": "known",
+        "value": 46.5,
+        "evidence": {
+          "kind": "supplier-statement",
+          "source": "https://www.namokimods.com/products/nmk920-tuna-skx007-srpd-watch-case-brushed-finish",
+          "retrievedAtIso": "2026-10-10T10:27:19Z"
+        }
+      }
+    },
+    "supplierMovements": {
+      "status": "unknown",
+      "reason": "Supplier states SKX007/SRPD parts family; exact movement installation not enumerated."
+    },
+    "dialRangeMm": {
+      "status": "unknown",
+      "reason": "No exact mating drawing or measured installation recovered."
+    },
+    "installation": {
+      "movementRotationDeg": {
+        "status": "unknown",
+        "reason": "No exact mating drawing or measured installation recovered."
+      },
+      "dialRotationDeg": {
+        "status": "unknown",
+        "reason": "No exact mating drawing or measured installation recovered."
+      },
+      "calendarApertureDeg": {
+        "status": "unknown",
+        "reason": "No exact mating drawing or measured installation recovered."
+      },
+      "dateWheelOrientationDeg": {
+        "status": "unknown",
+        "reason": "No exact mating drawing or measured installation recovered."
+      },
+      "stemHeightMm": {
+        "status": "unknown",
+        "reason": "No exact mating drawing or measured installation recovered."
+      },
+      "spacerId": {
+        "status": "unknown",
+        "reason": "No exact mating drawing or measured installation recovered."
+      },
+      "dialFeetInterface": {
+        "status": "unknown",
+        "reason": "No exact mating drawing or measured installation recovered."
+      },
+      "loading": {
+        "status": "unknown",
+        "reason": "Rear/front service path needs exact variant confirmation."
+      }
+    },
+    "notes": "Old supplier-hosted envelope sketch is not linked to the current SKU. Body, opening, tube, cutout and axis are presentation assumptions. SKU alias/current variant identity unresolved. Crown and bezel included; not a matched hardware certificate."
+  },
+  "crownPresentation": {
+    "surface": {
+      "shape": "onion",
+      "grip": "fine-fluted",
+      "coreDiameterMm": 6,
+      "maximumOuterDiameterMm": 7,
+      "lengthMm": 4
+    },
+    "finish": {
+      "id": "rose-gold",
+      "label": "Rose gold",
+      "color": "#c08a76",
+      "metalness": 1,
+      "roughness": 0.18,
+      "clearcoat": 0.25,
+      "provenance": "provisional"
+    },
+    "physicalFit": "unverified",
+    "capConcept": null
+  },
+  "alignmentChecks": [
+    {
+      "label": "Archetype binding",
+      "status": "pass",
+      "detail": "archetype-dive is a compatible NMK901 visual kit."
+    },
+    {
+      "label": "Component alignment",
+      "status": "warning",
+      "detail": "Procedural fallback: dial, bezel, hands, strap."
+    },
+    {
+      "label": "Saved camera",
+      "status": "pass",
+      "detail": "Camera position is stored with this project."
+    },
+    {
+      "label": "Assembly basis",
+      "status": "warning",
+      "detail": "The procedural assembly is active; load the 42 mm reference set for review."
+    }
+  ]
+}

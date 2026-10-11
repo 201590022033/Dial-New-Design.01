@@ -20,10 +20,13 @@ import { rankCandidatesBySensitivity } from '@/domain/configurator/practicalSens
 import { cn } from '@/utils/cn';
 import { useDesignEngineStore } from '@/stores/designEngineStore';
 import { applyArchetypeVisualProfile, getArchetypeVisualProfile } from '@/domain/configurator/archetypeProfiles';
+import { OffAxisPlatformDetail } from './OffAxisPlatformDetail';
+import { watchAssemblyToVisualModel } from '@/visual3d/watchAssemblyToVisualModel';
 import { defaultMarkerConfig, type MarkerKind } from '@/domain/generators/markerEngine';
 import type { TypographyFontCategory } from '@/domain/generators/typographyEngine';
 import { formatListingPrice } from '@/domain/catalogue/pricing';
-import { crownSlotError } from '@/domain/crown/selection';
+import { crownSlotError, isCrownPart } from '@/domain/crown/selection';
+import { CrownControls } from './CrownControls';
 
 const indexChoices: Array<{ id: 'auto' | 'dots' | 'arabic' | 'roman' | 'ticks'; label: string; kind?: MarkerKind }> = [
   { id: 'auto', label: 'Archetype default' },
@@ -220,6 +223,7 @@ export const OptionsTab: React.FC = () => {
     }
   };
 
+  if (activePartInstanceId && activePart && isCrownPart(activePart)) return <CrownControls id={activePartInstanceId} />;
   if (!activePartInstanceId) {
     return (
       <div className="space-y-3 overflow-y-auto p-3 text-slate-400 text-xs">
@@ -232,6 +236,7 @@ export const OptionsTab: React.FC = () => {
 
   return (
     <div className="flex flex-col h-full overflow-hidden p-3 gap-3" data-testid="options-tab">
+      {activePart?.offAxisPlatform && <details className="max-h-64 shrink-0 overflow-y-auto"><summary className="cursor-pointer text-xs text-amber-200">Off-axis case evidence and engineering projection</summary><OffAxisPlatformDetail model={watchAssemblyToVisualModel(assembly)} /></details>}
       <Nh05PartShortcuts />
       <p className="text-[10px] text-slate-400">Click to preview · double-click or press Enter to Apply. Compatibility checks and locks still apply.</p>
       <DialIndexOptions />

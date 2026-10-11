@@ -1,0 +1,178 @@
+{
+  "schema": "crown-c4-c5-evidence/v1",
+  "date": "2026-10-10",
+  "baselineCommit": "b5c313bf95e1b47c68d8bee1412cac46cbd32122",
+  "scope": "C4 complete; C5 presentation concept complete; physical cap hardware unqualified",
+  "generator": "Procedural Three.js lathe geometry; no new or modified GLB",
+  "verification": {
+    "testFiles": 104,
+    "tests": 911,
+    "lint": "passed",
+    "productionBuildAndTypeScript": "passed",
+    "browserErrors": 0
+  },
+  "screenshots": [
+    {
+      "file": "cap-concept-bom-unknown-no-order.jpg",
+      "bytes": 133673,
+      "sha256": "7838e0ea3bb09b2a4c29d868a64790f0e22dec3e8e48b7f642c3135b4aa3bdba"
+    },
+    {
+      "file": "closed-cap-rose-hd-front.jpg",
+      "bytes": 110339,
+      "sha256": "27810f3296f6b7ab41b3afdcdf6b804f6816f70482cadaa7da9a45561ba5a0f2"
+    },
+    {
+      "file": "engineering-detail-restored.jpg",
+      "bytes": 107816,
+      "sha256": "cfc928efb7f69d2b1954c957f655f2afb7fb63b75f36bf7c67d1e93131bb7e4c"
+    },
+    {
+      "file": "ladies34-closed-cap-hd-front.jpg",
+      "bytes": 115804,
+      "sha256": "424212c789771c53ac45f427197595241549a80a7be18f0584b8bc95f94eb040"
+    },
+    {
+      "file": "ladies34-closed-cap-hd-side.jpg",
+      "bytes": 111767,
+      "sha256": "7b01dd4fc1e896588613db78e92fb630d7c11d552c9b269795e017f0db2d4593"
+    },
+    {
+      "file": "ladies34-open-cap-hd-front.jpg",
+      "bytes": 121805,
+      "sha256": "07e4431e20d9ff60eaa64c90557319ed056a443e21149af2eaa462ea0d273910"
+    },
+    {
+      "file": "ladies34-open-cap-hd-side.jpg",
+      "bytes": 110648,
+      "sha256": "1abbffbcf28f5f12d407fe55c71c7de4e77cf4c20892e992be85244e81bb72d3"
+    },
+    {
+      "file": "open-cap-rose-hd-front.jpg",
+      "bytes": 120096,
+      "sha256": "03fc5f4534f25e2bd2c3eef142884332d4aff080af7d42fdbfff0a03653ec341"
+    }
+  ],
+  "changedSources": [
+    {
+      "file": "src/app/App.tsx",
+      "sha256": "6d266c54c00323c52a2f0b7f7209a61d2f10b8d877cedbfbf09785b78078f036"
+    },
+    {
+      "file": "src/components/configurator/BomCostLines.tsx",
+      "sha256": "2e01ab93fc030e0e3ae6b9bef7d40b726c18f7045cbb052944ca3f1691e6190a"
+    },
+    {
+      "file": "src/components/configurator/tray/CrownControls.tsx",
+      "sha256": "224fa3526cd9fb70d5b1e0112254f3d105b67aed37a3d02286d75398b9c1364c"
+    },
+    {
+      "file": "src/components/configurator/tray/CrownEngineeringDetail.tsx",
+      "sha256": "c04aa6d3469ec7ff0377cbba5835a1a3c1c56a98bb1f5807eadeb145e7bf0f69"
+    },
+    {
+      "file": "src/components/configurator/tray/OptionsTab.tsx",
+      "sha256": "942921e7e8172fac6af142bda87e87bb2a1802a29e0b7506daaa752c197207e9"
+    },
+    {
+      "file": "src/components/configurator/tray/StyleTab.tsx",
+      "sha256": "1e58e3ee7a47636db939e78f17b81a1bf1f3153a6819299c7805aa3791e141bf"
+    },
+    {
+      "file": "src/components/configurator/tray/SuppliersTab.tsx",
+      "sha256": "f2e7c271b48b26bdefee3fb50363e631598979fdaa33f57ced189567fdaf4bcd"
+    },
+    {
+      "file": "src/domain/assembly/assemblyTypes.ts",
+      "sha256": "65a2b876b9f5a978c6b45890131ebd88e5bb77eebb89aab340b08495056c8470"
+    },
+    {
+      "file": "src/domain/assembly/crownAssemblyValidation.ts",
+      "sha256": "98bb417d2b93842c991e9ba581ca83a51333725f02e2f4acd5622b4a18f218a9"
+    },
+    {
+      "file": "src/domain/catalogue/applyCatalogueVisualSelection.ts",
+      "sha256": "c89c536e57ab553060fec7749bac92165354384c762ba7f164c554d3bf9e1d8c"
+    },
+    {
+      "file": "src/domain/catalogue/pricing.ts",
+      "sha256": "51e1b901c99fc47b3d8e42cc23d7cb073f9f25bca4ee6bf88fd630caae121928"
+    },
+    {
+      "file": "src/domain/catalogue/types.ts",
+      "sha256": "98e6624287e1fccf46e00284d07455343468ba59c6d56896f733266f43942579"
+    },
+    {
+      "file": "src/domain/configurator/bomCostCalculator.ts",
+      "sha256": "b75b71a95e9b90397f1fb26e627a7e9fdfd3253824e36e6d8eca187a655344e5"
+    },
+    {
+      "file": "src/domain/configurator/configuratorTypes.ts",
+      "sha256": "a26c6926dbf6b57810cceffca3633fd4cb82ede6542a9c4738b11f300e8387bc"
+    },
+    {
+      "file": "src/domain/configurator/defaultBuilds.ts",
+      "sha256": "cef32ecd1359182a116e49e76ed6281eb163179345fd980e7ea98f0fe71c0b4f"
+    },
+    {
+      "file": "src/domain/configurator/versionManager.ts",
+      "sha256": "9da6a2bbab8146ac1838104001eb21e618c907ef126f2881c03a72f9c5c1c0cc"
+    },
+    {
+      "file": "src/domain/crown/compatibility.ts",
+      "sha256": "bae1617ad4669e35576f718a11570245de6d29ca9573bc1e98dfe336bfbf8526"
+    },
+    {
+      "file": "src/domain/crown/edit.ts",
+      "sha256": "f2905265f983fee7128d4b70db93df80f8d9055e8d3f03ff830d0f6f00aa3d8c"
+    },
+    {
+      "file": "src/domain/crown/selection.ts",
+      "sha256": "4b5cca6ec59694756b7342072385f4d2681ce8ee2e35c047d87c74cbbb86ee5c"
+    },
+    {
+      "file": "src/domain/sourcing/aliexpressCapture.ts",
+      "sha256": "342779fe49dcb8a6a17b4dc7eb28732d52b48cd87ea0e2c95331100be2ea141b"
+    },
+    {
+      "file": "src/domain/sourcing/snapshots.ts",
+      "sha256": "0159fc33cd8efbaf415f4bcb4adb0c92a538811e8d0ab589afe1191955e0171e"
+    },
+    {
+      "file": "src/services/projectFileService.ts",
+      "sha256": "c44738d2cd093ab869909a86f54fae86f1da224a3a0757839b0fde18b39d33e4"
+    },
+    {
+      "file": "src/services/runtimeProjectHydrationService.ts",
+      "sha256": "ad2a0a08d1cf15e2378b223c4abe13c1647fe8bafa3cc8f2d32901c86603b5f0"
+    },
+    {
+      "file": "src/stores/configuratorUIStore.ts",
+      "sha256": "d21a74e233f83643b205562d7e0f4bd938b3fe65c111f1dddbb2a7330ce3e10a"
+    },
+    {
+      "file": "src/stores/projectStore.ts",
+      "sha256": "bf89155be1fe36af40066318c643c06d177e16fd43ea0ded93546dc08efda312"
+    },
+    {
+      "file": "src/tests/crownControlsAndCap.test.tsx",
+      "sha256": "e7b3e7f19213442a554ed53fe0d9131f48ac4443b15077232364269e56100566"
+    },
+    {
+      "file": "src/visual3d/crownCapGeometry.ts",
+      "sha256": "38fafd1bf425667f810cf63aa64f3b564a7560d34cf1c777c83d32651aeceb68"
+    },
+    {
+      "file": "src/visual3d/VisualWatchRenderer.tsx",
+      "sha256": "52cfb48e98e53dbd50dd6afd9f61e5f4a2840b01dddc4f2f15217ff003d2aceb"
+    },
+    {
+      "file": "src/visual3d/VisualWatchScene.tsx",
+      "sha256": "586bf6c6620e9f00c43e569bb4b1db05832edf4ff14817a418405be147d0fce5"
+    },
+    {
+      "file": "src/visual3d/watchAssemblyToVisualModel.ts",
+      "sha256": "dfdebdb635d72969aacadfbe9bf2d86370d8fb27ebfd9849ef0d2eb1d111f3a8"
+    }
+  ]
+}

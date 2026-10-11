@@ -37,7 +37,7 @@ export const VisualWatchRenderer = ({ assembly, presentationMode, onTogglePresen
   const subdialSlug = savedRender?.archetypeId === 'archetype-chronograph'
     ? `-${savedRender.subdialHandStyle ?? 'needle'}`
     : '';
-  const exportBaseName = `NMK901-${archetypeSlug}-${lugSlug}${subdialSlug}-${activePreset}`;
+  const exportBaseName = `${model.offAxisPlatform?.id ?? 'NMK901'}-${archetypeSlug}-${lugSlug}${subdialSlug}-${activePreset}${model.crown.capConcept ? '-protected-cap-concept' : ''}`;
   useEffect(() => {
     const preset = savedRender?.renderPreset ?? 'studio';
     setActivePreset(preset);
@@ -74,10 +74,12 @@ export const VisualWatchRenderer = ({ assembly, presentationMode, onTogglePresen
       generatedAt: new Date().toISOString(),
       project: assembly.metadata.name,
       archetype: savedRender?.archetypeId ?? null,
-      platform: { id: platform.platformId, evidenceStatus: platform.evidenceStatus },
-      archetypeKit: activeKit ? { status: activeKit.status, movementIds: activeKit.movementIds, supplierMappingStatus: activeKit.supplierMappingStatus } : null,
+      platform: model.offAxisPlatform ? { id: model.offAxisPlatform.id, evidenceStatus: 'OFF_AXIS_PRESENTATION_UNQUALIFIED' } : { id: platform.platformId, evidenceStatus: platform.evidenceStatus },
+      archetypeKit: !model.offAxisPlatform && activeKit ? { status: activeKit.status, movementIds: activeKit.movementIds, supplierMappingStatus: activeKit.supplierMappingStatus } : null,
       studio: 'dark-dramatic',
       camera: { preset: activePreset, rotation, distance: cameraDistance },
+      offAxisPlatform: model.offAxisPlatform ?? null,
+      crownPresentation: { surface: model.crown.surface, finish: model.finishes.crown, physicalFit: 'unverified', capConcept: model.crown.capConcept ? { ...model.crown.capConcept, orderable: false, ownership: { operatingHead: 'crown', holder: 'case', cap: 'crown-assembly' }, notes: 'Generic envelope; open state is exploded, no qualified threads, hinge, extraction control, sealing or left-side installation' } : null },
       alignmentChecks
     };
     const encoder = new TextEncoder();
@@ -133,6 +135,8 @@ export const VisualWatchRenderer = ({ assembly, presentationMode, onTogglePresen
     onDoubleClick={() => applyCameraPreset('studio')}
   >
     <VisualWatchScene model={model} rotation={rotation} cameraDistance={cameraDistance} scalePreview={scalePreview} onExporterReady={registerExporter} />
+    {model.visible.crown && model.crown.capConcept && <p role="status" className="pointer-events-none absolute left-3 right-3 top-14 rounded border border-amber-500/50 bg-slate-950/90 px-2 py-1 text-[10px] text-amber-200">Protected cap concept · {model.crown.capConcept.state === 'open' ? 'exploded open view' : 'transparent closed view'} · hardware and case clearance unqualified · not orderable</p>}
+    {model.offAxisPlatform && <p role="status" className={`pointer-events-none absolute left-3 right-3 ${model.crown.capConcept ? 'top-24' : 'top-14'} rounded border border-amber-500/50 bg-slate-950/90 px-2 py-1 text-[10px] text-amber-200`}>Off-axis presentation · approximate case/tube/crown datum · installation and exact variant unqualified</p>}
     <button type="button" className="absolute right-3 top-3 rounded-lg border border-slate-500/40 bg-slate-950/85 px-3 py-2 text-xs text-white hover:bg-slate-800"
       onPointerDown={(event) => event.stopPropagation()}
       onDoubleClick={(event) => event.stopPropagation()}
@@ -154,7 +158,7 @@ export const VisualWatchRenderer = ({ assembly, presentationMode, onTogglePresen
         }, null, 2)}</pre>
       </details>
       <p className="mt-1 capitalize text-cyan-100">{lugSlug} lugs{savedRender?.archetypeId === 'archetype-chronograph' ? ` · ${savedRender.subdialHandStyle ?? 'needle'} subdial hands` : ''}</p>
-      <div className="mt-1 flex flex-wrap gap-1 text-[9px] font-semibold uppercase"><span className="rounded border border-amber-500/40 px-1.5 py-0.5 text-amber-200">{platform.evidenceStatus.replaceAll('_', ' ')}</span>{activeKit && <span className={activeKit.status === 'COMPATIBLE_KIT' ? 'rounded border border-emerald-500/40 px-1.5 py-0.5 text-emerald-200' : 'rounded border border-rose-500/40 px-1.5 py-0.5 text-rose-200'}>{activeKit.status.replaceAll('_', ' ')}</span>}</div>
+      <div className="mt-1 flex flex-wrap gap-1 text-[9px] font-semibold uppercase"><span className="rounded border border-amber-500/40 px-1.5 py-0.5 text-amber-200">{model.offAxisPlatform ? 'Off-axis presentation · installation unqualified' : platform.evidenceStatus.replaceAll('_', ' ')}</span>{!model.offAxisPlatform && activeKit && <span className={activeKit.status === 'COMPATIBLE_KIT' ? 'rounded border border-emerald-500/40 px-1.5 py-0.5 text-emerald-200' : 'rounded border border-rose-500/40 px-1.5 py-0.5 text-rose-200'}>{activeKit.status.replaceAll('_', ' ')}</span>}</div>
       {!referenceSelected && <p className="mt-1 text-slate-300">Loading applies the 42 mm case, face stack, crown, hand set, caseback and strap preview.</p>}
       <button type="button" className="mt-2 rounded border border-slate-400/50 px-2 py-1 hover:bg-slate-700" onClick={referenceSelected ? clearReference : selectReference}>
         {referenceSelected ? 'Use procedural preview' : 'Load 42 mm reference set'}

@@ -17,12 +17,19 @@ export const convertToZar = (amount: number, currency: string): number | null =>
   return null;
 };
 
+const snapshotConversion = (listing: SupplierListing, amount: number, currency: string): number | null => {
+  if (!Number.isFinite(amount) || amount < 0) return null;
+  if (!listing.priceSnapshot || currency.toUpperCase() === 'ZAR') return convertToZar(amount, currency);
+  const fx = listing.priceSnapshot.fx;
+  return fx && fx.currency.toUpperCase() === currency.toUpperCase() && Number.isFinite(fx.zarPerUnit) && fx.zarPerUnit > 0 && /^https:\/\//.test(fx.sourceUrl) && Number.isFinite(Date.parse(fx.checkedAtIso)) ? amount * fx.zarPerUnit : null;
+};
 export const listingPriceZar = (listing: SupplierListing): number | null =>
-  listing.unitPrice === null ? null : convertToZar(listing.unitPrice, listing.currency);
+  listing.unitPrice === null ? null : snapshotConversion(listing, listing.unitPrice, listing.currency);
 
 export const listingShippingZar = (listing: SupplierListing): number | null => {
   if (listing.shippingPrice === null || listing.shippingPrice === undefined) return null;
-  return convertToZar(listing.shippingPrice, listing.shippingCurrency ?? listing.currency);
+  if (listing.priceSnapshot && (listing.priceSnapshot.shippingToSa !== 'quoted' || !/^(ZA|South Africa)$/i.test(listing.shippingDestination ?? ''))) return null;
+  return snapshotConversion(listing, listing.shippingPrice, listing.shippingCurrency ?? listing.currency);
 };
 
 export const listingKnownLandedZar = (listing: SupplierListing): number | null => {

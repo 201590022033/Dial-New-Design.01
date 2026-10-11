@@ -82,7 +82,7 @@ describe('catalogue visual selections', () => {
   it('updates the master case envelope when a dedicated case GLB is applied', () => {
     const selected = applyCatalogueVisualSelection(createDefaultWatchAssembly(), 'inst-midcase', variant('cat-case-namoki-nmk920-tuna-47'));
     expect(selected.globalDimensions).toMatchObject({ caseDiameterMm: 47, totalThicknessMm: 11.3 });
-    expect(watchAssemblyToVisualModel(selected).assets.case.assetId).toBe('case-namoki-nmk920-tuna-47');
+    expect(watchAssemblyToVisualModel(selected).assets.case.assetId).toBe('case-namoki-nmk920-offaxis-v1');
   });
 });
 

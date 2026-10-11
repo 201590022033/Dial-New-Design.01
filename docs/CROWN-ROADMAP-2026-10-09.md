@@ -1,10 +1,14 @@
 # Crown research and milestone roadmap
 
+Publication update, 11 October 2026: C4–C7 commit/push is explicitly authorized by the user. CROWN-PUBLICATION-2026-10-11.md records this checkpoint and remaining qualification work, superseding historical unpublished/await-authorization statements below. Scheduler remains paused.
+
 Planning-only checkpoint, 9 October 2026, Africa/Johannesburg. Baseline: `6931131420adb5606323f8c8db54dc4c76604f8d`.
 
-Progress update, 10 October 2026: C0-C3 are complete. The user subsequently approved C2/C3 and commit/push. This roadmap retains the original research snapshot below. Current authority, verification and remaining gaps live in CROWN-RESUME-LEDGER-2026-10-09.md; interfaces live in CROWN-C1-CONTRACT-2026-10-10.md and current completion evidence in CROWN-C2-C3-HANDOFF-2026-10-10.md. C4-C7 remain unapproved.
+Progress update, 10 October 2026: C0-C3 are published at b5c313b. Approved C4/C5, C6 and C7A-E are complete locally. C5/C7 acceptance is provisional presentation with hardware evidence unqualified. The post-C7 C6 regression gate passed 106 files / 965 tests, lint/typecheck/build and actual two-case browser checks; see CROWN-C7-ACCEPTANCE-2026-10-10.md and the live ledger. C4-C7 publication was not requested. Historical next-approval suggestions below are superseded by this record.
 
 ## Authority and outcome
+
+Latest checkpoint, 10 October: “So can we do c7” and “please fcomplete” authorized C7. Two off-axis platforms now have bounded catalogue/source wiring, new case GLBs, one shared approximate datum, package accounting and independent installation unknowns. CROWN-C7-ACCEPTANCE-2026-10-10.md records completed presentation acceptance and the C6 rerun. C4-C7 remain local and uncommitted; scheduler paused.
 
 The user requested research, a detailed multi-agent plan and a continuation arrangement. This document does not authorize implementation, supplier onboarding, purchases, contacts, commits or pushes. Do not treat previous milestone publication approval as approval for new crown changes.
 

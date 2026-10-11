@@ -42,7 +42,8 @@ export const reference42NominalInterfaces = {
 
 /** An opt-in, fixed-size visual reference; never called by default assembly creation. */
 export const applyReference42Preview = (assembly: WatchAssembly): WatchAssembly => {
-  const existingCase = assembly.parts['inst-midcase'] ?? createDefaultWatchAssembly().parts['inst-midcase']!;
+  const previousCase = assembly.parts['inst-midcase'];
+  const existingCase = previousCase && !previousCase.offAxisPlatform ? previousCase : createDefaultWatchAssembly().parts['inst-midcase']!;
   const crown = assembly.parts['inst-crown'];
   const hands = assembly.parts['inst-hour-hand'];
   const dial = assembly.parts['inst-dial-blank'];

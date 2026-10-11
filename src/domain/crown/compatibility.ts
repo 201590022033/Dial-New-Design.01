@@ -51,5 +51,5 @@ export const checkCrownCompatibility = (assembly: WatchAssembly): CompatibilityC
   else if (spec.ownership.matchedAssemblyId && !platform?.matchedAssemblyId) missing.push('matched cap/lever assembly');
   if (contradictions.length) return [result('red', `Crown conflicts with selected platform: ${contradictions.join(', ')}.`)];
   // Nominal agreement alone cannot certify tolerances, sealing or assembly testing.
-  return [result('unknown', missing.length ? `Crown fit unknown: ${missing.join(', ')}. Concept preview only; confirm before procurement.` : 'Nominal crown interfaces agree; tolerances, clearances and sealing still require measurement/testing.')];
+  return [result('unknown', (missing.length ? `Crown fit unknown: ${missing.join(', ')}. Concept preview only; confirm before procurement.` : 'Nominal crown interfaces agree; tolerances, clearances and sealing still require measurement/testing.') + (crown.crownCapConcept ? ' Protected cap is a presentation envelope only; no matched holder, extraction controls, sealing or left-side installation is qualified.' : ''))];
 };

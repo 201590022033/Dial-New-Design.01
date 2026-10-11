@@ -11,6 +11,7 @@ import { useCatalogueStore } from '@/stores/catalogueStore';
 import { useSourcingStore } from '@/stores/sourcingStore';
 import { applyCatalogueVisualSelection } from '@/domain/catalogue/applyCatalogueVisualSelection';
 import { crownSlotError, isCrownPart } from '@/domain/crown/selection';
+import { selectedSupplierSnapshots } from '@/domain/sourcing/snapshots';
 import {
   calculatePracticalSensitivities
 } from '@/domain/configurator/practicalSensitivities';
@@ -40,6 +41,7 @@ function candidateHasLockedTarget(assembly: WatchAssembly, targetId: string, can
   const targets = candidate.kind === 'hand-set'
     ? [targetId, 'inst-hour-hand', 'inst-minute-hand', 'inst-central-seconds']
     : ['case', 'midcase'].includes(candidate.kind) ? [targetId, ...Object.values(assembly.parts).filter(isCrownPart).map(p => p.instanceId)] : [targetId];
+  if (['case', 'midcase'].includes(candidate.kind) && (candidate.suppliedBezel || assembly.parts['inst-rotating-bezel']?.catalogueItemId === 'cat-bezel-nmk920-package')) targets.push('inst-rotating-bezel');
   return targets.some(id => trayLocks.has(id) || assembly.parts[id]?.locked);
 }
 
@@ -102,6 +104,7 @@ export interface ConfiguratorUIStoreState {
   lastCommittedSnapshot: {
     assembly: WatchAssembly;
     sourcingPlan: Record<string, string | null>;
+    supplierSnapshots?: import('@/domain/catalogue/types').SupplierListing[];
   } | null;
 
   // Computed state getters
@@ -309,6 +312,7 @@ export const useConfiguratorUIStore = create<ConfiguratorUIStoreState>((set, get
       return;
     }
     const current = useWatchAssemblyStore.getState().assembly;
+    if (candidateItem.kind === 'crown' && get().lockedStyles[partInstanceId]) { set({ previewError: 'Unlock the crown style before editing.' }); return; }
     const evaluation = candidateItem.kind === 'style-finish' ? null : evaluateCandidate({
       assembly: current, targetPartInstanceId: partInstanceId,
       candidateCatalogueItemId: candidateItem.id, candidateItem
@@ -346,6 +350,7 @@ export const useConfiguratorUIStore = create<ConfiguratorUIStoreState>((set, get
     const currentAssembly = watchAssemblyStore.assembly;
     const currentSourcing = useSourcingStore.getState().sourcingPlan.selections;
     const isFinish = previewCandidateItem.kind === 'style-finish';
+    if (previewCandidateItem.kind === 'crown' && get().lockedStyles[previewPartInstanceId]) { set({ previewError: 'Unlock the crown style before editing.' }); return false; }
     const slotError = !isFinish ? crownSlotError(currentAssembly, previewPartInstanceId, previewCandidateItem) : undefined;
     if (slotError) { set({ previewError: slotError }); return false; }
     // A presentation-only finish must not bypass validation for a geometry swap.
@@ -373,7 +378,8 @@ export const useConfiguratorUIStore = create<ConfiguratorUIStoreState>((set, get
     // Snapshot for Undo
     const lastCommittedSnapshot = {
       assembly: JSON.parse(JSON.stringify(currentAssembly)) as WatchAssembly,
-      sourcingPlan: { ...currentSourcing }
+      sourcingPlan: { ...currentSourcing },
+      supplierSnapshots: selectedSupplierSnapshots(currentSourcing, useCatalogueStore.getState().supplierListings)
     };
 
     // Calculate cost delta for sensitivity evidence
@@ -391,12 +397,18 @@ export const useConfiguratorUIStore = create<ConfiguratorUIStoreState>((set, get
     // Commit to canonical WatchAssemblyStore
     // A crown transition is rebuilt against current state; a stale preview cannot
     // overwrite a newly selected case, its datum or unrelated edits.
-    const committed = !isFinish && (isCrownPart(currentAssembly.parts[previewPartInstanceId]!) || previewCandidateItem.visual?.category === 'case')
+    const committed = !isFinish && (isCrownPart(currentAssembly.parts[previewPartInstanceId]!) || previewCandidateItem.visual?.category === 'case' || previewCandidateItem.metadata.tags.includes('off-axis-accessory'))
       ? applyCatalogueVisualSelection(currentAssembly, previewPartInstanceId, previewCandidateItem) : previewAssembly;
     if (previewCandidateItem.visual?.category === 'case' && previewAssembly.designConfig?.visualReferenceConfig?.caseFinish) {
       committed.designConfig = { ...committed.designConfig, visualReferenceConfig: { ...committed.designConfig?.visualReferenceConfig, caseFinish: previewAssembly.designConfig.visualReferenceConfig.caseFinish } };
     }
     watchAssemblyStore.setAssembly(committed);
+    if (previewCandidateItem.offAxisPlatform || currentAssembly.parts[previewPartInstanceId]?.offAxisPlatform) {
+      useSourcingStore.getState().clearSupplierSelection(previewPartInstanceId);
+      for (const [id, before] of Object.entries(currentAssembly.parts)) {
+        if (before.catalogueItemId !== committed.parts[id]?.catalogueItemId) useSourcingStore.getState().clearSupplierSelection(id);
+      }
+    }
 
     // Track decision record
     const updatedCost = get().getCommittedCost().grandTotal;
@@ -505,7 +517,7 @@ export const useConfiguratorUIStore = create<ConfiguratorUIStoreState>((set, get
     );
 
     set((state) => ({
-      savedVersions: [record, ...state.savedVersions]
+      savedVersions: [{ ...record, supplierSnapshots: selectedSupplierSnapshots(sourcing, useCatalogueStore.getState().supplierListings) }, ...state.savedVersions]
     }));
   },
 
@@ -519,16 +531,16 @@ export const useConfiguratorUIStore = create<ConfiguratorUIStoreState>((set, get
     set({
       lastCommittedSnapshot: {
         assembly: JSON.parse(JSON.stringify(currentAssembly)) as WatchAssembly,
-        sourcingPlan: { ...currentSourcing }
+        sourcingPlan: { ...currentSourcing },
+        supplierSnapshots: selectedSupplierSnapshots(currentSourcing, useCatalogueStore.getState().supplierListings)
       },
       previewingVersionId: null
     });
 
     useWatchAssemblyStore.getState().setAssembly(JSON.parse(JSON.stringify(version.assembly)) as WatchAssembly);
     if (!options?.designOnly) {
-      for (const [partId, listingId] of Object.entries(version.sourcingPlan)) {
-        useSourcingStore.getState().setSupplierSelection(partId, listingId);
-      }
+      for (const listing of version.supplierSnapshots ?? []) useCatalogueStore.getState().addSupplierListing(structuredClone(listing));
+      useSourcingStore.getState().loadSourcingPlan({ assemblyId: version.assembly.metadata.id, selections: { ...version.sourcingPlan }, updatedAtIso: new Date().toISOString() });
     }
   },
 
@@ -559,7 +571,7 @@ export const useConfiguratorUIStore = create<ConfiguratorUIStoreState>((set, get
     );
 
     set((state) => ({
-      savedVersions: [dup, ...state.savedVersions]
+      savedVersions: [{ ...dup, supplierSnapshots: structuredClone(version.supplierSnapshots ?? []) }, ...state.savedVersions]
     }));
   },
 
@@ -582,7 +594,7 @@ export const useConfiguratorUIStore = create<ConfiguratorUIStoreState>((set, get
     );
 
     set((state) => ({
-      savedVersions: pruneAutomaticCheckpoints([record, ...state.savedVersions])
+      savedVersions: pruneAutomaticCheckpoints([{ ...record, supplierSnapshots: selectedSupplierSnapshots(sourcing, useCatalogueStore.getState().supplierListings) }, ...state.savedVersions])
     }));
   },
 
@@ -628,9 +640,8 @@ export const useConfiguratorUIStore = create<ConfiguratorUIStoreState>((set, get
     }
 
     useWatchAssemblyStore.getState().setAssembly(lastCommittedSnapshot.assembly);
-    for (const [partId, listingId] of Object.entries(lastCommittedSnapshot.sourcingPlan)) {
-      useSourcingStore.getState().setSupplierSelection(partId, listingId);
-    }
+    for (const listing of lastCommittedSnapshot.supplierSnapshots ?? []) useCatalogueStore.getState().addSupplierListing(structuredClone(listing));
+    useSourcingStore.getState().loadSourcingPlan({ assemblyId: lastCommittedSnapshot.assembly.metadata.id, selections: { ...lastCommittedSnapshot.sourcingPlan }, updatedAtIso: new Date().toISOString() });
 
     set({ lastCommittedSnapshot: null });
     return true;

@@ -54,6 +54,7 @@ export const createStarterBuild = (
     const saved = sourceAssembly.parts[savedCrownChoice.selected.crownInstanceId];
     if (saved) {
       fresh.parts['inst-crown'] = { ...structuredClone(saved), instanceId: 'inst-crown' };
+      fresh.parts['inst-crown'].crownCapConcept = undefined;
       // A new platform needs its own axis, but retains the crown's physical evidence.
       if (fresh.parts['inst-crown'].crownSpecification) {
         fresh.parts['inst-crown'].customProperties = { ...fresh.parts['inst-crown'].customProperties, detachedCrownSpecification: fresh.parts['inst-crown'].crownSpecification };

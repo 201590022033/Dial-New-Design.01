@@ -5,7 +5,7 @@ const text = z.string().trim().min(1);
 // Assertions validate the original document; they do not replace it with Zod's
 // parsed result. Identity values therefore must never rely on normalization.
 const identity = z.string().min(1).refine(value => value === value.trim(), 'identity must not contain leading or trailing whitespace');
-const evidence = <T extends z.ZodType>(value: T) => z.union([
+export const evidence = <T extends z.ZodType>(value: T) => z.union([
   z.object({ status: z.literal('unknown'), reason: text }),
   z.object({ status: z.literal('known'), value, evidence: z.object({
     kind: z.enum(['supplier-statement', 'drawing', 'visual-approximation', 'legacy-preserved']), source: text,

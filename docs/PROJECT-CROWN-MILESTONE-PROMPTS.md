@@ -1,8 +1,10 @@
 # Project Crown and Namokimods - milestone execution prompts
 
+11 October publication update: the user explicitly authorized C4–C7 commit/push. CROWN-PUBLICATION-2026-10-11.md supersedes historical unpublished statements below. Do not replay completed milestones; scheduler remains paused.
+
 Prepared 9 October 2026. These prompts are run cards, NOT current implementation approval. Run only the specific milestone approved by the human. Full requirements and source evidence live in CROWN-ROADMAP-2026-10-09.md; progress lives in CROWN-RESUME-LEDGER-2026-10-09.md. All paths below are relative to `C:/Users/Deon/Documents/GitHub/Dial-New-Design.01`.
 
-10 October progress: approved C0-C3 are complete; commit/push was explicitly authorized. Start subsequent approved work from the live ledger, frozen C1 contract and CROWN-C2-C3-HANDOFF-2026-10-10.md rather than replaying completed work. C4-C7 remain unapproved. Suggested delegation below is optional and subject to current session instructions.
+10 October progress: C0-C3 are published; approved C4/C5, C6 and C7A-E are complete locally. C5/C7 acceptance is provisional presentation with hardware evidence unqualified. The post-C7 C6 regression gate passed 106 files / 965 tests, lint/typecheck/build and actual two-case browser checks; see CROWN-C7-ACCEPTANCE-2026-10-10.md. C4-C7 publication was not requested. Read the live ledger before new work; do not replay these completed prompts. Historical delegation suggestions require explicit authorization.
 
 ## Common preamble - include with every prompt
 
@@ -95,6 +97,8 @@ Suggested agents: 3, review-first. A tests domain/angles/calendar/scale envelope
 Check3h/3.8h/4h/4.1h/4.2h distinctions, exactly one crown, tube/stem collinearity, shroud cutout and guard clearance, dial/calendar orientation,22 mm strap constraints and complete BOM bundle accounting. Scale ticks, numbers and hover envelopes must fit actual bezel/chapter/dial annulus, not shroud OD. Challenge stale selections and hand/finish/strap switches. Distinguish actual screenshots from deterministic assertions. Deliver severity-ranked audit, fixes and retests, supported/provisional matrix and named exclusions. Gate: no hidden fit certification or unresolved advertised software defect. Then run C6.
 
 ## C6 prompt - final regression gate and authorized checkpoint
+
+Originally completed 10 October for C0-C5 after “go c6”: 105 files / 940 tests. Subsequently authorized C7A-E provisional work is complete and C6 rerun passed 106 files / 965 tests, lint/typecheck/build. See CROWN-C7-ACCEPTANCE-2026-10-10.md for current scope/evidence. C4-C7 publication was not authorized.
 
 Suggested agents: 3 independent review lanes. A domain/migration/fit regression; B real browser Engineering/HD matrix; C sourcing/BOM/asset manifest and stale-state audit. Main owns final fixes and all publication. Skills: computer-use; PDF when reconciling source facts. Tools: full project scripts, Git diff/status, browser, GLB inspection.
 

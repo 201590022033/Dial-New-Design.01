@@ -4,6 +4,7 @@ import type { ComponentCatalogueItem } from '@/domain/catalogue/types';
 import { archetypeCrownDefaults, crownCatalogueItems, presentationEvidence } from './catalogue';
 import { validateCrownSpecification } from './validation';
 import type { CrownSpecificationV1, EvidenceValue } from './types';
+import { crownEditError } from './edit';
 
 export const crownSpecificationForPart = (part?: WatchAssemblyPartInstance): CrownSpecificationV1 | undefined => {
   if (!part) return undefined;
@@ -19,6 +20,7 @@ export const isCrownPart = (part: WatchAssemblyPartInstance): boolean => {
 export const crownSlotError = (assembly: WatchAssembly, targetId: string, item: ComponentCatalogueItem): string | undefined => {
   const target = assembly.parts[targetId];
   if (!target) return 'The target component no longer exists.';
+  if (item.crownEdit) return item.kind === 'crown' ? crownEditError(assembly, targetId, item.crownEdit) : 'Crown edits require a crown candidate.';
   if (['case', 'midcase'].includes(item.kind) && target.catalogueItemId !== item.id && Object.values(assembly.parts).some(p => isCrownPart(p) && p.locked)) return 'Unlock the operating crown before replacing its case platform.';
   if ((isCrownPart(target) && item.kind !== 'crown') || (!isCrownPart(target) && item.kind === 'crown')) return 'Crown options require an operating crown slot and a crown catalogue kind.';
   if (item.kind === 'crown' && item.visual && item.visual.category !== 'crown') return 'Crown visual category contradicts catalogue kind.';

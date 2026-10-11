@@ -1,15 +1,17 @@
 # Project Crown and Namokimods - portable context cache
 
+Publication update, 11 October 2026: the user explicitly authorized committing and pushing C4–C7. Read CROWN-PUBLICATION-2026-10-11.md and live Git state; this supersedes historical unpublished/await-authorization statements below. Separate case-diameter work is excluded. Scheduler remains paused.
+
 Updated 10 October 2026, Africa/Johannesburg. This file is an explicit disk-backed handoff, not an internal model cache. Read the live ledger and Git state before trusting this snapshot.
 
 ## Authority
 
-The user approved C0 followed by C1 in GPT-6.1 Sol light mode, then explicitly requested C2 and C3 followed by commit/push on 10 October. C0-C3 are complete; see the live ledger, C0 evidence, frozen C1 contract and CROWN-C2-C3-HANDOFF-2026-10-10.md. The coordinator cannot switch its own running model through available tools. C4-C7 implementation, supplier onboarding writes, contacts, purchases and scheduler activation remain outside this approval. Do not run later milestone prompts merely because they exist.
+The user approved C0/C1, C2/C3 with commit/push, C4/C5, C6, then “So can we do c7” and “please fcomplete” on 10 October. C7A-E provisional presentation and the subsequent C6 regression gate are complete; read CROWN-C7-ACCEPTANCE-2026-10-10.md and the live ledger. C4-C7 remain local and uncommitted. Bounded provisional supplier/catalogue wiring is included; exact variant identity and hardware fit remain unqualified. Publication, contacts, purchases and scheduler activation were not requested. The coordinator cannot switch its own running model through available tools.
 
 ## Workspace and entry points
 
 - Actual repository: `C:/Users/Deon/Documents/GitHub/Dial-New-Design.01`.
-- Baseline: main, `6931131420adb5606323f8c8db54dc4c76604f8d`. Recheck current branch/upstream; never reset to this snapshot.
+- Published C0-C3 baseline: main/origin/main, `b5c313bf95e1b47c68d8bee1412cac46cbd32122`. C4/C5 are uncommitted changes above it. Recheck current branch/upstream; never reset to this snapshot.
 - Roadmap: `docs/CROWN-ROADMAP-2026-10-09.md`.
 - Prompts: `docs/PROJECT-CROWN-MILESTONE-PROMPTS.md`.
 - Mutable progress/authority: `docs/CROWN-RESUME-LEDGER-2026-10-09.md`.
@@ -40,14 +42,16 @@ C2/C3 resolved findings 1-5 below: six concept choices, kind-safe Apply, shaped 
 
 Three focused agents reviewed movement interfaces, case/style examples and repo architecture; one followed up off-axis Tuna candidates. Main visually inspected the official U-BOAT mechanism PDF using the PDF skill. Primary and supplier URLs plus timestamped observations are retained in the roadmap. Revalidate live prices before implementation; no Rand FX quote or SA delivered price has been invented. Do not redo completed broad searches unless stale or resolving a named gap.
 
-Current implementation verification: 103 files / 884 tests pass, including 40 C1 and 58 C2/C3 additions; lint and production build (including tsc -b) pass. C0 has actual isolated browser baselines, primary drawing page inspections and eight embedded-head hashes/transformed bounds. Original case GLBs remain unchanged; six new crown GLBs and C3 browser evidence are retained. Engineering has no side/crown viewport; no full C6 visual-matrix claim is made.
+Current implementation verification: 104 files / 911 tests pass, including 27 C4/C5 additions; lint and production build (including tsc -b) pass. C0 has isolated browser baselines, primary drawing inspections and eight embedded-head hashes/transformed bounds. C4/C5 browser acceptance covers controls, persistence, locks, cap geometry and honest BOM. Existing case/crown GLBs remain unchanged by C4/C5. Engineering adds a shared-geometry crown front detail, while the main viewport has no side/crown view; no full C6 visual-matrix claim is made. Cap hardware and case/guard clearance remain unqualified and not orderable.
 
 ## Execution and resumption
 
-Sequence: C0 -> C1 -> C2/C3 -> C4 -> C7A-E -> C6. Optional C5 later. Maximum four active agents including main in the originating session; target 1-3 subagents based on independent work, not a mandatory quota. Shared contracts frozen before parallel edits. Main owns integration and assigns disjoint files; audit agents review independently after integration.
+Completed: C0 -> C1 -> C2/C3 -> C4/C5 concept -> scoped C6 -> C7A-E provisional presentation -> C6 regression rerun. Current verification: 106 files / 965 tests, lint/typecheck/build passed. Actual two-case browser acceptance and bounded evidence gaps are in the C7 audit. No approved implementation remains. Current session forbids new delegation unless explicitly requested; historical suggestions are not authorization.
 
 Paused origin heartbeat: `resume-dial-designer-crown-roadmap`, five-hour cadence. It is not active, not reset-synchronised, and does not bypass usage limits. Do not activate a second schedule or resume implementation without explicit human scope. If moving continuation into the new task, use the supported automation tool to update the existing schedule's target only after checking actual thread identity and approval. Do not leave both chats running code in the shared checkout.
 
 At every stop write authority, completed gate, Git diff/files, source hashes, tests/results, known limitations and exact next action to the ledger. Recheck live usage when relevant; never promise quota capacity or auto-buy credits. Read all applicable AGENTS.md and selected SKILL.md instructions before work. Use PDF for drawings and computer-use for real browser acceptance, not as a claim that model assertions equal visual inspection.
 
-Next safe action: read the live ledger, frozen C1 contract and C2/C3 handoff; verify current HEAD against origin/main for the authorized publication. Await approval for the next milestone. Preserve user work and keep scheduling paused.
+Next safe action: read the live ledger, C1 contract and CROWN-C7-ACCEPTANCE-2026-10-10.md; inspect current Git state and await new scope or publication authorization. Preserve local C4-C7 work and keep scheduling paused.
+
+Latest C6 checkpoint: user explicitly instructed "go c6". C6 passed for C0-C5 scope: 105 files / 940 tests, lint, separate typecheck, production build and diff checks. Added 29 matrix tests covering 1,620 shape/closure/finish combinations and 216 cap states across six starters at 34/38/42 mm, all ten profiles and legacy/import preservation. Actual browser acceptance covers six starters, representative Engineering/HD pairs, reference42/custom38, concept full-screen labels, version restore/reload, cancel and locks. All 30 C4/C5 source hashes unchanged; no production fix needed. C7 hardware/off-axis integration remains excluded. Changes remain uncommitted; C6 did not authorize publication.

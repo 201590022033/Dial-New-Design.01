@@ -4,6 +4,8 @@ import type { WatchAssembly } from '@/domain/assembly/assemblyTypes';
 export type CompatibilityStatus = 'green' | 'yellow' | 'red' | 'unknown';
 
 export type CompatibilityRuleCode =
+  | 'OFF_AXIS_PLATFORM_MISMATCH'
+  | 'OFF_AXIS_INSTALLATION_UNKNOWN'
   | 'CROWN_SLOT_MISMATCH'
   | 'CROWN_INTERFACE_MISMATCH'
   | 'CROWN_INTERFACE_UNKNOWN'

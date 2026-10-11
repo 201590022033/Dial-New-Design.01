@@ -22,6 +22,9 @@ export const aliExpressCaptureSchema = z.object({
   itemPrice: moneySchema,
   shipping: moneySchema.nullable(),
   capturedAtIso: z.string().datetime({ offset: true }),
+  exactSku: z.string().trim().min(1).optional(),
+  fx: z.object({ currency: z.string().length(3), zarPerUnit: z.number().finite().positive(), sourceUrl: z.string().url().startsWith('https://'), checkedAtIso: z.string().datetime({ offset: true }) }).optional(),
+  taxAssumptions: z.string().trim().min(1).optional(),
   notes: z.string().trim().optional()
 });
 
@@ -32,13 +35,15 @@ export const supplierListingFromCapture = (capture: AliExpressCapture, catalogue
   id: `aliexpress-${capture.itemId}-${capture.capturedAtIso.replace(/\D/g, '').slice(0, 14)}`,
   catalogueItemId,
   supplierName: capture.sellerName,
-  sku: `AE-${capture.itemId}`,
+  sku: capture.exactSku ?? `AE-${capture.itemId}`,
   productUrl: capture.sourceUrl,
   unitPrice: capture.itemPrice.amount,
   currency: capture.itemPrice.currency,
   shippingPrice: capture.shipping?.amount ?? null,
   shippingCurrency: capture.shipping?.currency ?? capture.itemPrice.currency,
-  shippingDestination: capture.destination,
+  shippingDestination: /^(ZA|South Africa)$/i.test(capture.destination) ? 'ZA' : capture.destination,
+  priceSnapshot: { variant: capture.variant || 'Unspecified variant — confirm before procurement', checkedAtIso: capture.capturedAtIso, fx: capture.fx,
+    shippingToSa: /^(ZA|South Africa)$/i.test(capture.destination) && capture.shipping ? 'quoted' : 'unknown', taxAssumptions: capture.taxAssumptions ?? 'Supplier tax inclusion and import charges unknown; estimate is not a checkout quote' },
   stockStatus: 'unknown',
   status: 'active',
   verificationStatus: 'unverified',

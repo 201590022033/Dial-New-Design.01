@@ -16,7 +16,7 @@ export const BomCostLines: React.FC<{ cost: CostBreakdown; interactive?: boolean
   const selectSupplier = useSourcingStore(s => s.setSupplierSelection);
   const selections = useSourcingStore(s => s.sourcingPlan.selections);
   const [feedback, setFeedback] = React.useState('');
-  const matches = (itemId: string | undefined) => listings.filter(l => l.catalogueItemId === itemId || l.replacementCatalogueItemId === itemId);
+  const matches = (itemId: string | undefined) => itemId ? listings.filter(l => l.catalogueItemId === itemId || l.replacementCatalogueItemId === itemId) : [];
   return <section aria-label="Individual component costs" className="space-y-2 text-xs">
   <h3 className="font-semibold text-slate-100">Individual component costs</h3>
   <p className="text-[10px] text-slate-400">Choose a component and supplier option, then Apply to watch to update the right-hand options and both views. Grey alternatives are excluded from totals. A price selection alone does not change the watch or certify fit. Unknown costs are not zero. Hand sets are counted once.</p>
@@ -26,10 +26,12 @@ export const BomCostLines: React.FC<{ cost: CostBreakdown; interactive?: boolean
       {interactive && line.choiceGroup && cost.lineItems.filter(l => l.choiceGroup === line.choiceGroup).length > 1 && <label className="flex items-center gap-2 mb-1"><input type="radio" name={`bom-${choiceScope}-${line.choiceGroup}`} aria-label={`Include ${line.name} in BOM`} checked={line.included !== false} disabled={line.fitWarning?.startsWith('Does not match')} onChange={() => choosePart(line.choiceGroup!, line.id)} />{line.included === false ? 'Alternative — not counted' : 'Included in BOM'}</label>}
       <div className="flex justify-between gap-2">
         <span className="font-semibold capitalize">{line.component}</span>
-        <span className={line.priceZar === null ? 'shrink-0 text-amber-300' : 'shrink-0 font-mono text-teal-300'}>{line.priceZar === null ? 'Price unknown' : formatBomZar(line.priceZar)}</span>
+        <span className={line.priceZar === null ? 'shrink-0 text-amber-300' : 'shrink-0 font-mono text-teal-300'}>{line.packageNote ? 'Included with case' : line.priceZar === null ? 'Price unknown' : formatBomZar(line.priceZar)}</span>
       </div>
       <p className="mt-1 break-words text-[10px] text-slate-300">{line.name}{line.included === false ? ' · Not counted' : !line.visible ? ' · Hidden in view' : ''}</p>
       {line.fitWarning && <p className="text-[10px] text-amber-300">{line.fitWarning}</p>}
+      {line.packageNote && <p className="text-[10px] text-teal-300">{line.packageNote}</p>}
+      {line.priceProvenance && <p className="text-[10px] text-slate-400">{line.priceProvenance}</p>}
       {interactive && matches(line.catalogueItemId).length > 0 && <label className="block mt-1 text-[10px]">Supplier price option<select className="mt-1 w-full rounded bg-slate-800 p-1" aria-label={`Supplier price for ${line.name}`} value={selections[line.id] ?? ''} onChange={e => {
         const value = e.target.value || null;
         for (const id of line.partInstanceIds.length ? line.partInstanceIds : [line.id]) selectSupplier(id, value);

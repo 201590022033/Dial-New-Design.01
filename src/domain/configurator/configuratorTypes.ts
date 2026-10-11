@@ -44,6 +44,7 @@ export interface CommittedDecisionRecord {
 }
 
 export interface SavedDesignVersion {
+  supplierSnapshots?: import('@/domain/catalogue/types').SupplierListing[];
   id: string;
   name: string;
   timestampIso: string;
@@ -79,6 +80,8 @@ export interface BomCostLine {
   choiceGroup?: string;
   fitWarning?: string;
   catalogueItemId?: string;
+  packageNote?: string;
+  priceProvenance?: string;
 }
 
 export interface CostBreakdown {

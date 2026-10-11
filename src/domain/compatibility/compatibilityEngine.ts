@@ -26,6 +26,7 @@ import { checkCatalogueVerificationState } from './rules/catalogueVerificationRu
 import { checkTemplateRequiredComponents } from './rules/templateRequiredComponentsRule';
 import { checkMovementPusherCompatibility } from './rules/movementPusherRule';
 import { checkCrownCompatibility } from '@/domain/crown/compatibility';
+import { checkOffAxisPlatform } from '@/domain/crown/offAxisPlatform';
 import { crownSlotError } from '@/domain/crown/selection';
 
 /**
@@ -53,18 +54,26 @@ export const runCompatibilityRules = (
   }
 
   // 3. Physical & Mating interface rules
-  checks.push(...checkMovementCaseCompatibility(assembly, geometry, candidateItem));
+  const offAxisCase = Object.values(assembly.parts).find(part => part.offAxisPlatform);
+  // Generic NH35 fallback seats and 3h installation assumptions cannot qualify
+  // an off-axis supplier platform whose hidden interfaces are unmeasured.
+  if (offAxisCase) {
+    for (const category of ['movement-case', 'case-dial', 'chapter-ring-case', 'crystal-case', 'bezel-case']) checks.push({ status: 'unknown', code: 'MISSING_REQUIRED_DIMENSION', category, summary: `Exact off-axis ${category} interface is unqualified; generic case dimensions are presentation assumptions.`, affectedPartIds: [offAxisCase.instanceId] });
+  } else {
+    checks.push(...checkMovementCaseCompatibility(assembly, geometry, candidateItem));
+    checks.push(...checkCaseDialCompatibility(assembly, geometry, candidateItem));
+    checks.push(...checkChapterRingCaseCompatibility(assembly, geometry, candidateItem));
+    checks.push(...checkCrystalCaseCompatibility(assembly, geometry, candidateItem));
+    checks.push(...checkBezelCaseCompatibility(assembly, geometry, candidateItem));
+  }
   checks.push(...checkMovementHandsCompatibility(assembly, candidateItem));
-  checks.push(...checkCaseDialCompatibility(assembly, geometry, candidateItem));
-  checks.push(...checkChapterRingCaseCompatibility(assembly, geometry, candidateItem));
   checks.push(...checkHandsClearanceCompatibility(assembly, geometry, candidateItem));
-  checks.push(...checkCrystalCaseCompatibility(assembly, geometry, candidateItem));
-  checks.push(...checkBezelCaseCompatibility(assembly, geometry, candidateItem));
   checks.push(...checkBezelInsertCompatibility(assembly, geometry, candidateItem));
   checks.push(...checkDateWindowMovementCompatibility(assembly, candidateItem));
   checks.push(...checkTemplateRequiredComponents(assembly, candidateItem));
   checks.push(...checkMovementPusherCompatibility(assembly, candidateItem));
   checks.push(...checkCrownCompatibility(assembly));
+  checks.push(...checkOffAxisPlatform(assembly));
 
   // 4. Map any severe 2.5D cylindrical CAD collision diagnostics
   for (const diag of geometry.diagnostics) {
@@ -136,11 +145,12 @@ export const evaluateCandidate = (
 
   // Run all deterministic compatibility checks
   const allChecks = runCompatibilityRules(provisionalAssembly, candidate);
-  // A concept crown swap must not be labelled incompatible by an unchanged
-  // hand/dial failure. The full build evaluation still reports those failures.
-  // New failures and all crown-interface contradictions remain hard refusals.
-  const existingRed = candidate.kind === 'crown' ? runCompatibilityRules(assembly).filter(c => c.status === 'red') : [];
-  const checks = candidate.kind === 'crown' ? allChecks.filter(c => c.status !== 'red' || c.category === 'crown-interface' || !existingRed.some(old => old.code === c.code && old.summary === c.summary && JSON.stringify(old.affectedPartIds) === JSON.stringify(c.affectedPartIds))) : allChecks;
+  // Bounded crown/platform/strap repairs may proceed past unchanged unrelated
+  // failures. Full-build evaluation still reports those failures; new failures,
+  // affected target contradictions and all off-axis/crown refusals remain hard.
+  const boundedRepair = candidate.kind === 'crown' || candidate.offAxisPlatform || candidate.metadata.tags.includes('off-axis-accessory') || (['case', 'midcase'].includes(candidate.kind) && Object.values(assembly.parts).some(part => part.offAxisPlatform));
+  const existingRed = boundedRepair ? runCompatibilityRules(assembly).filter(c => c.status === 'red') : [];
+  const checks = boundedRepair ? allChecks.filter(c => c.status !== 'red' || c.category === 'crown-interface' || c.category === 'off-axis-platform' || (candidate.kind !== 'crown' && c.affectedPartIds?.includes(targetPartInstanceId ?? '')) || !existingRed.some(old => old.code === c.code && old.summary === c.summary && JSON.stringify(old.affectedPartIds) === JSON.stringify(c.affectedPartIds))) : allChecks;
 
   const candidateInfo = {
     catalogueItemId: candidate.id,

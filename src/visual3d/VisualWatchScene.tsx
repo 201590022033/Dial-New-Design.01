@@ -20,6 +20,18 @@ import type { RegionAppearance } from '@/domain/appearance/appearance';
 import { clampTipExtentMm } from '@/domain/appearance/appearance';
 import { handLumeCapability } from './handAppearanceRegions';
 import { createCrownGeometry } from './crownGeometry';
+import { createCrownCapGeometry } from './crownCapGeometry';
+
+const CrownCapPresentation = ({ model }: { model: VisualWatchModel }) => {
+  const concept = model.crown.capConcept!;
+  const surface = model.crown.surface;
+  const geometry = useMemo(() => createCrownCapGeometry(surface, concept), [surface, concept]);
+  useEffect(() => () => { geometry.cap.dispose(); geometry.holder.dispose(); }, [geometry]);
+  return <group name="DD_PROTECTED_CAP_PRESENTATION_ONLY">
+    <mesh name="DD_CASE_CONCEPT_HOLDER" geometry={geometry.holder}><meshStandardMaterial {...finish(model.finishes.case)} /></mesh>
+    <mesh name="DD_CONCEPT_CAP_NOT_OPERATING_HEAD" geometry={geometry.cap}><meshStandardMaterial {...finish(model.finishes.crown)} transparent opacity={concept.state === 'closed' ? .5 : .85} depthWrite={false} /></mesh>
+  </group>;
+};
 
 const ProceduralCrown = ({ model }: { model: VisualWatchModel }) => {
   const { shape, grip, coreDiameterMm, maximumOuterDiameterMm, lengthMm } = model.crown.surface;
@@ -401,6 +413,7 @@ export const VisualComponent = ({ category, model, liveOuterArtwork = false }: {
   return <group name={category} position={placement.anchor.positionMm} rotation={placement.anchor.rotationRad}>
     <group position={placement.offset} rotation={placement.rotation}>
       {placement.glb ? <GlbAsset key={descriptor.assetId + ':' + descriptor.assetPath} descriptor={descriptor} fallback={fallback} appearance={model.archetypeAppearance} liveOuterArtwork={liveOuterArtwork} dialFinishConfig={category === 'dial' ? { kind: model.dial.textureKind as 'sunburst', intensity: model.dial.textureIntensity, contrast: model.dial.textureContrast, directionDeg: model.dial.textureDirectionDeg } : undefined} dialDiameterMm={model.dial.outerDiameterMm} /> : fallback}
+      {category === 'crown' && model.crown.capConcept && <CrownCapPresentation model={model} />}
       {category === 'dial' && <group position={placement.glb ? placement.descriptorOffset : [0, 0, model.previewEnvelope.dialZ - placement.anchor.positionMm[2]]}>
         {placement.glb && <LiveHourMarkers model={model} />}
         <DialArtwork model={model} />

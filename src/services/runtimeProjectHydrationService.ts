@@ -7,6 +7,8 @@ import { useScaleStore } from '@/stores/scaleStore';
 import { useSelectionStore } from '@/stores/selectionStore';
 import { useViewportStore } from '@/stores/viewportStore';
 import { useSourcingStore } from '@/stores/sourcingStore';
+import { useCatalogueStore } from '@/stores/catalogueStore';
+import { assertSourcingPlan, assertSupplierSnapshots } from '@/domain/sourcing/snapshots';
 import { scaleSnapshotFromAssembly, withScaleSnapshot } from '@/domain/scales/scaleDocumentAdapter';
 
 /**
@@ -15,6 +17,8 @@ import { scaleSnapshotFromAssembly, withScaleSnapshot } from '@/domain/scales/sc
  * Preserves specific custom physical bands and selection IDs from legacy project files.
  */
 export const hydrateRuntimeProject = (project: DialProjectFile): void => {
+  if (project.sourcing) assertSourcingPlan(project.sourcing);
+  if (project.supplierSnapshots) assertSupplierSnapshots(project.supplierSnapshots);
   // 1. Authoritative migration to WatchAssembly
   let assembly = project.assembly
     ? deserializeWatchAssembly(JSON.stringify(project.assembly))
@@ -36,6 +40,8 @@ export const hydrateRuntimeProject = (project: DialProjectFile): void => {
 
   // 3. Initialize sourcing plan for this assembly
   useSourcingStore.getState().resetSourcingPlan(assembly.metadata.id);
+  for (const listing of project.supplierSnapshots ?? []) useCatalogueStore.getState().addSupplierListing(structuredClone(listing));
+  if (project.sourcing) useSourcingStore.getState().loadSourcingPlan({ ...structuredClone(project.sourcing), assemblyId: assembly.metadata.id });
 
   // 4. Hydrate transient and specialized subsystems
   useScaleStore.getState().hydrateScaleState(scaleSnapshotFromAssembly(assembly) ?? project.scale);

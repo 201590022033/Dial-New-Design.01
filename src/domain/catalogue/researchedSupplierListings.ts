@@ -1,6 +1,7 @@
 import type { SupplierListing } from './types';
 import { nh05SupplierCandidateListings } from './nh05SupplierCandidates';
 import { supplierExpansionCandidateListings } from './supplierExpansionCandidates';
+import { offAxisSupplierListings } from './offAxisCatalogue';
 
 const RESEARCH_CAPTURED_AT = '2026-09-26T09:30:00+02:00';
 const LARGE_CASE_RESEARCH_AT = '2026-09-27T17:57:05+02:00';
@@ -93,12 +94,7 @@ export const researchedSupplierListings: SupplierListing[] = [
     drawingUrl: 'https://ae01.alicdn.com/kf/H8b156939f0b149c889aa7c5a7b4e63f5t.jpg',
     notes: 'Exact silvery NH-series case price. Seller drawing states 40.20 mm OD, 12.30 mm thickness and 20 mm lugs. Shipping to South Africa remains checkout-dependent.'
   }),
-  documentedCaseListing({
-    id: 'research-namoki-nmk920-tuna', catalogueItemId: 'cat-case-namoki-nmk920-tuna-47', supplierName: 'namokiMODS', sku: 'NMK920-BRUSHED',
-    productUrl: 'https://www.namokimods.com/products/nmk920-tuna-skx007-srpd-watch-case-brushed-finish', unitPrice: 195, currency: 'SGD', stockStatus: 'out-of-stock',
-    drawingUrl: 'https://cdn.shopify.com/s/files/1/0139/0434/7193/files/image_393d712f-eeae-4b1e-8028-3f021f774d1b_600x600.png?v=1625647458',
-    notes: 'Exact NMK920 listing and its published dimension image. Sold out when checked; shipping is advertised as free/discounted express but must be confirmed for South Africa.'
-  }),
+  ...offAxisSupplierListings,
   documentedCaseListing({
     id: 'research-ebay-feiyashi-samurai-188553207610', catalogueItemId: 'cat-case-feiyashi-samurai-438', supplierName: 'FEIYASHI / yulan01 on eBay', sku: 'EBAY-188553207610',
     productUrl: 'https://www.ebay.com/itm/188553207610', unitPrice: 56.99, currency: 'USD', stockStatus: 'in-stock', shippingPrice: 40, shippingCurrency: 'USD', shippingDestination: 'Worldwide listing; confirm South Africa',

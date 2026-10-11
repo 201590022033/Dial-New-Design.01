@@ -1,6 +1,7 @@
 import type { WatchAssembly } from '@/domain/assembly/assemblyTypes';
 import type { SavedDesignVersion } from './configuratorTypes';
 import { deserializeWatchAssembly } from '@/domain/assembly/assemblySerialization';
+import { assertSupplierSnapshots } from '@/domain/sourcing/snapshots';
 
 const MAX_AUTOMATIC_CHECKPOINTS = 8;
 
@@ -128,7 +129,9 @@ function validatedVersion(input: unknown): SavedDesignVersion | null {
         Object.values(part.dimensions).some(dimension => !Number.isFinite(dimension)))) return null;
     if (assembly.partOrder.some(id => typeof id !== 'string' || !assembly.parts[id])) return null;
     if (Object.entries(value.sourcingPlan).some(([key, listing]) => key.length > 200 || (listing !== null && (typeof listing !== 'string' || listing.length > 300)))) return null;
+    if (value.supplierSnapshots) assertSupplierSnapshots(value.supplierSnapshots);
     return { id: value.id, name: value.name, timestampIso: value.timestampIso, assembly,
+      ...(value.supplierSnapshots ? { supplierSnapshots: structuredClone(value.supplierSnapshots) } : {}),
       sourcingPlan: { ...value.sourcingPlan }, totalCost: value.totalCost, supplierCount: value.supplierCount,
       customPartCount: value.customPartCount, readinessLabel: value.readinessLabel,
       ...(typeof value.isAutomaticCheckpoint === 'boolean' ? { isAutomaticCheckpoint: value.isAutomaticCheckpoint } : {}),

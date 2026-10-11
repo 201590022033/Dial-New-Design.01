@@ -1,0 +1,151 @@
+{
+  "schema": "crown-c6-evidence/v1",
+  "date": "2026-10-10",
+  "baselineCommit": "b5c313bf95e1b47c68d8bee1412cac46cbd32122",
+  "scope": "C0-C5 ordinary crowns and protected cap presentation; C7 excluded",
+  "status": "PASS within stated scope",
+  "testFiles": 105,
+  "tests": 940,
+  "addedMatrixTests": 29,
+  "shapeClosureFinishCombinations": 1620,
+  "capStates": 216,
+  "inheritedProfileTransitions": 100,
+  "typecheck": "passed",
+  "lint": "passed",
+  "productionBuild": "passed",
+  "browserErrors": 0,
+  "priorC4C5SourcesUnchanged": 30,
+  "browserObservation": "Researched NMK903 38 mm case permits a provisional visual preview; incompatible Apply was disabled. Separate research-only warnings belonged to other cards.",
+  "screenshots": [
+    {
+      "file": "chronograph-engineering.jpg",
+      "bytes": 89901,
+      "sha256": "01182d9f795df3af2b59672c71c3d92f8a65142a24c444849f5ce80940098e4b"
+    },
+    {
+      "file": "chronograph-hd-front.jpg",
+      "bytes": 98047,
+      "sha256": "7a3d21877f52cc62560f9d2c8b9e6dd6f2b044688c33b53b60443ff06b1ea30f"
+    },
+    {
+      "file": "chronograph-hd-side.jpg",
+      "bytes": 89136,
+      "sha256": "34a04f6512abbb2949642c0512b666405868a5e19fd7e12493aff1ca6d8c07d1"
+    },
+    {
+      "file": "custom38-fullscreen-concept.jpg",
+      "bytes": 59367,
+      "sha256": "447ba99b6a8b6142aab4a79f6c95e18817e879ddc7e108e74c9680e4393856b1"
+    },
+    {
+      "file": "custom38-smooth-rose-open-front.jpg",
+      "bytes": 114266,
+      "sha256": "bf002b03a019830d1fe31f54564bc05ceae6b5e12c832f69efdacee1b0406e89"
+    },
+    {
+      "file": "diver-black-closed-front.jpg",
+      "bytes": 114869,
+      "sha256": "da390f2c421176c932b8ec8924bc9bd4eaca1c76dcf2de0cc07e1932dfeca571"
+    },
+    {
+      "file": "diver-black-closed-side.jpg",
+      "bytes": 107957,
+      "sha256": "83fa15a820c365d988ee77acbdd53253ad797025fa93a9a8805fc254d98a6e75"
+    },
+    {
+      "file": "diver-engineering-detail.jpg",
+      "bytes": 90923,
+      "sha256": "58865635ae1c7899ad4c3cfb95ae744548bfa8ef4aa4154cbfdf213c7d3dd70c"
+    },
+    {
+      "file": "diver-hd-front.jpg",
+      "bytes": 99367,
+      "sha256": "2ca8bbe4ea02143047faa5e4f6790d0b25c05a068fbac7761faa5d8cb86b3448"
+    },
+    {
+      "file": "dress-engineering.jpg",
+      "bytes": 85187,
+      "sha256": "d823e75d07935d6412882db519ff8e550732cf95a48a88b76457e68159c859ec"
+    },
+    {
+      "file": "dress-hd-front.jpg",
+      "bytes": 94862,
+      "sha256": "62641ca6cd89d2b3812a10e615a4fbfc5166c15a4b056ee8dcd2b245d4cb5562"
+    },
+    {
+      "file": "dress-hd-side.jpg",
+      "bytes": 89056,
+      "sha256": "b4e863c34b57f494974d16764c4f61325128d25066bf477c051f3aefafd6a963"
+    },
+    {
+      "file": "field-engineering.jpg",
+      "bytes": 87109,
+      "sha256": "e6e6542ed673dfce6f4cdf53bce976656be25f915ed0ac683ff9e64c89ce8df3"
+    },
+    {
+      "file": "field-hd-front.jpg",
+      "bytes": 95043,
+      "sha256": "41428a3fd749aeb658493a2cbcc9a3b4cf618db4ab82944a5601d9371bccc640"
+    },
+    {
+      "file": "field-hd-side.jpg",
+      "bytes": 89308,
+      "sha256": "ee82c8fe23a9188a6b32063ff489baf6f6449d9d0f7404a9411dabb011aa02e7"
+    },
+    {
+      "file": "ladies34-engineering.jpg",
+      "bytes": 85353,
+      "sha256": "782e394d3ad2fe4bc6fe33f2f1b5a938b030959f61cab0e98edb59e295202200"
+    },
+    {
+      "file": "ladies34-hd-front.jpg",
+      "bytes": 93417,
+      "sha256": "17d099fb3188c0dd93c91ffcf88188912be9a6ecddb158b3e60097c11952e133"
+    },
+    {
+      "file": "ladies34-hd-side.jpg",
+      "bytes": 89704,
+      "sha256": "91213d201c65436c3f3b0772a2a2292bf1df8c6b7382ba4424a07ac51d57e1ae"
+    },
+    {
+      "file": "pilot-engineering.jpg",
+      "bytes": 91941,
+      "sha256": "7e8218cd0a8afc95e7ff320ed134963edce61f700b95da8d6debf429f68d9823"
+    },
+    {
+      "file": "pilot-hd-front.jpg",
+      "bytes": 95777,
+      "sha256": "480c34aac7a37540473820d7ce990882309db1b2794e27f4953d9ba2364b2677"
+    },
+    {
+      "file": "pilot-hd-side.jpg",
+      "bytes": 88575,
+      "sha256": "cb9eba9ad2d746d18408c5fdff3338f929068ce794148649e86e12b384db13e4"
+    },
+    {
+      "file": "reference42-smooth-rose-open-front.jpg",
+      "bytes": 113040,
+      "sha256": "6ef399e2f67a415683a92eeafc949d2b3594aa1708ae816f8ae5741e04ce25f9"
+    },
+    {
+      "file": "reloaded38-engineering-cap.jpg",
+      "bytes": 89848,
+      "sha256": "95840fa2dd1ab2f7e12caae2435eebf52ad2ee3bfb6faa6c9d56ae25b242ca63"
+    },
+    {
+      "file": "researched38-apply-blocked.jpg",
+      "bytes": 87612,
+      "sha256": "d78b6effc807a997636ebd710964a91ef67edc5c806bd38a50ba99bf76e0dafd"
+    }
+  ],
+  "pinnedFiles": [
+    {
+      "file": "src/tests/crownReleaseGate.test.ts",
+      "sha256": "495ecac4c60bc0de77bd8a7ffe6abd2f8972d27595663ea98aac7d10d27e1d00"
+    },
+    {
+      "file": "docs/CROWN-C6-ACCEPTANCE-2026-10-10.md",
+      "sha256": "563d0acec84581f659a7d9afee53875e897181f77a2d17139b8988b3dad0e8a4"
+    }
+  ]
+}

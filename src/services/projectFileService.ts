@@ -8,6 +8,9 @@ import type { MarkerEngineConfig } from '@/domain/generators/markerEngine';
 import type { TypographyConfig } from '@/domain/generators/typographyEngine';
 import type { TextureEngineConfig } from '@/domain/generators/textureEngine';
 import { assertAssemblyCrownContracts } from '@/domain/assembly/crownAssemblyValidation';
+import type { WatchSourcingPlan } from '@/domain/sourcing/sourcingTypes';
+import type { SupplierListing } from '@/domain/catalogue/types';
+import { assertSourcingPlan, assertSupplierSnapshots } from '@/domain/sourcing/snapshots';
 
 export const DIAL_FILE_VERSION = '1.0.0';
 
@@ -24,6 +27,8 @@ export interface ProjectInfo {
 }
 
 export interface DialProjectFile {
+  sourcing?: WatchSourcingPlan;
+  supplierSnapshots?: SupplierListing[];
   assembly?: WatchAssembly;
   version: string;
   info: ProjectInfo;
@@ -88,12 +93,16 @@ export const createDefaultProjectInfo = (): ProjectInfo => {
 };
 
 export const serializeDialProject = (project: DialProjectFile): string => {
+  if (project.sourcing) assertSourcingPlan(project.sourcing);
+  if (project.supplierSnapshots) assertSupplierSnapshots(project.supplierSnapshots);
   if (project.assembly) assertAssemblyCrownContracts(project.assembly);
   return JSON.stringify(project, null, 2);
 };
 
 export const deserializeDialProject = (input: string): DialProjectFile => {
   const parsed = JSON.parse(input) as DialProjectFile;
+  if (parsed.sourcing) assertSourcingPlan(parsed.sourcing);
+  if (parsed.supplierSnapshots) assertSupplierSnapshots(parsed.supplierSnapshots);
   if (!parsed.version || !parsed.geometry || !parsed.bands || !parsed.scale) {
     throw new Error('Invalid .dial project payload.');
   }

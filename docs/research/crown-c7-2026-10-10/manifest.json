@@ -1,0 +1,210 @@
+{
+  "schema": "crown-c7-acceptance/v1",
+  "date": "2026-10-10",
+  "timezone": "Africa/Johannesburg",
+  "baseline": "b5c313bf95e1b47c68d8bee1412cac46cbd32122",
+  "scope": "C7A-E provisional presentation and C6 regression rerun",
+  "hardwareFit": "unqualified",
+  "exactVariantIdentity": "requires-confirmation",
+  "checks": {
+    "lint": "pass",
+    "buildIncludingTypeScript": "pass",
+    "offAxisTests": 25,
+    "typecheck": "pass",
+    "tests": 965,
+    "testFiles": 106
+  },
+  "blender": "5.2.1 LTS",
+  "files": [
+    {
+      "path": "public/assets/3d/variants/cases/case-namoki-nmk920-offaxis-v1.glb",
+      "sha256": "d5defb28871e1969dbe9dfcceddbedfcb1c5693ce1a6c703849d25eaf980b3d5",
+      "bytes": 222680
+    },
+    {
+      "path": "public/assets/3d/variants/cases/case-tandorio-tuna-465-offaxis-v1.glb",
+      "sha256": "3b6c39644401aa6233e6f95f2cc00e736d905eb39e04f0000355b0497012e7f3",
+      "bytes": 222984
+    },
+    {
+      "path": "src/domain/crown/offAxisLayouts.json",
+      "sha256": "b53341e2149dc2e6d0f8c15c0bf1326da09237facc7012d0d50f3ffe565859ee",
+      "bytes": 2283
+    },
+    {
+      "path": "src/domain/crown/offAxisPlatform.ts",
+      "sha256": "95fdefe2a92cd35d13603124ab5d81b2c1ef1e0afbff350ced6587d2459d3f91",
+      "bytes": 3905
+    },
+    {
+      "path": "src/domain/catalogue/offAxisCatalogue.ts",
+      "sha256": "0f863f61987769a4fa834f7469b83c520f7ef83c740ebf8c80bb4faae0c84af9",
+      "bytes": 9255
+    },
+    {
+      "path": "src/domain/catalogue/applyCatalogueVisualSelection.ts",
+      "sha256": "efdb15a5b860c0f6a800530b4453c85cbbfefd84c306c4ea6583ae47565c4644",
+      "bytes": 7576
+    },
+    {
+      "path": "src/domain/compatibility/compatibilityEngine.ts",
+      "sha256": "7c9239987924630aa640ef7bac0a86449bfcc7fde6db31f4fab0872bd871a663",
+      "bytes": 10679
+    },
+    {
+      "path": "src/stores/configuratorUIStore.ts",
+      "sha256": "ac496f205851f6a7bc67c5df5bcec4ff62ec224109585f9597afc98c1d4c9a3b",
+      "bytes": 24657
+    },
+    {
+      "path": "src/stores/catalogueStore.ts",
+      "sha256": "9a79d7bc6beef826de38c6e581433779bf46b8d8152ee4ccb7b9848e455bba16",
+      "bytes": 3118
+    },
+    {
+      "path": "src/components/configurator/tray/OffAxisPlatformDetail.tsx",
+      "sha256": "79e32a5ac0a47a88c3216776b70e53cd2965bdeb1cc40596c94888691ae23c30",
+      "bytes": 3097
+    },
+    {
+      "path": "src/components/configurator/tray/OptionsTab.tsx",
+      "sha256": "516ceb84bb3a4a8093d01c095e1594a90795e601b996f76d90e23f60162855e7",
+      "bytes": 23683
+    },
+    {
+      "path": "src/visual3d/VisualWatchRenderer.tsx",
+      "sha256": "804d041b372d71dcff394fb325558a632ea82b9a1ab488666f11944c262dbbe9",
+      "bytes": 16222
+    },
+    {
+      "path": "src/visual3d/watchAssemblyToVisualModel.ts",
+      "sha256": "4ae1565ded20fd31ce8a658c8389a38da063b943336ee3bc5e87012db4da7aa3",
+      "bytes": 29837
+    },
+    {
+      "path": "src/visual3d/visualAssetRegistry.ts",
+      "sha256": "80ba81ad10fda45b14a09fe6ca47d96be2072aec62cefcd8267295705a229f08",
+      "bytes": 24577
+    },
+    {
+      "path": "src/domain/presets/reference3d.ts",
+      "sha256": "9afd7f52cc9dc7819133ef0d8cd7c2bc0d0f636b634b73e6fe446fedc3766b5d",
+      "bytes": 11008
+    },
+    {
+      "path": "src/domain/configurator/bomCostCalculator.ts",
+      "sha256": "a4030667f438e72080a7d69ca1167491077fbb28628be445cbd4388d8c21ab7e",
+      "bytes": 11461
+    },
+    {
+      "path": "src/domain/sourcing/snapshots.ts",
+      "sha256": "d57dd2352eb7048e69675bb3d6ac9c6d67365ce641bec0ac1d3cab9dd4b7e570",
+      "bytes": 3534
+    },
+    {
+      "path": "src/tests/offAxisCrownPlatform.test.tsx",
+      "sha256": "1eb82112ad46f03c646404a4269b7547855d0bb41b11956d60d52357696745cb",
+      "bytes": 20287
+    },
+    {
+      "path": "tools/blender/generate_off_axis_cases.py",
+      "sha256": "2750665c6d6b9fa15fb485aa6979d03c2411e3ed21866e8c79d323a1938315f8",
+      "bytes": 4321
+    },
+    {
+      "path": "docs/research/crown-c7-2026-10-10/fx-usd.json",
+      "sha256": "47013f909c242a94cce06b148e996e2a83577018d596fb935a8d3f1d07bb5e6c",
+      "bytes": 84
+    },
+    {
+      "path": "docs/research/crown-c7-2026-10-10/locked-case-refusal.png",
+      "sha256": "770aed96675d5056eb0f0f2faf2ede0152d5affa282e2108036bc6c941486bca",
+      "bytes": 95589
+    },
+    {
+      "path": "docs/research/crown-c7-2026-10-10/nmk920-bundle-replacement.png",
+      "sha256": "fed2f17cca1a5af11a328ff888435a81822124d26c197a76e739747d1550ab71",
+      "bytes": 105946
+    },
+    {
+      "path": "docs/research/crown-c7-2026-10-10/nmk920-engineering.png",
+      "sha256": "d15cc72875fe5f8420438ecf85dd57ccd4b8c91e30acf2b52ee20fad38ae63ad",
+      "bytes": 93204
+    },
+    {
+      "path": "docs/research/crown-c7-2026-10-10/nmk920-explicit-crown-final.png",
+      "sha256": "93d0989b06099c4c6fd5b956d52a7e23faa23ff2acc540ebd03ee9e3b71436a5",
+      "bytes": 103122
+    },
+    {
+      "path": "docs/research/crown-c7-2026-10-10/nmk920-front.png",
+      "sha256": "7c25359d3f76efa4ac0321fcee367a0651cf6d657e572394bc706f6680aa7e73",
+      "bytes": 102960
+    },
+    {
+      "path": "docs/research/crown-c7-2026-10-10/nmk920-overview.png",
+      "sha256": "642969a4a1c27b8ff30a45e5040ec1f43352a63c1446d016d60ae8a207b0e8b2",
+      "bytes": 101564
+    },
+    {
+      "path": "docs/research/crown-c7-2026-10-10/nmk920-price.png",
+      "sha256": "49b24ce8dd41428e115bba48e114ed55e4ff37d1c048e8e1e6ffd9d103177fd6",
+      "bytes": 112987
+    },
+    {
+      "path": "C:/Users/Deon/Documents/Codex/2026-10-09/project-crown-and-namokimods/outputs/crown-c7-review-package.zip",
+      "sha256": "359923fc7a71f5ca17ef6516e1ecfca6279236d6c4e06243e33d5ae6ec2d0564",
+      "bytes": 1527227
+    },
+    {
+      "path": "docs/research/crown-c7-2026-10-10/nmk920-side.png",
+      "sha256": "e9f83c6df204164111b01b72d9549937cd9273dbd84f0637f215c8ccca94f99c",
+      "bytes": 95169
+    },
+    {
+      "path": "docs/research/crown-c7-2026-10-10/tandorio-bom.png",
+      "sha256": "303396e91db1ff25d0f59f1de33062b0e111153ee6086899b931f3d4cc124509",
+      "bytes": 124820
+    },
+    {
+      "path": "docs/research/crown-c7-2026-10-10/tandorio-front.png",
+      "sha256": "68f57204ba2f98cbcb435fa052382dc577fa3cc79b937b847b31281daaf739d3",
+      "bytes": 99159
+    },
+    {
+      "path": "docs/research/crown-c7-2026-10-10/tandorio-fullscreen.png",
+      "sha256": "14406170c12aeac43a555660f21f03d7a15a35002c76cb4f52674881c5adb08e",
+      "bytes": 47614
+    },
+    {
+      "path": "docs/research/crown-c7-2026-10-10/tandorio-restored-after-reload.png",
+      "sha256": "15f9f77c4aa29beca965753cbfee699d25ea6cbaa1ff8a5385c25bbf2aaf95a1",
+      "bytes": 96793
+    },
+    {
+      "path": "docs/research/crown-c7-2026-10-10/tandorio-side.png",
+      "sha256": "9c39e6c0388e25bd6b92c50e8fa0341a9e06f1db34a4ae80f7bcaf4ef7bfdc46",
+      "bytes": 93296
+    },
+    {
+      "path": "docs/research/crown-c7-2026-10-10/tandorio-supplier.png",
+      "sha256": "cddb7c9183d4018a4cad4c9d5ea1910ce00f477d4f83dac1e49827f9733b5f33",
+      "bytes": 105481
+    },
+    {
+      "path": "docs/research/crown-c7-2026-10-10/nmk920-review-package/custom-watch-design-2048.png",
+      "sha256": "44efcdbf7cbb69023d10a3d334952bfcd14231468b9ca4706b6cec26211f5e03",
+      "bytes": 1472885
+    },
+    {
+      "path": "docs/research/crown-c7-2026-10-10/nmk920-review-package/custom-watch-design.watch.json",
+      "sha256": "92f8bb29e179c1c75b205cc7817e4dbfb7340974f228b437413eedafb12c9f2f",
+      "bytes": 48415
+    },
+    {
+      "path": "docs/research/crown-c7-2026-10-10/nmk920-review-package/render-manifest.json",
+      "sha256": "8812a14d0a872b2114329bc44c272edd1ce7d928b96ab16c5560ab481dcac4a0",
+      "bytes": 5521
+    }
+  ]
+}

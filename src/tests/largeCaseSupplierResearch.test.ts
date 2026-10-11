@@ -29,12 +29,15 @@ describe('large diver, pilot and chronograph case research', () => {
     expect(catalogueItemById.get('cat-case-namoki-nmk920-tuna-47')?.nominalDimensions).toMatchObject({ diameterMm: 47, thicknessMm: 11.3 });
   });
 
-  it('requires an exact product-linked dimension drawing for every selectable researched case', () => {
+  it('retains linked envelope drawings while explicitly downgrading the unresolved NMK920 provenance', () => {
     const researchedCases = researchedSupplierListings.filter((listing) => addedCaseIds.includes(listing.catalogueItemId as typeof addedCaseIds[number]));
     expect(researchedCases).toHaveLength(6);
-    expect(researchedCases.every((listing) => listing.engineeringEvidence?.drawingUrl)).toBe(true);
-    expect(researchedCases.every((listing) => listing.engineeringEvidence?.level === 'dimensioned-drawing')).toBe(true);
-    expect(researchedCases.every((listing) => listing.engineeringEvidence?.glbReadiness === 'visual-glb-ready')).toBe(true);
+    const drawnCases = researchedCases.filter(listing => listing.catalogueItemId !== 'cat-case-namoki-nmk920-tuna-47');
+    expect(drawnCases).toHaveLength(5);
+    expect(drawnCases.every((listing) => listing.engineeringEvidence?.drawingUrl)).toBe(true);
+    expect(drawnCases.every((listing) => listing.engineeringEvidence?.level === 'dimensioned-drawing')).toBe(true);
+    expect(drawnCases.every((listing) => listing.engineeringEvidence?.glbReadiness === 'visual-glb-ready')).toBe(true);
+    expect(researchedCases.find(listing => listing.catalogueItemId === 'cat-case-namoki-nmk920-tuna-47')!.engineeringEvidence).toMatchObject({ level: 'headline-only', glbReadiness: 'provisional-only' });
     expect(researchedCases.every((listing) => listing.engineeringEvidence?.glbReadiness !== 'supplier-exact-ready')).toBe(true);
   });
 

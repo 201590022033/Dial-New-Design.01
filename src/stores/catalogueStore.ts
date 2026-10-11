@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { crownCatalogueItems } from '@/domain/crown/catalogue';
+import { offAxisPackageCrowns, offAxisStrapItem, offAxisPackageBezel } from '@/domain/catalogue/offAxisCatalogue';
 import {
   defaultCatalogueItems,
   defaultSupplierListings,
@@ -31,7 +32,7 @@ export interface CatalogueStoreState {
 }
 
 export const useCatalogueStore = create<CatalogueStoreState>((set, get) => ({
-  items: [...defaultCatalogueItems, ...crownCatalogueItems, ...visualVariantCatalogueItems, ...nh05SupplierCandidateItems, ...supplierExpansionCandidateItems],
+  items: [...defaultCatalogueItems, ...crownCatalogueItems, ...offAxisPackageCrowns, offAxisStrapItem, offAxisPackageBezel, ...visualVariantCatalogueItems, ...nh05SupplierCandidateItems, ...supplierExpansionCandidateItems],
   supplierListings: [...defaultSupplierListings, ...researchedSupplierListings],
   categoryFilter: 'all',
   searchQuery: '',

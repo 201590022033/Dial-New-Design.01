@@ -1,0 +1,1698 @@
+{
+  "version": "2.0.0",
+  "metadata": {
+    "id": "5fe84141-17e7-477f-9185-977781a2dda4",
+    "name": "Custom Watch Design",
+    "revision": "A",
+    "designer": "Watchmaker",
+    "material": "316L Stainless Steel",
+    "movement": "nh35",
+    "notes": "Configured with automatic calibre NH35 and modular dial assembly.",
+    "createdAtIso": "2026-10-10T10:39:42.343Z",
+    "updatedAtIso": "2026-10-10T14:35:59.483Z"
+  },
+  "globalDimensions": {
+    "caseDiameterMm": 47,
+    "totalThicknessMm": 11.3,
+    "bandGapMm": 0.15,
+    "manufacturingToleranceMm": 0.05,
+    "laserKerfMm": 0.08
+  },
+  "parts": {
+    "inst-dial-blank": {
+      "instanceId": "inst-dial-blank",
+      "catalogueItemId": "cat-dial-blank",
+      "name": "Dial Blank",
+      "category": "dial",
+      "visible": true,
+      "locked": false,
+      "layerIndex": 300,
+      "material": "brass",
+      "color": "#07182d",
+      "texture": "matte",
+      "dimensions": {
+        "diameterMm": 28.5,
+        "widthMm": 28.5,
+        "thicknessMm": 0.4,
+        "offsetXmm": 0,
+        "offsetYmm": 0
+      },
+      "typography": {
+        "fontFamily": "\"IBM Plex Mono\", monospace",
+        "fontSizeMm": 1.1,
+        "tracking": 0
+      },
+      "customProperties": {},
+      "visual": {
+        "category": "dial",
+        "assetId": "dial-face-40mm-layout-v1"
+      }
+    },
+    "inst-hour-hand": {
+      "instanceId": "inst-hour-hand",
+      "catalogueItemId": "cat-hour-hand",
+      "name": "Hour Hand",
+      "category": "hands",
+      "visible": true,
+      "locked": false,
+      "layerIndex": 701,
+      "material": "steel",
+      "color": "#CBD5E1",
+      "texture": "brushed",
+      "dimensions": {
+        "diameterMm": 10,
+        "widthMm": 1.2,
+        "thicknessMm": 0.2,
+        "offsetXmm": 0,
+        "offsetYmm": 0
+      },
+      "typography": {
+        "fontFamily": "\"IBM Plex Mono\", monospace",
+        "fontSizeMm": 1.1,
+        "tracking": 0
+      },
+      "customProperties": {}
+    },
+    "inst-minute-hand": {
+      "instanceId": "inst-minute-hand",
+      "catalogueItemId": "cat-minute-hand",
+      "name": "Minute Hand",
+      "category": "hands",
+      "visible": true,
+      "locked": false,
+      "layerIndex": 702,
+      "material": "steel",
+      "color": "#E2E8F0",
+      "texture": "brushed",
+      "dimensions": {
+        "diameterMm": 13.5,
+        "widthMm": 0.9,
+        "thicknessMm": 0.2,
+        "offsetXmm": 0,
+        "offsetYmm": 0
+      },
+      "typography": {
+        "fontFamily": "\"IBM Plex Mono\", monospace",
+        "fontSizeMm": 1.1,
+        "tracking": 0
+      },
+      "customProperties": {}
+    },
+    "inst-central-seconds": {
+      "instanceId": "inst-central-seconds",
+      "catalogueItemId": "cat-central-seconds",
+      "name": "Central Seconds",
+      "category": "hands",
+      "visible": true,
+      "locked": false,
+      "layerIndex": 703,
+      "material": "steel",
+      "color": "#CBD5E1",
+      "texture": "polished",
+      "dimensions": {
+        "diameterMm": 14,
+        "widthMm": 0.3,
+        "thicknessMm": 0.15,
+        "offsetXmm": 0,
+        "offsetYmm": 0
+      },
+      "typography": {
+        "fontFamily": "\"IBM Plex Mono\", monospace",
+        "fontSizeMm": 1.1,
+        "tracking": 0
+      },
+      "customProperties": {}
+    },
+    "inst-gmt-hand": {
+      "instanceId": "inst-gmt-hand",
+      "catalogueItemId": "cat-gmt-hand",
+      "name": "GMT Hand",
+      "category": "hands",
+      "visible": true,
+      "locked": false,
+      "layerIndex": 704,
+      "material": "steel",
+      "color": "#E2E8F0",
+      "texture": "polished",
+      "dimensions": {
+        "diameterMm": 12.5,
+        "widthMm": 1,
+        "thicknessMm": 0.2,
+        "offsetXmm": 0,
+        "offsetYmm": 0
+      },
+      "typography": {
+        "fontFamily": "\"IBM Plex Mono\", monospace",
+        "fontSizeMm": 1.1,
+        "tracking": 0
+      },
+      "customProperties": {}
+    },
+    "inst-chronograph-seconds": {
+      "instanceId": "inst-chronograph-seconds",
+      "catalogueItemId": "cat-chronograph-seconds",
+      "name": "Chronograph Seconds",
+      "category": "hands",
+      "visible": true,
+      "locked": false,
+      "layerIndex": 705,
+      "material": "steel",
+      "color": "#CBD5E1",
+      "texture": "polished",
+      "dimensions": {
+        "diameterMm": 14,
+        "widthMm": 0.25,
+        "thicknessMm": 0.15,
+        "offsetXmm": 0,
+        "offsetYmm": 0
+      },
+      "typography": {
+        "fontFamily": "\"IBM Plex Mono\", monospace",
+        "fontSizeMm": 1.1,
+        "tracking": 0
+      },
+      "customProperties": {}
+    },
+    "inst-counter-30m": {
+      "instanceId": "inst-counter-30m",
+      "catalogueItemId": "cat-counter-30m",
+      "name": "30-minute Counter",
+      "category": "complications",
+      "visible": true,
+      "locked": false,
+      "layerIndex": 506,
+      "material": "brass",
+      "color": "#E2E8F0",
+      "texture": "matte",
+      "dimensions": {
+        "diameterMm": 7,
+        "widthMm": 7,
+        "thicknessMm": 0.25,
+        "offsetXmm": 0,
+        "offsetYmm": 0
+      },
+      "typography": {
+        "fontFamily": "\"IBM Plex Mono\", monospace",
+        "fontSizeMm": 1.1,
+        "tracking": 0
+      },
+      "customProperties": {}
+    },
+    "inst-counter-12h": {
+      "instanceId": "inst-counter-12h",
+      "catalogueItemId": "cat-counter-12h",
+      "name": "12-hour Counter",
+      "category": "complications",
+      "visible": true,
+      "locked": false,
+      "layerIndex": 507,
+      "material": "brass",
+      "color": "#CBD5E1",
+      "texture": "matte",
+      "dimensions": {
+        "diameterMm": 7,
+        "widthMm": 7,
+        "thicknessMm": 0.25,
+        "offsetXmm": 0,
+        "offsetYmm": 0
+      },
+      "typography": {
+        "fontFamily": "\"IBM Plex Mono\", monospace",
+        "fontSizeMm": 1.1,
+        "tracking": 0
+      },
+      "customProperties": {}
+    },
+    "inst-running-seconds": {
+      "instanceId": "inst-running-seconds",
+      "catalogueItemId": "cat-running-seconds",
+      "name": "Running Seconds",
+      "category": "complications",
+      "visible": true,
+      "locked": false,
+      "layerIndex": 508,
+      "material": "brass",
+      "color": "#E2E8F0",
+      "texture": "matte",
+      "dimensions": {
+        "diameterMm": 6.5,
+        "widthMm": 6.5,
+        "thicknessMm": 0.25,
+        "offsetXmm": 0,
+        "offsetYmm": 0
+      },
+      "typography": {
+        "fontFamily": "\"IBM Plex Mono\", monospace",
+        "fontSizeMm": 1.1,
+        "tracking": 0
+      },
+      "customProperties": {}
+    },
+    "inst-date-window": {
+      "instanceId": "inst-date-window",
+      "catalogueItemId": "cat-date-window",
+      "name": "Date Window",
+      "category": "complications",
+      "visible": true,
+      "locked": false,
+      "layerIndex": 509,
+      "material": "steel",
+      "color": "#CBD5E1",
+      "texture": "satin",
+      "dimensions": {
+        "diameterMm": 3.5,
+        "widthMm": 2.8,
+        "thicknessMm": 0.4,
+        "offsetXmm": 0,
+        "offsetYmm": 0
+      },
+      "typography": {
+        "fontFamily": "\"IBM Plex Mono\", monospace",
+        "fontSizeMm": 1.1,
+        "tracking": 0
+      },
+      "customProperties": {}
+    },
+    "inst-day-window": {
+      "instanceId": "inst-day-window",
+      "catalogueItemId": "cat-day-window",
+      "name": "Day Window",
+      "category": "complications",
+      "visible": true,
+      "locked": false,
+      "layerIndex": 510,
+      "material": "steel",
+      "color": "#E2E8F0",
+      "texture": "satin",
+      "dimensions": {
+        "diameterMm": 6,
+        "widthMm": 3,
+        "thicknessMm": 0.4,
+        "offsetXmm": 0,
+        "offsetYmm": 0
+      },
+      "typography": {
+        "fontFamily": "\"IBM Plex Mono\", monospace",
+        "fontSizeMm": 1.1,
+        "tracking": 0
+      },
+      "customProperties": {}
+    },
+    "inst-moonphase": {
+      "instanceId": "inst-moonphase",
+      "catalogueItemId": "cat-moonphase",
+      "name": "Moonphase",
+      "category": "complications",
+      "visible": true,
+      "locked": false,
+      "layerIndex": 511,
+      "material": "brass",
+      "color": "#CBD5E1",
+      "texture": "gloss",
+      "dimensions": {
+        "diameterMm": 9,
+        "widthMm": 7,
+        "thicknessMm": 0.4,
+        "offsetXmm": 0,
+        "offsetYmm": 0
+      },
+      "typography": {
+        "fontFamily": "\"IBM Plex Mono\", monospace",
+        "fontSizeMm": 1.1,
+        "tracking": 0
+      },
+      "customProperties": {}
+    },
+    "inst-power-reserve": {
+      "instanceId": "inst-power-reserve",
+      "catalogueItemId": "cat-power-reserve",
+      "name": "Power Reserve",
+      "category": "complications",
+      "visible": true,
+      "locked": false,
+      "layerIndex": 512,
+      "material": "brass",
+      "color": "#E2E8F0",
+      "texture": "matte",
+      "dimensions": {
+        "diameterMm": 8,
+        "widthMm": 5,
+        "thicknessMm": 0.25,
+        "offsetXmm": 0,
+        "offsetYmm": 0
+      },
+      "typography": {
+        "fontFamily": "\"IBM Plex Mono\", monospace",
+        "fontSizeMm": 1.1,
+        "tracking": 0
+      },
+      "customProperties": {}
+    },
+    "inst-open-heart": {
+      "instanceId": "inst-open-heart",
+      "catalogueItemId": "cat-open-heart",
+      "name": "Open Heart",
+      "category": "complications",
+      "visible": true,
+      "locked": false,
+      "layerIndex": 513,
+      "material": "steel",
+      "color": "#CBD5E1",
+      "texture": "satin",
+      "dimensions": {
+        "diameterMm": 7.5,
+        "widthMm": 7.5,
+        "thicknessMm": 0.4,
+        "offsetXmm": 0,
+        "offsetYmm": 0
+      },
+      "typography": {
+        "fontFamily": "\"IBM Plex Mono\", monospace",
+        "fontSizeMm": 1.1,
+        "tracking": 0
+      },
+      "customProperties": {}
+    },
+    "inst-tourbillon-aperture": {
+      "instanceId": "inst-tourbillon-aperture",
+      "catalogueItemId": "cat-tourbillon-aperture",
+      "name": "Tourbillon Aperture",
+      "category": "complications",
+      "visible": true,
+      "locked": false,
+      "layerIndex": 514,
+      "material": "steel",
+      "color": "#E2E8F0",
+      "texture": "satin",
+      "dimensions": {
+        "diameterMm": 11,
+        "widthMm": 11,
+        "thicknessMm": 0.4,
+        "offsetXmm": 0,
+        "offsetYmm": 0
+      },
+      "typography": {
+        "fontFamily": "\"IBM Plex Mono\", monospace",
+        "fontSizeMm": 1.1,
+        "tracking": 0
+      },
+      "customProperties": {}
+    },
+    "inst-applied-indices": {
+      "instanceId": "inst-applied-indices",
+      "catalogueItemId": "cat-applied-indices",
+      "name": "Applied Indices",
+      "category": "indices",
+      "visible": true,
+      "locked": false,
+      "layerIndex": 415,
+      "material": "steel",
+      "color": "#CBD5E1",
+      "texture": "polished",
+      "dimensions": {
+        "diameterMm": 24,
+        "widthMm": 1.2,
+        "thicknessMm": 0.4,
+        "offsetXmm": 0,
+        "offsetYmm": 0
+      },
+      "typography": {
+        "fontFamily": "\"IBM Plex Mono\", monospace",
+        "fontSizeMm": 1.1,
+        "tracking": 0
+      },
+      "customProperties": {}
+    },
+    "inst-printed-indices": {
+      "instanceId": "inst-printed-indices",
+      "catalogueItemId": "cat-printed-indices",
+      "name": "Printed Indices",
+      "category": "indices",
+      "visible": true,
+      "locked": false,
+      "layerIndex": 416,
+      "material": "enamel",
+      "color": "#E2E8F0",
+      "texture": "matte",
+      "dimensions": {
+        "diameterMm": 24,
+        "widthMm": 0.8,
+        "thicknessMm": 0.1,
+        "offsetXmm": 0,
+        "offsetYmm": 0
+      },
+      "typography": {
+        "fontFamily": "\"IBM Plex Mono\", monospace",
+        "fontSizeMm": 1.1,
+        "tracking": 0
+      },
+      "customProperties": {}
+    },
+    "inst-mixed-index-sets": {
+      "instanceId": "inst-mixed-index-sets",
+      "catalogueItemId": "cat-mixed-index-sets",
+      "name": "Mixed Index Sets",
+      "category": "indices",
+      "visible": true,
+      "locked": false,
+      "layerIndex": 417,
+      "material": "steel",
+      "color": "#CBD5E1",
+      "texture": "polished",
+      "dimensions": {
+        "diameterMm": 24,
+        "widthMm": 1.5,
+        "thicknessMm": 0.4,
+        "offsetXmm": 0,
+        "offsetYmm": 0
+      },
+      "typography": {
+        "fontFamily": "\"IBM Plex Mono\", monospace",
+        "fontSizeMm": 1.1,
+        "tracking": 0
+      },
+      "customProperties": {}
+    },
+    "inst-arabic-numerals": {
+      "instanceId": "inst-arabic-numerals",
+      "catalogueItemId": "cat-arabic-numerals",
+      "name": "Arabic Numerals",
+      "category": "indices",
+      "visible": true,
+      "locked": false,
+      "layerIndex": 418,
+      "material": "enamel",
+      "color": "#E2E8F0",
+      "texture": "matte",
+      "dimensions": {
+        "diameterMm": 22,
+        "widthMm": 2.2,
+        "thicknessMm": 0.1,
+        "offsetXmm": 0,
+        "offsetYmm": 0
+      },
+      "typography": {
+        "fontFamily": "\"IBM Plex Mono\", monospace",
+        "fontSizeMm": 1.1,
+        "tracking": 0
+      },
+      "customProperties": {}
+    },
+    "inst-roman-numerals": {
+      "instanceId": "inst-roman-numerals",
+      "catalogueItemId": "cat-roman-numerals",
+      "name": "Roman Numerals",
+      "category": "indices",
+      "visible": true,
+      "locked": false,
+      "layerIndex": 419,
+      "material": "enamel",
+      "color": "#CBD5E1",
+      "texture": "matte",
+      "dimensions": {
+        "diameterMm": 22,
+        "widthMm": 2.5,
+        "thicknessMm": 0.1,
+        "offsetXmm": 0,
+        "offsetYmm": 0
+      },
+      "typography": {
+        "fontFamily": "\"IBM Plex Mono\", monospace",
+        "fontSizeMm": 1.1,
+        "tracking": 0
+      },
+      "customProperties": {}
+    },
+    "inst-baton-markers": {
+      "instanceId": "inst-baton-markers",
+      "catalogueItemId": "cat-baton-markers",
+      "name": "Baton Markers",
+      "category": "indices",
+      "visible": true,
+      "locked": false,
+      "layerIndex": 420,
+      "material": "steel",
+      "color": "#E2E8F0",
+      "texture": "brushed",
+      "dimensions": {
+        "diameterMm": 24,
+        "widthMm": 1,
+        "thicknessMm": 0.35,
+        "offsetXmm": 0,
+        "offsetYmm": 0
+      },
+      "typography": {
+        "fontFamily": "\"IBM Plex Mono\", monospace",
+        "fontSizeMm": 1.1,
+        "tracking": 0
+      },
+      "customProperties": {}
+    },
+    "inst-dot-markers": {
+      "instanceId": "inst-dot-markers",
+      "catalogueItemId": "cat-dot-markers",
+      "name": "Dot Markers",
+      "category": "indices",
+      "visible": true,
+      "locked": false,
+      "layerIndex": 421,
+      "material": "steel",
+      "color": "#CBD5E1",
+      "texture": "brushed",
+      "dimensions": {
+        "diameterMm": 24,
+        "widthMm": 1.4,
+        "thicknessMm": 0.35,
+        "offsetXmm": 0,
+        "offsetYmm": 0
+      },
+      "typography": {
+        "fontFamily": "\"IBM Plex Mono\", monospace",
+        "fontSizeMm": 1.1,
+        "tracking": 0
+      },
+      "customProperties": {}
+    },
+    "inst-triangle-markers": {
+      "instanceId": "inst-triangle-markers",
+      "catalogueItemId": "cat-triangle-markers",
+      "name": "Triangle Markers",
+      "category": "indices",
+      "visible": true,
+      "locked": false,
+      "layerIndex": 422,
+      "material": "steel",
+      "color": "#E2E8F0",
+      "texture": "brushed",
+      "dimensions": {
+        "diameterMm": 24,
+        "widthMm": 2.4,
+        "thicknessMm": 0.4,
+        "offsetXmm": 0,
+        "offsetYmm": 0
+      },
+      "typography": {
+        "fontFamily": "\"IBM Plex Mono\", monospace",
+        "fontSizeMm": 1.1,
+        "tracking": 0
+      },
+      "customProperties": {}
+    },
+    "inst-logo": {
+      "instanceId": "inst-logo",
+      "catalogueItemId": "cat-logo",
+      "name": "Logo",
+      "category": "typography",
+      "visible": true,
+      "locked": false,
+      "layerIndex": 623,
+      "material": "enamel",
+      "color": "#CBD5E1",
+      "texture": "gloss",
+      "dimensions": {
+        "diameterMm": 6,
+        "widthMm": 6,
+        "thicknessMm": 0.1,
+        "offsetXmm": 0,
+        "offsetYmm": 0
+      },
+      "typography": {
+        "fontFamily": "\"IBM Plex Mono\", monospace",
+        "fontSizeMm": 1.4,
+        "tracking": 0
+      },
+      "customProperties": {}
+    },
+    "inst-brand-text": {
+      "instanceId": "inst-brand-text",
+      "catalogueItemId": "cat-brand-text",
+      "name": "Brand Text",
+      "category": "typography",
+      "visible": true,
+      "locked": false,
+      "layerIndex": 624,
+      "material": "enamel",
+      "color": "#E2E8F0",
+      "texture": "matte",
+      "dimensions": {
+        "diameterMm": 12,
+        "widthMm": 12,
+        "thicknessMm": 0.1,
+        "offsetXmm": 0,
+        "offsetYmm": 0
+      },
+      "typography": {
+        "fontFamily": "\"IBM Plex Mono\", monospace",
+        "fontSizeMm": 1.4,
+        "tracking": 0
+      },
+      "customProperties": {}
+    },
+    "inst-water-resistance-text": {
+      "instanceId": "inst-water-resistance-text",
+      "catalogueItemId": "cat-water-resistance-text",
+      "name": "Water Resistance Text",
+      "category": "typography",
+      "visible": true,
+      "locked": false,
+      "layerIndex": 625,
+      "material": "enamel",
+      "color": "#CBD5E1",
+      "texture": "matte",
+      "dimensions": {
+        "diameterMm": 10,
+        "widthMm": 10,
+        "thicknessMm": 0.1,
+        "offsetXmm": 0,
+        "offsetYmm": 0
+      },
+      "typography": {
+        "fontFamily": "\"IBM Plex Mono\", monospace",
+        "fontSizeMm": 1.4,
+        "tracking": 0
+      },
+      "customProperties": {}
+    },
+    "inst-movement-text": {
+      "instanceId": "inst-movement-text",
+      "catalogueItemId": "cat-movement-text",
+      "name": "Automatic / Quartz Text",
+      "category": "typography",
+      "visible": true,
+      "locked": false,
+      "layerIndex": 626,
+      "material": "enamel",
+      "color": "#E2E8F0",
+      "texture": "matte",
+      "dimensions": {
+        "diameterMm": 10,
+        "widthMm": 10,
+        "thicknessMm": 0.1,
+        "offsetXmm": 0,
+        "offsetYmm": 0
+      },
+      "typography": {
+        "fontFamily": "\"IBM Plex Mono\", monospace",
+        "fontSizeMm": 1.4,
+        "tracking": 0
+      },
+      "customProperties": {}
+    },
+    "inst-chapter-ring": {
+      "instanceId": "inst-chapter-ring",
+      "catalogueItemId": "cat-chapter-ring",
+      "name": "Chapter Ring",
+      "category": "rings",
+      "visible": true,
+      "locked": false,
+      "layerIndex": 227,
+      "material": "steel",
+      "color": "#CBD5E1",
+      "texture": "circular-brush",
+      "dimensions": {
+        "diameterMm": 30.5,
+        "widthMm": 1.8,
+        "thicknessMm": 1.5,
+        "offsetXmm": 0,
+        "offsetYmm": 0
+      },
+      "typography": {
+        "fontFamily": "\"IBM Plex Mono\", monospace",
+        "fontSizeMm": 1.1,
+        "tracking": 0
+      },
+      "customProperties": {}
+    },
+    "inst-rehaut": {
+      "instanceId": "inst-rehaut",
+      "catalogueItemId": "cat-rehaut",
+      "name": "Rehaut",
+      "category": "rings",
+      "visible": true,
+      "locked": false,
+      "layerIndex": 228,
+      "material": "steel",
+      "color": "#E2E8F0",
+      "texture": "sandblasted",
+      "dimensions": {
+        "diameterMm": 30.5,
+        "widthMm": 1.2,
+        "thicknessMm": 2,
+        "offsetXmm": 0,
+        "offsetYmm": 0
+      },
+      "typography": {
+        "fontFamily": "\"IBM Plex Mono\", monospace",
+        "fontSizeMm": 1.1,
+        "tracking": 0
+      },
+      "customProperties": {}
+    },
+    "inst-inner-bezel": {
+      "instanceId": "inst-inner-bezel",
+      "catalogueItemId": "cat-inner-bezel",
+      "name": "Inner Bezel",
+      "category": "rings",
+      "visible": true,
+      "locked": false,
+      "layerIndex": 229,
+      "material": "steel",
+      "color": "#CBD5E1",
+      "texture": "matte",
+      "dimensions": {
+        "diameterMm": 32,
+        "widthMm": 1.6,
+        "thicknessMm": 1.2,
+        "offsetXmm": 0,
+        "offsetYmm": 0
+      },
+      "typography": {
+        "fontFamily": "\"IBM Plex Mono\", monospace",
+        "fontSizeMm": 1.1,
+        "tracking": 0
+      },
+      "customProperties": {}
+    },
+    "inst-rotating-bezel": {
+      "instanceId": "inst-rotating-bezel",
+      "catalogueItemId": "cat-bezel-nmk920-package",
+      "name": "NMK920 included bezel — envelope preview",
+      "category": "rings",
+      "visible": true,
+      "locked": false,
+      "layerIndex": 230,
+      "material": "steel",
+      "color": "#E2E8F0",
+      "texture": "matte",
+      "dimensions": {
+        "diameterMm": 38,
+        "widthMm": 3.5,
+        "thicknessMm": 2.2,
+        "offsetXmm": 0,
+        "offsetYmm": 0
+      },
+      "typography": {
+        "fontFamily": "\"IBM Plex Mono\", monospace",
+        "fontSizeMm": 1.1,
+        "tracking": 0
+      },
+      "customProperties": {}
+    },
+    "inst-fixed-bezel": {
+      "instanceId": "inst-fixed-bezel",
+      "catalogueItemId": "cat-fixed-bezel",
+      "name": "Fixed Bezel",
+      "category": "rings",
+      "visible": true,
+      "locked": false,
+      "layerIndex": 231,
+      "material": "steel",
+      "color": "#CBD5E1",
+      "texture": "matte",
+      "dimensions": {
+        "diameterMm": 38,
+        "widthMm": 2.8,
+        "thicknessMm": 2,
+        "offsetXmm": 0,
+        "offsetYmm": 0
+      },
+      "typography": {
+        "fontFamily": "\"IBM Plex Mono\", monospace",
+        "fontSizeMm": 1.1,
+        "tracking": 0
+      },
+      "customProperties": {}
+    },
+    "inst-crystal": {
+      "instanceId": "inst-crystal",
+      "catalogueItemId": "cat-crystal",
+      "name": "Crystal",
+      "category": "case",
+      "visible": true,
+      "locked": false,
+      "layerIndex": 132,
+      "material": "sapphire",
+      "color": "#E2E8F0",
+      "texture": "clear",
+      "dimensions": {
+        "diameterMm": 31.5,
+        "widthMm": 31.5,
+        "thicknessMm": 1.5,
+        "offsetXmm": 0,
+        "offsetYmm": 0
+      },
+      "typography": {
+        "fontFamily": "\"IBM Plex Mono\", monospace",
+        "fontSizeMm": 1.1,
+        "tracking": 0
+      },
+      "customProperties": {}
+    },
+    "inst-flat-sapphire": {
+      "instanceId": "inst-flat-sapphire",
+      "catalogueItemId": "cat-flat-sapphire",
+      "name": "Flat Sapphire",
+      "category": "case",
+      "visible": true,
+      "locked": false,
+      "layerIndex": 133,
+      "material": "sapphire",
+      "color": "#CBD5E1",
+      "texture": "clear",
+      "dimensions": {
+        "diameterMm": 31.5,
+        "widthMm": 31.5,
+        "thicknessMm": 1.5,
+        "offsetXmm": 0,
+        "offsetYmm": 0
+      },
+      "typography": {
+        "fontFamily": "\"IBM Plex Mono\", monospace",
+        "fontSizeMm": 1.1,
+        "tracking": 0
+      },
+      "customProperties": {}
+    },
+    "inst-domed-sapphire": {
+      "instanceId": "inst-domed-sapphire",
+      "catalogueItemId": "cat-domed-sapphire",
+      "name": "Domed Sapphire",
+      "category": "case",
+      "visible": true,
+      "locked": false,
+      "layerIndex": 134,
+      "material": "sapphire",
+      "color": "#E2E8F0",
+      "texture": "clear",
+      "dimensions": {
+        "diameterMm": 31.5,
+        "widthMm": 31.5,
+        "thicknessMm": 2.5,
+        "offsetXmm": 0,
+        "offsetYmm": 0
+      },
+      "typography": {
+        "fontFamily": "\"IBM Plex Mono\", monospace",
+        "fontSizeMm": 1.1,
+        "tracking": 0
+      },
+      "customProperties": {}
+    },
+    "inst-double-domed-sapphire": {
+      "instanceId": "inst-double-domed-sapphire",
+      "catalogueItemId": "cat-double-domed-sapphire",
+      "name": "Double Domed Sapphire",
+      "category": "case",
+      "visible": true,
+      "locked": false,
+      "layerIndex": 135,
+      "material": "sapphire",
+      "color": "#CBD5E1",
+      "texture": "clear",
+      "dimensions": {
+        "diameterMm": 31.5,
+        "widthMm": 31.5,
+        "thicknessMm": 2.8,
+        "offsetXmm": 0,
+        "offsetYmm": 0
+      },
+      "typography": {
+        "fontFamily": "\"IBM Plex Mono\", monospace",
+        "fontSizeMm": 1.1,
+        "tracking": 0
+      },
+      "customProperties": {}
+    },
+    "inst-caseback": {
+      "instanceId": "inst-caseback",
+      "catalogueItemId": "cat-caseback",
+      "name": "Caseback",
+      "category": "case",
+      "visible": true,
+      "locked": false,
+      "layerIndex": 136,
+      "material": "steel",
+      "color": "#E2E8F0",
+      "texture": "brushed",
+      "dimensions": {
+        "diameterMm": 35,
+        "widthMm": 35,
+        "thicknessMm": 1.8,
+        "offsetXmm": 0,
+        "offsetYmm": 0
+      },
+      "typography": {
+        "fontFamily": "\"IBM Plex Mono\", monospace",
+        "fontSizeMm": 1.1,
+        "tracking": 0
+      },
+      "customProperties": {}
+    },
+    "inst-lugs": {
+      "instanceId": "inst-lugs",
+      "catalogueItemId": "cat-lugs",
+      "name": "Lugs",
+      "category": "case",
+      "visible": true,
+      "locked": false,
+      "layerIndex": 137,
+      "material": "steel",
+      "color": "#CBD5E1",
+      "texture": "brushed",
+      "dimensions": {
+        "diameterMm": 48,
+        "widthMm": 20,
+        "thicknessMm": 4.5,
+        "offsetXmm": 0,
+        "offsetYmm": 0
+      },
+      "typography": {
+        "fontFamily": "\"IBM Plex Mono\", monospace",
+        "fontSizeMm": 1.1,
+        "tracking": 0
+      },
+      "customProperties": {}
+    },
+    "inst-crown": {
+      "instanceId": "inst-crown",
+      "catalogueItemId": "cat-crown-onion",
+      "name": "Onion crown — concept",
+      "category": "external",
+      "visible": true,
+      "locked": false,
+      "layerIndex": 838,
+      "material": "steel",
+      "color": "#E2E8F0",
+      "texture": "polished",
+      "dimensions": {
+        "diameterMm": 6,
+        "thicknessMm": 4,
+        "widthMm": 7,
+        "offsetXmm": 0,
+        "offsetYmm": 0
+      },
+      "typography": {
+        "fontFamily": "\"IBM Plex Mono\", monospace",
+        "fontSizeMm": 1.1,
+        "tracking": 0
+      },
+      "customProperties": {
+        "crownDefaultCaseId": "cat-case-tandorio-tuna-465-black",
+        "detachedCrownSpecification": {
+          "schema": "crown-spec/v1",
+          "axisId": "crown-main",
+          "shape": {
+            "status": "known",
+            "value": "onion",
+            "evidence": {
+              "kind": "visual-approximation",
+              "source": "Crown C2/C3 presentation family; no supplier interface or sealing qualification"
+            }
+          },
+          "grip": {
+            "status": "known",
+            "value": "fine-fluted",
+            "evidence": {
+              "kind": "visual-approximation",
+              "source": "Crown C2/C3 presentation family; no supplier interface or sealing qualification"
+            }
+          },
+          "coreDiameterMm": {
+            "status": "known",
+            "value": 6,
+            "evidence": {
+              "kind": "visual-approximation",
+              "source": "Crown C2/C3 presentation family; no supplier interface or sealing qualification"
+            }
+          },
+          "maximumOuterDiameterMm": {
+            "status": "known",
+            "value": 7,
+            "evidence": {
+              "kind": "visual-approximation",
+              "source": "Crown C2/C3 presentation family; no supplier interface or sealing qualification"
+            }
+          },
+          "headLengthMm": {
+            "status": "known",
+            "value": 4,
+            "evidence": {
+              "kind": "visual-approximation",
+              "source": "Crown C2/C3 presentation family; no supplier interface or sealing qualification"
+            }
+          },
+          "closure": {
+            "status": "known",
+            "value": "screw-down",
+            "evidence": {
+              "kind": "supplier-statement",
+              "source": "https://tandoriowatch.com/products/tuna-can-watch-case-46-5mm",
+              "retrievedAtIso": "2026-10-10T10:27:19Z"
+            }
+          },
+          "finish": {
+            "mode": "override",
+            "material": "rose-gold",
+            "color": "#c08a76",
+            "texture": "polished"
+          },
+          "protection": {
+            "status": "unknown",
+            "reason": "Not established by legacy crown data"
+          },
+          "ownership": {
+            "operatingHead": "crown",
+            "tube": "case",
+            "boss": "case",
+            "fixedGuards": "case"
+          },
+          "interfaces": {
+            "movementStem": {
+              "movementId": {
+                "status": "unknown",
+                "reason": "Not established by legacy crown data"
+              },
+              "revision": {
+                "status": "unknown",
+                "reason": "Not established by legacy crown data"
+              },
+              "stemReference": {
+                "status": "unknown",
+                "reason": "Not established by legacy crown data"
+              },
+              "thread": {
+                "outerDiameterMm": {
+                  "status": "unknown",
+                  "reason": "Not established by legacy crown data"
+                },
+                "pitchMm": {
+                  "status": "unknown",
+                  "reason": "Not established by legacy crown data"
+                },
+                "supplierTapLabel": {
+                  "status": "unknown",
+                  "reason": "Not established by legacy crown data"
+                }
+              }
+            },
+            "crownSocket": {
+              "thread": {
+                "outerDiameterMm": {
+                  "status": "unknown",
+                  "reason": "Not established by legacy crown data"
+                },
+                "pitchMm": {
+                  "status": "unknown",
+                  "reason": "Not established by legacy crown data"
+                },
+                "supplierTapLabel": {
+                  "status": "unknown",
+                  "reason": "Not established by legacy crown data"
+                }
+              },
+              "boreDiameterMm": {
+                "status": "unknown",
+                "reason": "Not established by legacy crown data"
+              },
+              "engagementLengthMm": {
+                "status": "unknown",
+                "reason": "Not established by legacy crown data"
+              }
+            },
+            "caseTubeEngagement": {
+              "caseFamily": {
+                "status": "unknown",
+                "reason": "Not established by legacy crown data"
+              },
+              "thread": {
+                "outerDiameterMm": {
+                  "status": "unknown",
+                  "reason": "Not established by legacy crown data"
+                },
+                "pitchMm": {
+                  "status": "unknown",
+                  "reason": "Not established by legacy crown data"
+                },
+                "supplierTapLabel": {
+                  "status": "unknown",
+                  "reason": "Not established by legacy crown data"
+                }
+              },
+              "engagementLengthMm": {
+                "status": "unknown",
+                "reason": "Not established by legacy crown data"
+              },
+              "gasketEnvelopeMm": {
+                "status": "unknown",
+                "reason": "Not established by legacy crown data"
+              }
+            },
+            "capHolder": {
+              "mechanismId": {
+                "status": "unknown",
+                "reason": "Not established by legacy crown data"
+              },
+              "thread": {
+                "outerDiameterMm": {
+                  "status": "unknown",
+                  "reason": "Not established by legacy crown data"
+                },
+                "pitchMm": {
+                  "status": "unknown",
+                  "reason": "Not established by legacy crown data"
+                },
+                "supplierTapLabel": {
+                  "status": "unknown",
+                  "reason": "Not established by legacy crown data"
+                }
+              },
+              "clearanceMm": {
+                "status": "unknown",
+                "reason": "Not established by legacy crown data"
+              }
+            }
+          },
+          "installation": {
+            "movementRotationDeg": {
+              "status": "unknown",
+              "reason": "Not established by legacy crown data"
+            },
+            "stemHeightMm": {
+              "status": "unknown",
+              "reason": "Not established by legacy crown data"
+            },
+            "spacerId": {
+              "status": "unknown",
+              "reason": "Not established by legacy crown data"
+            },
+            "dialFeetInterface": {
+              "status": "unknown",
+              "reason": "Not established by legacy crown data"
+            },
+            "dialRotationDeg": {
+              "status": "unknown",
+              "reason": "Not established by legacy crown data"
+            },
+            "calendarApertureDeg": {
+              "status": "unknown",
+              "reason": "Not established by legacy crown data"
+            },
+            "dateWheelOrientationDeg": {
+              "status": "unknown",
+              "reason": "Not established by legacy crown data"
+            },
+            "loading": {
+              "status": "unknown",
+              "reason": "Not established by legacy crown data"
+            }
+          }
+        }
+      },
+      "visual": {
+        "category": "crown",
+        "assetId": "crown-onion"
+      }
+    },
+    "inst-pushers": {
+      "instanceId": "inst-pushers",
+      "catalogueItemId": "cat-pushers",
+      "name": "Pushers",
+      "category": "external",
+      "visible": false,
+      "locked": false,
+      "layerIndex": 839,
+      "material": "steel",
+      "color": "#CBD5E1",
+      "texture": "polished",
+      "dimensions": {
+        "diameterMm": 4.5,
+        "widthMm": 3.5,
+        "thicknessMm": 3,
+        "offsetXmm": 0,
+        "offsetYmm": 0
+      },
+      "typography": {
+        "fontFamily": "\"IBM Plex Mono\", monospace",
+        "fontSizeMm": 1.1,
+        "tracking": 0
+      },
+      "customProperties": {}
+    },
+    "inst-helium-valve": {
+      "instanceId": "inst-helium-valve",
+      "catalogueItemId": "cat-helium-valve",
+      "name": "Helium Valve (future)",
+      "category": "external",
+      "visible": true,
+      "locked": false,
+      "layerIndex": 840,
+      "material": "steel",
+      "color": "#E2E8F0",
+      "texture": "polished",
+      "dimensions": {
+        "diameterMm": 4,
+        "widthMm": 3,
+        "thicknessMm": 2.5,
+        "offsetXmm": 0,
+        "offsetYmm": 0
+      },
+      "typography": {
+        "fontFamily": "\"IBM Plex Mono\", monospace",
+        "fontSizeMm": 1.1,
+        "tracking": 0
+      },
+      "customProperties": {}
+    },
+    "inst-strap-integration": {
+      "instanceId": "inst-strap-integration",
+      "catalogueItemId": "cat-strap-rubber-22-preview",
+      "name": "22mm strap interface — unpriced preview",
+      "category": "external",
+      "visible": true,
+      "locked": false,
+      "layerIndex": 841,
+      "material": "rubber",
+      "color": "#080b10",
+      "texture": "matte",
+      "dimensions": {
+        "diameterMm": 22,
+        "thicknessMm": 3,
+        "widthMm": 22,
+        "offsetXmm": 0,
+        "offsetYmm": 0
+      },
+      "typography": {
+        "fontFamily": "\"IBM Plex Mono\", monospace",
+        "fontSizeMm": 1.1,
+        "tracking": 0
+      },
+      "customProperties": {}
+    },
+    "inst-bracelet-integration": {
+      "instanceId": "inst-bracelet-integration",
+      "catalogueItemId": "cat-bracelet-integration",
+      "name": "Bracelet Integration",
+      "category": "external",
+      "visible": true,
+      "locked": false,
+      "layerIndex": 842,
+      "material": "steel",
+      "color": "#E2E8F0",
+      "texture": "satin",
+      "dimensions": {
+        "diameterMm": 20,
+        "widthMm": 20,
+        "thicknessMm": 3.5,
+        "offsetXmm": 0,
+        "offsetYmm": 0
+      },
+      "typography": {
+        "fontFamily": "\"IBM Plex Mono\", monospace",
+        "fontSizeMm": 1.1,
+        "tracking": 0
+      },
+      "customProperties": {}
+    },
+    "inst-midcase": {
+      "instanceId": "inst-midcase",
+      "catalogueItemId": "cat-case-namoki-nmk920-tuna-47",
+      "name": "namokiMODS NMK920 Tuna 47mm Case — provisional off-axis",
+      "category": "case",
+      "visible": true,
+      "locked": false,
+      "layerIndex": 143,
+      "material": "steel",
+      "color": "#CBD5E1",
+      "texture": "brushed",
+      "dimensions": {
+        "diameterMm": 47,
+        "thicknessMm": 11.3,
+        "widthMm": 47,
+        "offsetXmm": 0,
+        "offsetYmm": 0
+      },
+      "typography": {
+        "fontFamily": "\"IBM Plex Mono\", monospace",
+        "fontSizeMm": 1.1,
+        "tracking": 0
+      },
+      "customProperties": {},
+      "offAxisPlatform": {
+        "schema": "off-axis-platform/v1",
+        "id": "nmk920-brushed",
+        "caseCatalogueId": "cat-case-namoki-nmk920-tuna-47",
+        "sourceUrl": "https://www.namokimods.com/products/nmk920-tuna-skx007-srpd-watch-case-brushed-finish",
+        "variantId": "40465538744495",
+        "sku": "NMK920-PL",
+        "identityStatus": "requires-confirmation",
+        "physicalFit": "unqualified",
+        "presentationMovementIds": [
+          "nh35"
+        ],
+        "envelope": {
+          "shroudDiameterMm": {
+            "status": "known",
+            "value": 47,
+            "evidence": {
+              "kind": "supplier-statement",
+              "source": "https://www.namokimods.com/products/nmk920-tuna-skx007-srpd-watch-case-brushed-finish",
+              "retrievedAtIso": "2026-10-10T10:27:19Z"
+            }
+          },
+          "midcaseDiameterMm": {
+            "status": "unknown",
+            "reason": "No exact mating drawing or measured installation recovered."
+          },
+          "bezelOuterMm": {
+            "status": "unknown",
+            "reason": "No exact mating drawing or measured installation recovered."
+          },
+          "bezelInnerMm": {
+            "status": "unknown",
+            "reason": "No exact mating drawing or measured installation recovered."
+          },
+          "dialSeatMm": {
+            "status": "unknown",
+            "reason": "No exact mating drawing or measured installation recovered."
+          },
+          "crystalSeatMm": {
+            "status": "unknown",
+            "reason": "No exact mating drawing or measured installation recovered."
+          },
+          "casebackDiameterMm": {
+            "status": "unknown",
+            "reason": "No exact mating drawing or measured installation recovered."
+          },
+          "lugWidthMm": {
+            "status": "known",
+            "value": 22,
+            "evidence": {
+              "kind": "supplier-statement",
+              "source": "https://www.namokimods.com/products/nmk920-tuna-skx007-srpd-watch-case-brushed-finish",
+              "retrievedAtIso": "2026-10-10T10:27:19Z"
+            }
+          },
+          "lugToLugMm": {
+            "status": "known",
+            "value": 46.5,
+            "evidence": {
+              "kind": "supplier-statement",
+              "source": "https://www.namokimods.com/products/nmk920-tuna-skx007-srpd-watch-case-brushed-finish",
+              "retrievedAtIso": "2026-10-10T10:27:19Z"
+            }
+          }
+        },
+        "supplierMovements": {
+          "status": "unknown",
+          "reason": "Supplier states SKX007/SRPD parts family; exact movement installation not enumerated."
+        },
+        "dialRangeMm": {
+          "status": "unknown",
+          "reason": "No exact mating drawing or measured installation recovered."
+        },
+        "installation": {
+          "movementRotationDeg": {
+            "status": "unknown",
+            "reason": "No exact mating drawing or measured installation recovered."
+          },
+          "dialRotationDeg": {
+            "status": "unknown",
+            "reason": "No exact mating drawing or measured installation recovered."
+          },
+          "calendarApertureDeg": {
+            "status": "unknown",
+            "reason": "No exact mating drawing or measured installation recovered."
+          },
+          "dateWheelOrientationDeg": {
+            "status": "unknown",
+            "reason": "No exact mating drawing or measured installation recovered."
+          },
+          "stemHeightMm": {
+            "status": "unknown",
+            "reason": "No exact mating drawing or measured installation recovered."
+          },
+          "spacerId": {
+            "status": "unknown",
+            "reason": "No exact mating drawing or measured installation recovered."
+          },
+          "dialFeetInterface": {
+            "status": "unknown",
+            "reason": "No exact mating drawing or measured installation recovered."
+          },
+          "loading": {
+            "status": "unknown",
+            "reason": "Rear/front service path needs exact variant confirmation."
+          }
+        },
+        "notes": "Old supplier-hosted envelope sketch is not linked to the current SKU. Body, opening, tube, cutout and axis are presentation assumptions. SKU alias/current variant identity unresolved. Crown and bezel included; not a matched hardware certificate."
+      },
+      "crownAxes": [
+        {
+          "schema": "crown-axis/v1",
+          "axisId": "crown-main",
+          "clockwiseFrom3hDeg": {
+            "status": "known",
+            "value": 30,
+            "evidence": {
+              "kind": "visual-approximation",
+              "source": "https://www.namokimods.com/products/nmk920-tuna-skx007-srpd-watch-case-brushed-finish; Exact angle unpublished; approximate 4h presentation; presentation angle, not measured fit",
+              "retrievedAtIso": "2026-10-10T10:27:19Z"
+            }
+          },
+          "interfaceRadiusMm": {
+            "status": "known",
+            "value": 23.8,
+            "evidence": {
+              "kind": "visual-approximation",
+              "source": "Crown C2/C3 presentation family; no supplier interface or sealing qualification"
+            }
+          },
+          "stemHeightMm": {
+            "status": "known",
+            "value": 0,
+            "evidence": {
+              "kind": "visual-approximation",
+              "source": "Crown C2/C3 presentation family; no supplier interface or sealing qualification"
+            }
+          },
+          "supplierPosition": {
+            "status": "unknown",
+            "reason": "No exact numeric angle or clock wording published for current SKU."
+          }
+        }
+      ],
+      "visual": {
+        "category": "case",
+        "assetId": "case-namoki-nmk920-offaxis-v1"
+      }
+    }
+  },
+  "partOrder": [
+    "inst-crystal",
+    "inst-flat-sapphire",
+    "inst-domed-sapphire",
+    "inst-double-domed-sapphire",
+    "inst-caseback",
+    "inst-lugs",
+    "inst-midcase",
+    "inst-chapter-ring",
+    "inst-rehaut",
+    "inst-inner-bezel",
+    "inst-rotating-bezel",
+    "inst-fixed-bezel",
+    "inst-dial-blank",
+    "inst-applied-indices",
+    "inst-printed-indices",
+    "inst-mixed-index-sets",
+    "inst-arabic-numerals",
+    "inst-roman-numerals",
+    "inst-baton-markers",
+    "inst-dot-markers",
+    "inst-triangle-markers",
+    "inst-counter-30m",
+    "inst-counter-12h",
+    "inst-running-seconds",
+    "inst-date-window",
+    "inst-day-window",
+    "inst-moonphase",
+    "inst-power-reserve",
+    "inst-open-heart",
+    "inst-tourbillon-aperture",
+    "inst-logo",
+    "inst-brand-text",
+    "inst-water-resistance-text",
+    "inst-movement-text",
+    "inst-hour-hand",
+    "inst-minute-hand",
+    "inst-central-seconds",
+    "inst-gmt-hand",
+    "inst-chronograph-seconds",
+    "inst-crown",
+    "inst-pushers",
+    "inst-helium-valve",
+    "inst-strap-integration",
+    "inst-bracelet-integration"
+  ],
+  "selectedColorPalette": {
+    "primary": "#07182d",
+    "secondary": "#1D4ED8",
+    "accent": "#C7F9CC"
+  },
+  "templateId": "diver",
+  "designConfig": {
+    "markerConfig": {
+      "kind": "round",
+      "count": 12,
+      "startAngleDeg": 0,
+      "radiusInnerMm": 11.15,
+      "radiusOuterMm": 13.1,
+      "widthMm": 0.95,
+      "style": {
+        "applied": false,
+        "printed": true,
+        "lumed": true,
+        "metallic": false,
+        "outline": false,
+        "filled": true
+      }
+    },
+    "typographyConfig": {
+      "content": "DIVER 200 m",
+      "layout": "arc",
+      "fontCategory": "modern-sans",
+      "radiusMm": 9.2,
+      "angleStartDeg": -38,
+      "angleSpanDeg": 76,
+      "kerning": 0,
+      "letterSpacing": 0.08,
+      "wordSpacing": 0.2,
+      "rotationDeg": 0,
+      "alignment": "center",
+      "curvature": 0.8,
+      "color": "#C7F9CC",
+      "fontSizeMm": 1.15
+    },
+    "textureConfig": {
+      "kind": "sunburst",
+      "intensity": 0.35,
+      "contrast": 0.65
+    },
+    "dialFaceConfig": {
+      "style": "plain",
+      "finish": "matte",
+      "color": "#07182d",
+      "secondaryColor": "#1D4ED8",
+      "texture": {
+        "kind": "sunburst",
+        "intensity": 0.35,
+        "contrast": 0.65
+      },
+      "border": {
+        "enabled": true,
+        "color": "#E2E8F0",
+        "widthMm": 0.16,
+        "insetMm": 0
+      },
+      "centreHole": {
+        "diameterMm": 1.5,
+        "chamferMm": 0
+      },
+      "opacity": 1,
+      "layerOrder": 10
+    },
+    "geometryParameters": {
+      "caseDiameterMm": 42,
+      "dialDiameterMm": 38,
+      "movementDiameterMm": 30.5,
+      "movementCentreHoleMm": 1.5,
+      "bandClearanceMm": 0.2,
+      "bandGapMm": 0.15,
+      "chapterRingWidthMm": 1.6,
+      "innerBezelWidthMm": 1.2,
+      "outerBezelWidthMm": 1.5,
+      "manufacturingToleranceMm": 0.05,
+      "laserKerfMm": 0.08,
+      "minimumLineWidthMm": 0.1,
+      "minimumTextHeightMm": 1.4,
+      "defaultUnits": "mm"
+    },
+    "visualReferenceConfig": {
+      "dialMarkerMode": "auto",
+      "archetypeId": "archetype-dive",
+      "bezelId": "bezel-dive",
+      "strapStyleId": "rubber",
+      "componentAssetOverrides": {
+        "crown": "crown-onion",
+        "case": "case-namoki-nmk920-offaxis-v1"
+      },
+      "caseFinish": "steel",
+      "renderPreset": "face",
+      "renderRotation": [
+        0,
+        0,
+        0
+      ],
+      "renderDistance": 13.4
+    },
+    "crownChoice": {
+      "schema": "crown-choice/v1",
+      "selected": {
+        "crownInstanceId": "inst-crown",
+        "source": "explicit-user"
+      },
+      "recommendedDefault": {
+        "catalogueItemId": "cat-crown-tandorio465-package",
+        "reason": "Selected exact case bundle supplies this crown; interface fit still needs evidence",
+        "evidence": {
+          "status": "known",
+          "value": "Included operating crown; dimensions and interfaces unqualified",
+          "evidence": {
+            "kind": "supplier-statement",
+            "source": "https://tandoriowatch.com/products/tuna-can-watch-case-46-5mm",
+            "retrievedAtIso": "2026-10-10T10:27:19Z"
+          }
+        }
+      }
+    }
+  },
+  "scaleBinding": {
+    "scaleKind": "circular",
+    "assignedPartId": "band-outer-bezel",
+    "config": {
+      "startValue": 0,
+      "endValue": 60,
+      "majorStep": 5,
+      "minorStep": 1,
+      "direction": "clockwise",
+      "radiusMm": 15.5,
+      "majorTickLengthMm": 0.7,
+      "minorTickLengthMm": 0.35,
+      "majorTickWidthMm": 0.2,
+      "minorTickWidthMm": 0.12,
+      "tickDirection": "outside",
+      "tickStyle": "line",
+      "labelFrequency": 1,
+      "labelOrientation": "radial",
+      "labelPlacement": "outside",
+      "labelRotationOffsetDeg": 0,
+      "rotationOffsetDeg": 0,
+      "color": "#F8FAFC",
+      "fontFamily": "\"IBM Plex Mono\", monospace",
+      "previewEnabled": true,
+      "bandInnerRadiusMm": 15.5,
+      "bandOuterRadiusMm": 19,
+      "minimumLineWidthMm": 0.1,
+      "labelOffsetMm": 0.7,
+      "scaleFontSizeMm": 0.8,
+      "scaleTickLengthFactor": 1,
+      "placementTargetBandId": "band-outer-bezel"
+    },
+    "context": {
+      "startAngleDeg": 0,
+      "endAngleDeg": 360
+    },
+    "previewEnabled": true,
+    "crossArchetypeUnlocked": false,
+    "archetypeId": "archetype-dive"
+  }
+}
