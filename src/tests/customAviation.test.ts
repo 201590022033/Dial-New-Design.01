@@ -17,20 +17,21 @@ import { scaleArtworkClipEnvelope, scaleArtworkRadialShiftMm, scaleArtworkSurfac
 import { watchAssemblyToVisualModel } from '@/visual3d/watchAssemblyToVisualModel';
 
 const assemblyFixture = () => createStarterBuild('pilot').assembly;
-const wideBand = () => {
-  const band = assemblyToBands(assemblyFixture()).find(entry => entry.kind === 'chapter-ring')!;
-  return { ...band, visible: true, geometry: { ...band.geometry, innerRadius: 13, outerRadius: 16 } };
+const wideBand = (id = 'knots-mph') => {
+  const band = assemblyToBands(assemblyFixture()).find(entry => entry.kind === (id === 'decimal-hour' ? 'dial-face' : 'chapter-ring'))!;
+  return { ...band, visible: true, geometry: { ...band.geometry, innerRadius: id === 'decimal-hour' ? 0 : 13, outerRadius: 16 } };
 };
 beforeEach(() => {
   useWatchAssemblyStore.getState().setAssembly(assemblyFixture());
   useWatchAssemblyStore.getState().clearAssemblyHistory();
 });
 describe('Milestone 5 custom aviation', () => {
-  it('binds custom chapter artwork instead of an original row retained but disabled', () => {
-    const custom = runCustomAviation(customAviationDefaults('decimal-hour'), wideBand());
+  it('binds custom dial artwork instead of an original row retained but disabled', () => {
+    const custom = runCustomAviation(customAviationDefaults('decimal-hour'), wideBand('decimal-hour'));
     const original = { ...custom, kind: 'slide-rule' as const, placementTargetBandId: 'band-outer-bezel', fixedPlacementTargetBandId: 'band-chapter-ring' };
     const preview = { ...original, layers: [original, custom] };
-    expect(scaleArtworkBinding(preview, 'band-chapter-ring')).toEqual({ layer: custom, ring: 'outer' });
+    expect(scaleArtworkBinding(preview, 'band-dial-face')).toEqual({ layer: custom, ring: 'outer' });
+    expect(original.fixedPlacementTargetBandId).toBe('band-chapter-ring');
     expect(scaleArtworkBinding(preview, 'band-outer-bezel')).toEqual({ layer: original, ring: 'outer' });
     const model = watchAssemblyToVisualModel(assemblyFixture());
     expect(scaleArtworkClipEnvelope(custom, model, 'outer')).toBe(custom.placementEnvelope);
@@ -56,7 +57,7 @@ describe('Milestone 5 custom aviation', () => {
     for (const knots of [0,1,100,120,999]) expect(mphToKnots(knotsToMph(knots))).toBeCloseTo(knots, 12);
   });
   it('prints exactly 100 hundredth-hour stations with one seam and paired minute labels', () => {
-    const result = runCustomAviation(customAviationDefaults('decimal-hour'), wideBand());
+    const result = runCustomAviation(customAviationDefaults('decimal-hour'), wideBand('decimal-hour'));
     expect(result.validation.valid).toBe(true);
     expect(result.ticks).toHaveLength(100);
     expect(new Set(result.ticks.map(tick => tick.angleDeg)).size).toBe(100);
@@ -77,21 +78,21 @@ describe('Milestone 5 custom aviation', () => {
     expect(last.value).toBe(200); expect(last.angleDeg).toBe(300);
   });
   it('refuses narrow surfaces without shifting mathematical stations', () => {
-    const band = wideBand(), layer = customAviationDefaults('decimal-hour');
-    const result = runCustomAviation(layer, { ...band, geometry: { ...band.geometry, outerRadius: 13.3 } });
+    const band = wideBand('decimal-hour'), layer = customAviationDefaults('decimal-hour');
+    const result = runCustomAviation(layer, { ...band, geometry: { ...band.geometry, innerRadius: 13, outerRadius: 13.3 } });
     expect(result.validation.valid).toBe(false);
     expect(result.ticks[25]!.angleDeg).toBe(90);
     expect(runCustomAviation(layer, undefined).validation.valid).toBe(false);
     expect(runCustomAviation(layer, { ...band, visible: false }).validation.valid).toBe(false);
   });
-  it('retains original state and blocks a second layer claiming its chapter ring', () => {
+  it('retains original state with decimal hours exclusively on the independent dial face', () => {
     const assembly = assemblyFixture(), bands = assemblyToBands(assembly);
     const config = { ...getScalePlugin('slide-rule')!.defaultConfig, engineeringPreset: 'aviation-slide-rule' as const, placementTargetBandId: 'band-outer-bezel', fixedPlacementTargetBandId: 'band-chapter-ring' };
     assembly.designConfig!.customAviationLayers = { version: 1, layers: [{ ...customAviationDefaults('decimal-hour'), enabled: true }] };
     const original = JSON.stringify(config);
     const result = resolveScaleLayers(assembly, bands, 'slide-rule', config, fullMinuteRingContext)!;
-    expect(result.validation.valid).toBe(false);
-    expect(result.validation.warnings.join(' ')).toContain('same physical band');
+    expect(result.validation.warnings.join(' ')).not.toContain('same physical band');
+    expect(result.layers!.find(layer => layer.kind === 'custom')!.placementTargetBandId).toBe('band-dial-face');
     expect(JSON.stringify(config)).toBe(original);
     expect(result.layers!.some(layer => layer.kind === 'slide-rule')).toBe(true);
   });
@@ -112,7 +113,7 @@ describe('Milestone 5 custom aviation', () => {
   });
   it('blocks locked targets and malformed imports', () => {
     const state = useWatchAssemblyStore.getState();
-    state.setPartLocked('inst-chapter-ring', true);
+    state.setPartLocked('inst-dial-blank', true);
     state.updateCustomAviationLayer('decimal-hour', { enabled: true });
     expect(useWatchAssemblyStore.getState().assembly.designConfig!.customAviationLayers).toBeUndefined();
     expect(() => assertCustomAviation({ version: 1, layers: [{ ...customAviationDefaults('knots-mph'), fontSizeMm: NaN }] })).toThrow();

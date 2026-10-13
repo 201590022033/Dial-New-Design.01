@@ -2,7 +2,7 @@
 .case-diameter-control legend { padding: 0 4px; font-size: 10px; color: var(--dd-text-muted); }
 .case-diameter-controls { display: flex; align-items: flex-start; gap: 8px; }
 .case-diameter-track { min-width: 0; flex: 1; padding-top: 5px; }
-.case-diameter-track input { width: 100%; display: block; height: 18px; margin: 0; accent-color: #fbbf24; cursor: ew-resize; }
+.case-diameter-track input { width: 100%; display: block; height: 18px; margin: 0; accent-color: #fbbf24; cursor: ew-resize; touch-action: none; }
 .case-diameter-track input:disabled { cursor: not-allowed; opacity: .45; }
 .case-diameter-ticks { position: relative; height: 28px; margin: 0 7px; }
 .case-diameter-tick { position: absolute; top: 0; transform: translateX(-50%); padding: 0; width: 20px; height: 27px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; font: 10px 'IBM Plex Mono', monospace; border: 0; background: transparent; cursor: help; }
@@ -18,13 +18,15 @@
 .case-diameter-help p { flex: 1; margin: 0; color: #9ca3af; font-size: 9px; line-height: 1.4; }
 .case-diameter-help button { flex-shrink: 0; padding: 3px 5px; color: #5eead4; font-size: 10px; border-radius: 4px; }
 .case-diameter-error { font-size: 11px; color: #fcd34d; margin-top: 4px; }
+.case-diameter-snap { margin: 0; color: #5eead4; font-size: 10px; }
+.case-diameter-snap:empty { display: none; }
 .case-diameter-control :focus-visible, .case-size-popover :focus-visible { outline: 2px solid #5eead4; outline-offset: 2px; }
 .case-size-popover { z-index: 55; overflow-y: auto; overscroll-behavior: contain; box-sizing: border-box; border: 1px solid #4b5563; border-radius: 12px; background: #171d24; color: #f0f0f0; box-shadow: 0 18px 50px #0009; padding: 12px; font-family: 'Space Grotesk', sans-serif; }
 .case-size-popover-top { display: flex; align-items: center; justify-content: space-between; color: #94a3b8; letter-spacing: .12em; font-size: 9px; }
 .case-size-popover-top button { width: 28px; height: 28px; border-radius: 5px; color: #e2e8f0; font-size: 20px; letter-spacing: 0; }
 .case-size-image { display: flex; flex-direction: column; align-items: center; border-radius: 8px; background: radial-gradient(ellipse at center, #33415588, #0b1119); padding: 6px; }
-.case-size-image svg { height: 112px; width: 112px; }
-.case-size-image.reference-only svg { filter: grayscale(1); opacity: .65; }
+.case-size-image svg { height: 132px; width: 132px; }
+.case-size-image.reference-only svg { filter: saturate(.65); opacity: .9; }
 .case-size-image span { font-size: 9px; color: #94a3b8; }
 .case-size-value { margin: 9px 0 0; color: #fbbf24; font: 27px 'IBM Plex Mono', monospace; }
 .case-size-value span { font-size: 12px; color: #94a3b8; }

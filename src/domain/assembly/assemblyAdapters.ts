@@ -1,3 +1,5 @@
+import type { ComponentCatalogueItem } from '@/domain/catalogue/types';
+import { readCatalogueSelectionSnapshot } from '@/domain/catalogue/catalogueSelectionSnapshot';
 import { createBand } from '@/domain/bands/bandRegistry';
 import type { BandEntity, BandKind } from '@/domain/bands/types';
 import { getCatalogueItem } from '@/domain/catalogue/catalogueRegistry';
@@ -53,7 +55,8 @@ export const assemblyToBands = (assembly: WatchAssembly): BandEntity[] => {
  * No synthetic component kinds, manufacturing profiles, materials, or geometry are fabricated.
  */
 export const partInstanceToLegacyEntity = (
-  instance: WatchAssemblyPartInstance
+  instance: WatchAssemblyPartInstance,
+  catalogueItems: readonly ComponentCatalogueItem[] = []
 ): WatchComponentEntity => {
   if (!instance.catalogueItemId || instance.catalogueItemId.trim() === '') {
     throw new CatalogueReferenceError(
@@ -63,7 +66,7 @@ export const partInstanceToLegacyEntity = (
     );
   }
 
-  const catItem = getCatalogueItem(instance.catalogueItemId);
+  const catItem = catalogueItems.find(item => item.id === instance.catalogueItemId) ?? getCatalogueItem(instance.catalogueItemId) ?? readCatalogueSelectionSnapshot(instance);
   if (!catItem) {
     throw new CatalogueReferenceError(
       instance.instanceId,
@@ -133,10 +136,11 @@ export const partInstanceToLegacyEntity = (
  * Converts all parts of a WatchAssembly to legacy WatchComponentEntity[]
  */
 export const assemblyToWatchComponentEntities = (
-  assembly: WatchAssembly
+  assembly: WatchAssembly,
+  catalogueItems: readonly ComponentCatalogueItem[] = []
 ): WatchComponentEntity[] => {
   return assembly.partOrder
     .map((instanceId) => assembly.parts[instanceId])
     .filter((instance): instance is WatchAssemblyPartInstance => instance !== undefined)
-    .map(partInstanceToLegacyEntity);
+    .map(instance => partInstanceToLegacyEntity(instance, catalogueItems));
 };

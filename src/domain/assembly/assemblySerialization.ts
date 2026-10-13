@@ -1,3 +1,6 @@
+import { withDialOnlyDecimalHours } from '@/domain/scales/decimalHourPlacement';
+import { assertDesignIntent } from '@/domain/design-first/designIntent';
+import { assertDiverBezel } from '@/domain/scales/diverBezel';
 import type { DialProjectFile } from '@/services/projectFileService';
 import type { BandEntity } from '@/domain/bands/types';
 import { defaultGeometryParameters } from '@/domain/geometry/geometryEngine';
@@ -63,8 +66,12 @@ export const assertNoTransientState = (data: unknown): void => {
  * Strictly guarantees that no transient UI state is written to the document.
  */
 export const serializeWatchAssembly = (assembly: WatchAssembly): string => {
+  assembly = withDialOnlyDecimalHours(assembly);
   assertNoTransientState(assembly);
   assertAssemblyCrownContracts(assembly);
+  if (assembly.designConfig?.designIntent !== undefined) assertDesignIntent(assembly.designConfig.designIntent);
+  if (assembly.designConfig?.diverBezel) assertDiverBezel(assembly.designConfig.diverBezel);
+  if (assembly.scaleBinding?.config.diverBezel) assertDiverBezel(assembly.scaleBinding.config.diverBezel);
   if (assembly.designConfig?.slideRuleLayers) assertSlideRuleLayers(assembly.designConfig.slideRuleLayers);
   if (assembly.designConfig?.customAviationLayers) assertCustomAviation(assembly.designConfig.customAviationLayers);
   if (assembly.designConfig?.appearance) assertAppearance(assembly.designConfig.appearance);
@@ -102,7 +109,7 @@ export const deserializeWatchAssembly = (jsonString: string): WatchAssembly => {
     throw new Error('Invalid WatchAssembly: Root must be an object.');
   }
 
-  const raw = parsed as Partial<WatchAssembly>;
+  const raw = withDialOnlyDecimalHours(parsed as WatchAssembly) as Partial<WatchAssembly>;
 
   if (!raw.version || typeof raw.version !== 'string') {
     throw new Error('Invalid WatchAssembly: Missing or invalid "version" field.');
@@ -126,6 +133,9 @@ export const deserializeWatchAssembly = (jsonString: string): WatchAssembly => {
 
   // Ensure no transient state was injected
   assertNoTransientState(raw);
+  if (raw.designConfig?.designIntent !== undefined) assertDesignIntent(raw.designConfig.designIntent);
+  if (raw.designConfig?.diverBezel) assertDiverBezel(raw.designConfig.diverBezel);
+  if (raw.scaleBinding?.config.diverBezel) assertDiverBezel(raw.scaleBinding.config.diverBezel);
   if (raw.designConfig?.slideRuleLayers) assertSlideRuleLayers(raw.designConfig.slideRuleLayers);
   if (raw.designConfig?.customAviationLayers) assertCustomAviation(raw.designConfig.customAviationLayers);
   if (raw.designConfig?.appearance) assertAppearance(raw.designConfig.appearance);

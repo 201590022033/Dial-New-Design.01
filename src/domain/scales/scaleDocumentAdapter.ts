@@ -54,7 +54,8 @@ export const withScaleSnapshot = (assembly: WatchAssembly, snapshot: ScaleSnapsh
     scaleBinding: { scaleKind: copy.selectedScaleKind, assignedPartId: target, config: copy.pluginConfig as unknown as Record<string, unknown>,
       context: copy.context, previewEnabled: copy.previewEnabled, crossArchetypeUnlocked: copy.crossArchetypeUnlocked,
       archetypeId: assembly.designConfig?.visualReferenceConfig?.archetypeId },
-    designConfig: { ...assembly.designConfig, ...(layers.layers.length ? { slideRuleLayers: layers } : {}) }
+    designConfig: { ...assembly.designConfig,
+      ...(copy.selectedScaleKind === 'circular' && copy.pluginConfig.diverBezel && assembly.designConfig?.visualReferenceConfig?.archetypeId === 'archetype-dive' ? { diverBezel: copy.pluginConfig.diverBezel } : {}), ...(layers.layers.length ? { slideRuleLayers: layers } : {}) }
   };
 };
 

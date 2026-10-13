@@ -1,3 +1,4 @@
+import { useCatalogueStore } from './catalogueStore';
 import { create } from 'zustand';
 import { createWatchComponentEntities } from '@/domain/watch-components/factory';
 import type { WatchComponentEntity } from '@/domain/watch-components/types';
@@ -109,7 +110,7 @@ export const useWatchComponentStore = create<WatchComponentState>((set) => ({
   },
   setComponents: (components) => set({ components }),
   syncFromAssembly: (assembly: WatchAssembly) => {
-    const legacyEntities = assemblyToWatchComponentEntities(assembly);
+    const legacyEntities = assemblyToWatchComponentEntities(assembly, useCatalogueStore.getState().items);
     set({ components: legacyEntities });
   }
 }));

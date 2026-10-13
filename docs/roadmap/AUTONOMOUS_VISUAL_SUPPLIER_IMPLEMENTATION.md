@@ -23,7 +23,7 @@ Started: 2026-09-26.
 
 - [x] Define a validated, timestamped capture format.
 - [x] Add an item-page capture helper.
-- [x] Add component-scoped JSON import in the Suppliers tab.
+- [x] Add component-scoped JSON import in the Suppliers tab. DF5 supersedes the original immediate listing/selection import with the durable supplier review queue; publication is DF6. Existing offer records are retained.
 - [ ] Browser-test against a current AliExpress item page and revise selectors as needed.
 
 ## Verification gate

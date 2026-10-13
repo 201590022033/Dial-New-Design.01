@@ -1,3 +1,4 @@
+import { useConfiguratorUIStore } from '@/stores/configuratorUIStore';
 import type { DialProjectFile } from '@/services/projectFileService';
 import { deserializeWatchAssembly, migrateLegacyProjectToAssembly } from '@/domain/assembly/assemblySerialization';
 import { useWatchAssemblyStore } from '@/stores/watchAssemblyStore';
@@ -24,6 +25,8 @@ export const hydrateRuntimeProject = (project: DialProjectFile): void => {
     ? deserializeWatchAssembly(JSON.stringify(project.assembly))
     : migrateLegacyProjectToAssembly(project);
   if (!scaleSnapshotFromAssembly(assembly) && project.scale.selectedScaleKind === 'slide-rule') assembly = withScaleSnapshot(assembly, project.scale);
+  useConfiguratorUIStore.getState().cancelPreview();
+  useConfiguratorUIStore.setState({ archetypePreviewAssembly: null, previewingVersionId: null });
   useWatchAssemblyStore.getState().setAssembly(assembly);
 
   // 2. If the persisted legacy project contains custom physical bands, preserve them in bandsStore

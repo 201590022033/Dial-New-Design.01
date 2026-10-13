@@ -1,51 +1,35 @@
 import React, { useState } from 'react';
-import { Store, Check, ShieldCheck, HelpCircle, FileUp } from 'lucide-react';
+import { Store, Check, ShieldCheck, HelpCircle } from 'lucide-react';
 import { useConfiguratorUIStore } from '@/stores/configuratorUIStore';
 import { useWatchAssemblyStore } from '@/stores/watchAssemblyStore';
 import { useCatalogueStore } from '@/stores/catalogueStore';
 import { useSourcingStore } from '@/stores/sourcingStore';
 import { cn } from '@/utils/cn';
 import { getMovementSupplierReadiness } from '@/domain/movements/movementSupplierReadiness';
-import { getCatalogueItem } from '@/domain/catalogue/catalogueRegistry';
 import { formatListingPrice, isListingPriceStale, listingKnownLandedZar, listingPriceZar, listingShippingZar } from '@/domain/catalogue/pricing';
-import { parseAliExpressCapture, supplierListingFromCapture } from '@/domain/sourcing';
 import { partDiscoveryLinks, partDiscoveryQuery } from '@/domain/sourcing/partDiscovery';
+import { DesignIntentPanel } from '../DesignIntentPanel';
+import { SupplierDraftPanel } from '../SupplierDraftPanel';
+import { designPartSlot } from '@/domain/design-first/designBriefExtraction';
 
 export const SuppliersTab: React.FC = () => {
   const activePartInstanceId = useConfiguratorUIStore((s) => s.activePartInstanceId);
   const assembly = useWatchAssemblyStore((s) => s.assembly);
   const supplierListings = useCatalogueStore((s) => s.supplierListings);
-  const addSupplierListing = useCatalogueStore((s) => s.addSupplierListing);
+  const catalogueItems = useCatalogueStore((s) => s.items);
   const sourcingSelections = useSourcingStore((s) => s.sourcingPlan.selections);
   const setSupplierSelection = useSourcingStore((s) => s.setSupplierSelection);
-  const [captureStatus, setCaptureStatus] = useState<string | null>(null);
   const [discovery, setDiscovery] = useState<{ partId: string; query: string; cheaper: boolean; searchedAt?: string } | null>(null);
   const beginSearch = (cheaper: boolean) => {
     const part = activePartInstanceId && assembly.parts[activePartInstanceId];
     if (part) setDiscovery({ partId: part.instanceId, query: partDiscoveryQuery(assembly, part), cheaper });
   };
 
-  const handleCaptureImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    event.target.value = '';
-    if (!file || !activePartInstanceId) return;
-    const part = assembly.parts[activePartInstanceId];
-    if (!part) return;
-    try {
-      const capture = parseAliExpressCapture(JSON.parse(await file.text()));
-      const listing = supplierListingFromCapture(capture, part.catalogueItemId);
-      addSupplierListing(listing);
-      setSupplierSelection(activePartInstanceId, listing.id);
-      setCaptureStatus(`Imported ${capture.sellerName}; item and shipping were timestamped ${new Date(capture.capturedAtIso).toLocaleString()}.`);
-    } catch (error) {
-      setCaptureStatus(`Import failed: ${error instanceof Error ? error.message : 'invalid capture file'}`);
-    }
-  };
-
   if (!activePartInstanceId) {
     return (
       <div className="p-6 text-center text-slate-400 text-xs">
-        Select a component to inspect verified suppliers and procurement listings.
+        <p>Select a component to inspect suppliers and procurement listings.</p>
+        <SupplierDraftPanel />
       </div>
     );
   }
@@ -63,12 +47,14 @@ export const SuppliersTab: React.FC = () => {
   });
 
   const selectedListingId = sourcingSelections[activePartInstanceId] ?? null;
-  const movementReadiness = getCatalogueItem(activePart?.catalogueItemId ?? '')?.kind === 'movement'
+  const activeItem = catalogueItems.find(item => item.id === activePart?.catalogueItemId);
+  const movementReadiness = activeItem?.kind === 'movement'
     ? getMovementSupplierReadiness(assembly.metadata.movement)
     : null;
 
   return (
     <div className="flex flex-col h-full overflow-y-auto p-3 gap-4" data-testid="suppliers-tab">
+      <DesignIntentPanel />
       <div className="border-b border-slate-800 pb-2">
         {activePart?.crownCapConcept && <p role="status" className="text-xs text-amber-200">Protected cap/holder is a presentation concept with no orderable hardware. Listings below price only the operating crown; they do not qualify the cap or holder.</p>}
         <h3 className="text-xs font-semibold text-slate-200">
@@ -89,22 +75,10 @@ export const SuppliersTab: React.FC = () => {
         {discovery.searchedAt && <p role="status">Search opened {new Date(discovery.searchedAt).toLocaleString()} (not a price check).</p>}
         <p>Results are unverified. Check the exact variant, movement, dial seat, hand bores and drawings before ordering. Colours are presentation choices, not confirmed supplier stock.</p>
         <p>Compare item + shipping to South Africa, then taxes / duties and discounts at checkout. An unknown shipping price is not free shipping. Search engines cannot guarantee the cheapest compatible part.</p>
-        <p>Save an AliExpress price snapshot using Import below; no supplier onboarding required.</p>
+        <p>Save an AliExpress price snapshot in Supplier drafts below. It stays in the review queue until reviewed and published.</p>
       </section>}
 
-      <div className="rounded-lg border border-slate-700 bg-slate-900/70 p-3 text-[11px] text-slate-300">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <p className="font-semibold text-slate-200">AliExpress price snapshot</p>
-            <p className="mt-0.5 text-slate-400">Import a capture JSON from the item-page helper. It remains unverified and keeps shipping separate.</p>
-          </div>
-          <label className="inline-flex cursor-pointer items-center gap-1.5 rounded border border-teal-700 bg-teal-950/40 px-2 py-1.5 text-teal-200 hover:border-teal-500">
-            <FileUp className="h-3.5 w-3.5" /> Import
-            <input type="file" accept="application/json,.json" className="hidden" onChange={(event) => { void handleCaptureImport(event); }} />
-          </label>
-        </div>
-        {captureStatus && <p role="status" className="mt-2 text-amber-200">{captureStatus}</p>}
-      </div>
+      <SupplierDraftPanel catalogueItemId={activePart?.catalogueItemId ?? null} slot={activeItem ? designPartSlot(activeItem) : undefined} />
 
       {movementReadiness && !movementReadiness.orderable && (
         <div className="rounded-lg border border-amber-700/60 bg-amber-950/30 p-3 text-[11px] text-amber-100">

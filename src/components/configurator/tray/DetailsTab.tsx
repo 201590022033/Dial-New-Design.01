@@ -37,6 +37,9 @@ export const DetailsTab: React.FC = () => {
         </p>
       </div>
 
+      {catItem?.kind === 'rehaut' && <p className="text-xs text-slate-300" role="note">
+        The rehaut is the stationary inner case wall below the crystal, around the dial. It may be integral to the case or formed by an insert. A chapter ring can cover or carry markings on this area; a rotating inner bezel is a different mechanism. This generic design entry does not establish a separate item to order. Check the chosen case supplier's package contents.
+      </p>}
       {/* Engineering Dimensions */}
       <div className="space-y-2">
         <h4 className="text-[11px] font-mono text-slate-400 uppercase tracking-wider flex items-center gap-1.5">

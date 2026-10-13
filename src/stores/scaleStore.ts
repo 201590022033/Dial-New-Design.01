@@ -1,3 +1,5 @@
+import { resizePilotRadius } from '@/domain/scales/pilotMarkingSizing';
+import { assertDiverBezel, defaultDiverBezel } from '@/domain/scales/diverBezel';
 import { create } from 'zustand';
 import type { BandEntity } from '@/domain/bands/types';
 import { getScalePlugin } from '@/domain/scales/scaleRegistry';
@@ -102,13 +104,15 @@ export const useScaleStore = create<ScaleState>((set, get) => ({
     if (!state.crossArchetypeUnlocked && !scalePolicyForArchetype(state.activeArchetypeId).allowed.includes(program)) return false;
     const selection = getScaleProgram(program, bands);
     const defaults = getScalePlugin(selection.kind)?.defaultConfig ?? state.pluginConfig;
-    const targetBand = bands.find((band) => band.kind === 'outer-bezel');
+    const isDiver = program === 'diver' && useWatchAssemblyStore.getState().assembly.designConfig?.visualReferenceConfig?.archetypeId === 'archetype-dive';
+    const diverBezel = isDiver ? useWatchAssemblyStore.getState().assembly.designConfig?.diverBezel ?? { ...defaultDiverBezel } : undefined;
+    const targetBand = bands.find((band) => band.kind === (diverBezel?.mounting === 'internal' ? 'inner-bezel' : 'outer-bezel'));
     if (scaleTargetLocked({ ...state.pluginConfig, placementTargetBandId: targetBand?.id ?? state.pluginConfig.placementTargetBandId })) return false;
     set({
       selectedScaleKind: selection.kind,
       pluginConfig: {
-        ...defaults, ...selection.config,
-        fontFamily: state.pluginConfig.fontFamily,
+        ...defaults, ...selection.config, diverBezel,
+        fontFamily: isDiver || state.pluginConfig.fontFamily.includes('IBM Plex Mono') ? 'Arial, sans-serif' : state.pluginConfig.fontFamily,
         color: state.pluginConfig.color,
         scaleFontSizeMm: state.pluginConfig.scaleFontSizeMm ?? 0.8,
         scaleTickLengthFactor: state.pluginConfig.scaleTickLengthFactor ?? 1,
@@ -156,7 +160,12 @@ export const useScaleStore = create<ScaleState>((set, get) => ({
     get().regeneratePreview();
   },
   updatePluginConfig: (params) => {
-    if (scaleTargetLocked(get().pluginConfig)) return;
+    if (params.diverBezel) {
+      if (get().selectedScaleKind !== 'circular' || useWatchAssemblyStore.getState().assembly.designConfig?.visualReferenceConfig?.archetypeId !== 'archetype-dive') return;
+      assertDiverBezel(params.diverBezel);
+    }
+    if (params.rotationOffsetDeg !== undefined && !Number.isFinite(params.rotationOffsetDeg)) return;
+    if (scaleTargetLocked(get().pluginConfig) || scaleTargetLocked({ ...get().pluginConfig, ...params })) return;
     set((state) => ({
       pluginConfig: {
         ...state.pluginConfig,
@@ -211,7 +220,13 @@ export const useScaleStore = create<ScaleState>((set, get) => ({
       pluginConfig: {
         ...state.pluginConfig,
         radiusMm: (innerRadius + outerRadius) / 2,
-        outerRadiusMm: Math.max(innerRadius, outerRadius - 0.2),
+        outerRadiusMm: state.selectedScaleKind === 'slide-rule'
+          ? resizePilotRadius(state.pluginConfig.outerRadiusMm, state.pluginConfig, innerRadius, outerRadius)
+          : Math.max(innerRadius, outerRadius - 0.2),
+        ...(state.selectedScaleKind === 'slide-rule' && state.pluginConfig.referenceDesign ? {
+          referenceOuterTickRadiusMm: resizePilotRadius(state.pluginConfig.referenceOuterTickRadiusMm, state.pluginConfig, innerRadius, outerRadius),
+          referenceOuterNumeralRadiusMm: resizePilotRadius(state.pluginConfig.referenceOuterNumeralRadiusMm, state.pluginConfig, innerRadius, outerRadius)
+        } : {}),
         // Aviation has a separate fixed chapter-ring scale. Updating its
         // rotating bezel must never pull that inner ring out onto the bezel.
         innerRadiusMm: state.selectedScaleKind === 'slide-rule'

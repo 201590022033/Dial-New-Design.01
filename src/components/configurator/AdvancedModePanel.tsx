@@ -8,9 +8,11 @@ import {
 import { useConfiguratorUIStore } from '@/stores/configuratorUIStore';
 import { useWatchAssemblyStore } from '@/stores/watchAssemblyStore';
 import { useGlobalSettingsStore } from '@/stores/globalSettingsStore';
+import { scalePolicyForArchetype } from '@/domain/scales/archetypeScalePolicy';
 import { useScaleStore } from '@/stores/scaleStore';
 import { AviationSlideRulePanel } from '@/components/configurator/AviationSlideRulePanel';
-import { ReferenceSlideRulePanel } from './ReferenceSlideRulePanel';
+import { DiverBezelPanel } from './DiverBezelPanel';
+import { ReferenceSlideRuleSelections, ReferenceSlideRulePanel } from './ReferenceSlideRulePanel';
 import { CustomAviationPanel } from './CustomAviationPanel';
 
 export const AdvancedModePanel: React.FC = () => {
@@ -28,10 +30,14 @@ export const AdvancedModePanel: React.FC = () => {
   // Scale store
   const scalePreviewEnabled = useScaleStore((s) => s.previewEnabled);
   const setScalePreviewEnabled = useScaleStore((s) => s.setPreviewEnabled);
+  const unlocked = useScaleStore(s => s.crossArchetypeUnlocked);
+  const aviationAllowed = unlocked || scalePolicyForArchetype(assembly.designConfig?.visualReferenceConfig?.archetypeId).allowed.includes('aviation');
   const referenceDesign = useScaleStore((s) => s.pluginConfig.referenceDesign);
 
   // Parametric adjustment state for active component
   const activePart = activePartInstanceId ? assembly.parts[activePartInstanceId] : null;
+  const rotatingBezel = assembly.parts['inst-rotating-bezel'];
+  const bezelDiameter = rotatingBezel?.dimensions.diameterMm;
   const paramDiameter = activePart?.dimensions.diameterMm ?? 28.5;
   const setParamDiameter = (diameterMm: number) => {
     if (!activePart || !Number.isFinite(diameterMm) || diameterMm <= 0) return;
@@ -55,6 +61,29 @@ export const AdvancedModePanel: React.FC = () => {
         <p className="text-[11px] text-slate-400 mt-0.5">
           Full parametric dimensions, scale generators, and deterministic clearance controls.
         </p>
+      </div>
+
+      {/* Slide Rule & Scale Generation Engine Links */}
+      <div className="space-y-2 pt-2 border-t border-slate-800">
+        <h4 className="text-[11px] font-mono text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+          <Sparkles className="h-3.5 w-3.5 text-teal-400" /> Bezel markings & operation
+        </h4>
+        <div className="p-2.5 rounded-lg bg-slate-900 border border-slate-800 space-y-2">
+          <DiverBezelPanel />
+          {aviationAllowed && <ReferenceSlideRuleSelections />}
+          <AviationSlideRulePanel />
+          <ReferenceSlideRulePanel />
+          {aviationAllowed && <CustomAviationPanel />}
+          {(!referenceDesign || referenceDesign === 'simplified') && <label className="flex items-center gap-2 cursor-pointer pt-1">
+            <input
+              type="checkbox"
+              checked={scalePreviewEnabled}
+              onChange={(e) => setScalePreviewEnabled(e.target.checked)}
+              className="rounded border-slate-700 text-teal-500 bg-slate-950 focus:ring-0"
+            />
+            <span className="text-slate-300 text-xs">Enable Live Scale Dial Projection</span>
+          </label>}
+        </div>
       </div>
 
       {/* Engineering Overlays Toggles */}
@@ -144,8 +173,13 @@ export const AdvancedModePanel: React.FC = () => {
             </span>
           </label>
           <p className="text-[10px] leading-relaxed text-slate-400">
-            This is the master case size. Fixed-size HD GLBs are used only at their authored diameter; other sizes switch to the scalable procedural preview.
+            This is the case preview size. Selected parts retain their dimensions; changing this value does not enlarge the rotating bezel.
           </p>
+          {bezelDiameter && <p className="text-[10px] leading-relaxed text-amber-200" data-testid="bezel-case-proportions">
+            Rotating bezel Ø{bezelDiameter.toFixed(2)} mm / case preview Ø{caseDiameterMm.toFixed(2)} mm
+            {' · '}{(100 * bezelDiameter / caseDiameterMm).toFixed(1)}% of case diameter.
+            {' '}Procedural case styling is illustrative; use part dimensions and Details to assess fit.
+          </p>}
           <div className="flex justify-between text-slate-300">
             <span>Manufacturing Tolerance:</span>
             <span className="font-mono text-slate-200">±{manufacturingToleranceMm} mm</span>
@@ -157,26 +191,7 @@ export const AdvancedModePanel: React.FC = () => {
         </div>
       </div>
 
-      {/* Slide Rule & Scale Generation Engine Links */}
-      <div className="space-y-2 pt-2 border-t border-slate-800">
-        <h4 className="text-[11px] font-mono text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-          <Sparkles className="h-3.5 w-3.5 text-teal-400" /> Slide-Rule & Scales Engine
-        </h4>
-        <div className="p-2.5 rounded-lg bg-slate-900 border border-slate-800 space-y-2">
-          <AviationSlideRulePanel />
-          <ReferenceSlideRulePanel />
-          <CustomAviationPanel />
-          {(!referenceDesign || referenceDesign === 'simplified') && <label className="flex items-center gap-2 cursor-pointer pt-1">
-            <input
-              type="checkbox"
-              checked={scalePreviewEnabled}
-              onChange={(e) => setScalePreviewEnabled(e.target.checked)}
-              className="rounded border-slate-700 text-teal-500 bg-slate-950 focus:ring-0"
-            />
-            <span className="text-slate-300 text-xs">Enable Live Scale Dial Projection</span>
-          </label>}
-        </div>
-      </div>
+
     </div>
   );
 };

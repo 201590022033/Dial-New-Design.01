@@ -38,11 +38,13 @@ describe('strap styles and direct option Apply', () => {
     assembly.globalDimensions.caseDiameterMm = 42;
     expect(watchAssemblyToVisualModel(assembly).assets.strap.assetId).toBe('archetype-strap-rubber');
   });
-  it('wires double-click and Enter through the existing guarded Apply, not a stale hover', () => {
+  it('previews only on deliberate activation and retains the separate guarded Apply', () => {
     const source = readFileSync('src/components/configurator/tray/OptionsTab.tsx', 'utf8');
     expect(source).toContain('onDoubleClick=');
     expect(source).toContain("event.key === 'Enter'");
-    expect(source).toContain('applyCatalogueVisualSelection(current, activePartInstanceId, item)');
-    expect(source).toContain('if (applyPreview())');
+    expect(source).not.toContain('onMouseEnter=');
+    expect(source).not.toContain('onClick={() => handlePreviewCandidate(item)}');
+    expect(source).toContain('handlePreviewCandidate(item);');
+    expect(source).toContain('applyPreview();');
   });
 });

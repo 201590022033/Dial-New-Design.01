@@ -1,0 +1,405 @@
+{
+  "draft": {
+    "schema": "dial-designer/supplier-draft/v1",
+    "id": "df6-seikomods-ct728-oyster-2026-10-13",
+    "status": "draft",
+    "syntheticFixture": false,
+    "identity": {
+      "supplierId": "seikomods.com",
+      "productId": "CT728",
+      "variant": {
+        "state": "recorded",
+        "value": "With Oyster Bracelet / CT728OYSTER / variation 618364",
+        "source": {
+          "id": "df6-seikomods-ct728-oyster-official-product",
+          "kind": "supplier-page",
+          "locator": "https://www.seikomods.com/shop/ct728-homage-alpinist-case-set/",
+          "capturedAt": "2026-10-13T06:51:05Z"
+        },
+        "review": "unreviewed"
+      }
+    },
+    "sources": [
+      {
+        "id": "df6-seikomods-ct728-oyster-official-product",
+        "kind": "supplier-page",
+        "locator": "https://www.seikomods.com/shop/ct728-homage-alpinist-case-set/",
+        "capturedAt": "2026-10-13T06:51:05Z"
+      }
+    ],
+    "engineering": {
+      "catalogueItemId": null,
+      "slot": "case",
+      "measurements": {
+        "crystalSeatDiameterMm": {
+          "state": "unknown",
+          "reason": "The inspected supplier page does not establish this mating measurement or tolerance."
+        },
+        "crystalSeatDepthMm": {
+          "state": "unknown",
+          "reason": "The inspected supplier page does not establish this mating measurement or tolerance."
+        },
+        "dialSeatDiameterMm": {
+          "state": "unknown",
+          "reason": "The inspected supplier page does not establish this mating measurement or tolerance."
+        },
+        "dialSeatDepthMm": {
+          "state": "unknown",
+          "reason": "The inspected supplier page does not establish this mating measurement or tolerance."
+        },
+        "movementCavityDiameterMm": {
+          "state": "unknown",
+          "reason": "The inspected supplier page does not establish this mating measurement or tolerance."
+        },
+        "movementCavityDepthMm": {
+          "state": "unknown",
+          "reason": "The inspected supplier page does not establish this mating measurement or tolerance."
+        },
+        "stemHeightMm": {
+          "state": "unknown",
+          "reason": "The inspected supplier page does not establish this mating measurement or tolerance."
+        },
+        "crownTubeThreadDiameterMm": {
+          "state": "unknown",
+          "reason": "The inspected supplier page does not establish this mating measurement or tolerance."
+        },
+        "crownTubeThreadPitchMm": {
+          "state": "unknown",
+          "reason": "The inspected supplier page does not establish this mating measurement or tolerance."
+        },
+        "casebackThreadDiameterMm": {
+          "state": "unknown",
+          "reason": "The inspected supplier page does not establish this mating measurement or tolerance."
+        },
+        "casebackThreadPitchMm": {
+          "state": "unknown",
+          "reason": "The inspected supplier page does not establish this mating measurement or tolerance."
+        },
+        "gasketSeatDiameterMm": {
+          "state": "unknown",
+          "reason": "The inspected supplier page does not establish this mating measurement or tolerance."
+        },
+        "bezelCarrierInnerDiameterMm": {
+          "state": "unknown",
+          "reason": "The inspected supplier page does not establish this mating measurement or tolerance."
+        },
+        "bezelCarrierOuterDiameterMm": {
+          "state": "unknown",
+          "reason": "The inspected supplier page does not establish this mating measurement or tolerance."
+        },
+        "caseDiameterMm": {
+          "state": "recorded",
+          "value": {
+            "value": 39.5,
+            "unit": "mm"
+          },
+          "source": {
+            "id": "df6-seikomods-ct728-oyster-official-product",
+            "kind": "supplier-page",
+            "locator": "https://www.seikomods.com/shop/ct728-homage-alpinist-case-set/",
+            "capturedAt": "2026-10-13T06:51:05Z"
+          },
+          "review": "unreviewed"
+        },
+        "lugWidthMm": {
+          "state": "recorded",
+          "value": {
+            "value": 20,
+            "unit": "mm"
+          },
+          "source": {
+            "id": "df6-seikomods-ct728-oyster-official-product",
+            "kind": "supplier-page",
+            "locator": "https://www.seikomods.com/shop/ct728-homage-alpinist-case-set/",
+            "capturedAt": "2026-10-13T06:51:05Z"
+          },
+          "review": "unreviewed"
+        },
+        "lugToLugMm": {
+          "state": "recorded",
+          "value": {
+            "value": 46.5,
+            "unit": "mm"
+          },
+          "source": {
+            "id": "df6-seikomods-ct728-oyster-official-product",
+            "kind": "supplier-page",
+            "locator": "https://www.seikomods.com/shop/ct728-homage-alpinist-case-set/",
+            "capturedAt": "2026-10-13T06:51:05Z"
+          },
+          "review": "unreviewed"
+        }
+      },
+      "attributes": {
+        "finish": {
+          "state": "recorded",
+          "value": "Brushed/polished stainless steel",
+          "source": {
+            "id": "df6-seikomods-ct728-oyster-official-product",
+            "kind": "supplier-page",
+            "locator": "https://www.seikomods.com/shop/ct728-homage-alpinist-case-set/",
+            "capturedAt": "2026-10-13T06:51:05Z"
+          },
+          "review": "unreviewed"
+        },
+        "thicknessBasis": {
+          "state": "recorded",
+          "value": "12.5 mm is conditional on the supplied slim back plus a flat crystal, which must be purchased separately.",
+          "source": {
+            "id": "df6-seikomods-ct728-oyster-official-product",
+            "kind": "supplier-page",
+            "locator": "https://www.seikomods.com/shop/ct728-homage-alpinist-case-set/",
+            "capturedAt": "2026-10-13T06:51:05Z"
+          },
+          "review": "unreviewed"
+        },
+        "innerRing": {
+          "state": "recorded",
+          "value": "Fitted compass chapter ring rotates using the secondary crown.",
+          "source": {
+            "id": "df6-seikomods-ct728-oyster-official-product",
+            "kind": "supplier-page",
+            "locator": "https://www.seikomods.com/shop/ct728-homage-alpinist-case-set/",
+            "capturedAt": "2026-10-13T06:51:05Z"
+          },
+          "review": "unreviewed"
+        },
+        "crownFunctions": {
+          "state": "recorded",
+          "value": "Main setting/winding crown at 3; internal ring control at 4.",
+          "source": {
+            "id": "df6-seikomods-ct728-oyster-official-product",
+            "kind": "supplier-page",
+            "locator": "https://www.seikomods.com/shop/ct728-homage-alpinist-case-set/",
+            "capturedAt": "2026-10-13T06:51:05Z"
+          },
+          "review": "unreviewed"
+        },
+        "recommendedDial": {
+          "state": "recorded",
+          "value": "Nominal 28.5 mm dial recommendation; not a measured dial seat.",
+          "source": {
+            "id": "df6-seikomods-ct728-oyster-official-product",
+            "kind": "supplier-page",
+            "locator": "https://www.seikomods.com/shop/ct728-homage-alpinist-case-set/",
+            "capturedAt": "2026-10-13T06:51:05Z"
+          },
+          "review": "unreviewed"
+        },
+        "recommendedCrystal": {
+          "state": "recorded",
+          "value": "Nominal 32 mm SRPE crystal recommendation; not a measured crystal seat. GMT clearance requires a domed crystal according to seller.",
+          "source": {
+            "id": "df6-seikomods-ct728-oyster-official-product",
+            "kind": "supplier-page",
+            "locator": "https://www.seikomods.com/shop/ct728-homage-alpinist-case-set/",
+            "capturedAt": "2026-10-13T06:51:05Z"
+          },
+          "review": "unreviewed"
+        },
+        "smallPackageContents": {
+          "state": "recorded",
+          "value": "Back gasket, NH stem, bracelet spring bars and fitted crystal gasket stated.",
+          "source": {
+            "id": "df6-seikomods-ct728-oyster-official-product",
+            "kind": "supplier-page",
+            "locator": "https://www.seikomods.com/shop/ct728-homage-alpinist-case-set/",
+            "capturedAt": "2026-10-13T06:51:05Z"
+          },
+          "review": "unreviewed"
+        }
+      }
+    },
+    "offers": [],
+    "packageContents": [
+      {
+        "slot": "case",
+        "inclusion": {
+          "state": "recorded",
+          "value": "included",
+          "source": {
+            "id": "df6-seikomods-ct728-oyster-official-product",
+            "kind": "supplier-page",
+            "locator": "https://www.seikomods.com/shop/ct728-homage-alpinist-case-set/",
+            "capturedAt": "2026-10-13T06:51:05Z"
+          },
+          "review": "unreviewed"
+        }
+      },
+      {
+        "slot": "crystal",
+        "inclusion": {
+          "state": "recorded",
+          "value": "not-included",
+          "source": {
+            "id": "df6-seikomods-ct728-oyster-official-product",
+            "kind": "supplier-page",
+            "locator": "https://www.seikomods.com/shop/ct728-homage-alpinist-case-set/",
+            "capturedAt": "2026-10-13T06:51:05Z"
+          },
+          "review": "unreviewed"
+        }
+      },
+      {
+        "slot": "crown",
+        "inclusion": {
+          "state": "recorded",
+          "value": "included",
+          "source": {
+            "id": "df6-seikomods-ct728-oyster-official-product",
+            "kind": "supplier-page",
+            "locator": "https://www.seikomods.com/shop/ct728-homage-alpinist-case-set/",
+            "capturedAt": "2026-10-13T06:51:05Z"
+          },
+          "review": "unreviewed"
+        }
+      },
+      {
+        "slot": "caseback",
+        "inclusion": {
+          "state": "recorded",
+          "value": "included",
+          "source": {
+            "id": "df6-seikomods-ct728-oyster-official-product",
+            "kind": "supplier-page",
+            "locator": "https://www.seikomods.com/shop/ct728-homage-alpinist-case-set/",
+            "capturedAt": "2026-10-13T06:51:05Z"
+          },
+          "review": "unreviewed"
+        }
+      },
+      {
+        "slot": "chapter-ring",
+        "inclusion": {
+          "state": "recorded",
+          "value": "included",
+          "source": {
+            "id": "df6-seikomods-ct728-oyster-official-product",
+            "kind": "supplier-page",
+            "locator": "https://www.seikomods.com/shop/ct728-homage-alpinist-case-set/",
+            "capturedAt": "2026-10-13T06:51:05Z"
+          },
+          "review": "unreviewed"
+        }
+      },
+      {
+        "slot": "strap",
+        "inclusion": {
+          "state": "recorded",
+          "value": "included",
+          "source": {
+            "id": "df6-seikomods-ct728-oyster-official-product",
+            "kind": "supplier-page",
+            "locator": "https://www.seikomods.com/shop/ct728-homage-alpinist-case-set/",
+            "capturedAt": "2026-10-13T06:51:05Z"
+          },
+          "review": "unreviewed"
+        }
+      },
+      {
+        "slot": "dial",
+        "inclusion": {
+          "state": "recorded",
+          "value": "not-included",
+          "source": {
+            "id": "df6-seikomods-ct728-oyster-official-product",
+            "kind": "supplier-page",
+            "locator": "https://www.seikomods.com/shop/ct728-homage-alpinist-case-set/",
+            "capturedAt": "2026-10-13T06:51:05Z"
+          },
+          "review": "unreviewed"
+        }
+      },
+      {
+        "slot": "hands",
+        "inclusion": {
+          "state": "recorded",
+          "value": "not-included",
+          "source": {
+            "id": "df6-seikomods-ct728-oyster-official-product",
+            "kind": "supplier-page",
+            "locator": "https://www.seikomods.com/shop/ct728-homage-alpinist-case-set/",
+            "capturedAt": "2026-10-13T06:51:05Z"
+          },
+          "review": "unreviewed"
+        }
+      },
+      {
+        "slot": "inner-bezel",
+        "inclusion": {
+          "state": "unknown",
+          "reason": "Package inclusion is not explicitly established for this component."
+        }
+      },
+      {
+        "slot": "rotating-bezel",
+        "inclusion": {
+          "state": "unknown",
+          "reason": "Package inclusion is not explicitly established for this component."
+        }
+      }
+    ],
+    "images": [
+      {
+        "locator": "https://www.seikomods.com/wp-content/uploads/2025/11/ct728-2.jpg",
+        "sourceId": "df6-seikomods-ct728-oyster-official-product",
+        "usage": {
+          "state": "unknown",
+          "reason": "No documented permission for republication or derived imagery was established. Keep as a remote research reference."
+        }
+      }
+    ],
+    "extraction": {
+      "method": "manual"
+    },
+    "fitQualification": "not-assessed"
+  },
+  "offers": [],
+  "captures": [
+    {
+      "id": "df6-seikomods-ct728-oyster-capture-2026-10-13",
+      "sourceId": "df6-seikomods-ct728-oyster-official-product",
+      "capturedAt": "2026-10-13T06:51:05Z",
+      "sourceText": "Research paraphrase: 39.5 mm case without crown/guards; Oyster package contains back, two crowns, rotating ring and bracelet. Crystal, dial, hands and movement are separate. Internal fitting tolerances are absent.",
+      "raw": {
+        "commerce": {
+          "variant": "With Oyster Bracelet",
+          "sku": "CT728OYSTER",
+          "variationId": 618364,
+          "unitPrice": 69,
+          "currency": "GBP",
+          "regularPriceObservation": 99,
+          "shippingPrice": null,
+          "shippingDestination": "South Africa",
+          "stockStatus": "in-stock",
+          "basis": "Exact WooCommerce variant metadata: display_price=69, is_in_stock=true, product priceCurrency=GBP. Seller observation only; no reservation or checkout quote.",
+          "taxInclusion": "unknown"
+        },
+        "otherVariantObservation": {
+          "label": "With President Bracelet",
+          "sku": "CT728PRESIDENT",
+          "variationId": 618365,
+          "unitPrice": 69,
+          "currency": "GBP",
+          "stockStatus": "out-of-stock",
+          "relationship": "Different variant; not interchangeable with the selected Oyster identity."
+        },
+        "retrieval": {
+          "method": "Official product page via web reader, plus exact embedded WooCommerce variation data read from the same HTTPS page"
+        },
+        "capturedAt": "2026-10-13T06:51:05Z",
+        "sourceUrl": "https://www.seikomods.com/shop/ct728-homage-alpinist-case-set/",
+        "supplierId": "seikomods.com",
+        "productId": "CT728",
+        "variant": "With Oyster Bracelet / CT728OYSTER / variation 618364",
+        "slot": "case",
+        "unitPrice": 69,
+        "currency": "GBP",
+        "shippingPrice": null,
+        "shippingDestination": "South Africa",
+        "stockStatus": "in-stock",
+        "sku": "CT728OYSTER"
+      }
+    }
+  ]
+}

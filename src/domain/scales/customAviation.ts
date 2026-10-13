@@ -30,11 +30,13 @@ export interface CustomAviationLayer {
   pairedColor: string;
   rotationDeg: number;
   maximumKnots: number;
+  dialInsetMm?: number;
 }
 export interface CustomAviationDocument { version: 1; layers: CustomAviationLayer[] }
 export const customAviationDefaults = (id: CustomAviationProgram): CustomAviationLayer => ({
-  id, enabled: false, targetBandId: 'band-chapter-ring', fontSizeMm: .4,
-  color: '#F0F0F0', pairedColor: '#E63946', rotationDeg: 0, maximumKnots: 200
+  id, enabled: false, targetBandId: id === 'decimal-hour' ? 'band-dial-face' : 'band-chapter-ring', fontSizeMm: id === 'decimal-hour' ? .7 : .4,
+  color: '#F0F0F0', pairedColor: '#E63946', rotationDeg: 0, maximumKnots: 200,
+  ...(id === 'decimal-hour' ? { dialInsetMm: 2.5 } : {})
 });
 export const assertCustomAviation = (doc: CustomAviationDocument): void => {
   if (!doc || doc.version !== 1 || !Array.isArray(doc.layers) || doc.layers.length > 2) throw new Error('Invalid custom aviation document');
@@ -45,6 +47,8 @@ export const assertCustomAviation = (doc: CustomAviationDocument): void => {
       !Number.isFinite(layer.fontSizeMm) || layer.fontSizeMm < .25 || layer.fontSizeMm > 1.5 ||
       !Number.isFinite(layer.rotationDeg) || !Number.isFinite(layer.maximumKnots) || layer.maximumKnots < 20 || layer.maximumKnots > 1000)
       throw new Error('Invalid custom aviation layer');
+    if (layer.dialInsetMm !== undefined && (!Number.isFinite(layer.dialInsetMm) || layer.dialInsetMm < 0 || layer.dialInsetMm > 10)) throw new Error('Invalid decimal-hour dial inset.');
+    if (layer.id === 'decimal-hour' && layer.targetBandId !== 'band-dial-face') throw new Error('Decimal hours must be printed on the dial face.');
     ids.add(layer.id);
   }
 };
@@ -52,9 +56,12 @@ export const assertCustomAviation = (doc: CustomAviationDocument): void => {
 /** Two fixed linear reading rows on ONE physical part; never original log artwork. */
 export const runCustomAviation = (layer: CustomAviationLayer, band: BandEntity | undefined): ScaleRunResult => {
   assertCustomAviation({ version: 1, layers: [layer] });
-  const inner = band?.geometry.innerRadius ?? 0, outer = band?.geometry.outerRadius ?? 0;
+  const outer = Math.max(0, (band?.geometry.outerRadius ?? 0) - (layer.id === 'decimal-hour' ? layer.dialInsetMm ?? 2.5 : 0));
+  // Reserve a peripheral writing annulus on the dial; never cluster a full ring at its centre.
+  const inner = layer.id === 'decimal-hour' ? Math.max(band?.geometry.innerRadius ?? 0, outer - (layer.fontSizeMm * 2 + .95)) : band?.geometry.innerRadius ?? 0;
   const font = layer.fontSizeMm, margin = .12, hover = .025;
   const ticks: ScaleTick[] = [], labels: ScaleLabel[] = [], issues: string[] = [];
+  if (layer.id === 'decimal-hour' && band?.kind !== 'dial-face') issues.push('Decimal hours must be printed on the dial face.');
   if (!band || !band.visible) issues.push('Custom aviation target is missing or hidden.');
   const base = inner + margin + font / 2 + hover;
   const second = base + font + .13;

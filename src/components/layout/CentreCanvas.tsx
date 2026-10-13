@@ -1,3 +1,4 @@
+import { useDesignMatchingStore } from '@/stores/designMatchingStore';
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Focus, Maximize2, Minimize2, Move, Ruler, ScanLine, ZoomIn, ZoomOut } from 'lucide-react';
@@ -61,6 +62,8 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode, visua
   const previewStatus = useConfiguratorUIStore((s) => s.previewStatus);
   const previewError = useConfiguratorUIStore((s) => s.previewError);
   const previewCandidateItem = useConfiguratorUIStore((s) => s.previewCandidateItem);
+  const matchingPreview = useConfiguratorUIStore((s) => s.previewOrigin === 'design-matching');
+  const cancelMatchingPreview = useDesignMatchingStore(s => s.cancel);
   const applyPreview = useConfiguratorUIStore((s) => s.applyPreview);
   const cancelPreview = useConfiguratorUIStore((s) => s.cancelPreview);
   const selectPartContext = useConfiguratorUIStore((s) => s.selectPartContext);
@@ -323,19 +326,19 @@ export const CentreCanvas = ({ presentationMode, onTogglePresentationMode, visua
             <div className="flex items-center gap-1.5 ml-2">
               <button
                 type="button"
-                onClick={cancelPreview}
+                onClick={() => { if (matchingPreview) cancelMatchingPreview(); cancelPreview(); }}
                 className="px-2.5 py-0.5 rounded-full text-xs text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 transition-colors"
               >
                 Cancel
               </button>
-              <button
+              {matchingPreview ? <span className="text-[11px] text-teal-200">Apply in matching results</span> : <button
                 type="button"
                 onClick={applyPreview}
                 disabled={Boolean(previewError)}
                 className="px-3 py-0.5 rounded-full text-xs font-semibold text-slate-950 bg-teal-400 hover:bg-teal-300 transition-colors shadow-sm disabled:cursor-not-allowed disabled:bg-slate-600 disabled:text-slate-300"
               >
                 Apply
-              </button>
+              </button>}
             </div>
             {previewError && <span role="alert" className="max-w-xs text-[11px] text-rose-300">{previewError}</span>}
           </div>

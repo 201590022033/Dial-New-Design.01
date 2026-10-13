@@ -201,6 +201,7 @@ export interface ScaleValidationResult {
 }
 
 export interface ScalePluginConfig {
+  diverBezel?: import('./diverBezel').DiverBezelSettings;
   referenceDesign?: 'citizen' | 'navitimer' | 'simplified';
   referenceColourMode?: 'original' | 'custom';
   referenceColourOverrides?: Record<string, string>;
@@ -246,6 +247,7 @@ export interface ScalePluginConfig {
   outerNumeralsVisible?: boolean;
   innerNumeralsVisible?: boolean;
   /** Simplified aviation writing only; extra labels never create or reposition graduations. */
+  aviationGraduationStyle?: 'navitimer' | 'custom-density';
   aviationNumeralDetail?: 'key' | 'whole-units';
   outerScaleVisible?: boolean;
   innerScaleVisible?: boolean;

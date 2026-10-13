@@ -1,6 +1,8 @@
+import { PILOT_GRADUATION_FACTOR } from './pilotMarkingSizing';
 import type { ScaleLabel, ScalePluginConfig, ScaleTick } from '@/domain/scales/types';
 import { resolvedScaleSvg } from './resolvedScaleArtwork';
 import { runScalePlugin } from '@/services/scaleEngineService';
+import { navitimerSubdivisionValues } from './navitimerReferenceArtwork';
 import { logDecadeAngle } from './calibratedSlideRule';
 
 export type AviationCalculation = 'time' | 'distance' | 'groundspeed' | 'fuel-used' | 'endurance' | 'burn-rate';
@@ -67,19 +69,23 @@ export const generateAviationRings = (config: ScalePluginConfig): { ticks: Scale
     : config.tickDensityProfile === 'balanced'
       ? [[10, 20, 0.2], [20, 50, 0.5], [50, 100, 1]]
       : [[10, 20, 0.5], [20, 50, 1], [50, 100, 2]];
+  const navitimer = config.aviationGraduationStyle !== 'custom-density';
+  const stations = navitimer ? navitimerSubdivisionValues() : intervals.flatMap(([start, end, step]) =>
+    Array.from({ length: Math.round((end - start) / step) }, (_, index) => Math.round((start + index * step) * 1000) / 1000));
   for (const ringId of ['outer', 'inner'] as const) {
     const radiusMm = ringId === 'outer' ? (config.outerRadiusMm ?? 18.7) : (config.innerRadiusMm ?? 16.3);
     const rotation = ringId === 'outer' ? (config.outerRotationOffsetDeg ?? 0) : (config.innerRotationOffsetDeg ?? 0);
-    for (const [start, end, step] of intervals) for (let index = 0; start + index * step < end - 1e-8; index += 1) {
-      const value = Math.round((start + index * step) * 1000) / 1000;
-      const major = numberedMarks.has(value);
+    for (const value of stations) {
+      const numbered = numberedMarks.has(value);
+      const major = navitimer ? Number.isInteger(value) && (value <= 25 || value % 5 === 0) : numbered;
+      const intermediate = navitimer && !major && Number.isInteger(value) && value > 25 && value < 60;
       const angleDeg = aviationAngle(value) + rotation;
       ticks.push({
-        angleDeg, radiusMm, lengthMm: major ? 0.45 : 0.25,
-        widthMm: major ? 0.15 : 0.1, weight: major ? 'major' : 'minor',
+        angleDeg, radiusMm, lengthMm: (major ? 0.45 : intermediate ? 0.33 : navitimer ? 0.20 : 0.25) * PILOT_GRADUATION_FACTOR,
+        widthMm: (major ? 0.15 : intermediate ? 0.12 : 0.1) * PILOT_GRADUATION_FACTOR, weight: major ? 'major' : 'minor',
         direction: 'inside', style: 'line', value, ringId
       });
-      if (major || (config.aviationNumeralDetail === 'whole-units' && Number.isInteger(value))) {
+      if (numbered || (config.aviationNumeralDetail === 'whole-units' && Number.isInteger(value))) {
         labels.push({
           text: String(value), angleDeg,
           radiusMm: ringId === 'outer' ? radiusMm + 0.55 : radiusMm - 0.75,

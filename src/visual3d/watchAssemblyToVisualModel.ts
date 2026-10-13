@@ -72,6 +72,7 @@ export type VisualWatchModel = {
   bezelProfile: 'smooth' | 'coin-edge' | 'knurled' | 'scalloped';
   bezelEnvelope: { innerRadiusMm: number; outerRadiusMm: number };
   chapterRingEnvelope: { innerRadiusMm: number; outerRadiusMm: number };
+  rehaut?: { visible: boolean; innerRadiusMm: number; outerRadiusMm: number; heightMm: number; finish: FinishProfile };
   crystalMaterial: string;
   hands: {
     style: VisualHandStyle; material: string;
@@ -126,6 +127,7 @@ const materialProfile = (part: WatchAssemblyPartInstance | undefined, fallback: 
  * Broad 'case'/'external' categories contain unrelated parts.
  */
 export const visualCategoryForPart = (part: WatchAssemblyPartInstance): VisualCategory | undefined => {
+  if (getCatalogueItem(part.catalogueItemId)?.kind === 'rehaut') return undefined;
   if (part.visual && visualCategories.includes(part.visual.category)) return part.visual.category;
   const kind = getCatalogueItem(part.catalogueItemId)?.kind;
   if (kind === 'crown') return 'crown';
@@ -134,7 +136,7 @@ export const visualCategoryForPart = (part: WatchAssemblyPartInstance): VisualCa
   if (kind === 'case' || kind === 'midcase') return 'case';
   if (kind === 'caseback') return 'caseback';
   if (kind === 'strap-integration' || kind === 'bracelet-integration') return 'strap';
-  if (kind === 'chapter-ring' || kind === 'rehaut') return 'chapter-ring';
+  if (kind === 'chapter-ring') return 'chapter-ring';
   if (kind === 'rotating-bezel' || kind === 'fixed-bezel') return 'bezel';
   if (kind === 'dial-blank') return 'dial';
   if (part.category === 'hands') return 'hands';
@@ -150,6 +152,7 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
     return matching.find((part) => part.visible && (part.visual?.assetId || part.customProperties?.visualAssetId)) ?? matching.find((part) => part.visible) ?? matching[0];
   };
   const casePart = find('case'), dialPart = find('dial'), bezelPart = find('bezel'), chapterRingPart = find('chapter-ring'), handsPart = find('hands'), crownPart = find('crown'), pushersPart = find('pushers');
+  const rehautPart = parts.find(part => getCatalogueItem(part.catalogueItemId)?.kind === 'rehaut');
   const handValue = `${handsPart?.name ?? ''} ${handsPart?.texture ?? ''}`.toLowerCase();
   const declaredStyle = handsPart?.customProperties?.visualHandStyle;
   const registeredHandStyles: VisualHandStyle[] = ['baton', 'mercedes', 'needle', 'sword', 'dauphine', 'syringe', 'cathedral', 'pencil', 'broad-arrow', 'skeleton'];
@@ -216,7 +219,7 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
       ? { ...resolveFinishProfile(strapFinish, strapFinish), color: effectiveStrapColor }
       : resolveFinishProfile(resolved.materialProfile ?? materialProfile(part, fallbackFinish), fallbackFinish);
     // Legacy documents retain the main schematic; crown requires an actual part.
-    visible[category] = part ? part.visible : category !== 'crown';
+    visible[category] = part ? part.visible : category !== 'crown' && category !== 'chapter-ring';
     transforms[category] = part?.visual?.transform;
   }
   // These compact presentation GLBs are sterile substrates. A coloured marker
@@ -373,6 +376,13 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
       const widthMm = positive(bezelPart?.dimensions.widthMm, Math.max(1, outerRadiusMm * 0.16));
       return { innerRadiusMm: Math.max(0, outerRadiusMm - widthMm), outerRadiusMm };
     })(),
+    rehaut: rehautPart ? {
+      visible: rehautPart.visible,
+      outerRadiusMm: positive(rehautPart.dimensions.diameterMm, 30.5) / 2,
+      innerRadiusMm: Math.max(0, positive(rehautPart.dimensions.diameterMm, 30.5) / 2 - positive(rehautPart.dimensions.widthMm, 1.2)),
+      heightMm: positive(rehautPart.dimensions.thicknessMm, 2),
+      finish: resolveFinishProfile(materialProfile(rehautPart, 'brushed-steel'), 'brushed-steel')
+    } : undefined,
     chapterRingEnvelope: (() => {
       const outerRadiusMm = positive(chapterRingPart?.dimensions.diameterMm, dialDiameter + 2) / 2;
       const widthMm = positive(chapterRingPart?.dimensions.widthMm, 1.8);

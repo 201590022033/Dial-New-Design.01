@@ -1,3 +1,4 @@
+import { defaultDiverBezel } from '@/domain/scales/diverBezel';
 import type { WatchAssembly } from '@/domain/assembly/assemblyTypes';
 import { createDefaultWatchAssembly } from '@/domain/assembly/assemblyFactory';
 import { applyArchetypeVisualProfile } from './archetypeProfiles';
@@ -116,6 +117,21 @@ export const createStarterBuild = (
       designConfig: { ...base.designConfig, assemblyAnchors: undefined },
       parts
     };
+  }
+  if (buildType === 'diver') {
+    const bands = assemblyToBands(base);
+    const selection = getScaleProgram('diver', bands);
+    const target = bands.find(band => band.kind === 'outer-bezel');
+    base = withScaleSnapshot(base, {
+      selectedScaleKind: 'circular',
+      pluginConfig: { ...getScalePlugin('circular')!.defaultConfig, ...selection.config,
+        diverBezel: { ...defaultDiverBezel }, fontFamily: 'Arial, sans-serif',
+        color: '#eee8db', scaleFontSizeMm: .8, rotationOffsetDeg: 0,
+        placementTargetBandId: target?.id ?? 'band-outer-bezel',
+        bandInnerRadiusMm: target?.geometry.innerRadius ?? 15.5,
+        bandOuterRadiusMm: target?.geometry.outerRadius ?? 19 },
+      context: selection.context, previewEnabled: true, crossArchetypeUnlocked: false
+    });
   }
   if (buildType === 'chronograph') {
     const pushers = base.parts['inst-pushers'];

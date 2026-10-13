@@ -1,3 +1,4 @@
+import { diverBezelArtwork } from '@/domain/scales/diverBezel';
 import { getScalePlugin } from '@/domain/scales/scaleRegistry';
 import { styleScaleTicks } from '@/domain/scales/markingStyle';
 import { constrainScaleToPlacementEnvelope } from '@/domain/scales/placementEnvelope';
@@ -96,11 +97,12 @@ export const runScalePlugin = (
   const retained = (mark: ScaleTick | ScaleLabel) => kind !== 'slide-rule' || ((!mark.dedicatedConversion || mark.dedicatedConversion === 'distance') &&
     !('text' in mark && isForbiddenConversionCaption(mark.text)));
   const visible = (ring?: string) => ring === 'inner' ? config.innerScaleVisible !== false : config.outerScaleVisible !== false;
-  const generatedTicks = styleScaleTicks(plugin.tickGenerator(config, context), config).filter(retained).map((tick, index) => {
+  const diver = kind === 'circular' && config.diverBezel ? diverBezelArtwork(config) : null;
+  const generatedTicks = styleScaleTicks(diver?.ticks ?? plugin.tickGenerator(config, context), config).filter(retained).map((tick, index) => {
     const id = tick.id ?? `${kind}:${tick.ringId ?? 'outer'}:tick:${tick.value ?? index}`;
     return { ...tick, id, hoverPaddingMm: config.hoverPaddingMm, color: config.markColorOverrides?.[id] ?? tick.color ?? config.color };
   });
-  const generatedLabels = plugin.labelGenerator(generatedTicks, config).filter(retained).map((label, index) => {
+  const generatedLabels = (diver?.labels ?? plugin.labelGenerator(generatedTicks, config)).filter(retained).map((label, index) => {
     const id = label.id ?? `${kind}:${label.ringId ?? 'outer'}:label:${label.value ?? index}`;
     let boundsMm = label.boundsMm;
     if (!boundsMm && typeof document !== 'undefined') {
@@ -141,7 +143,7 @@ export const runScalePlugin = (
     }
     constrained.labels = selectReadableTachymeterLabels(constrained.labels, Math.max(0.12, config.minimumLineWidthMm));
   }
-  const pointers = (config.pointers ?? []).filter((pointer) =>
+  const pointers: ScalePointer[] = (config.pointers ?? []).filter((pointer) =>
     visible(pointer.ringId) && (!pointer.dedicatedConversion || pointer.dedicatedConversion === 'distance')).map((pointer) => {
     const envelope = pointer.ringId === 'inner' && config.fixedBandOuterRadiusMm !== undefined
       ? { innerRadiusMm: config.fixedBandInnerRadiusMm ?? 0, contentOuterRadiusMm: config.fixedBandOuterRadiusMm - constrained.envelope.safetyMarginMm }
@@ -159,6 +161,7 @@ export const runScalePlugin = (
     }
     return { ...resolved, radiusMm: min <= max ? Math.max(min, Math.min(resolved.radiusMm, max)) : Math.max(0, max) };
   });
+  if (diver && visible('outer')) pointers.push(diver.pointer);
   const ticks = constrained.ticks.filter((tick) => visible(tick.ringId));
   const labels = constrained.labels.filter((label) => visible(label.ringId) &&
     (label.ringId === 'inner' ? config.innerNumeralsVisible !== false : config.outerNumeralsVisible !== false));

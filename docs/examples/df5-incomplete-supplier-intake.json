@@ -1,0 +1,85 @@
+{
+  "draft": {
+    "schema": "dial-designer/supplier-draft/v1",
+    "id": "fixture-df5-incomplete-case",
+    "status": "ai-extracted",
+    "syntheticFixture": true,
+    "identity": {
+      "supplierId": "DF5 synthetic examples",
+      "productId": "Example case — incomplete fields",
+      "variant": {
+        "state": "unknown",
+        "reason": "No exact variant was selected in the synthetic capture."
+      }
+    },
+    "sources": [
+      {
+        "id": "fixture-df5-incomplete-source",
+        "kind": "synthetic-fixture",
+        "locator": "fixture://df5/incomplete-case",
+        "capturedAt": "2026-10-13T00:00:00+02:00"
+      }
+    ],
+    "engineering": {
+      "catalogueItemId": null,
+      "slot": "case",
+      "measurements": {
+        "caseDiameterMm": {
+          "state": "unknown",
+          "reason": "The illustrative source does not provide this measurement."
+        },
+        "crystalSeatDiameterMm": {
+          "state": "unknown",
+          "reason": "The illustrative source does not provide this measurement."
+        },
+        "dialSeatDiameterMm": {
+          "state": "unknown",
+          "reason": "The illustrative source does not provide this measurement."
+        },
+        "lugWidthMm": {
+          "state": "unknown",
+          "reason": "The illustrative source does not provide this measurement."
+        },
+        "movementCavityDiameterMm": {
+          "state": "unknown",
+          "reason": "The illustrative source does not provide this measurement."
+        }
+      },
+      "attributes": {
+        "finish": {
+          "state": "unknown",
+          "reason": "Finish is not specified."
+        }
+      }
+    },
+    "offers": [],
+    "packageContents": [
+      {
+        "slot": "crystal",
+        "inclusion": {
+          "state": "unknown",
+          "reason": "Package contents not specified."
+        }
+      }
+    ],
+    "images": [],
+    "extraction": {
+      "method": "ai",
+      "confidence": 1
+    },
+    "fitQualification": "not-assessed"
+  },
+  "offers": [],
+  "captures": [
+    {
+      "id": "fixture-df5-incomplete-capture",
+      "sourceId": "fixture-df5-incomplete-source",
+      "capturedAt": "2026-10-13T00:00:00+02:00",
+      "sourceText": "Synthetic example only. These values are illustrative and cannot establish supplier fit.",
+      "raw": {
+        "syntheticExample": true,
+        "fieldCoverage": "incomplete"
+      }
+    }
+  ]
+}

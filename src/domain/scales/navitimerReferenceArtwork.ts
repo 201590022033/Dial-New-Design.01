@@ -49,7 +49,7 @@ export interface NavitimerArtwork {
   pointers: ScalePointer[]; palette: Readonly<Record<ColourRole, string>>;
   validation: { valid: boolean; issues: string[]; boundsEvidence: 'browser-measured' | 'estimated' };
 }
-const values = () => ([[100, 150, 1], [150, 250, 2], [250, 600, 5], [600, 1000, 10]] as const)
+export const navitimerSubdivisionValues = () => ([[100, 150, 1], [150, 250, 2], [250, 600, 5], [600, 1000, 10]] as const)
   .flatMap(([start, end, step]) => Array.from({ length: (end - start) / step }, (_, i) => (start + i * step) / 10));
 const major = (v: number) => Number.isInteger(v) && (v <= 25 || v % 5 === 0);
 const printed = (row: Row, v: number) => row === 'outer' ? major(v) ? String(v) : null
@@ -58,7 +58,7 @@ const printed = (row: Row, v: number) => row === 'outer' ? major(v) ? String(v) 
 /** Independent 210-position schedule, never borrowed from the Citizen 225-position inventory. */
 export const navitimerGraduations = (outerRotationDeg = 0): NavitimerGraduation[] => {
   if (!Number.isFinite(outerRotationDeg)) throw new Error('Navitimer rotation must be finite.');
-  return (['outer', 'inner'] as const).flatMap((row) => values().map((value) => {
+  return (['outer', 'inner'] as const).flatMap((row) => navitimerSubdivisionValues().map((value) => {
     const tickClass = major(value) ? 'major' : Number.isInteger(value) && value > 25 && value < 60 ? 'intermediate' : 'minor';
     const special = value === 10 || value === 60;
     return {

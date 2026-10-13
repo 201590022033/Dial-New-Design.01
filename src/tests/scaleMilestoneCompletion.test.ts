@@ -49,7 +49,7 @@ describe('Milestone 2 remaining runtime acceptance', () => {
   it('removes forbidden conversion pointers without deleting normal graduations', () => {
     const result = runScalePlugin('slide-rule', { ...config, pointers: [{ ...pointer, dedicatedConversion: 'volume' }] }, context)!;
     expect(result.pointers).toHaveLength(0);
-    expect(result.ticks.filter((tick) => tick.ringId === 'outer')).toHaveLength(75);
+    expect(result.ticks.filter((tick) => tick.ringId === 'outer')).toHaveLength(210);
   });
   it('blocks every vector export on impossible fit instead of silently clipping for manufacture', () => {
     const result = runScalePlugin('slide-rule', { ...config, pointers: [{ ...pointer, widthMm: 10 }] }, context)!;

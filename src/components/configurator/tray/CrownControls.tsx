@@ -26,20 +26,19 @@ export const CrownControls: React.FC<{ id: string }> = ({ id }) => {
   const model = React.useMemo(() => watchAssemblyToVisualModel(displayed), [displayed]);
   const locked = part.locked || ui.lockedPartIds.has(id) || ui.lockedStyles[id];
   const offer = listings.find(l => l.id === selections[id] && (l.catalogueItemId === part.catalogueItemId || l.replacementCatalogueItemId === part.catalogueItemId));
-  const stage = (item: ComponentCatalogueItem, apply = false) => {
+  const stage = (item: ComponentCatalogueItem) => {
     const current = useWatchAssemblyStore.getState().assembly;
     try {
       ui.setPreview(applyCatalogueVisualSelection(current, id, item), id, item);
-      if (apply) ui.applyPreview();
     } catch (error) { useConfiguratorUIStore.setState({ previewError: error instanceof Error ? error.message : 'Unable to preview crown' }); }
   };
   const edit = (intent: CrownEdit) => crownEditCandidate(useWatchAssemblyStore.getState().assembly, id, intent);
   const option = (label: string, item: ComponentCatalogueItem, selected = false) => <button key={label} type="button" aria-pressed={selected}
     className={`rounded border p-2 text-left ${selected ? 'border-teal-400 text-teal-200' : 'border-slate-700'}`}
-    onClick={() => stage(item)} onDoubleClick={() => stage(item, true)} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); stage(item, true); } }}>{label}</button>;
+    onClick={e => { if (e.detail === 0) stage(item); }} onDoubleClick={() => stage(item)}>{label}</button>;
   return <div data-testid="crown-controls" className="h-full overflow-y-auto p-3 space-y-4 text-xs text-slate-200">
     <h3 className="font-semibold">Crown · {part.name}</h3>
-    <p className="text-slate-400">{ui.previewPartInstanceId === id && ui.previewAssembly ? 'Preview — saved crown unchanged until Apply.' : 'Committed selection.'} Click to preview; Apply, double-click or Enter commits the same checked change.</p>
+    <p className="text-slate-400">{ui.previewPartInstanceId === id && ui.previewAssembly ? 'Preview — saved crown unchanged until Apply.' : 'Committed selection.'} Double-click to preview, or focus a choice and press Enter or Space. Use Apply to keep the preview.</p>
     {locked && <p role="status" className="text-amber-200">Unlock the crown and its style before editing.</p>}
     <fieldset disabled={locked} className="space-y-4">
       <section aria-label="Crown shape" className="space-y-2"><h4>Shape</h4><div className="grid grid-cols-2 gap-2">{crownCatalogueItems.map(item => option(item.displayName, item, shownPart.catalogueItemId === item.id))}</div>

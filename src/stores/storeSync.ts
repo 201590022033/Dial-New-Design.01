@@ -1,3 +1,4 @@
+import { useCatalogueStore } from './catalogueStore';
 import { useWatchAssemblyStore } from './watchAssemblyStore';
 import { useGlobalSettingsStore } from './globalSettingsStore';
 import { useBandsStore } from './bandsStore';
@@ -59,7 +60,7 @@ export const syncAssemblyDownstream = (assembly: WatchAssembly): void => {
     useScaleStore.getState().regeneratePreview(bands);
     // 3. Sync watchComponentStore (DERIVED / ADAPTER)
     try {
-      const components = assemblyToWatchComponentEntities(assembly);
+      const components = assemblyToWatchComponentEntities(assembly, useCatalogueStore.getState().items);
       useWatchComponentStore.setState({ components });
     } catch {
       // If references are unresolvable during a migration error, let validation report it

@@ -16,6 +16,7 @@ import { clearScaleEngineCache } from '@/services/scaleEngineService';
 import { useWatchAssemblyStore } from '@/stores/watchAssemblyStore';
 import { useSourcingStore } from '@/stores/sourcingStore';
 import { useCatalogueStore } from '@/stores/catalogueStore';
+import { useSupplierReviewStore } from '@/stores/supplierReviewStore';
 import {
   useBandsStore,
   useDesignEngineStore,
@@ -33,6 +34,7 @@ const HelpCenter = lazy(() =>
 );
 
 export const App = () => {
+  useEffect(() => { void useSupplierReviewStore.getState().initialize(); }, []);
   const assembly = useWatchAssemblyStore((state) => state.assembly);
   const sourcingPlan = useSourcingStore(state => state.sourcingPlan);
   const supplierListings = useCatalogueStore(state => state.supplierListings);
@@ -363,7 +365,7 @@ export const App = () => {
         */}
         <div
           className={[
-            'grid min-h-0 h-full flex-1 gap-3 overflow-hidden',
+            'relative grid min-h-0 h-full flex-1 gap-3 overflow-hidden',
             presentationMode
               ? 'min-w-0 grid-cols-[minmax(0,1fr)]'
               : 'min-w-0 grid-cols-[56px_minmax(0,1fr)] grid-rows-[minmax(160px,1fr)_minmax(180px,.7fr)] md:grid-rows-1 md:grid-cols-[72px_minmax(0,1fr)_minmax(300px,340px)] lg:grid-cols-[84px_minmax(0,1fr)_380px] xl:grid-cols-[84px_minmax(0,1fr)_400px]'
@@ -383,7 +385,7 @@ export const App = () => {
             data-layout-column="centre-canvas"
             className="flex min-h-0 min-w-0 flex-col overflow-hidden rounded-xl border border-engineering-border bg-engineering-panel/50"
           >
-            <div className="flex-1 min-h-0 relative flex overflow-hidden">
+            <div className="flex-1 min-h-0 min-[900px]:relative flex overflow-hidden">
               {presentationMode ? null : <ComponentNavigator />}
               <div className="min-w-0 min-h-0 flex-1 relative flex items-center justify-center overflow-hidden">
               <CentreCanvas

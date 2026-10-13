@@ -51,9 +51,13 @@ Profiles are candidates until a trial order or sufficient evidence confirms comm
 4. On an AliExpress item page, select the exact variant and set delivery to South Africa.
 5. Click the bookmark. Confirm item price, currency, variant and shipping.
 6. The helper downloads a timestamped JSON file and also attempts to copy it.
-7. In Dial Designer, select the matching physical component, open **Suppliers**, and import the JSON.
+7. In Dial Designer, open **Suppliers → Supplier drafts**, confirm the component type, and import the JSON into the local review queue.
 
-The import is intentionally unverified. It does not change component geometry and cannot establish compatibility by itself.
+DF5 routes new captures into a durable local review queue. Import no longer adds a live commercial listing or selects it for the watch. Existing saved listings remain available. Drafts retain the source, capture date, exact variant or explicit unknown, commercial snapshot and missing engineering measurements. DF6 handles review and publication; import cannot establish compatibility.
+
+Manual entry and validated externally AI-extracted draft JSON feed the same queue. Offline text suggestions are transcription aids, not an AI model or a fit assessment. Repeated exact captures are deduplicated; later evidence for the same exact variant is retained as another capture revision. Unknown variants are not guessed or merged across different captures.
+
+Drafts and evidence attachments belong to this browser profile and app origin, independently of any .dial project. Export a supplier-queue backup to move them or protect against browser-data removal. Local saving is not cloud synchronisation. Image permission must have its own evidence; a saved image or removed branding does not establish permission.
 
 ## Acceptance criteria for a supplier listing
 
@@ -63,3 +67,15 @@ The import is intentionally unverified. It does not change component geometry an
 - Destination and timestamp.
 - Critical dimensions recorded or explicitly missing.
 - No claim of verified compatibility without engineering evidence.
+
+
+## DF6 local review and publication
+
+Saved draft entries now provide explicit field review, immutable corrections, rejection, local publication and withdrawal, with reviewer/reason and dated capture history. Publication never certifies missing interfaces and never selects a supplier for the watch. Commercial and image permission claims require separate checks; unknown-use imagery is omitted. A newer capture requires a fresh review.
+
+Review/publication decisions persist in a separate local journal and restore into the existing catalogue on startup. Draft backups contain capture/evidence data, not review decisions; they do not automatically publish records when restored. Use the [DF6 checkpoint](DF6-SUPPLIER-REVIEW-2026-10-13.md) for current limitations and real screen-reader checks. The bounded [official supplier pilot](research/df6-supplier-pilot-2026-10-13.md) covers Namoki NMK931 Steel and SeikoMods CT728 Oyster without treating case outside diameter or package contents as mating evidence.
+
+
+## DF7 complete workspace backup
+
+**Supplier workspace backup & restore** now exports drafts, retained captures, evidence bytes, review history and local publication state together. Prepare and inspect counts before explicitly restoring. Restore supports an empty workspace or an exact duplicate; different nonempty data is retained and replacement refused. The legacy draft-only export remains available separately. Data automatically migrates into a single local database; earlier databases are retained for recovery. See the [DF7 checkpoint](DF7-RELEASE-CHECKPOINT-2026-10-13.md) for validation, release boundaries and manual checks.

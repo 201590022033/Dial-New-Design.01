@@ -70,6 +70,10 @@ export interface CatalogueVisualMetadata {
  * Exists independently of any one watch design or assembly project.
  */
 export interface ComponentCatalogueItem {
+  /** Source-qualified exact-item dimensions for design-first comparisons. */
+  fitEvidence?: import('@/domain/design-first/componentFitEvidence').ComponentFitEvidenceV1;
+  /** Exact-case, per-field evidence. Schema validity alone does not certify fit. */
+  caseConstraints?: import('@/domain/design-first/caseConstraints').CaseConstraintsV1;
   offAxisPlatform?: import('@/domain/crown/offAxisPlatform').OffAxisCasePlatform;
   /** Transient UI intent; never a supplier listing or replacement component. */
   crownEdit?: import('@/domain/crown/edit').CrownEdit;

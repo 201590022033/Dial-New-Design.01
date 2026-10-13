@@ -1,3 +1,4 @@
+import { useConfiguratorUIStore } from '@/stores/configuratorUIStore';
 import { useState } from 'react';
 import { assemblyToBands } from '@/domain/assembly/assemblyAdapters';
 import { customAviationDefaults, decimalHourReading, durationMinutes, knotsToMph, mphToKnots, type CustomAviationProgram } from '@/domain/scales/customAviation';
@@ -10,6 +11,7 @@ import { generatePseudoDxf } from '@/services/exportGeometryService';
 export const CustomAviationPanel = () => {
   const assembly = useWatchAssemblyStore(state => state.assembly);
   const update = useWatchAssemblyStore(state => state.updateCustomAviationLayer);
+  const trayLocks = useConfiguratorUIStore(s => s.lockedPartIds);
   const preview = useScaleStore(state => state.preview);
   const [duration, setDuration] = useState('1:30');
   const [speed, setSpeed] = useState('100');
@@ -19,7 +21,7 @@ export const CustomAviationPanel = () => {
   const [rate, setRate] = useState('8');
   const [unit, setUnit] = useState('L');
   const [error, setError] = useState('');
-  const bands = assemblyToBands(assembly).filter(band => ['chapter-ring', 'inner-bezel', 'outer-bezel', 'fixed-bezel'].includes(band.kind));
+  const bands = assemblyToBands(assembly).filter(band => ['dial-face', 'chapter-ring', 'inner-bezel', 'outer-bezel', 'fixed-bezel'].includes(band.kind));
   const reading = decimalHourReading(durationMinutes(duration));
   const speedInput = speed.trim() ? Number(speed) : NaN;
   const speedAnswer = speedInput >= 0 ? reverse ? mphToKnots(speedInput) : knotsToMph(speedInput) : NaN;
@@ -46,18 +48,21 @@ export const CustomAviationPanel = () => {
     {(['decimal-hour', 'knots-mph'] as const).map(id => {
       const layer = assembly.designConfig?.customAviationLayers?.layers.find(entry => entry.id === id) ?? customAviationDefaults(id);
       const name = id === 'decimal-hour' ? 'Decimal hour (0.00–1.00 h)' : 'Knots / statute MPH';
-      const locked = bands.find(band => band.id === layer.targetBandId)?.locked;
+      const targetBands = bands.filter(band => id === 'decimal-hour' ? band.kind === 'dial-face' : band.kind !== 'dial-face');
+      const owner = layer.targetBandId === 'band-dial-face' ? 'inst-dial-blank' : layer.targetBandId === 'band-chapter-ring' ? 'inst-chapter-ring' : layer.targetBandId === 'band-inner-bezel' ? 'inst-inner-bezel' : 'inst-rotating-bezel';
+      const locked = bands.find(band => band.id === layer.targetBandId)?.locked || trayLocks.has(owner);
       return <fieldset key={id} className="space-y-2 rounded border border-slate-700 p-2" disabled={locked}>
         <legend>{name} · custom</legend>
         <label className="flex gap-2"><input type="checkbox" aria-label={`Enable ${name}`} checked={layer.enabled} onChange={event => update(id, { enabled: event.target.checked })}/>Enable {name}</label>
         <label className="block">Physical target<select className="ds-input" aria-label={`${name} target`} value={layer.targetBandId} onChange={event => update(id, { targetBandId: event.target.value })}>
-          {bands.map(band => <option key={band.id} value={band.id}>{band.name} · {((band.geometry.outerRadius - band.geometry.innerRadius)).toFixed(2)} mm width{band.locked ? ' · locked' : ''}</option>)}
+          {targetBands.map(band => <option key={band.id} value={band.id}>{band.name} · {((band.geometry.outerRadius - band.geometry.innerRadius)).toFixed(2)} mm width{band.locked ? ' · locked' : ''}</option>)}
         </select></label>
+        {id === 'decimal-hour' && <label className="block">Inset from dial edge (mm)<input className="ds-input" type="number" min="0" max="10" step=".1" aria-label="Decimal hour dial inset" value={layer.dialInsetMm ?? 2.5} onChange={event => { const value = Number(event.target.value); if (Number.isFinite(value) && value >= 0 && value <= 10) update(id, { dialInsetMm: value }); }}/><span className="text-[10px] text-slate-400">Move the printed ring inward to clear hour indices and lettering.</span></label>}
         <label className="block">Lettering (mm)<input className="ds-input" type="number" min=".25" max="1.5" step=".05" aria-label={`${name} lettering`} value={layer.fontSizeMm} onChange={event => { const value = Number(event.target.value); if (value >= .25 && value <= 1.5) update(id, { fontSizeMm: value }); }}/></label>
         <label className="block">Origin (degrees)<input className="ds-input" type="number" step="1" aria-label={`${name} origin`} value={layer.rotationDeg} onChange={event => { const value = Number(event.target.value); if (Number.isFinite(value)) update(id, { rotationDeg: value }); }}/></label>
         <div className="flex gap-2">{(['color', 'pairedColor'] as const).map((key, index) => <label key={key}>{index ? 'Paired row' : 'Primary row'}<input type="color" aria-label={`${name} ${index ? 'paired' : 'primary'} colour`} value={layer[key]} onChange={event => update(id, { [key]: event.target.value })}/><span className="font-mono">{layer[key]}</span></label>)}</div>
         {id === 'knots-mph' && <label className="block">Range maximum (kt)<input className="ds-input" type="number" min="20" max="1000" step="20" aria-label="Knots maximum" value={layer.maximumKnots} onChange={event => { const value = Number(event.target.value); if (value >= 20 && value <= 1000) update(id, { maximumKnots: value }); }}/></label>}
-        <p className="text-[10px] text-slate-400">{id === 'decimal-hour' ? '100 graduations: 0.01 h = 36 s. One 0.00 seam also means 1.00 h after a full turn; retain the whole-hour count. Red row is elapsed minutes.' : `Fixed linear paired readings: 0–${layer.maximumKnots} kt over 300°. Red row is statute mph. This is not the logarithmic distance-index group.`}</p>
+        <p className="text-[10px] text-slate-400">{id === 'decimal-hour' ? 'Dial face only. 100 graduations: 0.01 h = 36 s. One 0.00 seam also means 1.00 h after a full turn; retain the whole-hour count. Red row is elapsed minutes.' : `Fixed linear paired readings: 0–${layer.maximumKnots} kt over 300°. Red row is statute mph. This is not the logarithmic distance-index group.`}</p>
         <div className="flex gap-2">{(['svg', 'dxf', 'pdf'] as const).map(format => <button key={format} className="ds-button" disabled={!layer.enabled || !preview?.validation.valid} onClick={() => { void download(id, format); }}>{name} {format.toUpperCase()}</button>)}</div>
       </fieldset>;
     })}

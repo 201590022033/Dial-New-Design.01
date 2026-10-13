@@ -24,6 +24,7 @@ export const applyCatalogueVisualSelection = (
 
   part.catalogueItemId = item.id;
   part.name = item.displayName;
+  part.customProperties = { ...part.customProperties, catalogueSelection: item.id.startsWith('supplier-component-') ? { schema: 'catalogue-selection/v1', item: structuredClone(item) } : undefined };
   part.dimensions = {
     diameterMm: item.nominalDimensions.diameterMm,
     thicknessMm: item.nominalDimensions.thicknessMm,

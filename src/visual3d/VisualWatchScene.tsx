@@ -247,6 +247,23 @@ const PreviewChapterRing = ({ model, localZ }: { model: VisualWatchModel; localZ
   return <mesh geometry={geometry} position={[0, 0, localZ]}><meshStandardMaterial {...finish(model.finishes['chapter-ring'])} /></mesh>;
 };
 
+/** Separate case-wall preview: never a fallback owner for the chapter ring. */
+export const PreviewRehaut = ({ model }: { model: VisualWatchModel }) => {
+  const part = model.rehaut;
+  if (!part?.visible || part.outerRadiusMm <= part.innerRadiusMm) return null;
+  const bottom = model.previewEnvelope.dialZ;
+  return <mesh name="rehaut" position={[0, 0, bottom + part.heightMm / 2]} rotation={[Math.PI / 2, 0, 0]}>
+    <latheGeometry args={[[
+      new Vector2(part.innerRadiusMm, -part.heightMm / 2),
+      new Vector2(part.outerRadiusMm, -part.heightMm / 2),
+      new Vector2(part.outerRadiusMm, part.heightMm / 2),
+      new Vector2(part.innerRadiusMm, part.heightMm / 2),
+      new Vector2(part.innerRadiusMm, -part.heightMm / 2)
+    ], 128]} />
+    <meshStandardMaterial {...finish(part.finish)} />
+  </mesh>;
+};
+
 const PreviewStrap = ({ model, sign }: { model: VisualWatchModel; sign: number }) => {
   const a = model.previewEnvelope.attachment;
   const geometry = useMemo(() => createPreviewStrapGeometry(a, sign), [a, sign]);
@@ -427,14 +444,14 @@ const ScaledVisualComponent = ({ category, model, preview }: { category: VisualC
   const target = ring === 'outer' ? 'band-outer-bezel' : 'band-chapter-ring';
   const binding = scaleArtworkBinding(preview, target);
   const texture = useScaleArtworkTexture(ring ? binding?.layer ?? null : null, model, binding?.ring ?? 'outer', '#080d14', false);
-  if (!ring) return <VisualComponent category={category} model={model} liveOuterArtwork={category === 'bezel' && !!scaleArtworkBinding(preview, 'band-outer-bezel')} />;
+  if (!ring) return <VisualComponent category={category} model={model} liveOuterArtwork={category === 'bezel' && !!(scaleArtworkBinding(preview, 'band-outer-bezel') || scaleArtworkBinding(preview, 'band-inner-bezel'))} />;
   if (!model.visible[category]) return null;
   const placement = componentPlacement(model, category);
   const descriptor = model.assets[category];
   return <group name={category} position={placement.anchor.positionMm} rotation={placement.anchor.rotationRad}>
     <group position={placement.offset} rotation={placement.rotation}>
       <GlbAsset key={descriptor.assetId + ':' + descriptor.assetPath} descriptor={descriptor} appearance={model.archetypeAppearance}
-        scaleTexture={texture} fallback={<ProceduralComponent category={category} model={model} />} />
+        liveOuterArtwork={category === 'bezel' && !!scaleArtworkBinding(preview, 'band-inner-bezel')} scaleTexture={texture} fallback={<ProceduralComponent category={category} model={model} />} />
     </group>
   </group>;
 };
@@ -523,6 +540,7 @@ export const VisualWatchScene = ({ model, rotation, cameraDistance, scalePreview
     <pointLight position={[0, -4, 5]} intensity={1.1} color="#ffffff" distance={18} decay={2} /></group>}
     <group rotation={rotation} scale={MM_TO_SCENE}>
       {visualCategories.map((category) => <ScaledVisualComponent key={category} category={category} model={model} preview={scalePreview ?? null} />)}
+      <PreviewRehaut model={model} />
       <ScaleArtwork3D preview={scalePreview ?? null} model={model} />
     </group>
   </Canvas>

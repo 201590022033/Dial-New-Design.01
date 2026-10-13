@@ -109,10 +109,10 @@ describe('canonical scale editing integration', () => {
     const preview = useScaleStore.getState().preview!;
     const dxf = generatePseudoDxf({ target: 'outer-bezel', bands: [], selectedBandId: null, scalePreview: preview,
       context: { width: 600, height: 600, centerX: 300, centerY: 300, zoom: 1, panX: 0, panY: 0 }, designOverlay: null });
-    expect(dxf.match(/\nLWPOLYLINE\n/g)).toHaveLength(75);
+    expect(dxf.match(/\nLWPOLYLINE\n/g)).toHaveLength(210);
     expect(dxf.match(/\nTEXT\n/g)).toHaveLength(12);
     expect(dxf).toContain('$INSUNITS\n70\n4');
-    expect(dxf).toContain('\n43\n0.15\n');
+    expect(dxf).toContain('\n43\n0.1725\n');
     expect(dxf).not.toContain('scale-inner');
   });
   it('uses the exact same physical envelope in HD without a second radial shift', () => {
@@ -155,7 +155,7 @@ describe('physical annular artwork fit', () => {
     const preview = runScalePlugin('slide-rule', config, { startAngleDeg: 0, endAngleDeg: 360 })!;
     expect(preview.validation.valid).toBe(false);
     expect(preview.validation.structuredWarnings.some((warning) => warning.affectedObject === 'scale-envelope')).toBe(true);
-    expect(preview.ticks.filter((tick) => tick.ringId === 'outer')).toHaveLength(75);
+    expect(preview.ticks.filter((tick) => tick.ringId === 'outer')).toHaveLength(210);
     expect(preview.svg).toContain('clip-rule="evenodd"');
   });
 });

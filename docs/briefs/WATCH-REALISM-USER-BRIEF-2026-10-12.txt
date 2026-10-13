@@ -1,0 +1,44 @@
+TASK: Upgrade the realism of my existing watch GLB models using Blender (bpy, Python scripting). Process every .glb in the input folder. Keep it non-destructive. A reference web preview of the target look exists; match its feature set (listed below), but use Blender's better rendering for quality.
+
+PHASE 0 - INSPECT FIRST (do not modify anything yet)
+- Back up all originals to /backup.
+- Import each GLB and report: object/mesh names, scale/units, materials, triangle counts, and which object is case, lugs, bezel, crystal, dial, hands (hour/minute/seconds), crown, strap (short and long).
+- Report anything you can't identify or any file that deviates from the others. Wait for my OK before Phase 1 if names are ambiguous.
+
+RULES
+- Do NOT change dimensions, proportions, object names, pivots, or the dial's UV layout (dial artwork comes from my SVG export and must stay aligned).
+- Do NOT add color variants or option sets. Colors and options are controlled by my app's dashboard; keep each model's existing colors as the default.
+- Use modifiers rather than destructive edits where possible; apply only at export.
+- Real-world scale: case in mm, strap width 22 mm tapering to ~20 mm at the tail end.
+
+PHASE 1 - STRAP (leather)
+1. Cross-section: slightly padded "pillow" profile, rounded edges, ~3.5-4 mm thick, thinner toward the tail. The strap should curve away from the case and drop behind it naturally.
+2. Holes on the LONG strap only (the one that carries the tail): 7 holes, ~2 mm diameter, ~7.5 mm pitch, centered on width. Cut with Boolean (cylinders), then Bevel so each hole has a small rounded, slightly raised rim that is a darker shade of the strap color. For the web version, use real geometry only if the triangle budget allows; otherwise fake with a normal map + dark ring texture.
+3. Hole rims and edge paint must derive from the strap's base color (darker shade, ~45% brightness) through a single color input, so when the dashboard recolors the strap, the rims and edges follow automatically.
+4. Edges: burnished/painted edge, slightly glossier than the face.
+5. Stitching: two parallel rows ~2 mm from each edge, ~3 mm pitch, slightly raised cream waxed-cotton thread (roughness 0.7). Curve-based thread or baked normal map for the web version.
+6. Surface: full-grain leather = Voronoi pores + fine noise bump + subtle large-scale color variation; Principled BSDF roughness ~0.5, Sheen ~0.5 (warm tint). Subtle wear/patina around holes and the fold near the buckle end. Keep the grain texture neutral (grayscale) so the base color input tints it cleanly.
+7. Add a keeper loop and buckle tongue if missing; match the case metal.
+
+PHASE 2 - GLASS (sapphire crystal with AR coating)
+1. Slight dome (~0.8-1 mm rise), ~2.5 mm thick, clean rim bevel, separate from the dial.
+2. Cycles version: Principled BSDF, Transmission 1, Roughness 0, IOR 1.55. AR coating = low overall reflectivity with a faint magenta/green tint that shifts with viewing angle (Thin Film if my Blender version supports it, otherwise a Fresnel/Layer Weight tint on the reflection). Keep it SUBTLE: it must read as a faint colored reflection, never as tinted glass.
+3. Web/GLB version: use only what exports cleanly (transmission, IOR, clearcoat, iridescence extension if my exporter supports it). If the AR effect can't export, ship the GLB without it and list exactly what was dropped. Do not fake it with a tinted glass material.
+
+PHASE 3 - METAL, BEZEL, DIAL, HANDS
+- Case/lugs/crown: brushed steel = Metallic 1, Roughness ~0.3, Anisotropic ~0.5, circumferential brushing direction. Polished chamfers on lug edges and bezel rim. Bevel modifier (~0.1-0.2 mm) on all hard edges. Crown knurling via normal map or displacement.
+- Bezel: glossy ceramic (Coat 1, low roughness), keeping its existing color. Keep any printed scale (e.g. slide-rule log scale and lume pearl at 12) crisp and unblurred.
+- Dial: keep my artwork exactly; matte surface with a very subtle bump. Preserve the lume hour markers, numerals, minute track, and printed text, with lume as pale green with low emission.
+- Hands: real thickness (~0.3 mm) with beveled edges and lume inlays on the hour and minute hands; seconds hand thin with a counterweight tail, sitting highest. Keep existing hand colors.
+
+PHASE 4 - HERO RENDER (Cycles)
+- Lighting: studio setup with a large top softbox, two strip lights, and a warm kicker. AgX or Filmic color management, denoiser on, 256+ samples, shallow depth of field focused on the dial.
+- Pose: hands set to 10:10:35 for all hero shots.
+- Shots: 3/4 view, straight-on dial, and a macro of the strap holes and stitching. 2400px wide PNGs.
+- Also render one AR off vs. on comparison of the same view (comparison only, not a shipped variant).
+
+PHASE 5 - WEB EXPORT (GLB)
+- Same object names as the originals, +Y up, apply modifiers, textures <= 2048px, bake where needed. Keep the strap's base color as a single, cleanly named material input so my dashboard can drive it. Report triangle counts before and after. One GLB per watch style.
+
+DELIVERABLES: updated GLBs, hero PNGs, the Python script(s) used, and a short per-file change log that lists anything that did not carry into the GLB.
+ACCEPTANCE: dial artwork still aligned; no name or scale changes; no added color variants; strap holes visible at normal zoom and rims follow the strap color; AR visible only as a faint colored reflection; file sizes reasonable.

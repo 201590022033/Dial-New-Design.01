@@ -58,7 +58,7 @@ export const getScaleProgram = (program: ScaleProgram, bands: BandEntity[]): Sca
       outerRadiusMm: outer ? outer.innerRadius + 0.5 : 18.7,
       innerRadiusMm: chapter ? chapter.outerRadius - 0.25 : 15,
       outerRotationOffsetDeg: 0, innerRotationOffsetDeg: 0,
-      ringSyncMode: 'independent', tickDensityProfile: 'sparse',
+      ringSyncMode: 'independent', tickDensityProfile: 'sparse', aviationGraduationStyle: 'navitimer',
       includeMinorLabels: false, calculationMode: 'division', direction: 'clockwise',
       scaleFontSizeMm: 0.8
     },

@@ -1,0 +1,340 @@
+{
+  "draft": {
+    "schema": "dial-designer/supplier-draft/v1",
+    "id": "df6-namoki-nmk931-steel-2026-10-13",
+    "status": "draft",
+    "syntheticFixture": false,
+    "identity": {
+      "supplierId": "namokimods.com",
+      "productId": "NMK931",
+      "variant": {
+        "state": "recorded",
+        "value": "Steel Finish",
+        "source": {
+          "id": "df6-namoki-nmk931-steel-official-product",
+          "kind": "supplier-page",
+          "locator": "https://www.namokimods.com/products/nmk931-field-watch-case-bundle-steel-finish",
+          "capturedAt": "2026-10-13T06:51:05Z"
+        },
+        "review": "unreviewed"
+      }
+    },
+    "sources": [
+      {
+        "id": "df6-namoki-nmk931-steel-official-product",
+        "kind": "supplier-page",
+        "locator": "https://www.namokimods.com/products/nmk931-field-watch-case-bundle-steel-finish",
+        "capturedAt": "2026-10-13T06:51:05Z"
+      }
+    ],
+    "engineering": {
+      "catalogueItemId": null,
+      "slot": "case",
+      "measurements": {
+        "crystalSeatDiameterMm": {
+          "state": "unknown",
+          "reason": "The inspected supplier page does not establish this mating measurement or tolerance."
+        },
+        "crystalSeatDepthMm": {
+          "state": "unknown",
+          "reason": "The inspected supplier page does not establish this mating measurement or tolerance."
+        },
+        "dialSeatDiameterMm": {
+          "state": "unknown",
+          "reason": "The inspected supplier page does not establish this mating measurement or tolerance."
+        },
+        "dialSeatDepthMm": {
+          "state": "unknown",
+          "reason": "The inspected supplier page does not establish this mating measurement or tolerance."
+        },
+        "movementCavityDiameterMm": {
+          "state": "unknown",
+          "reason": "The inspected supplier page does not establish this mating measurement or tolerance."
+        },
+        "movementCavityDepthMm": {
+          "state": "unknown",
+          "reason": "The inspected supplier page does not establish this mating measurement or tolerance."
+        },
+        "stemHeightMm": {
+          "state": "unknown",
+          "reason": "The inspected supplier page does not establish this mating measurement or tolerance."
+        },
+        "crownTubeThreadDiameterMm": {
+          "state": "unknown",
+          "reason": "The inspected supplier page does not establish this mating measurement or tolerance."
+        },
+        "crownTubeThreadPitchMm": {
+          "state": "unknown",
+          "reason": "The inspected supplier page does not establish this mating measurement or tolerance."
+        },
+        "casebackThreadDiameterMm": {
+          "state": "unknown",
+          "reason": "The inspected supplier page does not establish this mating measurement or tolerance."
+        },
+        "casebackThreadPitchMm": {
+          "state": "unknown",
+          "reason": "The inspected supplier page does not establish this mating measurement or tolerance."
+        },
+        "gasketSeatDiameterMm": {
+          "state": "unknown",
+          "reason": "The inspected supplier page does not establish this mating measurement or tolerance."
+        },
+        "bezelCarrierInnerDiameterMm": {
+          "state": "unknown",
+          "reason": "The inspected supplier page does not establish this mating measurement or tolerance."
+        },
+        "bezelCarrierOuterDiameterMm": {
+          "state": "unknown",
+          "reason": "The inspected supplier page does not establish this mating measurement or tolerance."
+        },
+        "caseDiameterMm": {
+          "state": "recorded",
+          "value": {
+            "value": 38,
+            "unit": "mm"
+          },
+          "source": {
+            "id": "df6-namoki-nmk931-steel-official-product",
+            "kind": "supplier-page",
+            "locator": "https://www.namokimods.com/products/nmk931-field-watch-case-bundle-steel-finish",
+            "capturedAt": "2026-10-13T06:51:05Z"
+          },
+          "review": "unreviewed"
+        },
+        "lugWidthMm": {
+          "state": "recorded",
+          "value": {
+            "value": 20,
+            "unit": "mm"
+          },
+          "source": {
+            "id": "df6-namoki-nmk931-steel-official-product",
+            "kind": "supplier-page",
+            "locator": "https://www.namokimods.com/products/nmk931-field-watch-case-bundle-steel-finish",
+            "capturedAt": "2026-10-13T06:51:05Z"
+          },
+          "review": "unreviewed"
+        },
+        "lugToLugMm": {
+          "state": "recorded",
+          "value": {
+            "value": 46.5,
+            "unit": "mm"
+          },
+          "source": {
+            "id": "df6-namoki-nmk931-steel-official-product",
+            "kind": "supplier-page",
+            "locator": "https://www.namokimods.com/products/nmk931-field-watch-case-bundle-steel-finish",
+            "capturedAt": "2026-10-13T06:51:05Z"
+          },
+          "review": "unreviewed"
+        }
+      },
+      "attributes": {
+        "finish": {
+          "state": "recorded",
+          "value": "Steel",
+          "source": {
+            "id": "df6-namoki-nmk931-steel-official-product",
+            "kind": "supplier-page",
+            "locator": "https://www.namokimods.com/products/nmk931-field-watch-case-bundle-steel-finish",
+            "capturedAt": "2026-10-13T06:51:05Z"
+          },
+          "review": "unreviewed"
+        },
+        "thicknessBasis": {
+          "state": "recorded",
+          "value": "9.2 mm stated without caseback; not an assembled watch thickness.",
+          "source": {
+            "id": "df6-namoki-nmk931-steel-official-product",
+            "kind": "supplier-page",
+            "locator": "https://www.namokimods.com/products/nmk931-field-watch-case-bundle-steel-finish",
+            "capturedAt": "2026-10-13T06:51:05Z"
+          },
+          "review": "unreviewed"
+        },
+        "rehaut": {
+          "state": "recorded",
+          "value": "Stationary chapter ring and bezel form part of the case.",
+          "source": {
+            "id": "df6-namoki-nmk931-steel-official-product",
+            "kind": "supplier-page",
+            "locator": "https://www.namokimods.com/products/nmk931-field-watch-case-bundle-steel-finish",
+            "capturedAt": "2026-10-13T06:51:05Z"
+          },
+          "review": "unreviewed"
+        },
+        "smallPackageContents": {
+          "state": "recorded",
+          "value": "Caseback gasket and two 20 mm spring bars stated.",
+          "source": {
+            "id": "df6-namoki-nmk931-steel-official-product",
+            "kind": "supplier-page",
+            "locator": "https://www.namokimods.com/products/nmk931-field-watch-case-bundle-steel-finish",
+            "capturedAt": "2026-10-13T06:51:05Z"
+          },
+          "review": "unreviewed"
+        },
+        "familyClaim": {
+          "state": "recorded",
+          "value": "Seller names SKX013 crowns and SKX casebacks; this is not a measured interface qualification.",
+          "source": {
+            "id": "df6-namoki-nmk931-steel-official-product",
+            "kind": "supplier-page",
+            "locator": "https://www.namokimods.com/products/nmk931-field-watch-case-bundle-steel-finish",
+            "capturedAt": "2026-10-13T06:51:05Z"
+          },
+          "review": "unreviewed"
+        }
+      }
+    },
+    "offers": [],
+    "packageContents": [
+      {
+        "slot": "case",
+        "inclusion": {
+          "state": "recorded",
+          "value": "included",
+          "source": {
+            "id": "df6-namoki-nmk931-steel-official-product",
+            "kind": "supplier-page",
+            "locator": "https://www.namokimods.com/products/nmk931-field-watch-case-bundle-steel-finish",
+            "capturedAt": "2026-10-13T06:51:05Z"
+          },
+          "review": "unreviewed"
+        }
+      },
+      {
+        "slot": "crystal",
+        "inclusion": {
+          "state": "recorded",
+          "value": "included",
+          "source": {
+            "id": "df6-namoki-nmk931-steel-official-product",
+            "kind": "supplier-page",
+            "locator": "https://www.namokimods.com/products/nmk931-field-watch-case-bundle-steel-finish",
+            "capturedAt": "2026-10-13T06:51:05Z"
+          },
+          "review": "unreviewed"
+        }
+      },
+      {
+        "slot": "crown",
+        "inclusion": {
+          "state": "recorded",
+          "value": "included",
+          "source": {
+            "id": "df6-namoki-nmk931-steel-official-product",
+            "kind": "supplier-page",
+            "locator": "https://www.namokimods.com/products/nmk931-field-watch-case-bundle-steel-finish",
+            "capturedAt": "2026-10-13T06:51:05Z"
+          },
+          "review": "unreviewed"
+        }
+      },
+      {
+        "slot": "chapter-ring",
+        "inclusion": {
+          "state": "recorded",
+          "value": "included",
+          "source": {
+            "id": "df6-namoki-nmk931-steel-official-product",
+            "kind": "supplier-page",
+            "locator": "https://www.namokimods.com/products/nmk931-field-watch-case-bundle-steel-finish",
+            "capturedAt": "2026-10-13T06:51:05Z"
+          },
+          "review": "unreviewed"
+        }
+      },
+      {
+        "slot": "caseback",
+        "inclusion": {
+          "state": "unknown",
+          "reason": "Package inclusion is not explicitly established for this component."
+        }
+      },
+      {
+        "slot": "inner-bezel",
+        "inclusion": {
+          "state": "unknown",
+          "reason": "Package inclusion is not explicitly established for this component."
+        }
+      },
+      {
+        "slot": "rotating-bezel",
+        "inclusion": {
+          "state": "unknown",
+          "reason": "Package inclusion is not explicitly established for this component."
+        }
+      },
+      {
+        "slot": "strap",
+        "inclusion": {
+          "state": "unknown",
+          "reason": "Package inclusion is not explicitly established for this component."
+        }
+      },
+      {
+        "slot": "dial",
+        "inclusion": {
+          "state": "unknown",
+          "reason": "Package inclusion is not explicitly established for this component."
+        }
+      },
+      {
+        "slot": "hands",
+        "inclusion": {
+          "state": "unknown",
+          "reason": "Package inclusion is not explicitly established for this component."
+        }
+      }
+    ],
+    "images": [],
+    "extraction": {
+      "method": "manual"
+    },
+    "fitQualification": "not-assessed"
+  },
+  "offers": [],
+  "captures": [
+    {
+      "id": "df6-namoki-nmk931-steel-capture-2026-10-13",
+      "sourceId": "df6-namoki-nmk931-steel-official-product",
+      "capturedAt": "2026-10-13T06:51:05Z",
+      "sourceText": "Research paraphrase: steel 38 mm case, 20 mm lugs. Bundle names sapphire, crown and integral stationary ring. Caseback gasket does not establish a supplied caseback. Mating seats were not dimensioned.",
+      "raw": {
+        "commerce": {
+          "variant": "Steel Finish",
+          "exactSku": null,
+          "unitPrice": null,
+          "currency": "SGD",
+          "headlineObservation": {
+            "amount": 118,
+            "currency": "SGD",
+            "basis": "Product-specific page display; no checkout or selected SKU confirmation."
+          },
+          "shippingPrice": null,
+          "shippingDestination": "South Africa",
+          "stockStatus": "unknown",
+          "stockObservation": "Page displayed backorder wording and an Add to Cart control; no checkout confirmation.",
+          "taxInclusion": "unknown"
+        },
+        "retrieval": {
+          "method": "Official product page via web reader",
+          "additionalEndpoint": "Shopify product JSON request required connection verification; no bypass attempted."
+        },
+        "capturedAt": "2026-10-13T06:51:05Z",
+        "sourceUrl": "https://www.namokimods.com/products/nmk931-field-watch-case-bundle-steel-finish",
+        "supplierId": "namokimods.com",
+        "productId": "NMK931",
+        "variant": "Steel Finish",
+        "slot": "case",
+        "unitPrice": null,
+        "currency": "SGD",
+        "shippingPrice": null,
+        "shippingDestination": "South Africa",
+        "stockStatus": "unknown"
+      }
+    }
+  ]
+}

@@ -14,7 +14,7 @@ const RingArtwork = ({ preview, model, ring }: { preview: ScaleRunResult; model:
   const z = scaleArtworkSurfaceZ(model, ring, preview);
   return <mesh name={`scale-artwork-${ring}`} position={[0, 0, z]}>
     <planeGeometry args={[model.caseDiameterMm, model.caseDiameterMm]} />
-    <meshStandardMaterial map={texture} transparent depthWrite={false} roughness={0.48} metalness={0.08} polygonOffset polygonOffsetFactor={-1} />
+    <meshStandardMaterial map={texture} transparent depthWrite={false} roughness={0.72} metalness={0} polygonOffset polygonOffsetFactor={-1} />
   </mesh>;
 };
 

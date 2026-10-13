@@ -8,7 +8,7 @@ import { getScaleProgram } from '@/domain/scales/scalePrograms';
 const config = {
   ...getScalePlugin('slide-rule')!.defaultConfig,
   engineeringPreset: 'aviation-slide-rule' as const,
-  tickDensityProfile: 'sparse' as const,
+  tickDensityProfile: 'sparse' as const, aviationGraduationStyle: 'custom-density' as const,
   outerRadiusMm: 18.7,
   innerRadiusMm: 16.3,
   outerRotationOffsetDeg: 0,

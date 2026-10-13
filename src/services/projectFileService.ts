@@ -1,3 +1,7 @@
+import { withDialOnlyDecimalHours } from '@/domain/scales/decimalHourPlacement';
+import { assertCustomAviation } from '@/domain/scales/customAviation';
+import { assertDesignIntent } from '@/domain/design-first/designIntent';
+import { assertDiverBezel } from '@/domain/scales/diverBezel';
 import type { BandEntity } from '@/domain/bands/types';
 import type { WatchAssembly } from '@/domain/assembly/assemblyTypes';
 import type { GlobalGeometryParameters } from '@/domain/geometry/types';
@@ -93,20 +97,32 @@ export const createDefaultProjectInfo = (): ProjectInfo => {
 };
 
 export const serializeDialProject = (project: DialProjectFile): string => {
+  if (project.assembly?.designConfig?.designIntent !== undefined) assertDesignIntent(project.assembly.designConfig.designIntent);
+  if (project.assembly) project = { ...project, assembly: withDialOnlyDecimalHours(project.assembly) };
+  if (project.assembly?.designConfig?.customAviationLayers) assertCustomAviation(project.assembly.designConfig.customAviationLayers);
   if (project.sourcing) assertSourcingPlan(project.sourcing);
   if (project.supplierSnapshots) assertSupplierSnapshots(project.supplierSnapshots);
   if (project.assembly) assertAssemblyCrownContracts(project.assembly);
+  if (project.assembly?.designConfig?.diverBezel) assertDiverBezel(project.assembly.designConfig.diverBezel);
+  if (project.assembly?.scaleBinding?.config.diverBezel) assertDiverBezel(project.assembly.scaleBinding.config.diverBezel);
+  if (project.scale?.pluginConfig.diverBezel) assertDiverBezel(project.scale.pluginConfig.diverBezel);
   return JSON.stringify(project, null, 2);
 };
 
 export const deserializeDialProject = (input: string): DialProjectFile => {
   const parsed = JSON.parse(input) as DialProjectFile;
+  if (parsed.assembly?.designConfig?.designIntent !== undefined) assertDesignIntent(parsed.assembly.designConfig.designIntent);
+  if (parsed.assembly) parsed.assembly = withDialOnlyDecimalHours(parsed.assembly);
+  if (parsed.assembly?.designConfig?.customAviationLayers) assertCustomAviation(parsed.assembly.designConfig.customAviationLayers);
   if (parsed.sourcing) assertSourcingPlan(parsed.sourcing);
   if (parsed.supplierSnapshots) assertSupplierSnapshots(parsed.supplierSnapshots);
   if (!parsed.version || !parsed.geometry || !parsed.bands || !parsed.scale) {
     throw new Error('Invalid .dial project payload.');
   }
   if (parsed.assembly) assertAssemblyCrownContracts(parsed.assembly);
+  if (parsed.assembly?.designConfig?.diverBezel) assertDiverBezel(parsed.assembly.designConfig.diverBezel);
+  if (parsed.assembly?.scaleBinding?.config.diverBezel) assertDiverBezel(parsed.assembly.scaleBinding.config.diverBezel);
+  if (parsed.scale?.pluginConfig.diverBezel) assertDiverBezel(parsed.scale.pluginConfig.diverBezel);
 
   parsed.scale.context = migrateLegacyMinuteRingContext(
     parsed.scale.context,

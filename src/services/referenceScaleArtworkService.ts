@@ -1,3 +1,4 @@
+import { PILOT_GRADUATION_FACTOR } from '@/domain/scales/pilotMarkingSizing';
 import { generateCitizenReferenceArtwork, CITIZEN_REFERENCE_ID, type CitizenArtworkOptions } from '@/domain/scales/citizenReferenceArtwork';
 import { generateNavitimerReferenceArtwork, NAVITIMER_REFERENCE_ID } from '@/domain/scales/navitimerReferenceArtwork';
 import type { ScalePluginConfig, ScaleMathContext, ScaleLabel } from '@/domain/scales/types';
@@ -85,8 +86,8 @@ export const runReferenceScale = (config: ScalePluginConfig, _context: ScaleMath
     outerRotationDeg: config.outerRotationOffsetDeg ?? 0,
     colourMode: config.referenceColourMode ?? 'original', colourOverrides: config.referenceColourOverrides,
     outerVisible: config.outerScaleVisible, innerVisible: config.innerScaleVisible,
-    distanceVisible: config.referenceDistanceVisible, tickFactor: config.referenceTickFactor,
-    lineFactor: config.referenceLineFactor, hoverPaddingMm: config.hoverPaddingMm,
+    distanceVisible: config.referenceDistanceVisible, tickFactor: (config.referenceTickFactor ?? 1) * PILOT_GRADUATION_FACTOR,
+    lineFactor: (config.referenceLineFactor ?? 1) * PILOT_GRADUATION_FACTOR, hoverPaddingMm: config.hoverPaddingMm,
     measureText: fontMeasurer(fontFamily)
   };
   const artwork = navitimer ? generateNavitimerReferenceArtwork(options) : generateCitizenReferenceArtwork(options);
@@ -157,7 +158,7 @@ export const runReferenceScale = (config: ScalePluginConfig, _context: ScaleMath
   }
   const structuredWarnings = issues.map((description) => ({ severity: 'error' as const, description, affectedObject: 'reference-scale', suggestedFix: 'Adjust artwork dimensions within the physical target; mathematical positions are fixed.' }));
   const allWarnings = [...structuredWarnings, ...readabilityWarnings.map((description) => ({ severity: 'warning' as const, description, affectedObject: 'reference-scale', suggestedFix: 'Check 1:1 readability and make a material/laser test, or choose a wider physical ring.' }))];
-  const stripInner = Math.max(fixedInner, options.inner.tickRadiusMm - 30 * unit * (config.referenceTickFactor ?? 1) - unit * 2);
+  const stripInner = Math.max(fixedInner, options.inner.tickRadiusMm - 30 * unit * (config.referenceTickFactor ?? 1) * PILOT_GRADUATION_FACTOR - unit * 2);
   const result: ScaleRunResult = {
     kind: 'slide-rule', pluginName: `${designName} (${navitimer ? NAVITIMER_REFERENCE_ID : CITIZEN_REFERENCE_ID}; photographic reconstruction)`,
     fontSizeMm: font, fontFamily, color: ink(navitimer ? 'black-ink' : 'outer-light-ink'),

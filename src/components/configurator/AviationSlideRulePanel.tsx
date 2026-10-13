@@ -89,7 +89,7 @@ export const AviationSlideRulePanel = () => {
         <button type="button" disabled={!unlocked && !policy.allowed.includes('aviation')} aria-pressed={activeProgram === 'aviation'} className={`${programClass('aviation')} disabled:cursor-not-allowed disabled:opacity-35`} onClick={() => selectProgram('aviation')}>Aviation log</button>
         <button type="button" disabled={!unlocked && !policy.allowed.includes('compass')} aria-pressed={activeProgram === 'compass'} className={`${programClass('compass')} disabled:cursor-not-allowed disabled:opacity-35`} onClick={() => selectProgram('compass')}>Compass N–NW</button>
       </div>
-      {activeProgram === 'diver' ? <p>Sixty evenly spaced minute marks. The first 20 minutes are emphasized for visibility; turn/return and decompression decisions still require a dive plan and instruments.</p> : null}
+      {activeProgram === 'diver' ? <p>A calibrated 60-minute ring. Diver-specific fine graduations, colour sections and operation controls appear above for the Diver archetype.</p> : null}
       {activeProgram === 'chrono' ? <p>Reciprocal tachymeter values 60–500 on an open arc. Read average speed after timing a known distance; choose units consistent with that distance.</p> : null}
       {activeProgram === 'compass' ? <p>Cardinal and intercardinal bearings every 45°, with small tick marks between them. This is an orientation aid, not a magnetic compass.</p> : null}
       {activeProgram === 'other' && !reference ? <p>Select a program to generate its markings.</p> : null}
@@ -150,8 +150,9 @@ export const AviationSlideRulePanel = () => {
           </p>
           <p>Align the bezel rate with 60 on the chapter ring; read the corresponding time against distance or fuel quantity. The printed ring is one decade, so interpret tens/hundreds from your flight-plan units.</p>
           <label className="block">Graduation detail
-            <select className="ds-input mt-1" value={config.tickDensityProfile ?? 'sparse'} onChange={(event) => updateConfig({ tickDensityProfile: event.target.value as 'sparse' | 'balanced' | 'dense' })}>
-              <option value="sparse">Simplified · 0.5 / 1 / 2 units</option>
+            <select className="ds-input mt-1" aria-label="Graduation detail" value={config.aviationGraduationStyle === 'custom-density' ? config.tickDensityProfile ?? 'sparse' : 'navitimer'} onChange={(event) => updateConfig(event.target.value === 'navitimer' ? { aviationGraduationStyle: 'navitimer' } : { aviationGraduationStyle: 'custom-density', tickDensityProfile: event.target.value as 'sparse' | 'balanced' | 'dense' })}>
+              <option value="navitimer">Navitimer subdivisions · 0.1 / 0.2 / 0.5 / 1 units</option>
+              <option value="sparse">Coarse · 0.5 / 1 / 2 units</option>
               <option value="balanced">Fine · 0.2 / 0.5 / 1 units</option>
               <option value="dense">Extra fine · 0.1 / 0.2 / 0.5 units</option>
             </select>

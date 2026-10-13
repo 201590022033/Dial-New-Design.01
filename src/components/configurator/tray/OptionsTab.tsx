@@ -185,14 +185,6 @@ export const OptionsTab: React.FC = () => {
     setPreview(provisional, activePartInstanceId, item);
   };
 
-  const handleApplyCandidate = (item: ComponentCatalogueItem) => {
-    if (!activePartInstanceId) return;
-    // Rebuild this exact option; never commit whichever card was last hovered.
-    const current = useWatchAssemblyStore.getState().assembly;
-    setPreview(applyCatalogueVisualSelection(current, activePartInstanceId, item), activePartInstanceId, item);
-    if (applyPreview()) useConfiguratorUIStore.getState().setArchetypePreview(null);
-  };
-
   const renderStatusBadge = (status: CompatibilityStatus) => {
     switch (status) {
       case 'green':
@@ -235,10 +227,10 @@ export const OptionsTab: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col h-full overflow-hidden p-3 gap-3" data-testid="options-tab">
+    <div className="flex flex-col h-full overflow-y-auto p-3 gap-3" data-testid="options-tab">
       {activePart?.offAxisPlatform && <details className="max-h-64 shrink-0 overflow-y-auto"><summary className="cursor-pointer text-xs text-amber-200">Off-axis case evidence and engineering projection</summary><OffAxisPlatformDetail model={watchAssemblyToVisualModel(assembly)} /></details>}
       <Nh05PartShortcuts />
-      <p className="text-[10px] text-slate-400">Click to preview · double-click or press Enter to Apply. Compatibility checks and locks still apply.</p>
+      <p className="text-[10px] text-slate-400">Double-click an option to preview, or focus it and press Enter or Space. Use Apply to keep it; Cancel restores your current choice.</p>
       <DialIndexOptions />
       {/* Search Header */}
       <div className="flex flex-col gap-1.5">
@@ -267,7 +259,7 @@ export const OptionsTab: React.FC = () => {
       </div>
 
       {/* Candidate List Grouped by Style */}
-      <div className="flex-1 overflow-y-auto pr-1 space-y-4">
+      <div className="shrink-0 pr-1 space-y-4">
         {Object.entries(groupedByStyle).map(([styleName, candidates]) => (
           <div key={styleName} className="space-y-2">
             <h3 className="text-[11px] font-mono uppercase tracking-wider text-slate-400 border-b border-slate-800 pb-1">
@@ -299,15 +291,13 @@ export const OptionsTab: React.FC = () => {
                 return (
                   <div
                     key={item.id}
-                    onMouseEnter={() => handlePreviewCandidate(item)}
-                    onClick={() => handlePreviewCandidate(item)}
-                    onDoubleClick={(event) => { if ((event.target as HTMLElement).closest('button')) return; handleApplyCandidate(item); }}
+                    onDoubleClick={(event) => { if ((event.target as HTMLElement).closest('button')) return; handlePreviewCandidate(item); }}
                     role="button"
                     tabIndex={0}
-                    aria-label={`Preview or apply ${item.displayName}`}
+                    aria-label={`Preview ${item.displayName}`}
                     onKeyDown={(event) => {
                       if (event.target !== event.currentTarget) return;
-                      if (event.key === 'Enter') { event.preventDefault(); handleApplyCandidate(item); }
+                      if (event.key === 'Enter') { event.preventDefault(); handlePreviewCandidate(item); }
                       if (event.key === ' ') { event.preventDefault(); handlePreviewCandidate(item); }
                     }}
                     data-candidate-id={item.id}

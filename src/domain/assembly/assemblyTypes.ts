@@ -82,6 +82,9 @@ export interface WatchAssemblyGlobalDimensions {
  * - Ring/dial geometry parameters
  */
 export interface WatchAssemblyDesignConfig {
+  /** Saved creative preferences; matching snapshots and candidate lists remain transient. */
+  designIntent?: import('@/domain/design-first/designIntent').DesignIntentV1;
+  diverBezel?: import('@/domain/scales/diverBezel').DiverBezelSettings;
   /** Authored selection and advisory recommendation are separate; loading never applies a recommendation. */
   crownChoice?: CrownChoiceV1;
   /** Canonical, independent semantic region settings; absent documents retain legacy defaults. */

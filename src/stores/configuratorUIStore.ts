@@ -68,6 +68,7 @@ export interface ConfiguratorUIStoreState {
   searchAllComponents: boolean;
 
   // Live Temporary Preview
+  previewOrigin: 'options' | 'design-matching' | null;
   previewAssembly: WatchAssembly | null;
   previewCandidateItem: ComponentCatalogueItem | null;
   previewPartInstanceId: string | null;
@@ -165,6 +166,7 @@ export const useConfiguratorUIStore = create<ConfiguratorUIStoreState>((set, get
   searchQuery: '',
   searchAllComponents: false,
 
+  previewOrigin: null,
   previewAssembly: null,
   previewCandidateItem: null,
   previewPartInstanceId: null,
@@ -318,6 +320,7 @@ export const useConfiguratorUIStore = create<ConfiguratorUIStoreState>((set, get
       candidateCatalogueItemId: candidateItem.id, candidateItem
     });
     set({
+      previewOrigin: 'options',
       previewAssembly: assembly,
       previewPartInstanceId: partInstanceId,
       previewCandidateItem: candidateItem,
@@ -330,6 +333,10 @@ export const useConfiguratorUIStore = create<ConfiguratorUIStoreState>((set, get
   setArchetypePreview: (assembly) => set({ archetypePreviewAssembly: assembly }),
 
   applyPreview: () => {
+    if (get().previewOrigin === 'design-matching') {
+      set({ previewError: 'Apply this choice from the matching results so it can be checked against your current design.' });
+      return false;
+    }
     const { previewAssembly, previewCandidateItem, previewPartInstanceId, lockedPartIds } = get();
     if (!previewAssembly || !previewPartInstanceId || !previewCandidateItem) {
       set({ previewError: 'There is no active component preview to apply.' });
@@ -438,6 +445,7 @@ export const useConfiguratorUIStore = create<ConfiguratorUIStoreState>((set, get
     }
 
     set((state) => ({
+      previewOrigin: null,
       previewAssembly: null,
       previewCandidateItem: null,
       previewPartInstanceId: null,
@@ -458,6 +466,7 @@ export const useConfiguratorUIStore = create<ConfiguratorUIStoreState>((set, get
 
   cancelPreview: () => {
     set({
+      previewOrigin: null,
       previewAssembly: null,
       previewCandidateItem: null,
       previewPartInstanceId: null,

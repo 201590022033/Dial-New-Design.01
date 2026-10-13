@@ -1,0 +1,156 @@
+{
+  "draft": {
+    "schema": "dial-designer/supplier-draft/v1",
+    "id": "fixture-df5-recorded-case",
+    "status": "ai-extracted",
+    "syntheticFixture": true,
+    "identity": {
+      "supplierId": "DF5 synthetic examples",
+      "productId": "Example case — recorded fields",
+      "variant": {
+        "state": "recorded",
+        "value": "steel / 40 mm",
+        "source": {
+          "id": "fixture-df5-recorded-source",
+          "kind": "synthetic-fixture",
+          "locator": "fixture://df5/recorded-case",
+          "capturedAt": "2026-10-13T00:00:00+02:00"
+        },
+        "review": "unreviewed"
+      }
+    },
+    "sources": [
+      {
+        "id": "fixture-df5-recorded-source",
+        "kind": "synthetic-fixture",
+        "locator": "fixture://df5/recorded-case",
+        "capturedAt": "2026-10-13T00:00:00+02:00"
+      }
+    ],
+    "engineering": {
+      "catalogueItemId": null,
+      "slot": "case",
+      "measurements": {
+        "caseDiameterMm": {
+          "state": "recorded",
+          "value": {
+            "value": 40,
+            "unit": "mm"
+          },
+          "source": {
+            "id": "fixture-df5-recorded-source",
+            "kind": "synthetic-fixture",
+            "locator": "fixture://df5/recorded-case",
+            "capturedAt": "2026-10-13T00:00:00+02:00"
+          },
+          "review": "unreviewed"
+        },
+        "crystalSeatDiameterMm": {
+          "state": "recorded",
+          "value": {
+            "value": 31.5,
+            "unit": "mm"
+          },
+          "source": {
+            "id": "fixture-df5-recorded-source",
+            "kind": "synthetic-fixture",
+            "locator": "fixture://df5/recorded-case",
+            "capturedAt": "2026-10-13T00:00:00+02:00"
+          },
+          "review": "unreviewed"
+        },
+        "dialSeatDiameterMm": {
+          "state": "recorded",
+          "value": {
+            "value": 28.5,
+            "unit": "mm"
+          },
+          "source": {
+            "id": "fixture-df5-recorded-source",
+            "kind": "synthetic-fixture",
+            "locator": "fixture://df5/recorded-case",
+            "capturedAt": "2026-10-13T00:00:00+02:00"
+          },
+          "review": "unreviewed"
+        },
+        "lugWidthMm": {
+          "state": "recorded",
+          "value": {
+            "value": 20,
+            "unit": "mm"
+          },
+          "source": {
+            "id": "fixture-df5-recorded-source",
+            "kind": "synthetic-fixture",
+            "locator": "fixture://df5/recorded-case",
+            "capturedAt": "2026-10-13T00:00:00+02:00"
+          },
+          "review": "unreviewed"
+        },
+        "movementCavityDiameterMm": {
+          "state": "recorded",
+          "value": {
+            "value": 27.4,
+            "unit": "mm"
+          },
+          "source": {
+            "id": "fixture-df5-recorded-source",
+            "kind": "synthetic-fixture",
+            "locator": "fixture://df5/recorded-case",
+            "capturedAt": "2026-10-13T00:00:00+02:00"
+          },
+          "review": "unreviewed"
+        }
+      },
+      "attributes": {
+        "finish": {
+          "state": "recorded",
+          "value": "steel",
+          "source": {
+            "id": "fixture-df5-recorded-source",
+            "kind": "synthetic-fixture",
+            "locator": "fixture://df5/recorded-case",
+            "capturedAt": "2026-10-13T00:00:00+02:00"
+          },
+          "review": "unreviewed"
+        }
+      }
+    },
+    "offers": [],
+    "packageContents": [
+      {
+        "slot": "crystal",
+        "inclusion": {
+          "state": "recorded",
+          "value": "included",
+          "source": {
+            "id": "fixture-df5-recorded-source",
+            "kind": "synthetic-fixture",
+            "locator": "fixture://df5/recorded-case",
+            "capturedAt": "2026-10-13T00:00:00+02:00"
+          },
+          "review": "unreviewed"
+        }
+      }
+    ],
+    "images": [],
+    "extraction": {
+      "method": "ai",
+      "confidence": 1
+    },
+    "fitQualification": "not-assessed"
+  },
+  "offers": [],
+  "captures": [
+    {
+      "id": "fixture-df5-recorded-capture",
+      "sourceId": "fixture-df5-recorded-source",
+      "capturedAt": "2026-10-13T00:00:00+02:00",
+      "sourceText": "Synthetic example only. These values are illustrative and cannot establish supplier fit.",
+      "raw": {
+        "syntheticExample": true,
+        "fieldCoverage": "recorded"
+      }
+    }
+  ]
+}

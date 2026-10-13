@@ -1,4 +1,7 @@
+import { withDialOnlyDecimalHours } from '@/domain/scales/decimalHourPlacement';
+import { updateDesignIntent, type DesignIntentV1 } from '@/domain/design-first/designIntent';
 import { create } from 'zustand';
+import { useSourcingStore } from '@/stores/sourcingStore';
 import { withScaleSnapshot } from '@/domain/scales/scaleDocumentAdapter';
 import {
   createDefaultWatchAssembly,
@@ -39,6 +42,8 @@ export interface WatchAssemblyStoreState {
 
   // Assembly-level authoritative actions
   setAssembly: (assembly: WatchAssembly) => void;
+  setDesignIntent: (intent: DesignIntentV1) => void;
+  commitDesignMatch: (assembly: WatchAssembly, updates: Record<string, string | null>) => void;
   setBomPartSelection: (group: string, partId: string) => void;
   updateMetadata: (patch: Partial<WatchAssemblyMetadata>) => void;
   updateGlobalDimensions: (patch: Partial<WatchAssemblyGlobalDimensions>) => void;
@@ -97,8 +102,26 @@ const resolvePartInstanceId = (
   return null;
 };
 
+const clearDocumentPreviews = () => { useConfiguratorUIStore.getState().cancelPreview(); useConfiguratorUIStore.setState({ archetypePreviewAssembly: null, previewingVersionId: null }); };
+
 let restoringAssemblyHistory = false;
 const cloneAssembly = (assembly: WatchAssembly): WatchAssembly => JSON.parse(JSON.stringify(assembly)) as WatchAssembly;
+
+type SourcingDelta = { partId: string; before: string | null | undefined; after: string | null };
+// Metadata belongs to a history entry, never to the saved engineering document.
+const sourcingHistory = new WeakMap<WatchAssembly, readonly SourcingDelta[]>();
+const restoreSourcingDelta = (delta: readonly SourcingDelta[], direction: 'before' | 'after'): void => {
+  if (!delta.length) return;
+  const plan = useSourcingStore.getState().sourcingPlan;
+  const selections = { ...plan.selections };
+  for (const entry of delta) {
+    const value = entry[direction];
+    if (value === undefined) delete selections[entry.partId];
+    else selections[entry.partId] = value;
+  }
+  useSourcingStore.setState({ sourcingPlan: { ...plan, selections, updatedAtIso: new Date().toISOString() }, dirty: true });
+};
+
 
 export const useWatchAssemblyStore = create<WatchAssemblyStoreState>((set, get) => ({
   assembly: createDefaultWatchAssembly(),
@@ -110,25 +133,56 @@ export const useWatchAssemblyStore = create<WatchAssemblyStoreState>((set, get) 
     const state = get();
     const previous = state.historyPast.at(-1);
     if (!previous) return;
+    clearDocumentPreviews();
+    const currentSnapshot = cloneAssembly(state.assembly);
+    const delta = sourcingHistory.get(previous);
+    if (delta) sourcingHistory.set(currentSnapshot, delta);
     restoringAssemblyHistory = true;
-    try { set({ assembly: cloneAssembly(previous), dirty: true,
-      historyPast: state.historyPast.slice(0, -1), historyFuture: [...state.historyFuture, cloneAssembly(state.assembly)] }); }
+    try {
+      if (delta) restoreSourcingDelta(delta, 'before');
+      set({ assembly: cloneAssembly(previous), dirty: true,
+      historyPast: state.historyPast.slice(0, -1), historyFuture: [...state.historyFuture, currentSnapshot] }); }
     finally { restoringAssemblyHistory = false; }
   },
   redoAssembly: () => {
     const state = get();
     const next = state.historyFuture.at(-1);
     if (!next) return;
+    clearDocumentPreviews();
+    const currentSnapshot = cloneAssembly(state.assembly);
+    const delta = sourcingHistory.get(next);
+    if (delta) sourcingHistory.set(currentSnapshot, delta);
     restoringAssemblyHistory = true;
-    try { set({ assembly: cloneAssembly(next), dirty: true,
-      historyFuture: state.historyFuture.slice(0, -1), historyPast: [...state.historyPast, cloneAssembly(state.assembly)].slice(-50) }); }
+    try {
+      if (delta) restoreSourcingDelta(delta, 'after');
+      set({ assembly: cloneAssembly(next), dirty: true,
+      historyFuture: state.historyFuture.slice(0, -1), historyPast: [...state.historyPast, currentSnapshot].slice(-50) }); }
     finally { restoringAssemblyHistory = false; }
   },
 
   getResolvedGeometry: () => resolveAssemblyGeometry(get().assembly),
 
   setAssembly: (assembly) => {
-    set({ assembly, dirty: false });
+    set({ assembly: withDialOnlyDecimalHours(assembly), dirty: false });
+  },
+  commitDesignMatch: (assembly, updates) => {
+    const state = get();
+    if (assembly.metadata.id !== state.assembly.metadata.id || Object.keys(updates).some(id => !assembly.parts[id])) {
+      throw new Error('The matching choice no longer belongs to this design. Search again.');
+    }
+    const selections = useSourcingStore.getState().sourcingPlan.selections;
+    const delta = Object.entries(updates).map(([partId, after]) => ({ partId, before: selections[partId], after }));
+    const previous = cloneAssembly(state.assembly);
+    sourcingHistory.set(previous, delta);
+    restoringAssemblyHistory = true;
+    try {
+      restoreSourcingDelta(delta, 'after');
+      set({ assembly: withDialOnlyDecimalHours(assembly), dirty: true,
+        historyPast: [...state.historyPast, previous].slice(-50), historyFuture: [] });
+    } finally { restoringAssemblyHistory = false; }
+  },
+  setDesignIntent: (intent) => {
+    set(state => ({ assembly: updateDesignIntent(state.assembly, intent), dirty: true }));
   },
   setScaleSnapshot: (snapshot, previous) => {
     // A legacy assembly has no scale binding yet. Its first edit must still
@@ -349,9 +403,10 @@ export const useWatchAssemblyStore = create<WatchAssemblyStoreState>((set, get) 
     const assembly = get().assembly;
     const existing = assembly.designConfig?.customAviationLayers?.layers ?? [];
     const current = existing.find(layer => layer.id === id) ?? customAviationDefaults(id);
-    const next = { ...current, ...patch, id };
+    if (id === 'decimal-hour' && patch.targetBandId && patch.targetBandId !== 'band-dial-face') return;
+    const next = { ...current, ...patch, id, ...(id === 'decimal-hour' ? { targetBandId: 'band-dial-face' } : {}) };
     const targetKinds = [current.targetBandId, next.targetBandId].map(target => target.replace(/^band-/, ''));
-    if (Object.values(assembly.parts).some(part => part.locked && targetKinds.includes(getCatalogueItem(part.catalogueItemId)?.linkedBandKind ?? ''))) return;
+    if (Object.values(assembly.parts).some(part => (part.locked || useConfiguratorUIStore.getState().lockedPartIds.has(part.instanceId)) && targetKinds.includes(getCatalogueItem(part.catalogueItemId)?.linkedBandKind ?? ''))) return;
     const document = { version: 1 as const, layers: [...existing.filter(layer => layer.id !== id), next] };
     assertCustomAviation(document);
     set({ assembly: { ...assembly, designConfig: { ...assembly.designConfig, customAviationLayers: document } }, dirty: true });
@@ -640,6 +695,7 @@ export const useWatchAssemblyStore = create<WatchAssemblyStoreState>((set, get) 
   },
 
   resetAssembly: () => {
+    clearDocumentPreviews();
     set({
       assembly: createDefaultWatchAssembly(),
       dirty: false
@@ -652,6 +708,7 @@ export const useWatchAssemblyStore = create<WatchAssemblyStoreState>((set, get) 
 
   importJson: (json) => {
     const deserialized = deserializeWatchAssembly(json);
+    clearDocumentPreviews();
     set({
       assembly: deserialized,
       dirty: false

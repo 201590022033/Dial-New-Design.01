@@ -9,6 +9,7 @@ import { runCustomAviation } from '@/domain/scales/customAviation';
 /** Resolve physical dimensions once, identically for the editor and saved layers. */
 export const resolvePhysicalScaleConfig = (assembly: WatchAssembly, bands: BandEntity[], config: ScalePluginConfig, kind: ScaleKind): ScalePluginConfig => {
   const next = { ...config };
+  if (assembly.designConfig?.visualReferenceConfig?.archetypeId !== 'archetype-dive' || kind !== 'circular') delete next.diverBezel;
   const target = bands.find((band) => band.id === config.placementTargetBandId);
   const fixed = bands.find((band) => band.id === (config.fixedPlacementTargetBandId ?? 'band-chapter-ring'));
   if (!target) return next;

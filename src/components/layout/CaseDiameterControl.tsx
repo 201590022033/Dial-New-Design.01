@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useWatchAssemblyStore } from '@/stores/watchAssemblyStore';
 import { useConfiguratorUIStore } from '@/stores/configuratorUIStore';
@@ -7,6 +7,7 @@ import { CASE_SIZE_REFERENCES, getCaseSizeLabel, getCaseSizeMatches, getNearestC
 import { applyToolbarDiameter, CASE_PREVIEW_MAX_MM, CASE_PREVIEW_MIN_MM } from './toolbarActions';
 import { caseReferencePosition, caseReferenceTickPercent, parseCasePreviewDiameter, shouldCloseCaseReference } from './caseDiameterReferenceLayout';
 import { CaseSizeReferenceThumbnail } from './CaseSizeReferenceThumbnail';
+import { caseDiameterFromPointer, emptyCaseDiameterSnap, snapCaseDiameter } from './caseDiameterSnap';
 import './caseDiameterReferences.css';
 
 /** Browsing is local UI state; only the existing checked action writes assembly. */
@@ -20,6 +21,11 @@ export const CaseDiameterControl = () => {
   const [draft, setDraft] = useState(String(diameter));
   const draftRef = useRef(String(diameter));
   const [error, setError] = useState<string | null>(null);
+  const snap = useRef(emptyCaseDiameterSnap());
+  const [snapTarget, setSnapTarget] = useState<number | null>(null);
+  const catalogueSizes = useMemo(() => [...new Set(items
+    .filter(item => item.kind === 'case' || item.kind === 'midcase')
+    .map(item => item.nominalDimensions.diameterMm))], [items]);
   const [referenceDiameter, setReferenceDiameter] = useState<number | null>(null);
   const [position, setPosition] = useState<ReturnType<typeof caseReferencePosition> | null>(null);
   const anchor = useRef<HTMLFieldSetElement>(null);
@@ -44,6 +50,8 @@ export const CaseDiameterControl = () => {
     draftRef.current = String(diameter);
     setDraft(String(diameter));
     gestureStart.current = null;
+    snap.current = emptyCaseDiameterSnap();
+    setSnapTarget(null);
   }, [assembly, diameter]);
   const clearClose = () => {
     if (closeTimer.current !== null) clearTimeout(closeTimer.current);
@@ -102,6 +110,14 @@ export const CaseDiameterControl = () => {
     };
   }, [open]);
   const changeDraft = (value: string) => { draftRef.current = value; setDraft(value); setError(null); };
+  const movePointer = (input: HTMLInputElement, clientX: number) => {
+    const bounds = input.getBoundingClientRect();
+    const raw = caseDiameterFromPointer(clientX, bounds.left, bounds.width);
+    const result = snapCaseDiameter(raw, catalogueSizes, performance.now(), snap.current);
+    snap.current = result.state;
+    setSnapTarget(result.state.held?.diameterMm ?? null);
+    changeDraft(String(result.value)); show(result.value);
+  };
   const apply = (value = draftRef.current, expectedAssembly?: typeof assembly) => {
     try {
       applyToolbarDiameter(parseCasePreviewDiameter(value), expectedAssembly);
@@ -109,6 +125,7 @@ export const CaseDiameterControl = () => {
     } catch (reason) { setError(reason instanceof Error ? reason.message : 'Cannot resize preview.'); }
   };
   const cancelGesture = () => {
+    snap.current = emptyCaseDiameterSnap(); setSnapTarget(null);
     if (gestureStart.current === null) return;
     changeDraft(gestureStart.current); setReferenceDiameter(Number(gestureStart.current)); gestureStart.current = null;
   };
@@ -125,11 +142,28 @@ export const CaseDiameterControl = () => {
             min={CASE_PREVIEW_MIN_MM} max={CASE_PREVIEW_MAX_MM} step="0.1" disabled={disabled}
             value={draft.trim() && Number.isFinite(Number(draft)) ? Number(draft) : diameter}
             onMouseEnter={() => show(Number(draftRef.current) || diameter)} onFocus={() => show(Number(draftRef.current) || diameter)}
-            onChange={(event) => { changeDraft(event.target.value); show(Number(event.target.value)); }}
-            onPointerDown={(event) => { gestureStart.current = draftRef.current; gestureAssembly.current = assembly; event.currentTarget.setPointerCapture(event.pointerId); show(Number(draftRef.current)); }}
-            onPointerUp={(event) => { if (gestureStart.current !== null) { gestureStart.current = null; apply(event.currentTarget.value, gestureAssembly.current); } }}
+            onChange={(event) => {
+              // Native change remains authoritative for keyboard/assistive input.
+              // Pointer gestures use coordinates so rendering a snapped value cannot stall native dragging.
+              if (gestureStart.current !== null) return;
+              changeDraft(event.target.value); show(Number(event.target.value));
+            }}
+            onPointerDown={(event) => {
+              if (!event.isPrimary || event.button !== 0) return;
+              event.preventDefault();
+              event.currentTarget.focus({ preventScroll: true });
+              snap.current = emptyCaseDiameterSnap(); setSnapTarget(null);
+              gestureStart.current = draftRef.current; gestureAssembly.current = assembly;
+              event.currentTarget.setPointerCapture(event.pointerId);
+              movePointer(event.currentTarget, event.clientX);
+            }}
+            onPointerMove={(event) => {
+              if (gestureStart.current === null || !event.isPrimary) return;
+              event.preventDefault(); movePointer(event.currentTarget, event.clientX);
+            }}
+            onPointerUp={() => { if (gestureStart.current !== null) { gestureStart.current = null; apply(draftRef.current, gestureAssembly.current); } snap.current = emptyCaseDiameterSnap(); setSnapTarget(null); }}
             onPointerCancel={cancelGesture} onLostPointerCapture={cancelGesture}
-            onKeyDown={(event) => { if (event.key === 'Escape') { changeDraft(String(diameter)); gestureStart.current = null; } }}
+            onKeyDown={(event) => { if (event.key === 'Escape') { cancelGesture(); changeDraft(String(diameter)); gestureStart.current = null; } }}
             onKeyUp={(event) => { if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End', 'PageUp', 'PageDown'].includes(event.key)) apply(event.currentTarget.value); }} />
           <div className="case-diameter-ticks" aria-label="Case diameter comparisons">
             {CASE_SIZE_REFERENCES.map((entry, index) => {
@@ -152,11 +186,12 @@ export const CaseDiameterControl = () => {
         <button type="button" className="case-diameter-set" disabled={disabled} onClick={() => apply()}>Set</button>
       </div>
       <div className="case-diameter-help">
-        <p id={`${popupId}-help`}>{disabledReason ?? 'Custom preview only; supplier cases and hand lengths do not resize.'}</p>
+        <p id={`${popupId}-help`}>{disabledReason ?? 'Drag pauses briefly near catalogue sizes. Keys and number entry stay precise; supplier parts do not resize.'}</p>
         <button ref={toggle} type="button" aria-expanded={open} aria-controls={open ? popupId : undefined}
           onClick={() => { if (open) close(); else { pinned.current = true; show(Number(draftRef.current) || diameter); } }}>Size guide</button>
       </div>
       {error && <p role="alert" className="case-diameter-error">{error}</p>}
+      <p className="case-diameter-snap" role="status">{snapTarget !== null ? `${snapTarget} mm catalogue size · gentle snap` : ''}</p>
     </fieldset>
     {open && position && createPortal(<div ref={panel} id={popupId} role="region" aria-label="Watch case size reference" className="case-size-popover"
       style={position} onMouseEnter={clearClose} onMouseLeave={scheduleClose} onFocusCapture={clearClose} onBlur={(event) => blur(event.relatedTarget)}>

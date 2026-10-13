@@ -58,7 +58,7 @@ export const scaleArtworkSurfaceZ = (model: VisualWatchModel, ring: ScaleArtwork
   const envelope = model.previewEnvelope;
   const target = ring === 'inner' ? preview?.fixedPlacementTargetBandId : preview?.placementTargetBandId;
   if (target === 'band-dial-face') return envelope.dialZ + model.dial.thicknessMm / 2 + 0.008;
-  if (target === 'band-chapter-ring') return envelope.chapterZ + PREVIEW_CHAPTER_FACE_OFFSET_MM + 0.008;
+  if (target === 'band-chapter-ring' || (target === 'band-inner-bezel' && preview?.kind === 'circular')) return envelope.chapterZ + PREVIEW_CHAPTER_FACE_OFFSET_MM + 0.008;
   if (ring === 'inner' && !target) return envelope.chapterZ + PREVIEW_CHAPTER_FACE_OFFSET_MM + 0.008;
   // Authored inserts and raised pip/scale details extend above the carrier.
   // The procedural insert also sits 0.08 mm above its carrier top.
