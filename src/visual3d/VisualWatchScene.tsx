@@ -21,6 +21,10 @@ import { clampTipExtentMm } from '@/domain/appearance/appearance';
 import { handLumeCapability } from './handAppearanceRegions';
 import { createCrownGeometry } from './crownGeometry';
 import { createCrownCapGeometry } from './crownCapGeometry';
+import { createLeatherGrainTexture } from './leatherGrain';
+import { strapRegionColor } from './realismMaterials';
+import { responsiveCameraDistance } from './renderQuality';
+import { DevelopmentRenderStats } from './DevelopmentRenderStats';
 
 const CrownCapPresentation = ({ model }: { model: VisualWatchModel }) => {
   const concept = model.crown.capConcept!;
@@ -48,6 +52,9 @@ const physicalFinish = (profile: FinishProfile, color?: string) => ({
   ior: profile.ior ?? 1.5,
   transmission: profile.transmission ?? 0,
   thickness: profile.thickness ?? 0,
+  iridescence: profile.iridescence ?? 0,
+  iridescenceIOR: profile.iridescenceIOR ?? 1.3,
+  iridescenceThicknessRange: profile.iridescenceThicknessRange ?? [100, 400] as [number, number],
   sheen: profile.sheen ?? 0,
   sheenRoughness: profile.sheenRoughness ?? 0.5,
   emissive: profile.emissive ?? '#000000',
@@ -269,16 +276,21 @@ const PreviewStrap = ({ model, sign }: { model: VisualWatchModel; sign: number }
   const geometry = useMemo(() => createPreviewStrapGeometry(a, sign), [a, sign]);
   useEffect(() => () => geometry.dispose(), [geometry]);
   const style = model.archetypeAppearance.strapStyleId;
+  const grain = useMemo(() => style === 'leather' || style === 'racing' ? createLeatherGrainTexture() : null, [style]);
+  useEffect(() => () => grain?.dispose(), [grain]);
   const surfaceZ = a.barZ + a.strapThickness / 2 + .04;
   return <group>
-    <mesh castShadow geometry={geometry}><meshPhysicalMaterial {...physicalFinish(model.finishes.strap)} /></mesh>
+    <mesh castShadow geometry={geometry}><meshPhysicalMaterial {...physicalFinish(model.finishes.strap, model.archetypeAppearance.strapColor)} bumpMap={grain} bumpScale={.035} roughnessMap={grain} /></mesh>
     {/* Presentation relief follows the scaled attachment, never a fixed 42mm strap. */}
     {style === 'rubber' && Array.from({ length: 8 }, (_, i) => <mesh key={i} position={[0, sign * (a.barY + 7 + i * 3), surfaceZ]}>
       <boxGeometry args={[a.strapWidth * .82, .55, .18]} /><meshStandardMaterial {...finish(model.finishes.strap)} />
     </mesh>)}
     {style !== 'rubber' && [-1, 1].flatMap(side => Array.from({ length: 18 }, (_, i) => <mesh key={`${side}-${i}`} position={[side * a.strapWidth * (.43 - i * .0035), sign * (a.barY + 5 + i * a.strapLength / 22), surfaceZ]}>
-      <boxGeometry args={[.18, .75, .10]} /><meshStandardMaterial color={style === 'canvas' ? '#b0ab80' : '#b39472'} roughness={.9} />
+      <boxGeometry args={[.18, .75, .10]} /><meshStandardMaterial color={style === 'canvas' ? '#b0ab80' : '#e7dcc8'} roughness={.9} />
     </mesh>))}
+    {style === 'leather' && sign < 0 && a.strapLength >= 56 && Array.from({ length: 7 }, (_, i) => <mesh name={`DD_PREVIEW_TAIL_HOLE_RECESS_${i}`} key={`tail-hole-${i}`} position={[0, -(a.barY + 8 + i * 7.5), surfaceZ + .015]}>
+      <circleGeometry args={[1, 24]} /><meshStandardMaterial color={strapRegionColor(model.archetypeAppearance.strapColor, .45)} roughness={.8} />
+    </mesh>)}
     {style === 'racing' && Array.from({ length: 5 }, (_, i) => <mesh key={`recess-${i}`} position={[0, sign * (a.barY + 9 + i * 6), surfaceZ + .02]}>
       <circleGeometry args={[Math.min(1.6, a.strapWidth * .11), 32]} /><meshStandardMaterial color="#080706" roughness={1} />
     </mesh>)}
@@ -370,7 +382,7 @@ export const ProceduralComponent = ({ category, model }: { category: VisualCateg
       })}
     </group>;
     case 'crystal': return <mesh position={[0, 0, localZ(envelope.crystalZ)]} rotation={[Math.PI / 2, 0, 0]}>
-      <cylinderGeometry args={[envelope.crystalRadius, envelope.crystalRadius, envelope.crystalThickness, 128]} /><meshPhysicalMaterial {...physicalFinish(model.finishes.crystal)} transparent opacity={model.finishes.crystal.opacity ?? 0.1} depthWrite={false} envMapIntensity={2.25} />
+      <cylinderGeometry args={[envelope.crystalRadius, envelope.crystalRadius, envelope.crystalThickness, 128]} /><meshPhysicalMaterial {...physicalFinish(model.finishes.crystal)} opacity={1} depthWrite={false} envMapIntensity={2.25} />
     </mesh>;
     case 'crown': return <ProceduralCrown model={model} />;
     case 'pushers': return <group>
@@ -477,12 +489,12 @@ const DarkDramaticEnvironment = () => {
 };
 
 const CameraDistanceController = ({ distance }: { distance: number }) => {
-  const { camera, invalidate } = useThree();
+  const { camera, invalidate, size } = useThree();
   useEffect(() => {
-    camera.position.set(0, 0, distance);
+    camera.position.set(0, 0, responsiveCameraDistance(distance, size.width, size.height));
     camera.updateProjectionMatrix();
     invalidate();
-  }, [camera, distance, invalidate]);
+  }, [camera, distance, invalidate, size.width, size.height]);
   return null;
 };
 
@@ -497,22 +509,28 @@ const StillExporterBridge = ({ onReady }: { onReady?: (exporter: StillExporter |
       const pixelRatio = gl.getPixelRatio();
       const perspective = camera instanceof PerspectiveCamera ? camera : null;
       const aspect = perspective?.aspect;
-      gl.setPixelRatio(1);
-      gl.setSize(2048, 2048, false);
-      if (perspective) {
-        perspective.aspect = 1;
-        perspective.updateProjectionMatrix();
+      const position = camera.position.clone();
+      try {
+        gl.setPixelRatio(1);
+        gl.setSize(2048, 2048, false);
+        if (perspective) {
+          // Export the same saved framing at square aspect, even from portrait HD.
+          perspective.position.z *= Math.min(1, size.x / size.y);
+          perspective.aspect = 1;
+          perspective.updateProjectionMatrix();
+        }
+        gl.render(scene, camera);
+        return gl.domElement.toDataURL('image/png');
+      } finally {
+        gl.setPixelRatio(pixelRatio);
+        gl.setSize(size.x, size.y, false);
+        camera.position.copy(position);
+        if (perspective && aspect !== undefined) {
+          perspective.aspect = aspect;
+          perspective.updateProjectionMatrix();
+        }
+        invalidate();
       }
-      gl.render(scene, camera);
-      const png = gl.domElement.toDataURL('image/png');
-      gl.setPixelRatio(pixelRatio);
-      gl.setSize(size.x, size.y, false);
-      if (perspective && aspect !== undefined) {
-        perspective.aspect = aspect;
-        perspective.updateProjectionMatrix();
-      }
-      invalidate();
-      return png;
     };
     onReady(exporter);
     return () => onReady(null);
@@ -525,6 +543,7 @@ export const VisualWatchScene = ({ model, rotation, cameraDistance, scalePreview
   return (
   <Canvas frameloop="demand" shadows camera={{ position: [0, 0, cameraDistance], fov: 29 }} dpr={[1, 1.75]} gl={{ antialias: true, powerPreference: 'high-performance', preserveDrawingBuffer: true }}
     onCreated={({ gl }) => { gl.toneMapping = ACESFilmicToneMapping; gl.toneMappingExposure = 0.94; gl.outputColorSpace = SRGBColorSpace; }}>
+    {import.meta.env.DEV && <DevelopmentRenderStats />}
     <DarkDramaticEnvironment />
     <CameraDistanceController distance={cameraDistance} />
     <StillExporterBridge onReady={onExporterReady} />

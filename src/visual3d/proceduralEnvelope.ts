@@ -101,6 +101,9 @@ export const createPreviewStrapGeometry = (a: Attachment, sign: number) => {
       positions.setXYZ(i + 2, b[0]!, b[1]!, b[2]!);
     }
   }
+  const uv = geometry.getAttribute('uv');
+  for (let i = 0; i < positions.count; i++) uv.setXY(i, positions.getX(i) / 8, positions.getY(i) / 8);
+  uv.needsUpdate = true;
   geometry.computeVertexNormals();
   geometry.computeBoundingBox();
   return geometry;

@@ -1,15 +1,16 @@
 import React, { Suspense, type ReactElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
-import { BoxGeometry, Group, Mesh } from 'three';
+import { BoxGeometry, Color, Group, Mesh, MeshPhysicalMaterial, Texture } from 'three';
 import { Canvas } from '@react-three/fiber';
 import { createDefaultWatchAssembly } from '@/domain/assembly/assemblyFactory';
 import { watchAssemblyToVisualModel } from '@/visual3d/watchAssemblyToVisualModel';
 import { ProceduralComponent, VisualComponent, VisualWatchScene } from '@/visual3d/VisualWatchScene';
 import { GlbAsset, LoadedGlbAsset } from '@/visual3d/GlbAsset';
+import { REALISM_SCHEMA } from '@/visual3d/realismMaterials';
 import { glbLoadUrl } from '@/visual3d/glbLoadUrl';
 import { createPreviewCaseGeometry } from '@/visual3d/proceduralEnvelope';
-import { categoryAnchor, visualCategories, type VisualAssetDescriptor } from '@/visual3d/visualAssetRegistry';
+import { categoryAnchor, visualAssetRegistry, visualCategories, type VisualAssetDescriptor } from '@/visual3d/visualAssetRegistry';
 
 const loader = vi.hoisted(() => ({ load: vi.fn() }));
 const canvasCapture: { props: unknown } = vi.hoisted(() => ({ props: undefined }));
@@ -28,9 +29,18 @@ describe('P4 scene integration and GLB failure boundaries', () => {
 
   it('uses stable hand URLs across Suspense retries and distinct URLs for different styles', () => {
     const baton: VisualAssetDescriptor = { assetId: 'hands-baton-42', category: 'hands', assetType: 'glb', assetPath: '/hands-baton-42.glb' };
-    expect(glbLoadUrl(baton)).toBe('/hands-baton-42.glb?v=main-hand-library-3');
+    expect(glbLoadUrl(baton)).toBe('/hands-baton-42.glb?v=watch-realism-v2');
     expect(glbLoadUrl(baton)).toBe(glbLoadUrl(baton));
     expect(glbLoadUrl({ ...baton, assetId: 'hands-mercedes-42', assetPath: '/hands-mercedes-42.glb' })).not.toBe(glbLoadUrl(baton));
+  });
+
+  it('uses the same stable release revision for every registered component GLB', () => {
+    const components = Object.values(visualAssetRegistry).filter(asset => asset.assetType === 'glb');
+    expect(components.length).toBeGreaterThan(100);
+    for (const asset of components) {
+      expect(glbLoadUrl(asset)).toBe(`${asset.assetPath!}?v=watch-realism-v2`);
+      expect(glbLoadUrl(asset)).toBe(glbLoadUrl(asset));
+    }
   });
 
   it('retries a suspended main hand load at the same URL until its mesh is available', () => {
@@ -123,6 +133,38 @@ describe('P4 scene integration and GLB failure boundaries', () => {
     expect(clone).toHaveBeenCalledTimes(2);
     expect(clone.mock.results[0]!.value).not.toBe(clone.mock.results[1]!.value);
     expect(scene.parent).toBeNull();
+  });
+
+  it('honours material roles before broad strap names and retains imported physical detail', () => {
+    const scene = new Group();
+    const material = new MeshPhysicalMaterial({ color: '#e7dcc8', roughness: .34, anisotropy: .7, normalMap: new Texture() });
+    material.userData = { DD_REALISM_SCHEMA: REALISM_SCHEMA, DD_REALISM_ROLE: 'strap-stitch' };
+    const mesh = new Mesh(new BoxGeometry(), material); mesh.name = 'DD_STRAP_STITCH'; scene.add(mesh);
+    loader.load.mockReturnValue({ scene });
+    const clone = vi.spyOn(scene, 'clone');
+    const appearance = { ...watchAssemblyToVisualModel(createDefaultWatchAssembly()).archetypeAppearance, strapColor: '#0022ee' };
+    renderToStaticMarkup(<LoadedGlbAsset descriptor={{ ...descriptor, category: 'strap' }} appearance={appearance} />);
+    const result = clone.mock.results[0]!.value as Group;
+    const resultMaterial = (result.children[0] as Mesh).material as MeshPhysicalMaterial;
+    expect(resultMaterial).not.toBe(material);
+    expect(resultMaterial.color).toEqual(new Color('#e7dcc8'));
+    expect(resultMaterial).toMatchObject({ roughness: .34, anisotropy: .7 });
+    expect(resultMaterial.normalMap).toBe(material.normalMap);
+    expect(mesh.material).toBe(material);
+  });
+
+  it('passes explicit crown finish overrides without dropping imported maps', () => {
+    const scene = new Group();
+    const material = new MeshPhysicalMaterial({ roughness: .41, metalness: .91, anisotropy: .6, normalMap: new Texture() });
+    material.userData = { DD_REALISM_SCHEMA: REALISM_SCHEMA, DD_REALISM_ROLE: 'steel-brushed' };
+    scene.add(new Mesh(new BoxGeometry(), material));
+    loader.load.mockReturnValue({ scene });
+    const clone = vi.spyOn(scene, 'clone');
+    const appearance = { ...watchAssemblyToVisualModel(createDefaultWatchAssembly()).archetypeAppearance, crownFinishOverride: { roughness: .075, metalness: 1 } };
+    renderToStaticMarkup(<LoadedGlbAsset descriptor={descriptor} appearance={appearance} />);
+    const result = (clone.mock.results[0]!.value as Group).children[0] as Mesh;
+    expect(result.material).toMatchObject({ roughness: .075, metalness: 1, anisotropy: .6, normalMap: material.normalMap });
+    expect(material).toMatchObject({ roughness: .41, metalness: .91 });
   });
 
   it('places unit and axis conversion inside descriptor corrections', () => {

@@ -2,3 +2,8 @@
 # DXF TEXT entities containing a space are intentional format content.
 output/pdf/*.pdf binary
 output/pdf/*.dxf -text whitespace=-blank-at-eol
+
+# Realism render/dependency fingerprints include producer bytes.
+# Keep those bytes stable across Windows and other checkouts.
+tools/blender/realism_* text eol=lf
+tools/blender/test_realism_*.py text eol=lf

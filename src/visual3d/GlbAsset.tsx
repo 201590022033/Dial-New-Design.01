@@ -12,11 +12,13 @@ import type { AppearanceDocument } from '@/domain/appearance/appearance';
 import { applyHandAppearance } from './handAppearanceRegions';
 import { useAppearancePreviewStore } from '@/stores/appearancePreviewStore';
 import { hideEmbeddedCrownPreview } from './crownAssetOwnership';
+import { applyRealismAppearance, clonePresentationMaterial, neutralCrystal, realismRole } from './realismMaterials';
 
 type AssetAppearance = {
   crownColor?: string;
   crownMetalness?: number;
   crownRoughness?: number;
+  crownFinishOverride?: { roughness: number; metalness: number };
   regions?: AppearanceDocument;
   caseColor?: string;
   handsColor?: string;
@@ -77,21 +79,23 @@ export const LoadedGlbAsset = ({ descriptor, appearance, scaleTexture, liveOuter
       object.receiveShadow = true;
       const sourceMaterials = (Array.isArray(object.material) ? object.material : [object.material]) as Material[];
       const clonedMaterials = sourceMaterials.map((material) => {
-        const isCrystal = material.name.toLowerCase().includes('sapphire') || objectName.includes('CRYSTAL') || objectName.startsWith('DD_DIAMOND_');
-        if (!isCrystal || !(material instanceof MeshStandardMaterial)) return material.clone();
-        return new MeshPhysicalMaterial({
-          color: material.color.clone(), map: material.map, normalMap: material.normalMap,
-          roughnessMap: material.roughnessMap, metalnessMap: material.metalnessMap,
-          alphaMap: material.alphaMap, side: material.side
-        });
+        const role = realismRole(material);
+        const isCrystal = role === 'crystal' || role === 'diamond' || material.name.toLowerCase().includes('sapphire') || objectName.includes('CRYSTAL') || objectName.startsWith('DD_DIAMOND_');
+        return clonePresentationMaterial(material, isCrystal);
       });
       object.material = Array.isArray(object.material) ? clonedMaterials : clonedMaterials[0];
       const materials = clonedMaterials;
       for (const material of materials) {
         if (!(material instanceof MeshStandardMaterial)) continue;
-        material.envMapIntensity = 1.35;
+        const role = realismRole(material);
+        const metalColor = descriptor.category === 'crown' ? appearance?.crownColor : descriptor.category === 'bezel' ? appearance?.bezelMetalColor ?? appearance?.caseColor : appearance?.caseColor;
+        const refined = applyRealismAppearance(material, { strapColor, caseColor: appearance?.caseColor, metalColor, metalFinish: descriptor.category === 'crown' ? appearance?.crownFinishOverride : undefined, bezelColor, dialColor, handsColor: appearance?.handsColor, lumeEnabled: appearance?.lumeEnabled, lumeColor: appearance?.lumeColor });
+        if (role === 'crystal') object.castShadow = false;
+        if (!refined) material.envMapIntensity = 1.35;
         const name = material.name.toLowerCase();
-        if (objectName.startsWith('DD_DIAMOND_')) {
+        if (refined) {
+          // Versioned materials retain their authored physical finish.
+        } else if (objectName.startsWith('DD_DIAMOND_')) {
           material.color = new Color('#f4faff');
           material.metalness = 0;
           material.roughness = 0.035;
@@ -105,19 +109,7 @@ export const LoadedGlbAsset = ({ descriptor, appearance, scaleTexture, liveOuter
           material.metalness = 1;
           material.roughness = 0.18;
         } else if (name.includes('sapphire') || objectName.includes('CRYSTAL')) {
-          material.color = new Color('#e8f7ff');
-          material.transparent = true;
-          material.opacity = 0.26;
-          material.depthWrite = false;
-          material.roughness = 0.025;
-          material.envMapIntensity = 2.25;
-          if (material instanceof MeshPhysicalMaterial) {
-            material.transmission = 0.98;
-            material.ior = 1.76;
-            material.thickness = 0.75;
-            material.clearcoat = 1;
-            material.clearcoatRoughness = 0.015;
-          }
+          if (material instanceof MeshPhysicalMaterial) neutralCrystal(material);
           object.castShadow = false;
         } else if (objectName.includes('CASE_MIDCASE')) {
           material.color = new Color(appearance?.caseColor ?? '#b5bec8');
@@ -212,6 +204,17 @@ export const LoadedGlbAsset = ({ descriptor, appearance, scaleTexture, liveOuter
           material.roughness = appearance?.strapStyleId === 'canvas' ? 0.88 : appearance?.strapStyleId === 'leather' || appearance?.strapStyleId === 'racing' ? 0.46 : 0.62;
           material.envMapIntensity = appearance?.strapStyleId === 'canvas' ? 0.35 : 0.7;
         }
+        if (refined && (role === 'ink' || role === 'lume') && appearance?.markerColor && !objectName.includes('DATE_') && (objectName.includes('DIAL_MARKER') || objectName.includes('_INDEX_') || objectName.includes('HOUR_MARKERS') || objectName.includes('DIAL_MINUTE') || objectName.includes('ARCH_MINUTE') || objectName.includes('NUMERAL') || objectName.includes('ARCH_ORIENTATION'))) {
+          material.color.set(appearance.markerColor);
+          const automaticLume = !appearance.markerColorExplicit && appearance.lumeEnabled;
+          material.emissive.set(automaticLume ? appearance.lumeColor : '#000000');
+          material.emissiveIntensity = automaticLume && appearance.markerColor !== '#26313D' ? .12 : 0;
+        }
+        if (role === 'dial-face' && dialFinishTexture !== undefined) {
+          material.roughnessMap = dialFinishTexture;
+          material.bumpMap = dialFinishTexture;
+          material.bumpScale = finishBumpScale;
+        }
         if (objectName.startsWith('DD_SCALE_SURFACE_')) {
           // Printing belongs to the authored annulus below/around the crystal.
           // Its PBR material receives the same studio lighting as the carrier.
@@ -223,9 +226,8 @@ export const LoadedGlbAsset = ({ descriptor, appearance, scaleTexture, liveOuter
           material.opacity = 1;
         }
         material.needsUpdate = true;
-        const metalColor = descriptor.category === 'crown' ? appearance?.crownColor : descriptor.category === 'bezel' ? appearance?.bezelMetalColor ?? appearance?.caseColor : appearance?.caseColor;
-        if (descriptor.category === 'crown') { material.roughness = appearance?.crownRoughness ?? material.roughness; material.metalness = appearance?.crownMetalness ?? material.metalness; }
-        if (metalColor && ['case', 'caseback', 'crown', 'pushers', 'bezel'].includes(descriptor.category) && material.metalness > 0.5) {
+        if (!refined && descriptor.category === 'crown') { material.roughness = appearance?.crownRoughness ?? material.roughness; material.metalness = appearance?.crownMetalness ?? material.metalness; }
+        if (!refined && metalColor && ['case', 'caseback', 'crown', 'pushers', 'bezel'].includes(descriptor.category) && material.metalness > 0.5) {
           material.color = new Color(metalColor);
         }
       }
@@ -239,7 +241,7 @@ export const LoadedGlbAsset = ({ descriptor, appearance, scaleTexture, liveOuter
         // Clip both against the complete reviewed blade endpoint, not two independent tips.
         const role = /^DD_HAND_(HOUR|MINUTE|SECONDS)_(BODY|TIP)$/.exec(mesh.name);
         const absoluteEnd = descriptor.assetId === 'reference-42-hands-preview' && role ? { HOUR: -8.5, MINUTE: -13.3, SECONDS: -13 }[role[1] as 'HOUR' | 'MINUTE' | 'SECONDS'] : undefined;
-        applyHandAppearance(mesh, appearance.regions!, absoluteEnd);
+        applyHandAppearance(mesh, appearance.regions!, absoluteEnd, (material) => material.dispose());
       });
     }
     if (night) clone.traverse((object) => {
@@ -247,12 +249,12 @@ export const LoadedGlbAsset = ({ descriptor, appearance, scaleTexture, liveOuter
       for (const material of Array.isArray(object.material) ? object.material : [object.material]) {
         if (!(material instanceof MeshStandardMaterial)) continue;
         material.envMapIntensity = 0;
-        if (object.userData.DD_REGION === 'lume') material.emissiveIntensity = 1.5;
+        if (object.userData.DD_REGION === 'lume' || realismRole(material) === 'hand-lume') material.emissiveIntensity = 1.5;
       }
     });
     if (!hasMesh) throw new Error('GLB has no mesh');
     return clone;
-  }, [night, appearance?.regions, appearance?.caseColor, appearance?.crownColor, appearance?.crownMetalness, appearance?.crownRoughness, appearance?.handsColor, appearance?.markerColor, appearance?.markerColorExplicit, appearance?.bezelMetalColor, appearance?.dialTextureIntensity, appearance?.dialTextureKind, appearance?.lumeColor, appearance?.lumeEnabled, appearance?.strapStyleId, bezelColor, descriptor.assetId, descriptor.category, descriptor.scaleArtworkSurface, dialColor, gltf, scaleTexture, liveOuterArtwork, dialFinishTexture, finishBumpScale, strapColor]);
+  }, [night, appearance?.regions, appearance?.caseColor, appearance?.crownColor, appearance?.crownMetalness, appearance?.crownRoughness, appearance?.crownFinishOverride, appearance?.handsColor, appearance?.markerColor, appearance?.markerColorExplicit, appearance?.bezelMetalColor, appearance?.dialTextureIntensity, appearance?.dialTextureKind, appearance?.lumeColor, appearance?.lumeEnabled, appearance?.strapStyleId, bezelColor, descriptor.assetId, descriptor.category, descriptor.scaleArtworkSurface, dialColor, gltf, scaleTexture, liveOuterArtwork, dialFinishTexture, finishBumpScale, strapColor]);
   // Loading can complete after the frame triggered by a Style click. Demand
   // rendering must capture the new mesh (including sapphire transmission).
   useEffect(() => {

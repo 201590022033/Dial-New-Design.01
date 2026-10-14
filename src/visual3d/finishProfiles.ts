@@ -13,6 +13,9 @@ export interface FinishProfile {
   clearcoatRoughness?: number;
   ior?: number;
   thickness?: number;
+  iridescence?: number;
+  iridescenceIOR?: number;
+  iridescenceThicknessRange?: [number, number];
   emissive?: string;
   emissiveIntensity?: number;
   sheen?: number;
@@ -28,11 +31,11 @@ export const finishProfiles: Record<FinishProfileId, FinishProfile> = {
   'black-pvd': { id: 'black-pvd', label: 'Black PVD', color: '#16181b', metalness: 0.8, roughness: 0.28, provenance: 'provisional' },
   brass: { id: 'brass', label: 'Brass', color: '#b98945', metalness: 0.78, roughness: 0.3, provenance: 'provisional' },
   dial: { id: 'dial', label: 'Dial surface', color: '#0f172a', metalness: 0.02, roughness: 0.42, clearcoat: 0.12, clearcoatRoughness: 0.3, provenance: 'provisional' },
-  sapphire: { id: 'sapphire', label: 'Sapphire crystal', color: '#e8f7ff', metalness: 0, roughness: 0.025, transmission: 0.98, opacity: 1, clearcoat: 1, clearcoatRoughness: 0.015, ior: 1.76, thickness: 0.75, provenance: 'provisional' },
+  sapphire: { id: 'sapphire', label: 'Sapphire crystal', color: '#ffffff', metalness: 0, roughness: 0, transmission: 1, opacity: 1, clearcoat: 1, clearcoatRoughness: 0.015, ior: 1.55, thickness: 0.75, iridescence: .035, iridescenceIOR: 1.3, iridescenceThicknessRange: [220, 220], provenance: 'provisional' },
   lume: { id: 'lume', label: 'Lume', color: '#dfffd2', metalness: 0, roughness: 0.38, emissive: '#73b867', emissiveIntensity: 0.42, provenance: 'provisional' },
-  rubber: { id: 'rubber', label: 'Vulcanized rubber', color: '#111318', metalness: 0, roughness: 0.62, sheen: 0.18, sheenRoughness: 0.7, provenance: 'provisional' },
-  leather: { id: 'leather', label: 'Leather', color: '#4b2d1c', metalness: 0, roughness: 0.46, clearcoat: 0.08, clearcoatRoughness: 0.55, sheen: 0.32, sheenRoughness: 0.6, provenance: 'provisional' },
-  canvas: { id: 'canvas', label: 'Woven canvas', color: '#4a4a32', metalness: 0, roughness: 0.88, sheen: 0.12, sheenRoughness: 0.9, provenance: 'provisional' }
+  rubber: { id: 'rubber', label: 'Vulcanized rubber', color: '#111318', metalness: 0, roughness: 0.66, sheen: 0.18, sheenRoughness: 0.7, provenance: 'provisional' },
+  leather: { id: 'leather', label: 'Leather', color: '#4b2d1c', metalness: 0, roughness: 0.55, clearcoat: 0.08, clearcoatRoughness: 0.55, sheen: 0.32, sheenRoughness: 0.7, provenance: 'provisional' },
+  canvas: { id: 'canvas', label: 'Woven canvas', color: '#4a4a32', metalness: 0, roughness: 0.89, sheen: 0.12, sheenRoughness: 0.9, provenance: 'provisional' }
 };
 
 export const resolveFinishProfile = (value: string | undefined, fallback: FinishProfileId): FinishProfile =>

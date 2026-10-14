@@ -27,6 +27,10 @@ export const resolveCameraDistance = (value: unknown, preset: CameraPresetId): n
     ? value
     : CAMERA_PRESETS[preset].distance;
 
+/** Keep the same horizontal framing in portrait panels and reframe after HD resize. */
+export const responsiveCameraDistance = (distance: number, width: number, height: number): number =>
+  width > 0 && height > 0 ? distance / Math.min(1, width / height) : distance;
+
 export interface RenderAlignmentCheck {
   label: string;
   status: 'pass' | 'warning';

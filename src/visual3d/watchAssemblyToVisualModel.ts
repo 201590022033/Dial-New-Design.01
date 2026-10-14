@@ -95,6 +95,7 @@ export type VisualWatchModel = {
   };
   archetypeAppearance: {
     crownColor?: string; crownMetalness?: number; crownRoughness?: number;
+    crownFinishOverride?: { roughness: number; metalness: number };
     regions?: AppearanceDocument;
     caseColor?: string;
     handsColor?: string;
@@ -251,6 +252,12 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
     const size = (s: CrownSpecificationV1) => [specValue(s.coreDiameterMm, 0), specValue(s.maximumOuterDiameterMm, 0), specValue(s.headLengthMm, 0)];
     if (!authored || JSON.stringify(size(authored)) !== JSON.stringify(size(crownSpec))) assets.crown = visualAssetRegistry['visual-crown-default']!;
   }
+  const catalogueCrownFinish = getCatalogueItem(crownPart?.catalogueItemId ?? '')?.crownSpecification?.finish;
+  const hasStoredCrownSpec = !!(crownPart?.crownSpecification || crownPart?.customProperties?.detachedCrownSpecification);
+  const explicitCrownFinish = !!crownSpec && (
+    (hasStoredCrownSpec && JSON.stringify(crownSpec.finish) !== JSON.stringify(catalogueCrownFinish)) ||
+    (crownSpec.finish.mode === 'inherit-case' && !!visualReferences.caseFinish)
+  );
   if (crownSpec?.finish.mode === 'inherit-case') finishes.crown = finishes.case;
   if (crownSpec?.finish.mode === 'override') finishes.crown = { ...resolveFinishProfile(crownSpec.finish.material === 'rose-gold' || crownSpec.finish.material === 'black-pvd' ? crownSpec.finish.material : crownSpec.finish.texture === 'polished' ? 'polished-steel' : 'brushed-steel', 'polished-steel'), color: crownSpec.finish.color };
   const caseParams = casePart?.parametricGeometry?.schema === 'parametric-case/v1' ? casePart.parametricGeometry : undefined;
@@ -437,6 +444,7 @@ export const watchAssemblyToVisualModel = (assembly: WatchAssembly): VisualWatch
     },
     archetypeAppearance: {
       crownColor: finishes.crown.color, crownMetalness: finishes.crown.metalness, crownRoughness: finishes.crown.roughness,
+      crownFinishOverride: explicitCrownFinish ? { roughness: finishes.crown.roughness, metalness: finishes.crown.metalness } : undefined,
       regions: assembly.designConfig?.appearance ? resolveAppearance(assembly) : undefined,
       caseColor: visualReferences.caseFinish === 'rose-gold' || visualReferences.caseFinish === 'black-pvd' ? finishes.case.color : undefined,
       handsColor: visualReferences.handsColor ?? (visualReferences.handsFinish === 'rose-gold' ? finishes.hands.color : undefined),

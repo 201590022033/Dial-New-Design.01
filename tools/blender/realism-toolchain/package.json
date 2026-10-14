@@ -1,0 +1,10 @@
+{
+  "name": "watch-realism-validation-tools",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Offline tools; not an application dependency",
+  "dependencies": {
+    "@resvg/resvg-js": "2.6.2",
+    "gltf-validator": "2.0.0-dev.3.10"
+  }
+}

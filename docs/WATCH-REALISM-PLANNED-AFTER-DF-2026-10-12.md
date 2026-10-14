@@ -1,8 +1,8 @@
 # Watch model realism — separate planned task after DF7
 
-Status: **Planned; not started**. Added 12 October 2026 at the user's request. Dependency: complete the DF0–DF7 design-first roadmap before beginning this task. It is not a prerequisite for DF1 or part of its implementation.
+Status: **VR0–VR5 complete locally, 14 October 2026**. DF7 was committed and pushed as `c1cead1` before this work. The [work plan and execution ledger](WATCH-REALISM-WORK-PLAN-2026-10-14.md) records the medium-effort implementation, approved strap sides and completion evidence. The [release report](WATCH-REALISM-RELEASE-2026-10-14.md) identifies 101 refined components, six standalone watches/editable scenes, 20 final images and the verified archive, with preservation limits and remaining manual gates. Git publication was authorized on 14 October 2026; the generated archive remains a local pre-publication validation snapshot. Added 12 October 2026 as a separate post-DF task; it remains separate from the DF implementation.
 
-The original attached brief is preserved in [WATCH-REALISM-USER-BRIEF-2026-10-12.txt](briefs/WATCH-REALISM-USER-BRIEF-2026-10-12.txt). Its detailed material, geometry, rendering and export requirements remain the source request. This planning entry does not authorize running its Phase 0 or editing GLBs now.
+The original attached brief is preserved in [WATCH-REALISM-USER-BRIEF-2026-10-12.txt](briefs/WATCH-REALISM-USER-BRIEF-2026-10-12.txt). Its detailed material, geometry, rendering and export requirements remain the source request. The user's later explicit instructions authorize preparation and full implementation; the earlier planning-only boundary below is retained as historical context.
 
 ## Outcome
 
@@ -32,4 +32,4 @@ Improve existing watch GLB realism through Blender/bpy while preserving dashboar
 
 After VR0 has fixed interfaces, separate agents may own strap detail, glass/materials and the rendering/export pipeline in isolated files/assets. The lead integrates and checks the app's asset/UV/colour contracts. Blender scripts and existing GLB validators are the main tools; browser computer-use verifies dashboard behaviour. Image generation is not a substitute for editing the existing 3D assets.
 
-No asset edits, Blender execution, scheduling automation or publication were performed when adding this planned task.
+No asset edits, Blender execution, scheduling automation or publication were performed when adding this planned task on 12 October. The subsequently authorized VR0 inspected and backed up all 114 GLBs and ran Blender/capability probes without changing source assets. See the [inventory report](realism/VR0-ASSET-INVENTORY.md) and current execution ledger for later work.

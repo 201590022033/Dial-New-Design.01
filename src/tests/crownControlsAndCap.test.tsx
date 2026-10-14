@@ -1,3 +1,5 @@
+import { MeshPhysicalMaterial, Texture } from 'three';
+import { applyRealismAppearance, clonePresentationMaterial, REALISM_SCHEMA } from '@/visual3d/realismMaterials';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 vi.hoisted(() => { const data = new Map<string, string>(); vi.stubGlobal('localStorage', { getItem: (k: string) => data.get(k) ?? null, setItem: (k: string, v: string) => data.set(k, v), removeItem: (k: string) => data.delete(k) }); });
 import { renderToStaticMarkup } from 'react-dom/server';
@@ -70,6 +72,23 @@ describe('C4 connected crown transitions', () => {
     useWatchAssemblyStore.getState().undoAssembly(); expect(useWatchAssemblyStore.getState().assembly).toEqual(changed);
     useWatchAssemblyStore.getState().redoAssembly(); expect(useWatchAssemblyStore.getState().assembly).toEqual(committed);
   });
+  it('applies an explicit refined crown finish and Undo restores the authored finish detail', () => {
+    const source = new MeshPhysicalMaterial({ roughness: .41, metalness: .91, anisotropy: .63, normalMap: new Texture(), roughnessMap: new Texture() });
+    source.userData = { DD_REALISM_SCHEMA: REALISM_SCHEMA, DD_REALISM_ROLE: 'steel-polished' };
+    const rendered = () => {
+      const appearance = watchAssemblyToVisualModel(useWatchAssemblyStore.getState().assembly).archetypeAppearance;
+      const material = clonePresentationMaterial(source) as MeshPhysicalMaterial;
+      applyRealismAppearance(material, { metalColor: appearance.crownColor, metalFinish: appearance.crownFinishOverride });
+      return material;
+    };
+    expect(rendered()).toMatchObject({ roughness: .41, metalness: .91 });
+    expect(apply({ type: 'finish', finish: { mode: 'override', material: 'steel', color: '#e2e8f0', texture: 'polished' } })).toBe(true);
+    expect(rendered()).toMatchObject({ roughness: .075, metalness: 1, anisotropy: .63, normalMap: source.normalMap, roughnessMap: source.roughnessMap });
+    useWatchAssemblyStore.getState().undoAssembly();
+    expect(rendered()).toMatchObject({ roughness: .41, metalness: .91, anisotropy: .63, normalMap: source.normalMap, roughnessMap: source.roughnessMap });
+    expect(source).toMatchObject({ roughness: .41, metalness: .91 });
+  });
+
   it.each(['physical', 'tray', 'style'])('refuses %s lock acquired after preview', lock => {
     const assembly = useWatchAssemblyStore.getState().assembly, item = crownEditCandidate(assembly, id, rose);
     useConfiguratorUIStore.getState().setPreview(applyCatalogueVisualSelection(assembly, id, item), id, item);

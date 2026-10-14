@@ -6,7 +6,7 @@
   "assets": [
     {
       "path": "public/assets/3d/archetypes/hands-chronograph-baton.glb",
-      "sha256": "e84af883ac9e2712687d79e0acec197ab8fa73f4d34bc112d57a88eaef128b63",
+      "sha256": "58b72bdd999edbeb44692c82981a8b250e7f32ff897ea8e32b4504567cfa9e3d",
       "nodes": [
         {
           "name": "DD_ARCH_CHRONO_SECONDS",
@@ -516,11 +516,12 @@
         ],
         "explicitTipNodes": [],
         "explicitOutlineLumeNodes": []
-      }
+      },
+      "sourceSha256": "e84af883ac9e2712687d79e0acec197ab8fa73f4d34bc112d57a88eaef128b63"
     },
     {
       "path": "public/assets/3d/archetypes/hands-chronograph-needle.glb",
-      "sha256": "cedf9c855b51a1c56fd79092a2a913be5cffcf7fccc046af39ba47eda596c370",
+      "sha256": "428401b606b4376766a86f70e36ac70b3ae49302bda8e05050b4f47afbe53dcf",
       "nodes": [
         {
           "name": "DD_ARCH_CHRONO_SECONDS",
@@ -1030,11 +1031,12 @@
         ],
         "explicitTipNodes": [],
         "explicitOutlineLumeNodes": []
-      }
+      },
+      "sourceSha256": "cedf9c855b51a1c56fd79092a2a913be5cffcf7fccc046af39ba47eda596c370"
     },
     {
       "path": "public/assets/3d/archetypes/hands-chronograph-syringe.glb",
-      "sha256": "54de2752b1bd06e9b981cb6d63cbd356075c9bdeb71a4c845b8ad886fcfda18c",
+      "sha256": "da5689b3e1ce62641f2a15dfa97c098d6de824212ae10fe85c8db04a3cd692b4",
       "nodes": [
         {
           "name": "DD_ARCH_CHRONO_SECONDS",
@@ -1544,11 +1546,12 @@
         ],
         "explicitTipNodes": [],
         "explicitOutlineLumeNodes": []
-      }
+      },
+      "sourceSha256": "54de2752b1bd06e9b981cb6d63cbd356075c9bdeb71a4c845b8ad886fcfda18c"
     },
     {
       "path": "public/assets/3d/archetypes/hands-chronograph.glb",
-      "sha256": "cedf9c855b51a1c56fd79092a2a913be5cffcf7fccc046af39ba47eda596c370",
+      "sha256": "428401b606b4376766a86f70e36ac70b3ae49302bda8e05050b4f47afbe53dcf",
       "nodes": [
         {
           "name": "DD_ARCH_CHRONO_SECONDS",
@@ -2058,11 +2061,12 @@
         ],
         "explicitTipNodes": [],
         "explicitOutlineLumeNodes": []
-      }
+      },
+      "sourceSha256": "cedf9c855b51a1c56fd79092a2a913be5cffcf7fccc046af39ba47eda596c370"
     },
     {
       "path": "public/assets/3d/archetypes/hands-diver.glb",
-      "sha256": "8c9649597f9e997f6f9ebac6e950a94f3e1173f2e62ef9dd0386a8323bf331c6",
+      "sha256": "6ce209404b67753ad0c9e1cf22d24d248b0b38d4b3b779ba9e63bd0176a7d432",
       "nodes": [
         {
           "name": "DD_ARCH_HAND_0",
@@ -2313,11 +2317,12 @@
         "registerNodes": [],
         "explicitTipNodes": [],
         "explicitOutlineLumeNodes": []
-      }
+      },
+      "sourceSha256": "8c9649597f9e997f6f9ebac6e950a94f3e1173f2e62ef9dd0386a8323bf331c6"
     },
     {
       "path": "public/assets/3d/archetypes/hands-dress.glb",
-      "sha256": "a8ba6e4feb6a03ebcd9566a801fbf3e88301185c374ae5e3bdec73c843208be0",
+      "sha256": "2e84acd0157e29506b1a15c4f2fb7c343f55f8c1d6e90474790d3e39aeae65c2",
       "nodes": [
         {
           "name": "DD_ARCH_HAND_0",
@@ -2485,11 +2490,12 @@
         "registerNodes": [],
         "explicitTipNodes": [],
         "explicitOutlineLumeNodes": []
-      }
+      },
+      "sourceSha256": "a8ba6e4feb6a03ebcd9566a801fbf3e88301185c374ae5e3bdec73c843208be0"
     },
     {
       "path": "public/assets/3d/archetypes/hands-field.glb",
-      "sha256": "cf2ce42cccddcd72709dd856c57f263f1caae61dd017025cf85da34e9b9bd275",
+      "sha256": "d77c20b6577b2462c2df9d1dc56ffdab444e344c3292f9256f781edb0ed9efd1",
       "nodes": [
         {
           "name": "DD_ARCH_HAND_0",
@@ -2740,11 +2746,12 @@
         "registerNodes": [],
         "explicitTipNodes": [],
         "explicitOutlineLumeNodes": []
-      }
+      },
+      "sourceSha256": "cf2ce42cccddcd72709dd856c57f263f1caae61dd017025cf85da34e9b9bd275"
     },
     {
       "path": "public/assets/3d/archetypes/hands-pilot.glb",
-      "sha256": "11d0902c8b811c7e66c734c0a00fa503798461cd9421883edfffae38e498cef8",
+      "sha256": "7b6e4aee151378792993042db362e8260c95c5d61c973b1f6b89072fb458885a",
       "nodes": [
         {
           "name": "DD_ARCH_HAND_0",
@@ -2995,11 +3002,12 @@
         "registerNodes": [],
         "explicitTipNodes": [],
         "explicitOutlineLumeNodes": []
-      }
+      },
+      "sourceSha256": "11d0902c8b811c7e66c734c0a00fa503798461cd9421883edfffae38e498cef8"
     },
     {
       "path": "public/assets/3d/hands/hands_mercedes_42mm_v1.glb",
-      "sha256": "a04b110dbffe379fe27c27ae57e963a77231aef70a5a3f15bde215ed9e00195c",
+      "sha256": "d4c9cc6ee10353435252dd83ed9513d2fd4f75c179a240b6070e74d1ce546c40",
       "nodes": [
         {
           "name": "DD_HAND_HOUR",
@@ -3192,11 +3200,12 @@
         "registerNodes": [],
         "explicitTipNodes": [],
         "explicitOutlineLumeNodes": []
-      }
+      },
+      "sourceSha256": "a04b110dbffe379fe27c27ae57e963a77231aef70a5a3f15bde215ed9e00195c"
     },
     {
       "path": "public/assets/3d/hands/hands_mercedes_v1.glb",
-      "sha256": "ecbc5abc97142c759e6e362086fcbf67c1b2b75a23d18da83a3c3ed85b261cd3",
+      "sha256": "173343c4c20424ad67af4418e0e9deda1f68053ac94d9ddd7221d75ab399383e",
       "nodes": [
         {
           "name": "DD_HAND_HOUR",
@@ -3389,11 +3398,12 @@
         "registerNodes": [],
         "explicitTipNodes": [],
         "explicitOutlineLumeNodes": []
-      }
+      },
+      "sourceSha256": "ecbc5abc97142c759e6e362086fcbf67c1b2b75a23d18da83a3c3ed85b261cd3"
     },
     {
       "path": "public/assets/3d/reference-42/hands.glb",
-      "sha256": "64aa7a04e3d093f2a459a2e3f2a8e5d55f0c134738d1acf52736e79d32a998d7",
+      "sha256": "e34b408cd60829d9b5dfb2259c997ff9343a9dbe1d6fbc288e25a17b93aa5784",
       "nodes": [
         {
           "name": "DD_HAND_HOUR_BODY",
@@ -3960,11 +3970,12 @@
         "registerNodes": [],
         "explicitTipNodes": [],
         "explicitOutlineLumeNodes": []
-      }
+      },
+      "sourceSha256": "64aa7a04e3d093f2a459a2e3f2a8e5d55f0c134738d1acf52736e79d32a998d7"
     },
     {
       "path": "public/assets/3d/variants/hands/hands-baton-42.glb",
-      "sha256": "ee9689269724a0c754aa6d0ed1507f3b7156945dc42b1219ceb50d6d4b3cb913",
+      "sha256": "87c1fd96694f6f2b2560f8e91740d458d3d33a1a79d5af9bc5a8965fa8ed2633",
       "nodes": [
         {
           "name": "DD_HAND_HOUR",
@@ -4233,11 +4244,12 @@
         "registerNodes": [],
         "explicitTipNodes": [],
         "explicitOutlineLumeNodes": []
-      }
+      },
+      "sourceSha256": "ee9689269724a0c754aa6d0ed1507f3b7156945dc42b1219ceb50d6d4b3cb913"
     },
     {
       "path": "public/assets/3d/variants/hands/hands-baton-nh05-34.glb",
-      "sha256": "9bef317f30bb6ba236bb271a9bea5c1b21692bcc56e70c7f5de5b0de4c0c139c",
+      "sha256": "0e5dfd95a195e2fcd2392c3be9013369a2a58efbecd034f507465d2ca5ebc719",
       "nodes": [
         {
           "name": "DD_HAND_HOUR",
@@ -4506,11 +4518,12 @@
         "registerNodes": [],
         "explicitTipNodes": [],
         "explicitOutlineLumeNodes": []
-      }
+      },
+      "sourceSha256": "9bef317f30bb6ba236bb271a9bea5c1b21692bcc56e70c7f5de5b0de4c0c139c"
     },
     {
       "path": "public/assets/3d/variants/hands/hands-broad-arrow-42.glb",
-      "sha256": "ef461c599784f08b4b8d6e957ab2c8c1a2929f3c3749368a78c3f94b71cd951b",
+      "sha256": "6d2f4082a3153d97bfe7ad0bae7e4d35d9ecd1a79dca3c2de88513e3868f527a",
       "nodes": [
         {
           "name": "DD_HAND_HOUR",
@@ -4779,11 +4792,12 @@
         "registerNodes": [],
         "explicitTipNodes": [],
         "explicitOutlineLumeNodes": []
-      }
+      },
+      "sourceSha256": "ef461c599784f08b4b8d6e957ab2c8c1a2929f3c3749368a78c3f94b71cd951b"
     },
     {
       "path": "public/assets/3d/variants/hands/hands-cathedral-42.glb",
-      "sha256": "9b8c6a48bd566316408a079c20d5a4a6f7c26b1c7c3d212b1ab5791e306e8a80",
+      "sha256": "bda2ce1078983597f3f84d8945208bab74bb2c5138f6f2c2c2bfebcb247ce963",
       "nodes": [
         {
           "name": "DD_HAND_HOUR",
@@ -5052,11 +5066,12 @@
         "registerNodes": [],
         "explicitTipNodes": [],
         "explicitOutlineLumeNodes": []
-      }
+      },
+      "sourceSha256": "9b8c6a48bd566316408a079c20d5a4a6f7c26b1c7c3d212b1ab5791e306e8a80"
     },
     {
       "path": "public/assets/3d/variants/hands/hands-dauphine-42.glb",
-      "sha256": "e82e2c680bbf55e18fb9b3a46b5885e39cb67b8ed1f15d9714c5b5a852de2735",
+      "sha256": "0593711bae542911990f19ad071fa9f71d6bde9cc87237e1d48f6238f27fe6d5",
       "nodes": [
         {
           "name": "DD_HAND_HOUR",
@@ -5238,11 +5253,12 @@
         "registerNodes": [],
         "explicitTipNodes": [],
         "explicitOutlineLumeNodes": []
-      }
+      },
+      "sourceSha256": "e82e2c680bbf55e18fb9b3a46b5885e39cb67b8ed1f15d9714c5b5a852de2735"
     },
     {
       "path": "public/assets/3d/variants/hands/hands-mercedes-42.glb",
-      "sha256": "48b8f82cc174f56c1c04522238eb06dc6e37fbc1e0378ce36ff54d86d74b8495",
+      "sha256": "e1217cf715a17e328282956ba99c7761f6d43a20f2484a5c3cdde8b4d109802f",
       "nodes": [
         {
           "name": "DD_HAND_HOUR",
@@ -5722,11 +5738,12 @@
         "registerNodes": [],
         "explicitTipNodes": [],
         "explicitOutlineLumeNodes": []
-      }
+      },
+      "sourceSha256": "48b8f82cc174f56c1c04522238eb06dc6e37fbc1e0378ce36ff54d86d74b8495"
     },
     {
       "path": "public/assets/3d/variants/hands/hands-nh05-luminous-588.glb",
-      "sha256": "898f3d58ecf0c97f89c9b49e4d3d8f9d85ab2698b1e60e6cd688ca58773bb82d",
+      "sha256": "10af80a295e331a5ab4816b5b0a2e49690435ca3ea3f0e873b20f96d97631c1d",
       "nodes": [
         {
           "name": "DD_HAND_HOUR",
@@ -5998,11 +6015,12 @@
         "registerNodes": [],
         "explicitTipNodes": [],
         "explicitOutlineLumeNodes": []
-      }
+      },
+      "sourceSha256": "898f3d58ecf0c97f89c9b49e4d3d8f9d85ab2698b1e60e6cd688ca58773bb82d"
     },
     {
       "path": "public/assets/3d/variants/hands/hands-pencil-42.glb",
-      "sha256": "084a960978517cb9d3d5e2f8226856873d3f457087d94f3e66eac4474a950bee",
+      "sha256": "c0ab25939c80702dfb73e05500321f11c1ad752a2e7d8732d69987676a911cc3",
       "nodes": [
         {
           "name": "DD_HAND_HOUR",
@@ -6271,11 +6289,12 @@
         "registerNodes": [],
         "explicitTipNodes": [],
         "explicitOutlineLumeNodes": []
-      }
+      },
+      "sourceSha256": "084a960978517cb9d3d5e2f8226856873d3f457087d94f3e66eac4474a950bee"
     },
     {
       "path": "public/assets/3d/variants/hands/hands-skeleton-42.glb",
-      "sha256": "90538649857b9cb739f7bfce95a17929bed0a426bba03daa285c27c3021068ef",
+      "sha256": "1b8697a6c01284d07d17606421de6520c14c7aed6c216915db13b42cc791ca91",
       "nodes": [
         {
           "name": "DD_HAND_HOUR",
@@ -6457,11 +6476,12 @@
         "registerNodes": [],
         "explicitTipNodes": [],
         "explicitOutlineLumeNodes": []
-      }
+      },
+      "sourceSha256": "90538649857b9cb739f7bfce95a17929bed0a426bba03daa285c27c3021068ef"
     },
     {
       "path": "public/assets/3d/variants/hands/hands-sword-42.glb",
-      "sha256": "6e0453b209e06ff2074b3a5c50e0a377ea904b70aae326844264fd64b9865715",
+      "sha256": "6107e209da18e9eef3b2a5379106d3189a2164c39904af84729a67553304aff4",
       "nodes": [
         {
           "name": "DD_HAND_HOUR",
@@ -6730,11 +6750,12 @@
         "registerNodes": [],
         "explicitTipNodes": [],
         "explicitOutlineLumeNodes": []
-      }
+      },
+      "sourceSha256": "6e0453b209e06ff2074b3a5c50e0a377ea904b70aae326844264fd64b9865715"
     },
     {
       "path": "public/assets/3d/variants/hands/hands-syringe-42.glb",
-      "sha256": "1151d8919f04d09fa46615e3ec1ec59cc8ebaddcc78ccc05a10fc68bb46d3b0d",
+      "sha256": "d5b53e8a4ad6e5f10e931989a65c98dff1caddf3a2578a728e168890f6cc98df",
       "nodes": [
         {
           "name": "DD_HAND_HOUR",
@@ -7003,7 +7024,14 @@
         "registerNodes": [],
         "explicitTipNodes": [],
         "explicitOutlineLumeNodes": []
-      }
+      },
+      "sourceSha256": "1151d8919f04d09fa46615e3ec1ec59cc8ebaddcc78ccc05a10fc68bb46d3b0d"
     }
-  ]
+  ],
+  "realismRefresh": {
+    "date": "2026-10-14",
+    "sourceCommit": "c1cead147bf88c2b4e6ae8272984e75d096e49b1",
+    "scope": "Intentional material-only realism refinement; node names, geometry, frames, UV and region capabilities unchanged and independently compared.",
+    "hashRefresh": "Current public asset hashes verified after final fine-brushed-map promotion on 2026-10-14; historical source hashes and inventory claims retained."
+  }
 }

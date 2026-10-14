@@ -4,57 +4,76 @@
   "assets": [
     {
       "asset": "public/assets/3d/crowns/crown-smooth.glb",
-      "sha256": "4a3c074b995a7c222ddc74176cf670c7ce97d25c8d37d136365413d63794c41b",
+      "sha256": "2192509c71522938be2ac7365c4cec8bc093b4ed4c990381572b67e68da27097",
       "shape": "cylindrical",
       "grip": "smooth",
       "coreDiameterMm": 6.5,
       "maximumOuterDiameterMm": 6.5,
-      "headLengthMm": 3.5
+      "headLengthMm": 3.5,
+      "sourceGeometrySha256": "4a3c074b995a7c222ddc74176cf670c7ce97d25c8d37d136365413d63794c41b",
+      "sourceSha256": "4a3c074b995a7c222ddc74176cf670c7ce97d25c8d37d136365413d63794c41b"
     },
     {
       "asset": "public/assets/3d/crowns/crown-fine-fluted.glb",
-      "sha256": "7e9daeb3429539823261feecae3ca4a27d3b4a4a0acb2de356b721599df7b5e6",
+      "sha256": "dfe47b36f68258e0d51b467439b96a29cdf337b589ff42d84a2de6a63f4b1d8c",
       "shape": "cylindrical",
       "grip": "fine-fluted",
       "coreDiameterMm": 6.5,
       "maximumOuterDiameterMm": 6.9,
-      "headLengthMm": 3.5
+      "headLengthMm": 3.5,
+      "sourceGeometrySha256": "7e9daeb3429539823261feecae3ca4a27d3b4a4a0acb2de356b721599df7b5e6",
+      "sourceSha256": "7e9daeb3429539823261feecae3ca4a27d3b4a4a0acb2de356b721599df7b5e6"
     },
     {
       "asset": "public/assets/3d/crowns/crown-coarse-fluted.glb",
-      "sha256": "c264217680bf79c235ee6e0410496f0f1a0201360063bbccc7f2a1b8f866bb0c",
+      "sha256": "b9c3b84dc064e5246dc9ea2523082a65bbae49090fe752083ab3e27e2fa9d484",
       "shape": "cylindrical",
       "grip": "coarse-fluted",
       "coreDiameterMm": 6.5,
       "maximumOuterDiameterMm": 7.1,
-      "headLengthMm": 3.5
+      "headLengthMm": 3.5,
+      "sourceGeometrySha256": "c264217680bf79c235ee6e0410496f0f1a0201360063bbccc7f2a1b8f866bb0c",
+      "sourceSha256": "c264217680bf79c235ee6e0410496f0f1a0201360063bbccc7f2a1b8f866bb0c"
     },
     {
       "asset": "public/assets/3d/crowns/crown-knurled.glb",
-      "sha256": "d2ecd96893e5acc796acd41151c35b575ad8d5c933b9df93b4936341f5227912",
+      "sha256": "7af9f476e58571b69ee0c9af8e24621087d95a7c7fc53d14b8dbcbc0e43ac037",
       "shape": "cylindrical",
       "grip": "cross-knurled",
       "coreDiameterMm": 6.5,
       "maximumOuterDiameterMm": 6.9,
-      "headLengthMm": 3.5
+      "headLengthMm": 3.5,
+      "sourceGeometrySha256": "d2ecd96893e5acc796acd41151c35b575ad8d5c933b9df93b4936341f5227912",
+      "sourceSha256": "d2ecd96893e5acc796acd41151c35b575ad8d5c933b9df93b4936341f5227912"
     },
     {
       "asset": "public/assets/3d/crowns/crown-onion.glb",
-      "sha256": "4c73d1dc015c6dd262408b25832d9e80f36eb42e3ba8670b6e0d6b201bc10ea9",
+      "sha256": "28da07376cfc2100e84d9e30ada79b5520ef5d40bb81d9cf5b56674277c177c2",
       "shape": "onion",
       "grip": "fine-fluted",
       "coreDiameterMm": 6,
       "maximumOuterDiameterMm": 7,
-      "headLengthMm": 4
+      "headLengthMm": 4,
+      "sourceGeometrySha256": "4c73d1dc015c6dd262408b25832d9e80f36eb42e3ba8670b6e0d6b201bc10ea9",
+      "sourceSha256": "4c73d1dc015c6dd262408b25832d9e80f36eb42e3ba8670b6e0d6b201bc10ea9"
     },
     {
       "asset": "public/assets/3d/crowns/crown-compact-dress.glb",
-      "sha256": "7edc10939063d72ad1396a4c3c719f5bb13e3201e9e4bcb48c46a090e9d531bb",
+      "sha256": "f94e2350895bc922f85d97501f9a4cb4d02ba9731bac8823caa8a67a29ecdd43",
       "shape": "compact-dress",
       "grip": "fine-fluted",
       "coreDiameterMm": 5,
       "maximumOuterDiameterMm": 5.2,
-      "headLengthMm": 2.5
+      "headLengthMm": 2.5,
+      "sourceGeometrySha256": "7edc10939063d72ad1396a4c3c719f5bb13e3201e9e4bcb48c46a090e9d531bb",
+      "sourceSha256": "7edc10939063d72ad1396a4c3c719f5bb13e3201e9e4bcb48c46a090e9d531bb"
     }
-  ]
+  ],
+  "realismRefresh": {
+    "date": "2026-10-14",
+    "script": "tools/blender/realism_assets.py",
+    "contract": "101 source names/frames/envelopes/attachment geometry preserved; materials and new non-artwork map UV/tangents refined.",
+    "sourceCommit": "c1cead147bf88c2b4e6ae8272984e75d096e49b1",
+    "hashRefresh": "Current public asset hashes verified after final fine-brushed-map promotion on 2026-10-14; historical source hashes and inventory claims retained."
+  }
 }

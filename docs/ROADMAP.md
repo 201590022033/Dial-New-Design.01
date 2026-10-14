@@ -1,8 +1,8 @@
 # Dial Designer Roadmap
 
-## Planned follow-on after DF7 — watch realism
+## Follow-on after DF7 — watch realism
 
-[VR0–VR5 watch realism](WATCH-REALISM-PLANNED-AFTER-DF-2026-10-12.md) preserves the attached Blender brief as a separate planned task after the DF roadmap. It has not started.
+[VR0–VR5 watch realism](WATCH-REALISM-WORK-PLAN-2026-10-14.md) is **complete locally** after the committed/pushed DF7 release. All 114 originals are backed up; 101 refined components, six standalone GLBs/packed Blender scenes and 20 final PNG files are validated and packaged. Full application tests (1,315), lint/build and a bounded 20-switch HD browser check passed. See the [release report](WATCH-REALISM-RELEASE-2026-10-14.md) for the gallery/archive, preservation limits and remaining manual screen-reader, fit and long-session performance qualification. The approved strap convention is 6 o’clock adjustment tail / 12 o’clock buckle. Git publication was authorized on 14 October 2026. The generated Blender/render archive remains local; repository source and runtime assets are tracked in Git.
 
 ## Design-first workflow planning — 12 October 2026
 

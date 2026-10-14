@@ -1,0 +1,2117 @@
+{
+  "schema": "watch-realism-input/v1",
+  "source_commit": "c1cead147bf88c2b4e6ae8272984e75d096e49b1",
+  "scope": "101 registered/compatibility components; 13 review fixtures excluded from promotion",
+  "role_policy": "Names/source builders establish semantics; inventory candidates alone never authorize a geometry edit",
+  "approved_strap_sides": {
+    "6": "adjustment-hole tail",
+    "12": "buckle side"
+  },
+  "geometry_policy": "Preserve dimensions, names, pivots, dial/scale UV and attachment interfaces",
+  "files": [
+    {
+      "path": "public/assets/3d/archetypes/bezel-chronograph.glb",
+      "sha256": "d71e59efe7b3b6ed58ad4a3fab2722e0b12fcb3a9f1778f3682a516ebd0c5468",
+      "bytes": 615296,
+      "triangles": 22204,
+      "objects": 18,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "archetype bezel steel",
+        "archetype bezel insert",
+        "archetype bezel marking"
+      ],
+      "role_candidates": {
+        "bezel": 14,
+        "unidentified": 4
+      }
+    },
+    {
+      "path": "public/assets/3d/archetypes/bezel-diver.glb",
+      "sha256": "095cdab2df7988cb54ac44fa77e212162ba77e77f947fd5cb6487c39357b4313",
+      "bytes": 206140,
+      "triangles": 3288,
+      "objects": 63,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "archetype bezel steel",
+        "archetype bezel insert",
+        "archetype bezel marking"
+      ],
+      "role_candidates": {
+        "bezel": 63
+      }
+    },
+    {
+      "path": "public/assets/3d/archetypes/bezel-dress.glb",
+      "sha256": "131d11d9eeda4a4572d234c0fa7dc98e35ac2a21ad766bc7ff50e7f3cc220473",
+      "bytes": 55008,
+      "triangles": 1280,
+      "objects": 1,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "archetype bezel steel"
+      ],
+      "role_candidates": {
+        "bezel": 1
+      }
+    },
+    {
+      "path": "public/assets/3d/archetypes/bezel-field.glb",
+      "sha256": "131d11d9eeda4a4572d234c0fa7dc98e35ac2a21ad766bc7ff50e7f3cc220473",
+      "bytes": 55008,
+      "triangles": 1280,
+      "objects": 1,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "archetype bezel steel"
+      ],
+      "role_candidates": {
+        "bezel": 1
+      }
+    },
+    {
+      "path": "public/assets/3d/archetypes/bezel-pilot.glb",
+      "sha256": "b7829541c81eeb74d97c10cfe115ae7f032f28feb7ef02fa8a41a70987ef5043",
+      "bytes": 1596400,
+      "triangles": 52708,
+      "objects": 162,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "archetype bezel steel",
+        "Pilot logarithmic printing surface",
+        "Pilot ivory logarithmic marks"
+      ],
+      "role_candidates": {
+        "bezel": 2,
+        "unidentified": 72,
+        "scale-artwork": 87,
+        "live-scale-surface": 1
+      }
+    },
+    {
+      "path": "public/assets/3d/archetypes/chapter-ring-pilot.glb",
+      "sha256": "bec56c108fd1ecc9c099701c32b76b11a906310d0d618081c0c79717daa47801",
+      "bytes": 1416880,
+      "triangles": 50564,
+      "objects": 89,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "Pilot fixed chapter scale surface",
+        "Pilot ivory logarithmic marks"
+      ],
+      "role_candidates": {
+        "chapter-ring": 1,
+        "scale-artwork": 87,
+        "live-scale-surface": 1
+      }
+    },
+    {
+      "path": "public/assets/3d/archetypes/dial-chronograph.glb",
+      "sha256": "9c7a60ff89b036f06e20d95d4d0f60c38c726e2263789a912523fa010a42b1da",
+      "bytes": 1260932,
+      "triangles": 46308,
+      "objects": 6,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "applied polished marker",
+        "archetype dial accent",
+        "archetype dial surface",
+        "chronograph register"
+      ],
+      "role_candidates": {
+        "unidentified": 4,
+        "minute-artwork": 1,
+        "dial-or-artwork": 1
+      }
+    },
+    {
+      "path": "public/assets/3d/archetypes/dial-diver.glb",
+      "sha256": "6b8860c48d498bd3a757796e1dd9b2e39a420b7203830750a76f835e1628a4f8",
+      "bytes": 162008,
+      "triangles": 1508,
+      "objects": 74,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "archetype dial surface",
+        "archetype dial accent"
+      ],
+      "role_candidates": {
+        "dial-or-artwork": 1,
+        "index": 12,
+        "minute-artwork": 60,
+        "unidentified": 1
+      }
+    },
+    {
+      "path": "public/assets/3d/archetypes/dial-dress.glb",
+      "sha256": "bd009638108c7ca3d878c34fb494444b4f00a62116856770b256989a1d2ad73c",
+      "bytes": 56536,
+      "triangles": 780,
+      "objects": 13,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "archetype dial surface",
+        "applied polished marker"
+      ],
+      "role_candidates": {
+        "dial-or-artwork": 1,
+        "index": 12
+      }
+    },
+    {
+      "path": "public/assets/3d/archetypes/dial-field.glb",
+      "sha256": "30872986bbad90bd613c7727af4cf1fa3c2fc840cd07988972f98ec597dce728",
+      "bytes": 745116,
+      "triangles": 24992,
+      "objects": 74,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "archetype dial surface",
+        "archetype dial accent"
+      ],
+      "role_candidates": {
+        "dial-or-artwork": 1,
+        "minute-artwork": 60,
+        "numeral": 12,
+        "unidentified": 1
+      }
+    },
+    {
+      "path": "public/assets/3d/archetypes/dial-pilot.glb",
+      "sha256": "7a4b469819cee2f9fa4f63c0e87a0c5f75263cee303cb085a7f8384284367bf8",
+      "bytes": 745104,
+      "triangles": 24992,
+      "objects": 74,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "archetype dial surface",
+        "archetype dial accent"
+      ],
+      "role_candidates": {
+        "dial-or-artwork": 1,
+        "minute-artwork": 60,
+        "numeral": 12,
+        "unidentified": 1
+      }
+    },
+    {
+      "path": "public/assets/3d/archetypes/hands-chronograph-baton.glb",
+      "sha256": "e84af883ac9e2712687d79e0acec197ab8fa73f4d34bc112d57a88eaef128b63",
+      "bytes": 51924,
+      "triangles": 768,
+      "objects": 12,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "VK63 register hand",
+        "archetype hand metal",
+        "archetype hand lume"
+      ],
+      "role_candidates": {
+        "unidentified": 7,
+        "hand-role-unconfirmed": 5
+      }
+    },
+    {
+      "path": "public/assets/3d/archetypes/hands-chronograph-needle.glb",
+      "sha256": "cedf9c855b51a1c56fd79092a2a913be5cffcf7fccc046af39ba47eda596c370",
+      "bytes": 51476,
+      "triangles": 756,
+      "objects": 12,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "VK63 register hand",
+        "archetype hand metal",
+        "archetype hand lume"
+      ],
+      "role_candidates": {
+        "unidentified": 7,
+        "hand-role-unconfirmed": 5
+      }
+    },
+    {
+      "path": "public/assets/3d/archetypes/hands-chronograph-syringe.glb",
+      "sha256": "54de2752b1bd06e9b981cb6d63cbd356075c9bdeb71a4c845b8ad886fcfda18c",
+      "bytes": 52396,
+      "triangles": 780,
+      "objects": 12,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "VK63 register hand",
+        "archetype hand metal",
+        "archetype hand lume"
+      ],
+      "role_candidates": {
+        "unidentified": 7,
+        "hand-role-unconfirmed": 5
+      }
+    },
+    {
+      "path": "public/assets/3d/archetypes/hands-chronograph.glb",
+      "sha256": "cedf9c855b51a1c56fd79092a2a913be5cffcf7fccc046af39ba47eda596c370",
+      "bytes": 51476,
+      "triangles": 756,
+      "objects": 12,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "VK63 register hand",
+        "archetype hand metal",
+        "archetype hand lume"
+      ],
+      "role_candidates": {
+        "unidentified": 7,
+        "hand-role-unconfirmed": 5
+      }
+    },
+    {
+      "path": "public/assets/3d/archetypes/hands-diver.glb",
+      "sha256": "8c9649597f9e997f6f9ebac6e950a94f3e1173f2e62ef9dd0386a8323bf331c6",
+      "bytes": 24152,
+      "triangles": 312,
+      "objects": 6,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "archetype hand metal",
+        "archetype hand lume"
+      ],
+      "role_candidates": {
+        "hand-role-unconfirmed": 6
+      }
+    },
+    {
+      "path": "public/assets/3d/archetypes/hands-dress.glb",
+      "sha256": "a8ba6e4feb6a03ebcd9566a801fbf3e88301185c374ae5e3bdec73c843208be0",
+      "bytes": 20488,
+      "triangles": 288,
+      "objects": 4,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "archetype hand metal"
+      ],
+      "role_candidates": {
+        "hand-role-unconfirmed": 4
+      }
+    },
+    {
+      "path": "public/assets/3d/archetypes/hands-field.glb",
+      "sha256": "cf2ce42cccddcd72709dd856c57f263f1caae61dd017025cf85da34e9b9bd275",
+      "bytes": 24156,
+      "triangles": 312,
+      "objects": 6,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "archetype hand metal",
+        "archetype hand lume"
+      ],
+      "role_candidates": {
+        "hand-role-unconfirmed": 6
+      }
+    },
+    {
+      "path": "public/assets/3d/archetypes/hands-pilot.glb",
+      "sha256": "11d0902c8b811c7e66c734c0a00fa503798461cd9421883edfffae38e498cef8",
+      "bytes": 24160,
+      "triangles": 312,
+      "objects": 6,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "archetype hand metal",
+        "archetype hand lume"
+      ],
+      "role_candidates": {
+        "hand-role-unconfirmed": 6
+      }
+    },
+    {
+      "path": "public/assets/3d/archetypes/pushers-chronograph.glb",
+      "sha256": "2742bbf8738614a72cfa4a283d6804a0f9f976784eb14cb481cbc0d20db157b3",
+      "bytes": 119372,
+      "triangles": 2280,
+      "objects": 6,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "chronograph pusher steel"
+      ],
+      "role_candidates": {
+        "pusher-or-interface": 6
+      }
+    },
+    {
+      "path": "public/assets/3d/archetypes/strap-canvas.glb",
+      "sha256": "537532fd15b82641019c9b4191024e3b5f3d9a2cc91b26cc6237cf63cdd77adc",
+      "bytes": 105044,
+      "triangles": 1808,
+      "objects": 10,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "canvas strap detail",
+        "spring bar steel"
+      ],
+      "role_candidates": {
+        "strap-side-unconfirmed": 6,
+        "spring-bar": 4
+      }
+    },
+    {
+      "path": "public/assets/3d/archetypes/strap-leather.glb",
+      "sha256": "09a540bac36702bab6cd2f9831d760b70c4eeaa5f4a176513af209e5c7bc8180",
+      "bytes": 105044,
+      "triangles": 1808,
+      "objects": 10,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "leather strap detail",
+        "spring bar steel"
+      ],
+      "role_candidates": {
+        "strap-side-unconfirmed": 6,
+        "spring-bar": 4
+      }
+    },
+    {
+      "path": "public/assets/3d/archetypes/strap-racing.glb",
+      "sha256": "e2ee7f297fa63b2378d8b8fe64ed6340d5aca315282e9d9ac1062dad06dad8c6",
+      "bytes": 409520,
+      "triangles": 7448,
+      "objects": 40,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "racing strap detail",
+        "spring bar steel"
+      ],
+      "role_candidates": {
+        "strap-side-unconfirmed": 36,
+        "spring-bar": 4
+      }
+    },
+    {
+      "path": "public/assets/3d/archetypes/strap-rubber.glb",
+      "sha256": "79aae3873ce915b4cdd030ddbb30c431bfd7653f75b710c816232e11840df8dc",
+      "bytes": 105044,
+      "triangles": 1808,
+      "objects": 10,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "rubber strap detail",
+        "spring bar steel"
+      ],
+      "role_candidates": {
+        "strap-side-unconfirmed": 6,
+        "spring-bar": 4
+      }
+    },
+    {
+      "path": "public/assets/3d/bezels/bezel_diver_40mm_v1.glb",
+      "sha256": "821d74090dc8dc6732572aec52ecdd6cb552039ddbd9d4da18be72522fb123b7",
+      "bytes": 453120,
+      "triangles": 6524,
+      "objects": 2,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "bezel insert",
+        "polished steel"
+      ],
+      "role_candidates": {
+        "bezel": 2
+      }
+    },
+    {
+      "path": "public/assets/3d/bezels/bezel_knurled_42mm_v1.glb",
+      "sha256": "d6cab8bcefff9f76ef4df0ebb1cae6e0b9eb2336f886b7cf95e281cd3cbc2281",
+      "bytes": 252272,
+      "triangles": 3712,
+      "objects": 98,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "knurled bezel steel",
+        "black ceramic bezel insert"
+      ],
+      "role_candidates": {
+        "bezel": 98
+      }
+    },
+    {
+      "path": "public/assets/3d/cases/case_round_40mm_v1.glb",
+      "sha256": "d60b9221262c439e6313a1d8379b9a2ac7493c85f808bfe00b993e22061f0809",
+      "bytes": 78036,
+      "triangles": 2856,
+      "objects": 7,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD Polished Steel",
+        "DD Brushed Steel"
+      ],
+      "role_candidates": {
+        "crown-or-interface": 2,
+        "lug": 4,
+        "case": 1
+      }
+    },
+    {
+      "path": "public/assets/3d/crowns/crown-coarse-fluted.glb",
+      "sha256": "c264217680bf79c235ee6e0410496f0f1a0201360063bbccc7f2a1b8f866bb0c",
+      "bytes": 116528,
+      "triangles": 6400,
+      "objects": 1,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD Crown neutral steel.002"
+      ],
+      "role_candidates": {
+        "crown-or-interface": 1
+      }
+    },
+    {
+      "path": "public/assets/3d/crowns/crown-compact-dress.glb",
+      "sha256": "7edc10939063d72ad1396a4c3c719f5bb13e3201e9e4bcb48c46a090e9d531bb",
+      "bytes": 116532,
+      "triangles": 6400,
+      "objects": 1,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD Crown neutral steel.005"
+      ],
+      "role_candidates": {
+        "crown-or-interface": 1
+      }
+    },
+    {
+      "path": "public/assets/3d/crowns/crown-fine-fluted.glb",
+      "sha256": "7e9daeb3429539823261feecae3ca4a27d3b4a4a0acb2de356b721599df7b5e6",
+      "bytes": 116528,
+      "triangles": 6400,
+      "objects": 1,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD Crown neutral steel.001"
+      ],
+      "role_candidates": {
+        "crown-or-interface": 1
+      }
+    },
+    {
+      "path": "public/assets/3d/crowns/crown-knurled.glb",
+      "sha256": "d2ecd96893e5acc796acd41151c35b575ad8d5c933b9df93b4936341f5227912",
+      "bytes": 116528,
+      "triangles": 6400,
+      "objects": 1,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD Crown neutral steel.003"
+      ],
+      "role_candidates": {
+        "crown-or-interface": 1
+      }
+    },
+    {
+      "path": "public/assets/3d/crowns/crown-onion.glb",
+      "sha256": "4c73d1dc015c6dd262408b25832d9e80f36eb42e3ba8670b6e0d6b201bc10ea9",
+      "bytes": 116456,
+      "triangles": 6400,
+      "objects": 1,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD Crown neutral steel.004"
+      ],
+      "role_candidates": {
+        "crown-or-interface": 1
+      }
+    },
+    {
+      "path": "public/assets/3d/crowns/crown-smooth.glb",
+      "sha256": "4a3c074b995a7c222ddc74176cf670c7ce97d25c8d37d136365413d63794c41b",
+      "bytes": 116464,
+      "triangles": 6400,
+      "objects": 1,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD Crown neutral steel"
+      ],
+      "role_candidates": {
+        "crown-or-interface": 1
+      }
+    },
+    {
+      "path": "public/assets/3d/crystals/crystal_domed_32mm_v1.glb",
+      "sha256": "f7d2eb29b59238eb74fcb6fec739f52c885b8b825eb50e98d223803c164a4460",
+      "bytes": 445632,
+      "triangles": 6332,
+      "objects": 2,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "sapphire"
+      ],
+      "role_candidates": {
+        "crystal": 2
+      }
+    },
+    {
+      "path": "public/assets/3d/dials/dial_face_40mm_layout_v1.glb",
+      "sha256": "f47583aea636cb522a292e4bbfa05df7b1ba8e4dd47d9803583b6d017518a698",
+      "bytes": 398432,
+      "triangles": 6040,
+      "objects": 21,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "dial textured surface",
+        "luminous marking",
+        "aperture interior",
+        "applied marking metal"
+      ],
+      "role_candidates": {
+        "dial-or-artwork": 15,
+        "subdial": 6
+      }
+    },
+    {
+      "path": "public/assets/3d/face-review/assembly-animated.glb",
+      "sha256": "a271585f5d900f1c1a7d5e3a18909b67800efd227545167ad0ddd9a2ed9555d7",
+      "bytes": 4527672,
+      "triangles": 43088,
+      "objects": 1329,
+      "eligible": false,
+      "reason": "Unregistered animated/mixed-role demonstration fixture",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "steel",
+        "ivory printing",
+        "charcoal ceramic",
+        "dial-guilloche.001",
+        "lume visual swatch"
+      ],
+      "role_candidates": {
+        "bezel": 3,
+        "dial-or-artwork": 2,
+        "chapter-ring": 1,
+        "unidentified": 1260,
+        "minute-artwork": 60,
+        "hand-role-unconfirmed": 3
+      }
+    },
+    {
+      "path": "public/assets/3d/face-review/bezel-minutes.glb",
+      "sha256": "d336b52d2c7400fc11dcf2ccc3de974647ab256614797a49498da02e41227b58",
+      "bytes": 719452,
+      "triangles": 12016,
+      "objects": 195,
+      "eligible": false,
+      "reason": "Unregistered animated/mixed-role demonstration fixture",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "steel",
+        "ivory printing",
+        "charcoal ceramic"
+      ],
+      "role_candidates": {
+        "bezel": 3,
+        "unidentified": 132,
+        "minute-artwork": 60
+      }
+    },
+    {
+      "path": "public/assets/3d/face-review/bezel-slide.glb",
+      "sha256": "517180874e09a5e2003b8ef076fefe94ed7c1fd4bb5e445824d6e59783c19140",
+      "bytes": 1266844,
+      "triangles": 14944,
+      "objects": 585,
+      "eligible": false,
+      "reason": "Unregistered animated/mixed-role demonstration fixture",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "steel",
+        "ivory printing",
+        "charcoal ceramic"
+      ],
+      "role_candidates": {
+        "bezel": 3,
+        "unidentified": 582
+      }
+    },
+    {
+      "path": "public/assets/3d/face-review/bezel-tachy.glb",
+      "sha256": "b5e6729424f8f70afe048b94c8b264986ea5c245e578f347e02e597917610106",
+      "bytes": 866896,
+      "triangles": 17228,
+      "objects": 150,
+      "eligible": false,
+      "reason": "Unregistered animated/mixed-role demonstration fixture",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "steel",
+        "ivory printing",
+        "charcoal ceramic"
+      ],
+      "role_candidates": {
+        "bezel": 2,
+        "unidentified": 148
+      }
+    },
+    {
+      "path": "public/assets/3d/face-review/chapter-minutes.glb",
+      "sha256": "3328944dea876d081011af74c4263f5f8fe3f5ac82e60164ff6517cf4a8a6eb9",
+      "bytes": 451196,
+      "triangles": 9040,
+      "objects": 73,
+      "eligible": false,
+      "reason": "Unregistered animated/mixed-role demonstration fixture",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "charcoal ceramic",
+        "ivory printing"
+      ],
+      "role_candidates": {
+        "chapter-ring": 1,
+        "unidentified": 12,
+        "minute-artwork": 60
+      }
+    },
+    {
+      "path": "public/assets/3d/face-review/chapter-slide.glb",
+      "sha256": "28a092fbc18e680a9e86724a3260cda26be4f578fec2c7d11f4c3c0a447ff7dc",
+      "bytes": 997488,
+      "triangles": 11968,
+      "objects": 463,
+      "eligible": false,
+      "reason": "Unregistered animated/mixed-role demonstration fixture",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "charcoal ceramic",
+        "ivory printing"
+      ],
+      "role_candidates": {
+        "chapter-ring": 1,
+        "unidentified": 462
+      }
+    },
+    {
+      "path": "public/assets/3d/face-review/chapter-tachy.glb",
+      "sha256": "23a70b34a42f8e56713487aa10f2a1a82f272f2fc7cdb8096ae1cb3c3bc0851f",
+      "bytes": 601764,
+      "triangles": 14252,
+      "objects": 29,
+      "eligible": false,
+      "reason": "Unregistered animated/mixed-role demonstration fixture",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "charcoal ceramic",
+        "ivory printing"
+      ],
+      "role_candidates": {
+        "chapter-ring": 1,
+        "unidentified": 28
+      }
+    },
+    {
+      "path": "public/assets/3d/face-review/crystal-domed.glb",
+      "sha256": "b3905ea64b1eff5d33eb2a40b2d9f6f28df8e0f1befc57dbc7b4d2b58a6bbce6",
+      "bytes": 1337588,
+      "triangles": 19200,
+      "objects": 1,
+      "eligible": false,
+      "reason": "Unregistered animated/mixed-role demonstration fixture",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "sapphire-transmission.001"
+      ],
+      "role_candidates": {
+        "crystal": 1
+      }
+    },
+    {
+      "path": "public/assets/3d/face-review/crystal-flat.glb",
+      "sha256": "7c4f9b962f8c6c98b4c4b3165719eacc8a3078cceee9492362fdc665b922faae",
+      "bytes": 84320,
+      "triangles": 1536,
+      "objects": 1,
+      "eligible": false,
+      "reason": "Unregistered animated/mixed-role demonstration fixture",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "sapphire-transmission"
+      ],
+      "role_candidates": {
+        "crystal": 1
+      }
+    },
+    {
+      "path": "public/assets/3d/face-review/dial-chrono-guilloche.glb",
+      "sha256": "4322d9a17ea13178ff8dbb21c6c1191bec600172f10db1425e58528c12df39c9",
+      "bytes": 2293396,
+      "triangles": 16176,
+      "objects": 281,
+      "eligible": false,
+      "reason": "Unregistered animated/mixed-role demonstration fixture",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "steel",
+        "dial-guilloche",
+        "ivory printing",
+        "lume visual swatch",
+        "charcoal ceramic"
+      ],
+      "role_candidates": {
+        "dial-or-artwork": 2,
+        "unidentified": 216,
+        "minute-artwork": 60,
+        "hand-role-unconfirmed": 3
+      }
+    },
+    {
+      "path": "public/assets/3d/face-review/dial-date3-sunburst.glb",
+      "sha256": "d8426fa04470c675bb219cd8001e180890d5a5ecdfe4fc9cd1f862e9d442329c",
+      "bytes": 1793692,
+      "triangles": 4516,
+      "objects": 86,
+      "eligible": false,
+      "reason": "Unregistered animated/mixed-role demonstration fixture",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "steel",
+        "ivory printing",
+        "dial-sunburst",
+        "charcoal ceramic",
+        "lume visual swatch"
+      ],
+      "role_candidates": {
+        "dial-or-artwork": 2,
+        "unidentified": 24,
+        "minute-artwork": 60
+      }
+    },
+    {
+      "path": "public/assets/3d/face-review/dial-date6-linen.glb",
+      "sha256": "ee87cea8d917b3e0151aae1198aaaef14e87f7031457b549395b69e1ade2b1d9",
+      "bytes": 1035576,
+      "triangles": 4532,
+      "objects": 86,
+      "eligible": false,
+      "reason": "Unregistered animated/mixed-role demonstration fixture",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "steel",
+        "ivory printing",
+        "dial-linen",
+        "charcoal ceramic",
+        "lume visual swatch"
+      ],
+      "role_candidates": {
+        "dial-or-artwork": 2,
+        "unidentified": 24,
+        "minute-artwork": 60
+      }
+    },
+    {
+      "path": "public/assets/3d/face-review/dial-daydate-sunburst.glb",
+      "sha256": "9d7957a9c9f77cfd54ecbdf0641884e4941dcf3749fd983ac700379bfa1c416a",
+      "bytes": 1812916,
+      "triangles": 5008,
+      "objects": 86,
+      "eligible": false,
+      "reason": "Unregistered animated/mixed-role demonstration fixture",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "steel",
+        "ivory printing",
+        "dial-sunburst.001",
+        "charcoal ceramic",
+        "lume visual swatch"
+      ],
+      "role_candidates": {
+        "dial-or-artwork": 2,
+        "unidentified": 24,
+        "minute-artwork": 60
+      }
+    },
+    {
+      "path": "public/assets/3d/hands/hands_mercedes_42mm_v1.glb",
+      "sha256": "a04b110dbffe379fe27c27ae57e963a77231aef70a5a3f15bde215ed9e00195c",
+      "bytes": 457832,
+      "triangles": 6560,
+      "objects": 5,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "hand steel",
+        "lume"
+      ],
+      "role_candidates": {
+        "hour-hand": 2,
+        "hand-role-unconfirmed": 1,
+        "minute-hand": 1,
+        "seconds-hand": 1
+      }
+    },
+    {
+      "path": "public/assets/3d/hands/hands_mercedes_v1.glb",
+      "sha256": "ecbc5abc97142c759e6e362086fcbf67c1b2b75a23d18da83a3c3ed85b261cd3",
+      "bytes": 457856,
+      "triangles": 6560,
+      "objects": 5,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "hand steel",
+        "lume"
+      ],
+      "role_candidates": {
+        "hour-hand": 2,
+        "hand-role-unconfirmed": 1,
+        "minute-hand": 1,
+        "seconds-hand": 1
+      }
+    },
+    {
+      "path": "public/assets/3d/lug-cases/case-lugs-curved.glb",
+      "sha256": "dfb826bf591c9667bd09e7b50d5f1b22fa89e7efefb728b6fcd8c6b7e714b653",
+      "bytes": 215872,
+      "triangles": 7032,
+      "objects": 7,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD Polished Steel",
+        "DD Brushed Steel"
+      ],
+      "role_candidates": {
+        "crown-or-interface": 2,
+        "lug": 4,
+        "case": 1
+      }
+    },
+    {
+      "path": "public/assets/3d/lug-cases/case-lugs-drilled.glb",
+      "sha256": "94631c3f9a3566412ea9635c4176b7471d8e3acf75e8846410f71ef07ff6dda7",
+      "bytes": 215904,
+      "triangles": 7032,
+      "objects": 7,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD Polished Steel",
+        "DD Brushed Steel"
+      ],
+      "role_candidates": {
+        "crown-or-interface": 2,
+        "lug": 4,
+        "case": 1
+      }
+    },
+    {
+      "path": "public/assets/3d/lug-cases/case-lugs-faceted.glb",
+      "sha256": "103bea2ba192acf04f9f2ba176cd24d507c5b76fa74b0f3963719cb684862713",
+      "bytes": 215876,
+      "triangles": 7032,
+      "objects": 7,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD Polished Steel",
+        "DD Brushed Steel"
+      ],
+      "role_candidates": {
+        "crown-or-interface": 2,
+        "lug": 4,
+        "case": 1
+      }
+    },
+    {
+      "path": "public/assets/3d/lug-cases/case-lugs-hooded.glb",
+      "sha256": "db6a24eb105744e7eaec4b053b9275e0254e9d292512937bcb52a2c750f0b31a",
+      "bytes": 219576,
+      "triangles": 7056,
+      "objects": 9,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD Polished Steel",
+        "DD Brushed Steel"
+      ],
+      "role_candidates": {
+        "crown-or-interface": 2,
+        "lug": 6,
+        "case": 1
+      }
+    },
+    {
+      "path": "public/assets/3d/lug-cases/case-lugs-integrated.glb",
+      "sha256": "77f40eef1821e505bf3fa71547e2785e33896355d3190b41bc6a9e12d7a95057",
+      "bytes": 151484,
+      "triangles": 6548,
+      "objects": 5,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD Polished Steel",
+        "DD Brushed Steel"
+      ],
+      "role_candidates": {
+        "crown-or-interface": 2,
+        "lug": 2,
+        "case": 1
+      }
+    },
+    {
+      "path": "public/assets/3d/lug-cases/case-lugs-skeleton.glb",
+      "sha256": "f75201a48eef89543200e1eda79ce89972168a06a7d9ce479565f278f56196f3",
+      "bytes": 235032,
+      "triangles": 7416,
+      "objects": 7,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD Polished Steel",
+        "DD Brushed Steel"
+      ],
+      "role_candidates": {
+        "crown-or-interface": 2,
+        "lug": 4,
+        "case": 1
+      }
+    },
+    {
+      "path": "public/assets/3d/lug-cases/case-lugs-straight.glb",
+      "sha256": "d2768556a527baa73b29470885326cc94f04267e96bca9e4dfa57cf909ab65de",
+      "bytes": 215868,
+      "triangles": 7032,
+      "objects": 7,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD Polished Steel",
+        "DD Brushed Steel"
+      ],
+      "role_candidates": {
+        "crown-or-interface": 2,
+        "lug": 4,
+        "case": 1
+      }
+    },
+    {
+      "path": "public/assets/3d/lug-cases/case-lugs-teardrop.glb",
+      "sha256": "1567ffae7c949f96eedab2385882c19184c1f28a57481f7c5a7270b9b829857a",
+      "bytes": 215896,
+      "triangles": 7032,
+      "objects": 7,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD Polished Steel",
+        "DD Brushed Steel"
+      ],
+      "role_candidates": {
+        "crown-or-interface": 2,
+        "lug": 4,
+        "case": 1
+      }
+    },
+    {
+      "path": "public/assets/3d/lug-cases/case-lugs-twisted.glb",
+      "sha256": "e529f2179b46c1d20630eb09e2940108d30bee016e5a594a3b840fd7bbcd6c7a",
+      "bytes": 217612,
+      "triangles": 7060,
+      "objects": 7,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD Polished Steel",
+        "DD Brushed Steel"
+      ],
+      "role_candidates": {
+        "crown-or-interface": 2,
+        "lug": 4,
+        "case": 1
+      }
+    },
+    {
+      "path": "public/assets/3d/lug-cases/case-lugs-wire.glb",
+      "sha256": "e3ab58c8b6772f53fc4cec398b0160ee813384d78c8864e322b04585912a86eb",
+      "bytes": 187276,
+      "triangles": 8252,
+      "objects": 5,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD Polished Steel",
+        "DD Brushed Steel"
+      ],
+      "role_candidates": {
+        "crown-or-interface": 2,
+        "lug": 2,
+        "case": 1
+      }
+    },
+    {
+      "path": "public/assets/3d/reference-42/bezel.glb",
+      "sha256": "1f3cb3fc619a4a589f45a7f21fa26d819ed16d0e4410dc9294827b9d3a3a4323",
+      "bytes": 219256,
+      "triangles": 3476,
+      "objects": 64,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "316L brushed steel",
+        "black ceramic",
+        "reference lume",
+        "316L polished steel"
+      ],
+      "role_candidates": {
+        "bezel": 64
+      }
+    },
+    {
+      "path": "public/assets/3d/reference-42/case.glb",
+      "sha256": "9c09e94c5370812ec380c5bfd267bae2ab58b08bcb82f022b839ff98f38f4feb",
+      "bytes": 214628,
+      "triangles": 7032,
+      "objects": 7,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD Polished Steel",
+        "DD Brushed Steel"
+      ],
+      "role_candidates": {
+        "crown-or-interface": 2,
+        "lug": 4,
+        "case": 1
+      }
+    },
+    {
+      "path": "public/assets/3d/reference-42/caseback.glb",
+      "sha256": "733b63184f8e80bf5876388a2a62cfc9b9e70a7e9414d2a4d24e978c7278c89b",
+      "bytes": 90784,
+      "triangles": 1916,
+      "objects": 2,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "316L brushed steel",
+        "316L polished steel"
+      ],
+      "role_candidates": {
+        "caseback": 2
+      }
+    },
+    {
+      "path": "public/assets/3d/reference-42/chapter-ring.glb",
+      "sha256": "ddeb1df293aefa1983c88aa8ddca63f40fab5ee0184cae356ea5c8642f169e39",
+      "bytes": 160776,
+      "triangles": 2000,
+      "objects": 61,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "black ceramic",
+        "reference lume"
+      ],
+      "role_candidates": {
+        "chapter-ring": 61
+      }
+    },
+    {
+      "path": "public/assets/3d/reference-42/crown.glb",
+      "sha256": "8a0717da056a9a747e130853160b6b91c29ce8fed35c29e66688b2a224e09207",
+      "bytes": 66284,
+      "triangles": 1536,
+      "objects": 1,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD Crown Steel"
+      ],
+      "role_candidates": {
+        "crown-or-interface": 1
+      }
+    },
+    {
+      "path": "public/assets/3d/reference-42/crystal.glb",
+      "sha256": "7a7288230bd9520f18e15e1fb19b86e67a4ae9512b0147b1055fff8ab7dc8055",
+      "bytes": 36036,
+      "triangles": 636,
+      "objects": 1,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "sapphire"
+      ],
+      "role_candidates": {
+        "crystal": 1
+      }
+    },
+    {
+      "path": "public/assets/3d/reference-42/dial.glb",
+      "sha256": "709e6345ac8c5b2253445616a01233da609e8fa95b22022a501597c9b6cfc98d",
+      "bytes": 613100,
+      "triangles": 21532,
+      "objects": 23,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "warm white date card",
+        "316L polished steel",
+        "date ink",
+        "date aperture recess",
+        "navy dial",
+        "silver dial print",
+        "reference lume"
+      ],
+      "role_candidates": {
+        "date-detail": 3,
+        "numeral": 1,
+        "dial-or-artwork": 19
+      }
+    },
+    {
+      "path": "public/assets/3d/reference-42/hands.glb",
+      "sha256": "64aa7a04e3d093f2a459a2e3f2a8e5d55f0c134738d1acf52736e79d32a998d7",
+      "bytes": 161440,
+      "triangles": 2808,
+      "objects": 15,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "HAND_METAL",
+        "HAND_LUME"
+      ],
+      "role_candidates": {
+        "hour-hand": 4,
+        "minute-hand": 6,
+        "seconds-hand": 5
+      }
+    },
+    {
+      "path": "public/assets/3d/reference-42/strap.glb",
+      "sha256": "a9b9f57020263aa5f104f79cadd6ddc7481494d035b2f0311cdf99fb191a764d",
+      "bytes": 126416,
+      "triangles": 2160,
+      "objects": 15,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "316L polished steel",
+        "rubber strap relief"
+      ],
+      "role_candidates": {
+        "buckle": 3,
+        "strap-side-unconfirmed": 6,
+        "strap-keeper": 2,
+        "spring-bar": 4
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/bezels/bezel-diamond-rose-gold-34.glb",
+      "sha256": "5fef53c4bed87fbd100663a301f37ec16cd3c03d0307b3f9c029526247476b8c",
+      "bytes": 636676,
+      "triangles": 9578,
+      "objects": 142,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD_ROSE_GOLD",
+        "DD_DIAMOND"
+      ],
+      "role_candidates": {
+        "bezel": 95,
+        "gem": 47
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/bezels/bezel-diamond-rose-gold-42.glb",
+      "sha256": "b50665ecefe72f3ccd5a39a55e3fae764a0401e6a16e358f65ee2bd43e421e1c",
+      "bytes": 771540,
+      "triangles": 11580,
+      "objects": 175,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD_ROSE_GOLD",
+        "DD_DIAMOND"
+      ],
+      "role_candidates": {
+        "bezel": 117,
+        "gem": 58
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/bezels/bezel-dive-coin-edge-42.glb",
+      "sha256": "617118905f33cd42af21ad99fc888ab06e64d2de529549b2f30b2b46e2bfffc6",
+      "bytes": 309640,
+      "triangles": 3632,
+      "objects": 134,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD_BEZEL_STEEL",
+        "DD_BEZEL_INSERT",
+        "DD_BEZEL_MARKINGS"
+      ],
+      "role_candidates": {
+        "bezel": 134
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/bezels/bezel-dive-scalloped-42.glb",
+      "sha256": "e0211927f497e478e24ca9d32c81e0846b5467ee657a8ee6634fe24749263d6e",
+      "bytes": 268384,
+      "triangles": 3344,
+      "objects": 110,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD_BEZEL_STEEL",
+        "DD_BEZEL_INSERT",
+        "DD_BEZEL_MARKINGS"
+      ],
+      "role_candidates": {
+        "bezel": 110
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/bezels/bezel-dress-fluted-42.glb",
+      "sha256": "0030349f9852e77379aeee44c24b50015ec91ac56c0ac66174ac69a2e912014b",
+      "bytes": 167436,
+      "triangles": 1888,
+      "objects": 73,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD_BEZEL_STEEL"
+      ],
+      "role_candidates": {
+        "bezel": 73
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/bezels/bezel-gmt-42.glb",
+      "sha256": "203295cdc7cc2ac25eb796027d80ebc58a9ed6d5f9fb9baa3d8f286e71b23a89",
+      "bytes": 287032,
+      "triangles": 3488,
+      "objects": 122,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD_BEZEL_STEEL",
+        "DD_BEZEL_INSERT",
+        "DD_BEZEL_MARKINGS"
+      ],
+      "role_candidates": {
+        "bezel": 122
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/bezels/bezel-pilot-smooth-42.glb",
+      "sha256": "2cf795ccd044d353b6bb5699ff0b60b9ec6c0daafbd7b8fda2c4e81314149564",
+      "bytes": 44244,
+      "triangles": 1024,
+      "objects": 1,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD_BEZEL_STEEL"
+      ],
+      "role_candidates": {
+        "bezel": 1
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/bezels/bezel-slide-rule-42.glb",
+      "sha256": "ca4de57e726743adc7f3a4b78a77d7c4d62520b08a86732fe76252acec8e365d",
+      "bytes": 454612,
+      "triangles": 4640,
+      "objects": 218,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD_BEZEL_STEEL",
+        "DD_BEZEL_MARKINGS",
+        "DD_BEZEL_INSERT"
+      ],
+      "role_candidates": {
+        "bezel": 218
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/bezels/bezel-tachymeter-fixed-42.glb",
+      "sha256": "256e0b27358356651456638ed63b5115173b9384e8d0416cfbcf6c3d05541750",
+      "bytes": 267728,
+      "triangles": 3344,
+      "objects": 110,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD_BEZEL_STEEL",
+        "DD_BEZEL_INSERT",
+        "DD_BEZEL_MARKINGS"
+      ],
+      "role_candidates": {
+        "bezel": 110
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/cases/case-feiyashi-samurai-438.glb",
+      "sha256": "a3e7a65412d2905a690c85a496a804e632585ddb7c18e88600d19cbb6062185e",
+      "bytes": 110776,
+      "triangles": 2216,
+      "objects": 8,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD_CASE_BODY",
+        "DD_CASE_CAVITY"
+      ],
+      "role_candidates": {
+        "crown-or-interface": 1,
+        "case": 3,
+        "lug": 4
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/cases/case-namoki-nmk903-black-38.glb",
+      "sha256": "21506d16844076426628988965c996391b9fdd6b3a1d0222f20fa8ad62e1ebe4",
+      "bytes": 129224,
+      "triangles": 2504,
+      "objects": 8,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD_CASE_PVD_MATTE_BLACK",
+        "DD_CASE_CAVITY"
+      ],
+      "role_candidates": {
+        "crown-or-interface": 2,
+        "case": 2,
+        "lug": 4
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/cases/case-namoki-nmk920-offaxis-v1.glb",
+      "sha256": "d5defb28871e1969dbe9dfcceddbedfcb1c5693ce1a6c703849d25eaf980b3d5",
+      "bytes": 222680,
+      "triangles": 4264,
+      "objects": 8,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD_CASE_BODY",
+        "DD_CASE_CAVITY"
+      ],
+      "role_candidates": {
+        "crown-or-interface": 2,
+        "case": 2,
+        "lug": 4
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/cases/case-namoki-nmk920-tuna-47.glb",
+      "sha256": "9c1953a15a347058de58fb44d6b66796417b884a415d864b592d09e5802a087b",
+      "bytes": 110608,
+      "triangles": 2216,
+      "objects": 8,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD_CASE_BODY",
+        "DD_CASE_CAVITY"
+      ],
+      "role_candidates": {
+        "crown-or-interface": 1,
+        "case": 3,
+        "lug": 4
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/cases/case-nh05-ladies-dress-34.glb",
+      "sha256": "0fdfd8fe2e4d550eae0b8a19e32fbbbe24cdafe556ede224890381a738c129cf",
+      "bytes": 105768,
+      "triangles": 2120,
+      "objects": 7,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD_CASE_BODY",
+        "DD_CASE_CAVITY"
+      ],
+      "role_candidates": {
+        "crown-or-interface": 1,
+        "case": 2,
+        "lug": 4
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/cases/case-tandorio-bronze-diver-44.glb",
+      "sha256": "e7cd4fdf50df3b26aa02b847878ce1e047eb00a9d1d9d2b703228a675beae4d5",
+      "bytes": 138852,
+      "triangles": 2888,
+      "objects": 8,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD_CASE_BODY",
+        "DD_CASE_CAVITY"
+      ],
+      "role_candidates": {
+        "crown-or-interface": 1,
+        "case": 3,
+        "lug": 4
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/cases/case-tandorio-nh05-research-34.glb",
+      "sha256": "de31d496ba6636d17719e9be802f5e8a8adbad20632edd186b9223478cc0d1c4",
+      "bytes": 105792,
+      "triangles": 2120,
+      "objects": 7,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD_CASE_BODY",
+        "DD_CASE_CAVITY"
+      ],
+      "role_candidates": {
+        "crown-or-interface": 1,
+        "case": 2,
+        "lug": 4
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/cases/case-tandorio-pilot-40.glb",
+      "sha256": "ce2cd4305dfdf6678983c12fe3efe1ab587ba764fb641efedf41d70880b682a7",
+      "bytes": 105800,
+      "triangles": 2120,
+      "objects": 7,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD_CASE_BODY",
+        "DD_CASE_CAVITY"
+      ],
+      "role_candidates": {
+        "crown-or-interface": 1,
+        "case": 2,
+        "lug": 4
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/cases/case-tandorio-tuna-465-offaxis-v1.glb",
+      "sha256": "3b6c39644401aa6233e6f95f2cc00e736d905eb39e04f0000355b0497012e7f3",
+      "bytes": 222984,
+      "triangles": 4264,
+      "objects": 8,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD_CASE_BODY.001",
+        "DD_CASE_CAVITY.001"
+      ],
+      "role_candidates": {
+        "crown-or-interface": 2,
+        "case": 2,
+        "lug": 4
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/cases/case-tandorio-willard-41.glb",
+      "sha256": "9c4e3b99b5698b8e2027a631498702412c2ea50474311ef0c4c752ee4275507b",
+      "bytes": 128072,
+      "triangles": 2632,
+      "objects": 8,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD_CASE_BODY",
+        "DD_CASE_CAVITY"
+      ],
+      "role_candidates": {
+        "crown-or-interface": 1,
+        "case": 3,
+        "lug": 4
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/cases/case-wr-skx-sandblasted-42.glb",
+      "sha256": "3d04571f9152933e0e93195954dc0388f30282da487411b0d5e73585656986d4",
+      "bytes": 105772,
+      "triangles": 2120,
+      "objects": 7,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD_CASE_BODY",
+        "DD_CASE_CAVITY"
+      ],
+      "role_candidates": {
+        "crown-or-interface": 1,
+        "case": 2,
+        "lug": 4
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/dials/dial-chronograph-285.glb",
+      "sha256": "050ac73a4988353ba1a815503f3583fd979959c8bdc1d64db9e21636ac912186",
+      "bytes": 181136,
+      "triangles": 2112,
+      "objects": 64,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD_DIAL_MARKINGS",
+        "DD_DIAL_RECESS",
+        "DD_DIAL_FACE"
+      ],
+      "role_candidates": {
+        "dial-or-artwork": 64
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/dials/dial-diver-285.glb",
+      "sha256": "1df12f5d44db10fb64dc80c941d92bcc1b02118be95d0a37a1636e58f5b56e16",
+      "bytes": 159960,
+      "triangles": 1500,
+      "objects": 73,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD_DIAL_MARKINGS",
+        "DD_DIAL_FACE"
+      ],
+      "role_candidates": {
+        "dial-or-artwork": 73
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/dials/dial-dress-sector-285.glb",
+      "sha256": "0101032b2150180b9d64cd554dc20f91eaa0bf736732c61fb08ba8ea801dbb68",
+      "bytes": 203976,
+      "triangles": 2524,
+      "objects": 74,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD_DIAL_MARKINGS",
+        "DD_DIAL_FACE"
+      ],
+      "role_candidates": {
+        "dial-or-artwork": 74
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/dials/dial-field-285.glb",
+      "sha256": "287e01bda57c752b8ae94ef46faa9c09dbaef6c987c7ea5aaa0702012a400063",
+      "bytes": 159648,
+      "triangles": 1500,
+      "objects": 73,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD_DIAL_MARKINGS",
+        "DD_DIAL_FACE"
+      ],
+      "role_candidates": {
+        "dial-or-artwork": 73
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/dials/dial-gmt-285.glb",
+      "sha256": "1f96b8bd46727618b6b4696b1c4acd17ec27c0253be5ec4844774d6f39ef2894",
+      "bytes": 200732,
+      "triangles": 1788,
+      "objects": 97,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD_DIAL_MARKINGS",
+        "DD_DIAL_FACE"
+      ],
+      "role_candidates": {
+        "dial-or-artwork": 97
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/dials/dial-namoki-108-silver-285.glb",
+      "sha256": "9cbf3f9f3672fd485cfaac52dd1c267ca592cd31512956685240b1e2b79b9c1a",
+      "bytes": 1251772,
+      "triangles": 19452,
+      "objects": 380,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD_DIAL_SECTOR_INK",
+        "DD_DIAL_FACE_SUNBURST_SILVER"
+      ],
+      "role_candidates": {
+        "dial-or-artwork": 380
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/dials/dial-nh05-black-sunburst-245.glb",
+      "sha256": "196e8a1100b9bb6ff0097513a9818bdc9a2c758686853355857d48090fc6a027",
+      "bytes": 35900,
+      "triangles": 636,
+      "objects": 1,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD_DIAL_FACE"
+      ],
+      "role_candidates": {
+        "dial-or-artwork": 1
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/dials/dial-nh05-champagne-sunburst-245.glb",
+      "sha256": "5123e32fd2c8c2597e20f20f7a31067f601c58312c6643b4dce1a4ab42467102",
+      "bytes": 35904,
+      "triangles": 636,
+      "objects": 1,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD_DIAL_FACE"
+      ],
+      "role_candidates": {
+        "dial-or-artwork": 1
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/dials/dial-nh05-mother-of-pearl-245.glb",
+      "sha256": "d58affeafbdceeb2fd0d4b517ec45126e06df75d75822587efa5f44b745f9797",
+      "bytes": 35900,
+      "triangles": 636,
+      "objects": 1,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD_DIAL_FACE"
+      ],
+      "role_candidates": {
+        "dial-or-artwork": 1
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/dials/dial-nh05-silver-roman-245.glb",
+      "sha256": "9a1ce77510a43348d2c6f1bd572587dcc7426b6e587dc84955242f976f189f77",
+      "bytes": 204356,
+      "triangles": 2524,
+      "objects": 74,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD_DIAL_MARKINGS",
+        "DD_DIAL_FACE"
+      ],
+      "role_candidates": {
+        "dial-or-artwork": 74
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/dials/dial-nh05-white-matte-245.glb",
+      "sha256": "6f311b479fff1b211e5b706f7a2e6895be24d82b260a53b1cf3aecdb2979a329",
+      "bytes": 125404,
+      "triangles": 2268,
+      "objects": 14,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD_DATE_CARD",
+        "DD_DATE_NUMERAL",
+        "DD_DIAL_MARKINGS",
+        "DD_DIAL_FACE"
+      ],
+      "role_candidates": {
+        "date-detail": 1,
+        "numeral": 1,
+        "dial-or-artwork": 12
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/dials/dial-pilot-a-285.glb",
+      "sha256": "66dafa78dd9aa1b20e67e6ffdc89743bce3e7a1d0f414100b8bf9e497c6116d5",
+      "bytes": 161436,
+      "triangles": 1508,
+      "objects": 74,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD_DIAL_MARKINGS",
+        "DD_DIAL_FACE"
+      ],
+      "role_candidates": {
+        "dial-or-artwork": 74
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/dials/dial-pilot-b-285.glb",
+      "sha256": "2b42f27ca083e88e15ce0f1792120598e6109ee9f3d4b7a396d7058385bb6142",
+      "bytes": 161436,
+      "triangles": 1508,
+      "objects": 74,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD_DIAL_MARKINGS",
+        "DD_DIAL_FACE"
+      ],
+      "role_candidates": {
+        "dial-or-artwork": 74
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/dials/dial-sterile-285.glb",
+      "sha256": "80909dbfe76cc0bee159f339584b664d664163923c95c098e7489a2b935e8bcf",
+      "bytes": 35888,
+      "triangles": 636,
+      "objects": 1,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD_DIAL_FACE"
+      ],
+      "role_candidates": {
+        "dial-or-artwork": 1
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/hands/hands-baton-42.glb",
+      "sha256": "ee9689269724a0c754aa6d0ed1507f3b7156945dc42b1219ceb50d6d4b3cb913",
+      "bytes": 23764,
+      "triangles": 324,
+      "objects": 6,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD_HAND_STEEL",
+        "DD_HAND_LUME"
+      ],
+      "role_candidates": {
+        "hour-hand": 2,
+        "hand-role-unconfirmed": 1,
+        "minute-hand": 2,
+        "seconds-hand": 1
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/hands/hands-baton-nh05-34.glb",
+      "sha256": "9bef317f30bb6ba236bb271a9bea5c1b21692bcc56e70c7f5de5b0de4c0c139c",
+      "bytes": 23820,
+      "triangles": 324,
+      "objects": 6,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD_HAND_STEEL",
+        "DD_HAND_LUME"
+      ],
+      "role_candidates": {
+        "hour-hand": 2,
+        "hand-role-unconfirmed": 1,
+        "minute-hand": 2,
+        "seconds-hand": 1
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/hands/hands-broad-arrow-42.glb",
+      "sha256": "ef461c599784f08b4b8d6e957ab2c8c1a2929f3c3749368a78c3f94b71cd951b",
+      "bytes": 24736,
+      "triangles": 348,
+      "objects": 6,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD_HAND_STEEL",
+        "DD_HAND_LUME"
+      ],
+      "role_candidates": {
+        "hour-hand": 2,
+        "hand-role-unconfirmed": 1,
+        "minute-hand": 2,
+        "seconds-hand": 1
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/hands/hands-cathedral-42.glb",
+      "sha256": "9b8c6a48bd566316408a079c20d5a4a6f7c26b1c7c3d212b1ab5791e306e8a80",
+      "bytes": 24720,
+      "triangles": 348,
+      "objects": 6,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD_HAND_STEEL",
+        "DD_HAND_LUME"
+      ],
+      "role_candidates": {
+        "hour-hand": 2,
+        "hand-role-unconfirmed": 1,
+        "minute-hand": 2,
+        "seconds-hand": 1
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/hands/hands-dauphine-42.glb",
+      "sha256": "e82e2c680bbf55e18fb9b3a46b5885e39cb67b8ed1f15d9714c5b5a852de2735",
+      "bytes": 19484,
+      "triangles": 288,
+      "objects": 4,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD_HAND_STEEL"
+      ],
+      "role_candidates": {
+        "hour-hand": 1,
+        "hand-role-unconfirmed": 1,
+        "minute-hand": 1,
+        "seconds-hand": 1
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/hands/hands-mercedes-42.glb",
+      "sha256": "48b8f82cc174f56c1c04522238eb06dc6e37fbc1e0378ce36ff54d86d74b8495",
+      "bytes": 66428,
+      "triangles": 1172,
+      "objects": 11,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD_HAND_STEEL",
+        "DD_HAND_LUME"
+      ],
+      "role_candidates": {
+        "hour-hand": 7,
+        "hand-role-unconfirmed": 1,
+        "minute-hand": 2,
+        "seconds-hand": 1
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/hands/hands-nh05-luminous-588.glb",
+      "sha256": "898f3d58ecf0c97f89c9b49e4d3d8f9d85ab2698b1e60e6cd688ca58773bb82d",
+      "bytes": 23860,
+      "triangles": 324,
+      "objects": 6,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD_HAND_STEEL",
+        "DD_HAND_LUME"
+      ],
+      "role_candidates": {
+        "hour-hand": 2,
+        "hand-role-unconfirmed": 1,
+        "minute-hand": 2,
+        "seconds-hand": 1
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/hands/hands-pencil-42.glb",
+      "sha256": "084a960978517cb9d3d5e2f8226856873d3f457087d94f3e66eac4474a950bee",
+      "bytes": 23776,
+      "triangles": 324,
+      "objects": 6,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD_HAND_STEEL",
+        "DD_HAND_LUME"
+      ],
+      "role_candidates": {
+        "hour-hand": 2,
+        "hand-role-unconfirmed": 1,
+        "minute-hand": 2,
+        "seconds-hand": 1
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/hands/hands-skeleton-42.glb",
+      "sha256": "90538649857b9cb739f7bfce95a17929bed0a426bba03daa285c27c3021068ef",
+      "bytes": 19936,
+      "triangles": 300,
+      "objects": 4,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD_HAND_STEEL"
+      ],
+      "role_candidates": {
+        "hour-hand": 1,
+        "hand-role-unconfirmed": 1,
+        "minute-hand": 1,
+        "seconds-hand": 1
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/hands/hands-sword-42.glb",
+      "sha256": "6e0453b209e06ff2074b3a5c50e0a377ea904b70aae326844264fd64b9865715",
+      "bytes": 23768,
+      "triangles": 324,
+      "objects": 6,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD_HAND_STEEL",
+        "DD_HAND_LUME"
+      ],
+      "role_candidates": {
+        "hour-hand": 2,
+        "hand-role-unconfirmed": 1,
+        "minute-hand": 2,
+        "seconds-hand": 1
+      }
+    },
+    {
+      "path": "public/assets/3d/variants/hands/hands-syringe-42.glb",
+      "sha256": "1151d8919f04d09fa46615e3ec1ec59cc8ebaddcc78ccc05a10fc68bb46d3b0d",
+      "bytes": 24700,
+      "triangles": 348,
+      "objects": 6,
+      "eligible": true,
+      "reason": "Registered runtime or compatibility component",
+      "baseline": "C:\\Users\\Deon\\Documents\\GitHub\\Dial-New-Design.01\\.artifacts\\blender-review\\realism\\vr0-2026-10-13\\inventory.json",
+      "materials": [
+        "DD_HAND_STEEL",
+        "DD_HAND_LUME"
+      ],
+      "role_candidates": {
+        "hour-hand": 2,
+        "hand-role-unconfirmed": 1,
+        "minute-hand": 2,
+        "seconds-hand": 1
+      }
+    }
+  ]
+}
