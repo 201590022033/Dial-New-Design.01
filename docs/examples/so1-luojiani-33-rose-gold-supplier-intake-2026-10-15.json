@@ -1,0 +1,378 @@
+{
+  "draft": {
+    "schema": "dial-designer/supplier-draft/v1",
+    "id": "so1-luojiani-1005010782647157-a2-33-rose-gold-2026-10-15",
+    "status": "ai-extracted",
+    "syntheticFixture": false,
+    "identity": {
+      "supplierId": "aliexpress:seller-name:LUOJIANI NH35 Watch Parts Store",
+      "productId": "1005010782647157",
+      "variant": {
+        "state": "recorded",
+        "value": "A2",
+        "source": {
+          "id": "luojiani-33-user-screenshot",
+          "kind": "user-record",
+          "locator": "https://www.aliexpress.com/item/1005010782647157.html",
+          "capturedAt": "2026-10-15T09:15:26+02:00",
+          "revision": "User screenshot received 15 October 2026; original page capture time unknown; live page not read"
+        },
+        "review": "unreviewed"
+      }
+    },
+    "sources": [
+      {
+        "id": "luojiani-33-user-screenshot",
+        "kind": "user-record",
+        "locator": "https://www.aliexpress.com/item/1005010782647157.html",
+        "capturedAt": "2026-10-15T09:15:26+02:00",
+        "revision": "User screenshot received 15 October 2026; original page capture time unknown; live page not read"
+      },
+      {
+        "id": "luojiani-33-user-variant",
+        "kind": "user-record",
+        "locator": "https://www.aliexpress.com/item/1005010782647157.html",
+        "capturedAt": "2026-10-15T09:15:26+02:00",
+        "revision": "User explicitly selected Rose Gold 33mm; screenshot shows selected option A2"
+      }
+    ],
+    "engineering": {
+      "catalogueItemId": null,
+      "slot": "case",
+      "measurements": {
+        "crystalSeatDiameterMm": {
+          "state": "unknown",
+          "reason": "Not established by the supplied screenshot."
+        },
+        "crystalSeatDepthMm": {
+          "state": "unknown",
+          "reason": "Not established by the supplied screenshot."
+        },
+        "dialSeatDiameterMm": {
+          "state": "unknown",
+          "reason": "Not established by the supplied screenshot."
+        },
+        "dialSeatDepthMm": {
+          "state": "unknown",
+          "reason": "Not established by the supplied screenshot."
+        },
+        "lugWidthMm": {
+          "state": "unknown",
+          "reason": "Not established by the supplied screenshot."
+        },
+        "lugToLugMm": {
+          "state": "unknown",
+          "reason": "Not established by the supplied screenshot."
+        },
+        "thicknessMm": {
+          "state": "unknown",
+          "reason": "Not established by the supplied screenshot."
+        },
+        "movementCavityDiameterMm": {
+          "state": "unknown",
+          "reason": "Not established by the supplied screenshot."
+        },
+        "movementCavityDepthMm": {
+          "state": "unknown",
+          "reason": "Not established by the supplied screenshot."
+        },
+        "stemHeightMm": {
+          "state": "unknown",
+          "reason": "Not established by the supplied screenshot."
+        },
+        "crownTubeThreadDiameterMm": {
+          "state": "unknown",
+          "reason": "Not established by the supplied screenshot."
+        },
+        "crownTubeThreadPitchMm": {
+          "state": "unknown",
+          "reason": "Not established by the supplied screenshot."
+        },
+        "casebackThreadDiameterMm": {
+          "state": "unknown",
+          "reason": "Not established by the supplied screenshot."
+        },
+        "casebackThreadPitchMm": {
+          "state": "unknown",
+          "reason": "Not established by the supplied screenshot."
+        },
+        "gasketSeatDiameterMm": {
+          "state": "unknown",
+          "reason": "Not established by the supplied screenshot."
+        },
+        "bezelCarrierInnerDiameterMm": {
+          "state": "unknown",
+          "reason": "Not established by the supplied screenshot."
+        },
+        "bezelCarrierOuterDiameterMm": {
+          "state": "unknown",
+          "reason": "Not established by the supplied screenshot."
+        },
+        "caseDiameterMm": {
+          "state": "recorded",
+          "value": {
+            "value": 33,
+            "unit": "mm"
+          },
+          "source": {
+            "id": "luojiani-33-user-screenshot",
+            "kind": "user-record",
+            "locator": "https://www.aliexpress.com/item/1005010782647157.html",
+            "capturedAt": "2026-10-15T09:15:26+02:00",
+            "revision": "User screenshot received 15 October 2026; original page capture time unknown; live page not read"
+          },
+          "review": "unreviewed"
+        }
+      },
+      "attributes": {
+        "title": {
+          "state": "recorded",
+          "value": "33mm NH05 watch case, rose-gold selected variant",
+          "source": {
+            "id": "luojiani-33-user-screenshot",
+            "kind": "user-record",
+            "locator": "https://www.aliexpress.com/item/1005010782647157.html",
+            "capturedAt": "2026-10-15T09:15:26+02:00",
+            "revision": "User screenshot received 15 October 2026; original page capture time unknown; live page not read"
+          },
+          "review": "unreviewed"
+        },
+        "supplierProductTitle": {
+          "state": "recorded",
+          "value": "Gold/Rose gold 33mm NH05 Watch Case Stainless Steel Strap For Datejust NH05 Movement 25mm Dial Sapphire glass Lady's Watch Case",
+          "source": {
+            "id": "luojiani-33-user-screenshot",
+            "kind": "user-record",
+            "locator": "https://www.aliexpress.com/item/1005010782647157.html",
+            "capturedAt": "2026-10-15T09:15:26+02:00",
+            "revision": "User screenshot received 15 October 2026; original page capture time unknown; live page not read"
+          },
+          "review": "unreviewed"
+        },
+        "sellerName": {
+          "state": "recorded",
+          "value": "LUOJIANI NH35 Watch Parts Store",
+          "source": {
+            "id": "luojiani-33-user-screenshot",
+            "kind": "user-record",
+            "locator": "https://www.aliexpress.com/item/1005010782647157.html",
+            "capturedAt": "2026-10-15T09:15:26+02:00",
+            "revision": "User screenshot received 15 October 2026; original page capture time unknown; live page not read"
+          },
+          "review": "unreviewed"
+        },
+        "material": {
+          "state": "recorded",
+          "value": "stainless steel",
+          "source": {
+            "id": "luojiani-33-user-screenshot",
+            "kind": "user-record",
+            "locator": "https://www.aliexpress.com/item/1005010782647157.html",
+            "capturedAt": "2026-10-15T09:15:26+02:00",
+            "revision": "User screenshot received 15 October 2026; original page capture time unknown; live page not read"
+          },
+          "review": "unreviewed"
+        },
+        "finish": {
+          "state": "recorded",
+          "value": "rose gold",
+          "source": {
+            "id": "luojiani-33-user-variant",
+            "kind": "user-record",
+            "locator": "https://www.aliexpress.com/item/1005010782647157.html",
+            "capturedAt": "2026-10-15T09:15:26+02:00",
+            "revision": "User explicitly selected Rose Gold 33mm; screenshot shows selected option A2"
+          },
+          "review": "unreviewed"
+        },
+        "sellerOptionCode": {
+          "state": "recorded",
+          "value": "A2",
+          "source": {
+            "id": "luojiani-33-user-screenshot",
+            "kind": "user-record",
+            "locator": "https://www.aliexpress.com/item/1005010782647157.html",
+            "capturedAt": "2026-10-15T09:15:26+02:00",
+            "revision": "User screenshot received 15 October 2026; original page capture time unknown; live page not read"
+          },
+          "review": "unreviewed"
+        },
+        "advertisedMovement": {
+          "state": "recorded",
+          "value": "NH05 compatibility claimed in listing title; installation not independently verified.",
+          "source": {
+            "id": "luojiani-33-user-screenshot",
+            "kind": "user-record",
+            "locator": "https://www.aliexpress.com/item/1005010782647157.html",
+            "capturedAt": "2026-10-15T09:15:26+02:00",
+            "revision": "User screenshot received 15 October 2026; original page capture time unknown; live page not read"
+          },
+          "review": "unreviewed"
+        },
+        "advertisedDialSize": {
+          "state": "recorded",
+          "value": "Title mentions 25 mm dial; actual dial seat and dial compatibility remain unknown.",
+          "source": {
+            "id": "luojiani-33-user-screenshot",
+            "kind": "user-record",
+            "locator": "https://www.aliexpress.com/item/1005010782647157.html",
+            "capturedAt": "2026-10-15T09:15:26+02:00",
+            "revision": "User screenshot received 15 October 2026; original page capture time unknown; live page not read"
+          },
+          "review": "unreviewed"
+        },
+        "advertisedCrystal": {
+          "state": "recorded",
+          "value": "Title mentions sapphire glass; material verification, coating, dimensions and package inclusion remain unknown.",
+          "source": {
+            "id": "luojiani-33-user-screenshot",
+            "kind": "user-record",
+            "locator": "https://www.aliexpress.com/item/1005010782647157.html",
+            "capturedAt": "2026-10-15T09:15:26+02:00",
+            "revision": "User screenshot received 15 October 2026; original page capture time unknown; live page not read"
+          },
+          "review": "unreviewed"
+        },
+        "bezelAppearance": {
+          "state": "recorded",
+          "value": "Photograph shows a stone-set bezel appearance; stone composition and mounting details are unknown.",
+          "source": {
+            "id": "luojiani-33-user-screenshot",
+            "kind": "user-record",
+            "locator": "https://www.aliexpress.com/item/1005010782647157.html",
+            "capturedAt": "2026-10-15T09:15:26+02:00",
+            "revision": "User screenshot received 15 October 2026; original page capture time unknown; live page not read"
+          },
+          "review": "unreviewed"
+        },
+        "shopIdentifier": {
+          "state": "unknown",
+          "reason": "Shop display name is visible, but a stable seller/shop ID is not provided in the screenshot."
+        },
+        "sourceBasis": {
+          "state": "recorded",
+          "value": "User-supplied screenshot and variant instruction. AI overview text on the retailer page was excluded from technical evidence.",
+          "source": {
+            "id": "luojiani-33-user-screenshot",
+            "kind": "user-record",
+            "locator": "https://www.aliexpress.com/item/1005010782647157.html",
+            "capturedAt": "2026-10-15T09:15:26+02:00",
+            "revision": "User screenshot received 15 October 2026; original page capture time unknown; live page not read"
+          },
+          "review": "unreviewed"
+        },
+        "selectedVariantLabel": {
+          "state": "recorded",
+          "value": "Rose Gold 33 mm",
+          "source": {
+            "id": "luojiani-33-user-variant",
+            "kind": "user-record",
+            "locator": "https://www.aliexpress.com/item/1005010782647157.html",
+            "capturedAt": "2026-10-15T09:15:26+02:00",
+            "revision": "User explicitly selected Rose Gold 33mm; screenshot shows selected option A2"
+          },
+          "review": "unreviewed"
+        }
+      }
+    },
+    "offers": [],
+    "packageContents": [
+      {
+        "slot": "case",
+        "inclusion": {
+          "state": "recorded",
+          "value": "included",
+          "source": {
+            "id": "luojiani-33-user-screenshot",
+            "kind": "user-record",
+            "locator": "https://www.aliexpress.com/item/1005010782647157.html",
+            "capturedAt": "2026-10-15T09:15:26+02:00",
+            "revision": "User screenshot received 15 October 2026; original page capture time unknown; live page not read"
+          },
+          "review": "unreviewed"
+        }
+      },
+      {
+        "slot": "crystal",
+        "inclusion": {
+          "state": "unknown",
+          "reason": "Selected variant package contents are not established by the screenshot or listing title."
+        }
+      },
+      {
+        "slot": "caseback",
+        "inclusion": {
+          "state": "unknown",
+          "reason": "Selected variant package contents are not established by the screenshot or listing title."
+        }
+      },
+      {
+        "slot": "crown",
+        "inclusion": {
+          "state": "unknown",
+          "reason": "Selected variant package contents are not established by the screenshot or listing title."
+        }
+      },
+      {
+        "slot": "strap",
+        "inclusion": {
+          "state": "unknown",
+          "reason": "Selected variant package contents are not established by the screenshot or listing title."
+        }
+      },
+      {
+        "slot": "dial",
+        "inclusion": {
+          "state": "unknown",
+          "reason": "Selected variant package contents are not established by the screenshot or listing title."
+        }
+      },
+      {
+        "slot": "hands",
+        "inclusion": {
+          "state": "unknown",
+          "reason": "Selected variant package contents are not established by the screenshot or listing title."
+        }
+      }
+    ],
+    "images": [],
+    "extraction": {
+      "method": "ai"
+    },
+    "fitQualification": "not-assessed"
+  },
+  "offers": [],
+  "captures": [
+    {
+      "id": "luojiani-33-screenshot-transcription",
+      "sourceId": "luojiani-33-user-screenshot",
+      "capturedAt": "2026-10-15T09:15:26+02:00",
+      "sourceText": "User-supplied screenshot. Store: LUOJIANI NH35 Watch Parts Store. Selected Color: A2. Specifications: Case Material Stainless Steel; Item Type Watch Cases; Item Diameter 33mm. Title mentions NH05 and 25mm dial and sapphire glass. Original screenshot capture date unknown; received 15 October 2026. Retailer AI overview excluded from evidence.",
+      "raw": {
+        "sourceBasis": "user-provided screenshot; not a live-page capture",
+        "shortUrl": "https://a.aliexpress.com/_ExL2EIm",
+        "productUrl": "https://www.aliexpress.com/item/1005010782647157.html",
+        "screenshotFile": "source-screenshot.png",
+        "screenshotSha256": "afa7c5827f51f995439897c960a17475ee95441571325396405d3a13da65402b",
+        "commercialObservation": {
+          "currency": "ZAR",
+          "displayedPriceText": "R584 (small fractional digits not transcribed)",
+          "approximateDisplayedPrice": 584,
+          "displayedShippingText": "R62.44",
+          "displayedShippingAmount": 62.44,
+          "shippingDestination": "unknown",
+          "stock": "unknown",
+          "exactCheckoutPrice": "unknown",
+          "observationDate": "original capture date unknown; user supplied 2026-10-15",
+          "verification": "unverified; retain as raw observation only"
+        }
+      }
+    },
+    {
+      "id": "luojiani-33-user-choice",
+      "sourceId": "luojiani-33-user-variant",
+      "capturedAt": "2026-10-15T09:15:26+02:00",
+      "sourceText": "User instruction: Rose Gold 33mm. Screenshot selected option label: Color A2."
+    }
+  ]
+}
