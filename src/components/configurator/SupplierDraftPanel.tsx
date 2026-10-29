@@ -32,6 +32,8 @@ function downloadLocalEvidence(blob: Blob, name: string) {
 const asRecord = (value: unknown): Record<string, unknown> | null => value !== null && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : null;
 function RawCommercialCapture({ raw }: { raw: unknown }) {
   const data = asRecord(raw);
+  const observation = asRecord(data?.commercialObservation);
+  if (observation) return <div className="space-y-1 border-l-2 border-slate-700 pl-2"><p>Screenshot item price: {fieldValue(observation.displayedPriceText)}</p><p>Screenshot shipping: {fieldValue(observation.displayedShippingText)}</p><p>Shipping destination: {fieldValue(observation.shippingDestination)}</p><p>Observation date: {fieldValue(observation.observationDate)}</p><p className="text-amber-200">Unverified screenshot observation. Item price is approximate; checkout price and shipping applicability are unknown. No catalogue offer is published.</p></div>;
   if (!data || !(data.schema === 'dial-designer/aliexpress-capture/v1' || (typeof data.supplierId === 'string' && typeof data.productId === 'string'))) return null;
   const price = data.schema ? asRecord(data.itemPrice) : { amount: data.unitPrice, currency: data.currency };
   const shipping = data.schema ? asRecord(data.shipping) : { amount: data.shippingPrice, currency: data.shippingCurrency ?? data.currency };
